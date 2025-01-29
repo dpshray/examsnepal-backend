@@ -51,22 +51,33 @@ class AuthController extends Controller
     }
 
     public function verifyEmail(Request $request)
-    {
-        $user = User::find($request->id);
+{
+    $user = User::find($request->id);
 
-        if (!$user) {
-            return response()->json(['message' => 'User not found.'], 404);
-        }
-
-        if ($user->email_verified_at) {
-            return response()->json(['message' => 'Email already verified.'], 200);
-        }
-
-        if ($request->hasValidSignature()) {
-            $user->markEmailAsVerified();
-            return response()->json(['message' => 'Email verified successfully.'], 200);
-        }
-
-        return response()->json(['message' => 'Invalid or expired verification link.'], 400);
+    if (!$user) {
+        return response()->json(['message' => 'User not found.'], 404);
     }
+
+    $loginUrl = env('FRONTEND_URL') . '/login';
+
+    if ($user->email_verified_at) {
+        return response()->json([
+            'message' => 'Email already verified.',
+            'login_url' => $loginUrl
+        ], 200);
+    }
+
+    if ($request->hasValidSignature()) {
+        $user->markEmailAsVerified();
+
+        return response()->json([
+            'message' => 'Email verified successfully.',
+            'login_url' => $loginUrl
+        ], 200);
+    }
+
+    return response()->json(['message' => 'Invalid or expired verification link.'], 400);
+}
+
+
 }
