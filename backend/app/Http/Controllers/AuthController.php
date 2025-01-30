@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 use App\Models\User;
+use App\Models\StudentProfile; 
+use Illuminate\Support\Facades\Auth; 
+use Tymon\JWTAuth\Facades\JWTAuth; 
 
 class AuthController extends Controller
 {
@@ -79,5 +82,83 @@ class AuthController extends Controller
     return response()->json(['message' => 'Invalid or expired verification link.'], 400);
 }
 
+public function loginStudent(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
+
+    $credentials = $request->only('email', 'password');
+
+    // Debugging: Check if the student exists
+    $student = StudentProfile::where('email', $credentials['email'])->first();
+
+    if (!$student) {
+        return response()->json(['error' => 'Student not found'], 404);
+    }
+
+    // Debugging: Check if the password is correct
+    if (!Hash::check($credentials['password'], $student->password)) {
+        return response()->json([
+            'error' => 'Incorrect password',
+        ], 401);
+    }
+
+    // Attempt to generate a token
+    if (!$token = Auth::guard('api')->attempt($credentials)) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    return $this->respondWithToken($token);
+}
+
+   
+    public function me()
+    {
+        return response()->json(Auth::guard('api')->user());
+    }
+
+  
+    public function logoutStudent()
+    {
+        try {
+            // Invalidate the current JWT token
+            JWTAuth::invalidate(JWTAuth::getToken());
+    
+            return response()->json(['message' => 'Successfully logged out']);
+        } catch (\Exception $e) {
+            \Log::error('JWT Logout Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Could not log out'], 500);
+        }
+    }
+    
+
+    
+public function refreshStudent()
+{
+    try {
+        $newToken = Auth::guard('api')->refresh();
+        return $this->respondWithToken($newToken);
+    } catch (\Exception $e) {
+        \Log::error('JWT Refresh Error: ' . $e->getMessage());
+        return response()->json(['error' => 'Could not refresh token'], 500);
+    }
+}
+
+    
+
+  
+    protected function respondWithToken($token)
+    {
+        $student = Auth::guard('api')->user(); 
+    
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            'student' => $student, 
+        ]);
+    }
 
 }

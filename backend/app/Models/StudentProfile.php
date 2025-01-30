@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable; 
+use Tymon\JWTAuth\Contracts\JWTSubject; 
 use Illuminate\Database\Eloquent\Model;
 
-class StudentProfile extends Model
+class StudentProfile extends Authenticatable implements JWTSubject
 {
     use HasFactory;
 
@@ -15,4 +17,15 @@ class StudentProfile extends Model
 
     protected $hidden = ['password'];
 
+    // Required for JWT
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    // Required for JWT
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 }

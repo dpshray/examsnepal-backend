@@ -35,12 +35,18 @@ return [
     |
     */
 
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
+ 'guards' => [
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'users',
     ],
+
+    // Add this guard for JWT authentication
+    'api' => [
+        'driver' => 'jwt',
+        'provider' => 'students',
+    ],
+],
 
     /*
     |--------------------------------------------------------------------------
@@ -59,17 +65,17 @@ return [
     |
     */
 
-    'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
-        ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+'providers' => [
+    'users' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
     ],
+
+    'students' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\StudentProfile::class,
+    ],
+],
 
     /*
     |--------------------------------------------------------------------------
