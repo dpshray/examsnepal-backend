@@ -22,7 +22,7 @@ class AuthenticateApi extends Middleware
      */
     public function handle($request, \Closure $next, ...$guards)
     {
-        Log::info('AuthenticateApi middleware executed.'); // Add this line
+   
         return parent::handle($request, $next, ...$guards);
     }
 
@@ -37,7 +37,6 @@ class AuthenticateApi extends Middleware
      */
     protected function unauthenticated($request, array $guards)
     {
-        Log::info('Unauthenticated request detected.'); // Add this line
         return response()->json(['error' => 'Unauthenticated.'], 401);
     }
 }

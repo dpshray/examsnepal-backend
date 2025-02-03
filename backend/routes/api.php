@@ -1,6 +1,8 @@
 <?php
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentProfileController;
+use App\Http\Controllers\Api\ForumController;
+use Illuminate\Support\Facades\Route;
 
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
@@ -19,4 +21,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/student/logout', [AuthController::class, 'logoutStudent']);
     Route::post('/student/refresh', [AuthController::class, 'refreshStudent']);
     Route::get('/student/me', [AuthController::class, 'me']);
+});
+
+Route::middleware(['auth:api'])->group(function () {
+    Route::get('/student/questions', [ForumController::class, 'fetchQuestions']);
+    Route::post('/student/addquestion', [ForumController::class, 'addQuestion']);
 });
