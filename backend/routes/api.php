@@ -26,4 +26,12 @@ Route::middleware('auth:api')->group(function () {
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/student/questions', [ForumController::class, 'fetchQuestions']);
     Route::post('/student/addquestion', [ForumController::class, 'addQuestion']);
+    Route::get('/student/questions/{id}',[ForumController::class, 'getQuestionById']);
+    Route::put('/student/questions/edit/{id}',[ForumController::class, 'updateQuestion']);
+    Route::get('/student/questions/their/{id}',[ForumController::class, 'getQuestionByTheirId']);
+    Route::get('/student/questions/{subStream}', [ForumController::class, 'fetchQuestionsBySubstream']);
+    Route::delete('/student/questions/{id}', [ForumController::class, 'deleteTheirQuestionCreated']);
 });
+// Route::get('/documentation', function () {
+//     return view('vendor.l5-swagger.index');
+// })->withoutMiddleware('auth:api');
