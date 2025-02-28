@@ -22,6 +22,7 @@ class AuthenticateApi extends Middleware
      */
     public function handle($request, \Closure $next, ...$guards)
     {
+        
    
         return parent::handle($request, $next, ...$guards);
     }

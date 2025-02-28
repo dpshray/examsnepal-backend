@@ -20,7 +20,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'fullname' => 'required|string|max:255',
             'email' => 'required|string|email',
-            'role' => 'required|string',
+            'role' => 'required|string', 
         ]);
 
         // If validation fails, return the error response
@@ -82,6 +82,47 @@ class AuthController extends Controller
     return response()->json(['message' => 'Invalid or expired verification link.'], 400);
 }
 
+/**
+ * @OA\Post(
+ *     path="/student/login",
+ *     summary="Login Student",
+ *     description="Authenticate a student and return a JWT token",
+ *     operationId="loginStudent",
+ *     tags={"Student Authentication"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"email","password"},
+ *             @OA\Property(property="email", type="string", format="email", example="student@example.com"),
+ *             @OA\Property(property="password", type="string", format="password", example="password123")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful Login",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="access_token", type="string", example="your_generated_jwt_token"),
+ *             @OA\Property(property="token_type", type="string", example="bearer"),
+ *             @OA\Property(property="expires_in", type="integer", example=3600)
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Unauthorized",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Incorrect password")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Student Not Found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Student not found")
+ *         )
+ *     )
+ * )
+ */
+
 public function loginStudent(Request $request)
 {
     $request->validate([
@@ -90,7 +131,6 @@ public function loginStudent(Request $request)
     ]);
 
     $credentials = $request->only('email', 'password');
-
     // Debugging: Check if the student exists
     $student = StudentProfile::where('email', $credentials['email'])->first();
 
@@ -111,6 +151,8 @@ public function loginStudent(Request $request)
     }
 
     return $this->respondWithToken($token);
+    // return $this->respondWithToken($credentials);
+
 }
 
    
