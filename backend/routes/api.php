@@ -25,6 +25,7 @@ Route::middleware('auth:api')->group(function () {
 
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/student/questions', [ForumController::class, 'fetchQuestions']);
+    Route::get('/student/myquestions', [ForumController::class, 'fetchMyQuestions']);
     Route::post('/student/addquestion', [ForumController::class, 'addQuestion']);
     Route::get('/student/questions/{id}',[ForumController::class, 'getQuestionById']);
     Route::put('/student/questions/edit/{id}',[ForumController::class, 'updateQuestion']);

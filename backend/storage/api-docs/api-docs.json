@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://my-default-host.com",
+            "url": "http://192.168.1.71:8000/api",
             "description": "Localhost API Server"
         }
     ],
@@ -22,6 +22,28 @@
                 "responses": {
                     "200": {
                         "description": "List of questions"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/student/myquestions": {
+            "get": {
+                "tags": [
+                    "Forum"
+                ],
+                "summary": "Fetch all questions created by me",
+                "operationId": "c9e58b3446dbf1f37afac09db1dcf2c6",
+                "responses": {
+                    "200": {
+                        "description": "List of questions created by me"
                     },
                     "401": {
                         "description": "Unauthorized"
