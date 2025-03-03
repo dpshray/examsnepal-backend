@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://192.168.1.71:8000/api",
+            "url": "http://192.168.1.78:8000/api",
             "description": "Localhost API Server"
         }
     ],
@@ -652,12 +652,12 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "student@example.com"
+                                        "example": "dhurbac66@gmail.com"
                                     },
                                     "password": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "password123"
+                                        "example": "Nepal123#"
                                     }
                                 },
                                 "type": "object"
@@ -723,6 +723,55 @@
                         }
                     }
                 }
+            }
+        },
+        "/student/logout": {
+            "post": {
+                "tags": [
+                    "Student Authentication"
+                ],
+                "summary": "Logout Student",
+                "description": "Invalidates the JWT token to log out the student.",
+                "operationId": "29c81c6c2100cbaaa3bd5bbcdf69c26b",
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfully logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Could not log out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Could not log out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/student/register": {

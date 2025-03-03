@@ -93,8 +93,8 @@ class AuthController extends Controller
  *         required=true,
  *         @OA\JsonContent(
  *             required={"email","password"},
- *             @OA\Property(property="email", type="string", format="email", example="student@example.com"),
- *             @OA\Property(property="password", type="string", format="password", example="password123")
+ *             @OA\Property(property="email", type="string", format="email", example="dhurbac66@gmail.com"),
+ *             @OA\Property(property="password", type="string", format="password", example="Nepal123#")
  *         )
  *     ),
  *     @OA\Response(
@@ -161,6 +161,29 @@ public function loginStudent(Request $request)
         return response()->json(Auth::guard('api')->user());
     }
 
+    /**
+     * @OA\Post(
+     *     path="/student/logout",
+     *     summary="Logout Student",
+     *     description="Invalidates the JWT token to log out the student.",
+     *     tags={"Student Authentication"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully logged out",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Successfully logged out")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Could not log out",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Could not log out")
+     *         )
+     *     )
+     * )
+     */
   
     public function logoutStudent()
     {
