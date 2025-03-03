@@ -17,8 +17,8 @@ use Illuminate\Http\JsonResponse;
  *     description="API Endpoints for Forum Questions"
  * )
  * 
- * @OA\Server(
- *     url=L5_SWAGGER_CONST_HOST,
+ * @OA\Server( 
+ *     url="https://api.examsnepal.dworklabs.com/api",
  *     description="Localhost API Server"
  * )
  * 
@@ -83,6 +83,50 @@ class ForumController extends Controller
 
         // Fetch questions where the stream matches the student's exam_type
         $questions = ForumQuestion::where('stream', $studentProfile->exam_type)
+            ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
+            ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
+            ->withCount('answers')
+            ->get();
+
+        return response()->json($questions);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/student/myquestions",
+     *     tags={"Forum"},
+     *     summary="Fetch all questions created by me",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of questions created by me"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
+
+    public function fetchMyQuestions()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // Fetch the student profile using the logged-in user's id
+        $studentProfile = StudentProfile::find($user->id);
+
+        if (!$studentProfile) {
+            return response()->json(['message' => 'Student profile not found'], 404);
+        }
+
+        // Fetch questions where the stream matches the student's exam_type
+        $questions = ForumQuestion::where('stream', $studentProfile->exam_type)
+            ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
+            ->where('user_id', $studentProfile->id)
             ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
             ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
             ->withCount('answers')

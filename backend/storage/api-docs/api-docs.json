@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://my-default-host.com",
+            "url": "http://192.168.1.78:8000/api",
             "description": "Localhost API Server"
         }
     ],
@@ -22,6 +22,28 @@
                 "responses": {
                     "200": {
                         "description": "List of questions"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/student/myquestions": {
+            "get": {
+                "tags": [
+                    "Forum"
+                ],
+                "summary": "Fetch all questions created by me",
+                "operationId": "c9e58b3446dbf1f37afac09db1dcf2c6",
+                "responses": {
+                    "200": {
+                        "description": "List of questions created by me"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -630,12 +652,12 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "student@example.com"
+                                        "example": "dhurbac66@gmail.com"
                                     },
                                     "password": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "password123"
+                                        "example": "Nepal123#"
                                     }
                                 },
                                 "type": "object"
@@ -701,6 +723,112 @@
                         }
                     }
                 }
+            }
+        },
+        "/student/logout": {
+            "post": {
+                "tags": [
+                    "Student Authentication"
+                ],
+                "summary": "Logout Student",
+                "description": "Invalidates the JWT token to log out the student.",
+                "operationId": "29c81c6c2100cbaaa3bd5bbcdf69c26b",
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfully logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Could not log out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Could not log out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/student/refresh": {
+            "post": {
+                "tags": [
+                    "Student Authentication"
+                ],
+                "summary": "Refresh Student Token",
+                "description": "Generates a new access token using the old (expired) token.",
+                "operationId": "b45cf46ec135be91f9deab8ec873a7b2",
+                "responses": {
+                    "200": {
+                        "description": "New access token generated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer",
+                                            "example": 3600
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Could not refresh token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Could not refresh token"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/student/register": {
