@@ -2,6 +2,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\Api\ForumController;
+use App\Http\Controllers\ExamTypeController;
+use App\Http\Controllers\OrganizationController;
 use Illuminate\Support\Facades\Route;
 
 // Registration route
@@ -32,7 +34,29 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/student/questions/their/{id}',[ForumController::class, 'getQuestionByTheirId']);
     Route::get('/student/questions/{subStream}', [ForumController::class, 'fetchQuestionsBySubstream']);
     Route::delete('/student/questions/{id}', [ForumController::class, 'deleteTheirQuestionCreated']);
+
+    // for exam type
+    Route::post('/exam-types', [ExamTypeController::class, 'store']);
+    Route::get('/exam-types/{id}', [ExamTypeController::class, 'show']);
+    Route::put('/exam-types/{id}', [ExamTypeController::class, 'update']);
+    Route::delete('/exam-types/{id}', [ExamTypeController::class, 'destroy']);
+
+    // for Organization
+    Route::get('/organization',[OrganizationController::class, 'index']);
+    Route::post('/organization',[OrganizationController::class, 'store']);
+    Route::get('/organization/{id}',[OrganizationController::class, 'show']);
+    Route::put('/organization/{id}',[OrganizationController::class, 'update']);
+    Route::delete('/organization/{id}',[OrganizationController::class, 'destroy']);
+
+
+
+
+
 });
+
+// for exam type
+Route::get('/exam-types', [ExamTypeController::class, 'index']);
+
 // Route::get('/documentation', function () {
 //     return view('vendor.l5-swagger.index');
 // })->withoutMiddleware('auth:api');
