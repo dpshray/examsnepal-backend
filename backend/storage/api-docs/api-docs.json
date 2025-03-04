@@ -831,6 +831,369 @@
                 ]
             }
         },
+        "/bookmarks": {
+            "get": {
+                "tags": [
+                    "Bookmarks"
+                ],
+                "summary": "Get all bookmarks with associated forum questions",
+                "description": "This endpoint retrieves all bookmarks and includes associated forum questions.",
+                "operationId": "getAllBookmarks",
+                "responses": {
+                    "200": {
+                        "description": "Bookmarks and their associated forum questions retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "description": "The unique ID of the bookmark",
+                                                "type": "integer"
+                                            },
+                                            "student_id": {
+                                                "description": "The ID of the student who created the bookmark",
+                                                "type": "integer"
+                                            },
+                                            "title": {
+                                                "description": "The title of the bookmark",
+                                                "type": "string"
+                                            },
+                                            "url": {
+                                                "description": "The URL of the bookmark",
+                                                "type": "string"
+                                            },
+                                            "created_at": {
+                                                "description": "Creation timestamp of the bookmark",
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "description": "Last update timestamp of the bookmark",
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "question": {
+                                                "properties": {
+                                                    "id": {
+                                                        "description": "The unique ID of the forum question",
+                                                        "type": "integer"
+                                                    },
+                                                    "title": {
+                                                        "description": "The title of the forum question",
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "description": "The content of the forum question",
+                                                        "type": "string"
+                                                    },
+                                                    "created_at": {
+                                                        "description": "Creation timestamp of the forum question",
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "description": "Last update timestamp of the forum question",
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No bookmarks found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Bookmarks"
+                ],
+                "summary": "Create a new bookmark",
+                "description": "Stores a new bookmark.",
+                "operationId": "storeBookmark",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "exam_id",
+                                    "question_id"
+                                ],
+                                "properties": {
+                                    "student_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "exam_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "question_id": {
+                                        "type": "integer",
+                                        "example": 101
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Bookmark created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Bookmark created successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "student_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "exam_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_id": {
+                                                    "type": "integer",
+                                                    "example": 101
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/bookmarks/{id}": {
+            "delete": {
+                "tags": [
+                    "Bookmarks"
+                ],
+                "summary": "Delete a bookmark",
+                "operationId": "deleteBookmark",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bookmark deleted successfully"
+                    },
+                    "404": {
+                        "description": "Bookmark not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/bookmarks/student/{id}": {
+            "get": {
+                "tags": [
+                    "Bookmarks"
+                ],
+                "summary": "Get bookmarks by student ID",
+                "description": "This endpoint retrieves all bookmarks for a specific student based on their student ID.",
+                "operationId": "getBookmarksByStudent",
+                "parameters": [
+                    {
+                        "name": "student_id",
+                        "in": "path",
+                        "description": "ID of the student to get the bookmarks for",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bookmarks retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "student_id": {
+                                                "type": "integer"
+                                            },
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "url": {
+                                                "type": "string"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No bookmarks found for the given student ID"
+                    },
+                    "400": {
+                        "description": "Invalid student ID provided"
+                    }
+                }
+            }
+        },
+        "/bookmarks/allmy": {
+            "get": {
+                "tags": [
+                    "Bookmarks"
+                ],
+                "summary": "Get all bookmarks for the authenticated user",
+                "description": "Fetches all bookmarks for the authenticated user.",
+                "operationId": "getAllMyBookmarks",
+                "responses": {
+                    "200": {
+                        "description": "Bookmarks retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "student_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "question_id": {
+                                                "type": "integer",
+                                                "example": 101
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-03-04T12:00:00Z"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-03-04T12:00:00Z"
+                                            },
+                                            "question": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 101
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "What is Laravel?"
+                                                    },
+                                                    "body": {
+                                                        "type": "string",
+                                                        "example": "Can someone explain what Laravel is?"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "User not Authenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No bookmarks found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "No bookmarks found for the given student ID"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/exam": {
             "get": {
                 "tags": [
@@ -2613,6 +2976,10 @@
         {
             "name": "Student Authentication",
             "description": "Student Authentication"
+        },
+        {
+            "name": "Bookmarks",
+            "description": "Bookmarks"
         },
         {
             "name": "Exams",

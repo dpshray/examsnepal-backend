@@ -2,6 +2,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\Api\ForumController;
+use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ExamTypeController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ExamController;
@@ -55,6 +56,15 @@ Route::middleware(['auth:api'])->group(function () {
     Route::delete('/exam/{id}',[ExamController::class, 'destroy']);
     Route::post('/exam',[ExamController::class, 'store']);
     Route::get('/exam/{id}',[ExamController::class, 'show']);
+
+    // for bookmarks
+    Route::get('/bookmarks',[BookmarkController::class,'index']);
+    Route::post('/bookmarks',[BookmarkController::class,'store']);
+    Route::delete('/bookmarks/{id}',[BookmarkController::class,'destroy']);
+    Route::get('/bookmarks/student/{id}',[BookmarkController::class,'getBookmarksByStudent']);
+    Route::get('/bookmarks/allmy',[BookmarkController::class,'getAllMyBookmarks']);
+
+
 
 });
 
