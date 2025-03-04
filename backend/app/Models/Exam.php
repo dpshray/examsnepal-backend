@@ -28,4 +28,9 @@ class Exam extends Model
     {
         return $this->belongsTo(ExamType::class); // Each Exam belongs to an Exam Type
     }
+
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
 }
