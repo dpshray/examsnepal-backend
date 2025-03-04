@@ -4,6 +4,8 @@ use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\Api\ForumController;
 use App\Http\Controllers\ExamTypeController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\ExamController;
+
 use Illuminate\Support\Facades\Route;
 
 // Registration route
@@ -40,7 +42,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/exam-types/{id}', [ExamTypeController::class, 'show']);
     Route::put('/exam-types/{id}', [ExamTypeController::class, 'update']);
     Route::delete('/exam-types/{id}', [ExamTypeController::class, 'destroy']);
-
+    
     // for Organization
     Route::get('/organization',[OrganizationController::class, 'index']);
     Route::post('/organization',[OrganizationController::class, 'store']);
@@ -48,9 +50,11 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/organization/{id}',[OrganizationController::class, 'update']);
     Route::delete('/organization/{id}',[OrganizationController::class, 'destroy']);
 
-
-
-
+    // for Exam
+    Route::get('/exam',[ExamController::class, 'index']);
+    Route::delete('/exam/{id}',[ExamController::class, 'destroy']);
+    Route::post('/exam',[ExamController::class, 'store']);
+    Route::get('/exam/{id}',[ExamController::class, 'show']);
 
 });
 

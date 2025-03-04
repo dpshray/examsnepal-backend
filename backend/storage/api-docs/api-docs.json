@@ -831,6 +831,626 @@
                 ]
             }
         },
+        "/exam": {
+            "get": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Get all exams",
+                "description": "Fetches a list of exams along with their associated organizations and exam types.",
+                "operationId": "getExams",
+                "responses": {
+                    "200": {
+                        "description": "List of exams retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "exam_name": {
+                                                "type": "string",
+                                                "example": "Math Final"
+                                            },
+                                            "exam_date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2025-06-10"
+                                            },
+                                            "organization": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "ABC University"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "examType": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Final Exam"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Create a new exam",
+                "description": "Store a new exam in the database.",
+                "operationId": "storeExam",
+                "requestBody": {
+                    "description": "Exam data to be stored",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "organization_id",
+                                    "exam_type_id",
+                                    "name",
+                                    "exam_date",
+                                    "exam_time"
+                                ],
+                                "properties": {
+                                    "organization_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "exam_type_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Mathematics Final Exam"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "A detailed mathematics final exam."
+                                    },
+                                    "exam_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-06-15"
+                                    },
+                                    "exam_time": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "09:00:00"
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "price": {
+                                        "type": "integer",
+                                        "example": 500
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Exam created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Exam created successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "organization_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "exam_type_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Mathematics Final Exam"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "A detailed mathematics final exam."
+                                                },
+                                                "exam_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2025-06-15"
+                                                },
+                                                "exam_time": {
+                                                    "type": "string",
+                                                    "format": "time",
+                                                    "example": "09:00:00"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "price": {
+                                                    "type": "integer",
+                                                    "example": 500
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-01-01T12:00:00"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-01-01T12:00:00"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Failed to store exam"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/exam/{id}": {
+            "get": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Get an exam by ID",
+                "description": "Retrieve the details of a specific exam by its ID.",
+                "operationId": "getExamById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the exam to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "exam_date": {
+                                            "type": "string",
+                                            "format": "date"
+                                        },
+                                        "exam_time": {
+                                            "type": "string",
+                                            "format": "time"
+                                        },
+                                        "is_active": {
+                                            "type": "boolean"
+                                        },
+                                        "price": {
+                                            "type": "integer"
+                                        },
+                                        "organization": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "exam_type": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Exam not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Exam not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Failed to retrieve exam"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Update an existing exam",
+                "description": "Update an exam's details in the database.",
+                "operationId": "updateExam",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the exam to be updated",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Exam data to be updated",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "organization_id",
+                                    "exam_type_id",
+                                    "name",
+                                    "exam_date",
+                                    "exam_time"
+                                ],
+                                "properties": {
+                                    "organization_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "exam_type_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Updated Mathematics Final Exam"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated description of the mathematics final exam."
+                                    },
+                                    "exam_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-07-15"
+                                    },
+                                    "exam_time": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "10:00:00"
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "price": {
+                                        "type": "integer",
+                                        "example": 600
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Exam updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Exam updated successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "organization_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "exam_type_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Updated Mathematics Final Exam"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Updated description of the mathematics final exam."
+                                                },
+                                                "exam_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2025-07-15"
+                                                },
+                                                "exam_time": {
+                                                    "type": "string",
+                                                    "format": "time",
+                                                    "example": "10:00:00"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "price": {
+                                                    "type": "integer",
+                                                    "example": 600
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-01-01T12:00:00"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-07-01T12:00:00"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Exam not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Exam not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Failed to update exam"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Delete an exam by ID",
+                "description": "Delete an exam from the database by its ID.",
+                "operationId": "deleteExam",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the exam to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Exam deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Exam not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Exam not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Failed to delete exam"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/exam-types": {
             "get": {
                 "tags": [
@@ -1993,6 +2613,10 @@
         {
             "name": "Student Authentication",
             "description": "Student Authentication"
+        },
+        {
+            "name": "Exams",
+            "description": "Exams"
         },
         {
             "name": "Exam Types",

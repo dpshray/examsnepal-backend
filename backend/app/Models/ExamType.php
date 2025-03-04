@@ -12,4 +12,9 @@ class ExamType extends Model
 
     protected $fillable = ['name', 'is_active'];
 
+    public function exams()
+    {
+        return $this->hasMany(Exam::class); // One Exam Type has many Exams
+    }
+
 }
