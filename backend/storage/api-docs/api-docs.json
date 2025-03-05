@@ -2832,6 +2832,880 @@
                 }
             }
         },
+        "/questions": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Get questions based on user's exam type",
+                "description": "Retrieve all questions where the exam's exam_type matches the authenticated user's exam_type.",
+                "operationId": "getQuestionsByExamType",
+                "responses": {
+                    "200": {
+                        "description": "Questions retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Questions retrieved successfully!"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "exam_id": {
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    },
+                                                    "question": {
+                                                        "type": "string",
+                                                        "example": "What is Laravel?"
+                                                    },
+                                                    "option_1": {
+                                                        "type": "string",
+                                                        "example": "A PHP framework"
+                                                    },
+                                                    "option_value_1": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "option_2": {
+                                                        "type": "string",
+                                                        "example": "A JavaScript library"
+                                                    },
+                                                    "option_value_2": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "option_3": {
+                                                        "type": "string",
+                                                        "example": "An operating system"
+                                                    },
+                                                    "option_value_3": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "option_4": {
+                                                        "type": "string",
+                                                        "example": "A database system"
+                                                    },
+                                                    "option_value_4": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "explanation": {
+                                                        "type": "string",
+                                                        "example": "Laravel is a PHP framework used for web development."
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-03-05T12:30:00Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-03-05T12:45:00Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Student profile not found or no exams found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Student profile not found or No exams found for this exam type"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Create a new question",
+                "description": "This endpoint allows users to create a new question.",
+                "operationId": "storeQuestion",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "exam_id",
+                                    "question",
+                                    "option_1",
+                                    "option_value_1",
+                                    "option_2",
+                                    "option_value_2"
+                                ],
+                                "properties": {
+                                    "exam_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "question": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "What is the capital of Nepal?"
+                                    },
+                                    "option_1": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Kathmandu"
+                                    },
+                                    "option_value_1": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "option_2": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Pokhara"
+                                    },
+                                    "option_value_2": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "option_3": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Lalitpur",
+                                        "nullable": true
+                                    },
+                                    "option_value_3": {
+                                        "type": "boolean",
+                                        "example": true,
+                                        "nullable": true
+                                    },
+                                    "option_4": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Bhaktapur",
+                                        "nullable": true
+                                    },
+                                    "option_value_4": {
+                                        "type": "boolean",
+                                        "example": false,
+                                        "nullable": true
+                                    },
+                                    "explanation": {
+                                        "type": "string",
+                                        "example": "Kathmandu is the capital of Nepal.",
+                                        "nullable": true
+                                    },
+                                    "subject": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Geography",
+                                        "nullable": true
+                                    },
+                                    "exam_type": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "MCQ",
+                                        "nullable": true
+                                    },
+                                    "remark": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Important question",
+                                        "nullable": true
+                                    },
+                                    "serial": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "old_exam_id": {
+                                        "type": "integer",
+                                        "example": 123,
+                                        "nullable": true
+                                    },
+                                    "uploader": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "mark_type": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Numerical",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Question created successfully!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question created successfully!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "exam_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question": {
+                                                    "type": "string",
+                                                    "example": "What is the capital of Nepal?"
+                                                },
+                                                "option_1": {
+                                                    "type": "string",
+                                                    "example": "Kathmandu"
+                                                },
+                                                "option_value_1": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "option_2": {
+                                                    "type": "string",
+                                                    "example": "Pokhara"
+                                                },
+                                                "option_value_2": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "option_3": {
+                                                    "type": "string",
+                                                    "example": "Lalitpur",
+                                                    "nullable": true
+                                                },
+                                                "option_value_3": {
+                                                    "type": "boolean",
+                                                    "example": true,
+                                                    "nullable": true
+                                                },
+                                                "option_4": {
+                                                    "type": "string",
+                                                    "example": "Bhaktapur",
+                                                    "nullable": true
+                                                },
+                                                "option_value_4": {
+                                                    "type": "boolean",
+                                                    "example": false,
+                                                    "nullable": true
+                                                },
+                                                "explanation": {
+                                                    "type": "string",
+                                                    "example": "Kathmandu is the capital of Nepal.",
+                                                    "nullable": true
+                                                },
+                                                "subject": {
+                                                    "type": "string",
+                                                    "example": "Geography",
+                                                    "nullable": true
+                                                },
+                                                "exam_type": {
+                                                    "type": "string",
+                                                    "example": "MCQ",
+                                                    "nullable": true
+                                                },
+                                                "remark": {
+                                                    "type": "string",
+                                                    "example": "Important question",
+                                                    "nullable": true
+                                                },
+                                                "serial": {
+                                                    "type": "integer",
+                                                    "example": 1,
+                                                    "nullable": true
+                                                },
+                                                "old_exam_id": {
+                                                    "type": "integer",
+                                                    "example": 123,
+                                                    "nullable": true
+                                                },
+                                                "uploader": {
+                                                    "type": "integer",
+                                                    "example": 1,
+                                                    "nullable": true
+                                                },
+                                                "mark_type": {
+                                                    "type": "string",
+                                                    "example": "Numerical",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create Question",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to create Question. Please try again."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Database error or other internal error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/questions/{id}": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Get a question by ID",
+                "description": "This endpoint allows users to retrieve a specific question by its ID.",
+                "operationId": "showQuestion",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of the question to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Question retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question retrieved successfully!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "exam_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question": {
+                                                    "type": "string",
+                                                    "example": "What is the capital of Nepal?"
+                                                },
+                                                "option_1": {
+                                                    "type": "string",
+                                                    "example": "Kathmandu"
+                                                },
+                                                "option_value_1": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "option_2": {
+                                                    "type": "string",
+                                                    "example": "Pokhara"
+                                                },
+                                                "option_value_2": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "option_3": {
+                                                    "type": "string",
+                                                    "example": "Lalitpur",
+                                                    "nullable": true
+                                                },
+                                                "option_value_3": {
+                                                    "type": "boolean",
+                                                    "example": true,
+                                                    "nullable": true
+                                                },
+                                                "option_4": {
+                                                    "type": "string",
+                                                    "example": "Bhaktapur",
+                                                    "nullable": true
+                                                },
+                                                "option_value_4": {
+                                                    "type": "boolean",
+                                                    "example": false,
+                                                    "nullable": true
+                                                },
+                                                "explanation": {
+                                                    "type": "string",
+                                                    "example": "Kathmandu is the capital of Nepal.",
+                                                    "nullable": true
+                                                },
+                                                "subject": {
+                                                    "type": "string",
+                                                    "example": "Geography",
+                                                    "nullable": true
+                                                },
+                                                "exam_type": {
+                                                    "type": "string",
+                                                    "example": "MCQ",
+                                                    "nullable": true
+                                                },
+                                                "remark": {
+                                                    "type": "string",
+                                                    "example": "Important question",
+                                                    "nullable": true
+                                                },
+                                                "serial": {
+                                                    "type": "integer",
+                                                    "example": 1,
+                                                    "nullable": true
+                                                },
+                                                "old_exam_id": {
+                                                    "type": "integer",
+                                                    "example": 123,
+                                                    "nullable": true
+                                                },
+                                                "uploader": {
+                                                    "type": "integer",
+                                                    "example": 1,
+                                                    "nullable": true
+                                                },
+                                                "mark_type": {
+                                                    "type": "string",
+                                                    "example": "Numerical",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Question not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question not found"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "No question found with the given ID"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve the question",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to retrieve the question. Please try again."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Database error or other internal error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Update a question",
+                "description": "Update an existing question by ID.",
+                "operationId": "updateExamQuestion",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of the question to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "exam_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "question": {
+                                        "type": "string",
+                                        "example": "What is the capital of Nepal?"
+                                    },
+                                    "option_1": {
+                                        "type": "string",
+                                        "example": "Kathmandu"
+                                    },
+                                    "option_value_1": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "option_2": {
+                                        "type": "string",
+                                        "example": "Pokhara"
+                                    },
+                                    "option_value_2": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "option_3": {
+                                        "type": "string",
+                                        "example": "Lalitpur",
+                                        "nullable": true
+                                    },
+                                    "option_value_3": {
+                                        "type": "boolean",
+                                        "example": true,
+                                        "nullable": true
+                                    },
+                                    "option_4": {
+                                        "type": "string",
+                                        "example": "Bhaktapur",
+                                        "nullable": true
+                                    },
+                                    "option_value_4": {
+                                        "type": "boolean",
+                                        "example": false,
+                                        "nullable": true
+                                    },
+                                    "explanation": {
+                                        "type": "string",
+                                        "example": "Kathmandu is the capital of Nepal.",
+                                        "nullable": true
+                                    },
+                                    "subject": {
+                                        "type": "string",
+                                        "example": "Geography",
+                                        "nullable": true
+                                    },
+                                    "exam_type": {
+                                        "type": "string",
+                                        "example": "MCQ",
+                                        "nullable": true
+                                    },
+                                    "remark": {
+                                        "type": "string",
+                                        "example": "Important question",
+                                        "nullable": true
+                                    },
+                                    "serial": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "old_exam_id": {
+                                        "type": "integer",
+                                        "example": 123,
+                                        "nullable": true
+                                    },
+                                    "uploader": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "mark_type": {
+                                        "type": "string",
+                                        "example": "Numerical",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Question updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question updated successfully!"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Question not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to update the question",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to update the question. Please try again."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Delete a question",
+                "description": "Delete a question by its ID.",
+                "operationId": "deleteExamQuestion",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of the question to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Question deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question deleted successfully!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Question not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to delete the question",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to delete the question. Please try again."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/student/register": {
             "post": {
                 "tags": [
@@ -2992,6 +3866,10 @@
         {
             "name": "Organizations",
             "description": "Organizations"
+        },
+        {
+            "name": "Questions",
+            "description": "Questions"
         }
     ],
     "components": {
