@@ -18,41 +18,44 @@ class QuestionController extends Controller
     /**
      * @OA\Get(
      *     path="/questions",
-     *     summary="Get questions based on user's exam type",
-     *     description="Retrieve all questions where the exam's exam_type matches the authenticated user's exam_type.",
-     *     operationId="getQuestionsByExamType",
+     *     operationId="getQuestions",
      *     tags={"Questions"},
-     *     security={{"bearerAuth":{}}}, 
+     *     summary="Get questions based on user exam type with pagination",
+     *     description="Fetches questions for the authenticated user based on their exam type, with pagination support.",
      *     @OA\Response(
      *         response=200,
      *         description="Questions retrieved successfully",
      *         @OA\JsonContent(
+     *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Questions retrieved successfully!"),
-     *             @OA\Property(property="data", type="array", @OA\Items(
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="question", type="string", example="What is PHP?"),
+     *                     @OA\Property(property="exam_id", type="integer", example=1)
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="pagination",
      *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="exam_id", type="integer", example=3),
-     *                 @OA\Property(property="question", type="string", example="What is Laravel?"),
-     *                 @OA\Property(property="option_1", type="string", example="A PHP framework"),
-     *                 @OA\Property(property="option_value_1", type="boolean", example=true),
-     *                 @OA\Property(property="option_2", type="string", example="A JavaScript library"),
-     *                 @OA\Property(property="option_value_2", type="boolean", example=false),
-     *                 @OA\Property(property="option_3", type="string", example="An operating system"),
-     *                 @OA\Property(property="option_value_3", type="boolean", example=false),
-     *                 @OA\Property(property="option_4", type="string", example="A database system"),
-     *                 @OA\Property(property="option_value_4", type="boolean", example=false),
-     *                 @OA\Property(property="explanation", type="string", example="Laravel is a PHP framework used for web development."),
-     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-03-05T12:30:00Z"),
-     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-03-05T12:45:00Z")
-     *             ))
+     *                 @OA\Property(property="total", type="integer", example=100),
+     *                 @OA\Property(property="per_page", type="integer", example=25),
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="last_page", type="integer", example=4),
+     *                 @OA\Property(property="next_page_url", type="string", example="http://your-api.com/api/questions?page=2"),
+     *                 @OA\Property(property="prev_page_url", type="string", example="null")
+     *             )
      *         )
      *     ),
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized",
      *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
+     *             type="object",
      *             @OA\Property(property="message", type="string", example="Unauthorized")
      *         )
      *     ),
@@ -60,10 +63,13 @@ class QuestionController extends Controller
      *         response=404,
      *         description="Student profile not found or no exams found",
      *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Student profile not found or No exams found for this exam type")
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Student profile not found")
      *         )
-     *     )
+     *     ),
+     *     security={
+     *         {"bearerAuth": {}}
+     *     }
      * )
      */
 
@@ -72,51 +78,89 @@ class QuestionController extends Controller
     {
         // Get authenticated user
         $user = Auth::user();
-
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
-
         // Fetch student's profile
         $studentProfile = StudentProfile::find($user->id);
-
         if (!$studentProfile) {
             return response()->json(['message' => 'Student profile not found'], 404);
         }
-
-        $userExamType = $studentProfile->exam_type; // This contains the exam_type value
-
-        // Get exam IDs by joining exams with exam_types table
-        // $examIds = Exam::whereHas('examType', function ($query) use ($userExamType) {
-        //     $query->where('exam_type', $userExamType);
-        // })->pluck('id');
+        $userExamType = $studentProfile->exam_type;
         $examType = ExamType::where('name', $userExamType)->first();
-
         if (!$examType) {
             return response()->json([
                 'success' => false,
                 'message' => 'Exam type not found in the system.'
             ], 404);
         }
-
         $examIds = Exam::where('exam_type_id', $examType->id)->pluck('id');
-
-
-
         if ($examIds->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'No exams found for this exam type.'
             ], 404);
         }
-
         // Get all questions that belong to these exams
-        $questions = Question::whereIn('exam_id', $examIds)->get();
-
+        $questions = Question::whereIn('exam_id', $examIds)->paginate(25);;
         return response()->json([
             'success' => true,
             'message' => 'Questions retrieved successfully!',
             'data' => $questions
+        ], 200);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/questions/all",
+     *     operationId="getAllQuestions",
+     *     tags={"Questions"},
+     *     summary="Get all questions",
+     *     description="Fetches all the questions from the database.",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Questions retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Questions retrieved successfully!"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="question", type="string", example="What is PHP?"),
+     *                     @OA\Property(property="exam_id", type="integer", example=1)
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No questions found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="No questions found")
+     *         )
+     *     )
+     * )
+     */
+
+    public function getAllQuestion()
+    {
+        $questions = Question::all();
+        if ($questions->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No questions found'
+            ], 404);
+        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Questions retrieved successfully!',
+            'data' => $questions,
         ], 200);
     }
 

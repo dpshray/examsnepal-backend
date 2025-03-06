@@ -2837,9 +2837,9 @@
                 "tags": [
                     "Questions"
                 ],
-                "summary": "Get questions based on user's exam type",
-                "description": "Retrieve all questions where the exam's exam_type matches the authenticated user's exam_type.",
-                "operationId": "getQuestionsByExamType",
+                "summary": "Get questions based on user exam type with pagination",
+                "description": "Fetches questions for the authenticated user based on their exam type, with pagination support.",
+                "operationId": "getQuestions",
                 "responses": {
                     "200": {
                         "description": "Questions retrieved successfully",
@@ -2863,63 +2863,46 @@
                                                         "type": "integer",
                                                         "example": 1
                                                     },
-                                                    "exam_id": {
-                                                        "type": "integer",
-                                                        "example": 3
-                                                    },
                                                     "question": {
                                                         "type": "string",
-                                                        "example": "What is Laravel?"
+                                                        "example": "What is PHP?"
                                                     },
-                                                    "option_1": {
-                                                        "type": "string",
-                                                        "example": "A PHP framework"
-                                                    },
-                                                    "option_value_1": {
-                                                        "type": "boolean",
-                                                        "example": true
-                                                    },
-                                                    "option_2": {
-                                                        "type": "string",
-                                                        "example": "A JavaScript library"
-                                                    },
-                                                    "option_value_2": {
-                                                        "type": "boolean",
-                                                        "example": false
-                                                    },
-                                                    "option_3": {
-                                                        "type": "string",
-                                                        "example": "An operating system"
-                                                    },
-                                                    "option_value_3": {
-                                                        "type": "boolean",
-                                                        "example": false
-                                                    },
-                                                    "option_4": {
-                                                        "type": "string",
-                                                        "example": "A database system"
-                                                    },
-                                                    "option_value_4": {
-                                                        "type": "boolean",
-                                                        "example": false
-                                                    },
-                                                    "explanation": {
-                                                        "type": "string",
-                                                        "example": "Laravel is a PHP framework used for web development."
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time",
-                                                        "example": "2025-03-05T12:30:00Z"
-                                                    },
-                                                    "updated_at": {
-                                                        "type": "string",
-                                                        "format": "date-time",
-                                                        "example": "2025-03-05T12:45:00Z"
+                                                    "exam_id": {
+                                                        "type": "integer",
+                                                        "example": 1
                                                     }
                                                 },
                                                 "type": "object"
                                             }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 25
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "example": "http://your-api.com/api/questions?page=2"
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "example": "null"
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -2933,10 +2916,6 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
                                         "message": {
                                             "type": "string",
                                             "example": "Unauthorized"
@@ -2953,13 +2932,9 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "Student profile not found or No exams found for this exam type"
+                                            "example": "Student profile not found"
                                         }
                                     },
                                     "type": "object"
@@ -3248,6 +3223,78 @@
                                         "error": {
                                             "type": "string",
                                             "example": "Database error or other internal error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/questions/all": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Get all questions",
+                "description": "Fetches all the questions from the database.",
+                "operationId": "getAllQuestions",
+                "responses": {
+                    "200": {
+                        "description": "Questions retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Questions retrieved successfully!"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "question": {
+                                                        "type": "string",
+                                                        "example": "What is PHP?"
+                                                    },
+                                                    "exam_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No questions found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No questions found"
                                         }
                                     },
                                     "type": "object"

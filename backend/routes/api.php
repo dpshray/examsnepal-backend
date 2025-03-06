@@ -67,11 +67,12 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/bookmarks/allmy', [BookmarkController::class, 'getAllMyBookmarks']);
 
     // for Questions
-    Route::post('questions', [QuestionController::class, 'store']);
-    Route::get('questions', [QuestionController::class, 'index']);
-    Route::get('questions/{id}', [QuestionController::class, 'show']);
-    Route::put('questions/{id}', [QuestionController::class, 'update']);
-    Route::delete('questions/{id}', [QuestionController::class, 'destroy']);
+    Route::post('/questions', [QuestionController::class, 'store']);
+    Route::get('/questions', [QuestionController::class, 'index']);
+    Route::get('/questions/all', [QuestionController::class, 'getAllQuestion']);
+    Route::get('/questions/{id}', [QuestionController::class, 'show']);
+    Route::put('/questions/{id}', [QuestionController::class, 'update']);
+    Route::delete('/questions/{id}', [QuestionController::class, 'destroy']);
 });
 
 // for exam type
