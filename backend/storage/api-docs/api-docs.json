@@ -2835,7 +2835,7 @@
         "/questions": {
             "get": {
                 "tags": [
-                    "Questions"
+                    "MCQs"
                 ],
                 "summary": "Get questions based on user exam type with pagination",
                 "description": "Fetches questions for the authenticated user based on their exam type, with pagination support.",
@@ -2951,7 +2951,7 @@
             },
             "post": {
                 "tags": [
-                    "Questions"
+                    "MCQs"
                 ],
                 "summary": "Create a new question",
                 "description": "This endpoint allows users to create a new question.",
@@ -3236,7 +3236,7 @@
         "/questions/all": {
             "get": {
                 "tags": [
-                    "Questions"
+                    "MCQs"
                 ],
                 "summary": "Get all questions",
                 "description": "Fetches all the questions from the database.",
@@ -3305,10 +3305,140 @@
                 }
             }
         },
+        "/search-questions": {
+            "get": {
+                "tags": [
+                    "MCQs"
+                ],
+                "summary": "Search MCQs by keyword",
+                "description": "Searches for multiple-choice questions (MCQs) based on a keyword using Full-Text Search.",
+                "operationId": "searchQuestions",
+                "parameters": [
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "description": "The keyword to search for MCQs",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Questions retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Questions retrieved successfully!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "question": {
+                                                                "type": "string",
+                                                                "example": "What is Laravel?"
+                                                            },
+                                                            "options": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "correct_answer": {
+                                                                "type": "string",
+                                                                "example": "A PHP framework"
+                                                            },
+                                                            "exam_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Keyword is required",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Keyword is required"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No questions found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No questions found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/questions/{id}": {
             "get": {
                 "tags": [
-                    "Questions"
+                    "MCQs"
                 ],
                 "summary": "Get a question by ID",
                 "description": "This endpoint allows users to retrieve a specific question by its ID.",
@@ -3491,7 +3621,7 @@
             },
             "put": {
                 "tags": [
-                    "Questions"
+                    "MCQs"
                 ],
                 "summary": "Update a question",
                 "description": "Update an existing question by ID.",
@@ -3672,7 +3802,7 @@
             },
             "delete": {
                 "tags": [
-                    "Questions"
+                    "MCQs"
                 ],
                 "summary": "Delete a question",
                 "description": "Delete a question by its ID.",
@@ -3915,8 +4045,8 @@
             "description": "Organizations"
         },
         {
-            "name": "Questions",
-            "description": "Questions"
+            "name": "MCQs",
+            "description": "MCQs"
         }
     ],
     "components": {

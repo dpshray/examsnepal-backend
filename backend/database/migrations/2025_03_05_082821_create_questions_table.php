@@ -31,6 +31,8 @@ return new class extends Migration
             $table->unsignedBigInteger('old_exam_id')->nullable();
             $table->foreignId('uploader')->constrained('users')->onDelete('cascade'); // Assuming uploader is a user
             $table->string('mark_type')->nullable();
+            $table->fullText('question');
+
             $table->timestamps();
         });
     }
