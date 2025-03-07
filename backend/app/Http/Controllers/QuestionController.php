@@ -19,7 +19,7 @@ class QuestionController extends Controller
      * @OA\Get(
      *     path="/questions",
      *     operationId="getQuestions",
-     *     tags={"Questions"},
+     *     tags={"MCQs"},
      *     summary="Get questions based on user exam type with pagination",
      *     description="Fetches questions for the authenticated user based on their exam type, with pagination support.",
      *     @OA\Response(
@@ -114,7 +114,7 @@ class QuestionController extends Controller
      * @OA\Get(
      *     path="/questions/all",
      *     operationId="getAllQuestions",
-     *     tags={"Questions"},
+     *     tags={"MCQs"},
      *     summary="Get all questions",
      *     description="Fetches all the questions from the database.",
      *     @OA\Response(
@@ -165,6 +165,132 @@ class QuestionController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/search-questions",
+     *     summary="Search MCQs by keyword",
+     *     description="Searches for multiple-choice questions (MCQs) based on a keyword using Full-Text Search.",
+     *     operationId="searchQuestions",
+     *     tags={"MCQs"},
+     * 
+     *     @OA\Parameter(
+     *         name="keyword",
+     *         in="query",
+     *         required=true,
+     *         description="The keyword to search for MCQs",
+     *         @OA\Schema(type="string")
+     *     ),
+     * 
+     *     @OA\Response(
+     *         response=200,
+     *         description="Questions retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Questions retrieved successfully!"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="question", type="string", example="What is Laravel?"),
+     *                         @OA\Property(property="options", type="array", @OA\Items(type="string")),
+     *                         @OA\Property(property="correct_answer", type="string", example="A PHP framework"),
+     *                         @OA\Property(property="exam_id", type="integer", example=1)
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="last_page", type="integer", example=5),
+     *                 @OA\Property(property="per_page", type="integer", example=10),
+     *                 @OA\Property(property="total", type="integer", example=50)
+     *             )
+     *         )
+     *     ),
+     * 
+     *     @OA\Response(
+     *         response=400,
+     *         description="Keyword is required",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Keyword is required")
+     *         )
+     *     ),
+     * 
+     *     @OA\Response(
+     *         response=404,
+     *         description="No questions found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="No questions found")
+     *         )
+     *     )
+     * )
+     */
+    public function searchQuestions(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+    
+        // Fetch the student's profile
+        $studentProfile = StudentProfile::find($user->id);
+        if (!$studentProfile) {
+            return response()->json(['message' => 'Student profile not found'], 404);
+        }
+    
+        $userExamType = $studentProfile->exam_type;
+        $examType = ExamType::where('name', $userExamType)->first();
+        if (!$examType) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Exam type not found in the system.'
+            ], 404);
+        }
+    
+        $examIds = Exam::where('exam_type_id', $examType->id)->pluck('id');
+        if ($examIds->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No exams found for this exam type.'
+            ], 404);
+        }
+    
+        $keyword = $request->query('keyword'); // Get the keyword from the query parameter
+        if (!$keyword) {
+            return response()->json(['message' => 'Keyword is required'], 400);
+        }
+        if (strlen($keyword) < 3) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Keyword must be at least 3 characters long.',
+            ], 400);
+        }
+    
+        // Use LIKE for flexible partial text search within the user's exam_ids
+        $questions = Question::whereIn('exam_id', $examIds)
+            ->where('question', 'LIKE', '%' . $keyword . '%')
+            ->paginate(10);
+    
+        if ($questions->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No Results Found...',
+            ], 404);
+        }
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Questions retrieved successfully!',
+            'data' => $questions,
+        ], 200);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
@@ -181,7 +307,7 @@ class QuestionController extends Controller
      *     summary="Create a new question",
      *     description="This endpoint allows users to create a new question.",
      *     operationId="storeQuestion",
-     *     tags={"Questions"},
+     *     tags={"MCQs"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\MediaType(
@@ -318,7 +444,7 @@ class QuestionController extends Controller
      *     summary="Get a question by ID",
      *     description="This endpoint allows users to retrieve a specific question by its ID.",
      *     operationId="showQuestion",
-     *     tags={"Questions"},
+     *     tags={"MCQs"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -429,7 +555,7 @@ class QuestionController extends Controller
      *     summary="Update a question",
      *     description="Update an existing question by ID.",
      *     operationId="updateExamQuestion",
-     *     tags={"Questions"},
+     *     tags={"MCQs"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -548,7 +674,7 @@ class QuestionController extends Controller
      *     summary="Delete a question",
      *     description="Delete a question by its ID.",
      *     operationId="deleteExamQuestion",
-     *     tags={"Questions"},
+     *     tags={"MCQs"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",

@@ -73,6 +73,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/questions/{id}', [QuestionController::class, 'show']);
     Route::put('/questions/{id}', [QuestionController::class, 'update']);
     Route::delete('/questions/{id}', [QuestionController::class, 'destroy']);
+    Route::get('/search-questions', [QuestionController::class, 'searchQuestions']);
+
 });
 
 // for exam type
