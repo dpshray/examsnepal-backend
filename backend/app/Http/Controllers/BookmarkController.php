@@ -120,6 +120,16 @@ class BookmarkController extends Controller
         if ($validated['student_id'] !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+        // Check if the bookmark already exists
+        if (Bookmark::where('student_id', $validated['student_id'])
+            ->where('question_id', $validated['question_id'])
+            ->exists()
+        ) {
+            return response()->json([
+                'error' => 'Duplicate Bookmark',
+                'message' => 'This bookmark already exists'
+            ], 409);
+        }
         try {
             $bookmark = Bookmark::create($validated);
             return response()->json([
