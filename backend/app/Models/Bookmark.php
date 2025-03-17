@@ -28,7 +28,7 @@ class Bookmark extends Model
 
     public function question()
     {
-        return $this->belongsTo(ForumQuestion::class, 'question_id');
+        return $this->belongsTo(Question::class, 'question_id');
     }
 
 
