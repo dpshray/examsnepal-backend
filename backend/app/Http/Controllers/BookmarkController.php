@@ -6,6 +6,7 @@ use App\Models\Bookmark;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class BookmarkController extends Controller
 {
@@ -112,12 +113,23 @@ class BookmarkController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'student_id' => 'required|integer|exists:student_profiles,id',
             'exam_id' => 'required|integer|exists:exams,id',
-            'question_id' => 'required|integer|exists:forum_questions,id',  // Added question_id validation
+            'question_id' => 'required|integer|exists:questions,id',
         ]);
-
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => 'Validation failed',
+                'messages' => $validator->errors()
+            ], 422);
+        }
+    
+        $validated = $validator->validated();
+        if($validated['student_id']!==Auth::id()){
+            return response()->json(['error'=>'Unauthorized'],401);
+        }
         try {
             $bookmark = Bookmark::create($validated);
             return response()->json([
@@ -188,65 +200,67 @@ class BookmarkController extends Controller
     }
 
     /**
-     * @OA\Get(
-     *     path="/bookmarks/student/{id}",
-     *     operationId="getBookmarksByStudent",
-     *     tags={"Bookmarks"},
-     *     summary="Get bookmarks by student ID",
-     *     description="This endpoint retrieves all bookmarks for a specific student based on their student ID.",
-     *     @OA\Parameter(
-     *         name="student_id",
-     *         in="path",
-     *         required=true,
-     *         description="ID of the student to get the bookmarks for",
-     *         @OA\Schema(
-     *             type="integer",
-     *             format="int64"
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Bookmarks retrieved successfully",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer"),
-     *                 @OA\Property(property="student_id", type="integer"),
-     *                 @OA\Property(property="title", type="string"),
-     *                 @OA\Property(property="url", type="string"),
-     *                 @OA\Property(property="created_at", type="string", format="date-time"),
-     *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="No bookmarks found for the given student ID"
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Invalid student ID provided"
-     *     )
-     * )
-     */
-    public function getBookmarksByStudent($id)
+ * @OA\Get(
+ *     path="/bookmarks/student/{student_id}",
+ *     summary="Get bookmarks by student ID",
+ *     description="Fetches all bookmarks associated with a given student ID",
+ *     tags={"Bookmarks"},
+ *     @OA\Parameter(
+ *         name="student_id",
+ *         in="path",
+ *         required=true,
+ *         description="ID of the student whose bookmarks are to be retrieved",
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="List of bookmarks",
+ *         @OA\JsonContent(
+ *             type="array",
+ *             @OA\Items(
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="student_id", type="integer", example=1),
+ *                 @OA\Property(property="exam_id", type="integer", example=5),
+ *                 @OA\Property(property="question_id", type="integer", example=10),
+ *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-03-17 10:00:00"),
+ *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-03-17 10:00:00")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Invalid student ID",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Invalid student ID")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="No bookmarks found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="No bookmarks found for the given student ID")
+ *         )
+ *     ),
+ *     security={{ "bearerAuth":{} }}
+ * )
+ */
+    public function getBookmarksByStudent($student_id)
     {
         // Check if the student_id is valid (you can add more validation as needed)
-        if (!is_numeric($id) || $id <= 0) {
+        if (!is_numeric($student_id) || $student_id <= 0) {
             return response()->json(['error' => 'Invalid student ID'], 400);
         }
 
         // Fetch bookmarks for the given student_id
-        $bookmarks = Bookmark::with('student')
-            ->where('student_id', $id)
+        $bookmarks = Bookmark::with('question')
+            ->where('student_id', $student_id)
             ->get();
 
         // Check if any bookmarks exist for the student
         if ($bookmarks->isEmpty()) {
             return response()->json(['error' => 'No bookmarks found for the given student ID'], 404);
         }
-
         return response()->json($bookmarks);
     }
 

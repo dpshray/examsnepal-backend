@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://192.168.1.78:8000/api",
+            "url": "https://api.examsnepal.dworklabs.com/api",
             "description": "Localhost API Server"
         }
     ],
@@ -1026,29 +1026,29 @@
                 }
             }
         },
-        "/bookmarks/student/{id}": {
+        "/bookmarks/student/{student_id}": {
             "get": {
                 "tags": [
                     "Bookmarks"
                 ],
                 "summary": "Get bookmarks by student ID",
-                "description": "This endpoint retrieves all bookmarks for a specific student based on their student ID.",
-                "operationId": "getBookmarksByStudent",
+                "description": "Fetches all bookmarks associated with a given student ID",
+                "operationId": "d01d5366a11e24224cd352d71c5c821b",
                 "parameters": [
                     {
                         "name": "student_id",
                         "in": "path",
-                        "description": "ID of the student to get the bookmarks for",
+                        "description": "ID of the student whose bookmarks are to be retrieved",
                         "required": true,
                         "schema": {
                             "type": "integer",
-                            "format": "int64"
+                            "example": 1
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Bookmarks retrieved successfully",
+                        "description": "List of bookmarks",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1056,24 +1056,30 @@
                                     "items": {
                                         "properties": {
                                             "id": {
-                                                "type": "integer"
+                                                "type": "integer",
+                                                "example": 1
                                             },
                                             "student_id": {
-                                                "type": "integer"
+                                                "type": "integer",
+                                                "example": 1
                                             },
-                                            "title": {
-                                                "type": "string"
+                                            "exam_id": {
+                                                "type": "integer",
+                                                "example": 5
                                             },
-                                            "url": {
-                                                "type": "string"
+                                            "question_id": {
+                                                "type": "integer",
+                                                "example": 10
                                             },
                                             "created_at": {
                                                 "type": "string",
-                                                "format": "date-time"
+                                                "format": "date-time",
+                                                "example": "2025-03-17 10:00:00"
                                             },
                                             "updated_at": {
                                                 "type": "string",
-                                                "format": "date-time"
+                                                "format": "date-time",
+                                                "example": "2025-03-17 10:00:00"
                                             }
                                         },
                                         "type": "object"
@@ -1082,13 +1088,44 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "No bookmarks found for the given student ID"
-                    },
                     "400": {
-                        "description": "Invalid student ID provided"
+                        "description": "Invalid student ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Invalid student ID"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No bookmarks found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "No bookmarks found for the given student ID"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/bookmarks/allmy": {
