@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "https://api.examsnepal.dworklabs.com/api",
+            "url": "http://192.168.1.162:8000/api",
             "description": "Localhost API Server"
         }
     ],
@@ -836,12 +836,11 @@
                 "tags": [
                     "Bookmarks"
                 ],
-                "summary": "Get all bookmarks with associated forum questions",
-                "description": "This endpoint retrieves all bookmarks and includes associated forum questions.",
-                "operationId": "getAllBookmarks",
+                "summary": "Get all bookmarks with question and student details",
+                "operationId": "e324077332db101556bb3d52193f34e4",
                 "responses": {
                     "200": {
-                        "description": "Bookmarks and their associated forum questions retrieved successfully",
+                        "description": "List of bookmarks",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -849,57 +848,59 @@
                                     "items": {
                                         "properties": {
                                             "id": {
-                                                "description": "The unique ID of the bookmark",
-                                                "type": "integer"
+                                                "type": "integer",
+                                                "example": 1
                                             },
                                             "student_id": {
-                                                "description": "The ID of the student who created the bookmark",
-                                                "type": "integer"
+                                                "type": "integer",
+                                                "example": 101
                                             },
-                                            "title": {
-                                                "description": "The title of the bookmark",
-                                                "type": "string"
+                                            "exam_id": {
+                                                "type": "integer",
+                                                "example": 55
                                             },
-                                            "url": {
-                                                "description": "The URL of the bookmark",
-                                                "type": "string"
-                                            },
-                                            "created_at": {
-                                                "description": "Creation timestamp of the bookmark",
-                                                "type": "string",
-                                                "format": "date-time"
-                                            },
-                                            "updated_at": {
-                                                "description": "Last update timestamp of the bookmark",
-                                                "type": "string",
-                                                "format": "date-time"
+                                            "question_id": {
+                                                "type": "integer",
+                                                "example": 302
                                             },
                                             "question": {
                                                 "properties": {
                                                     "id": {
-                                                        "description": "The unique ID of the forum question",
-                                                        "type": "integer"
+                                                        "type": "integer",
+                                                        "example": 302
                                                     },
                                                     "title": {
-                                                        "description": "The title of the forum question",
-                                                        "type": "string"
+                                                        "type": "string",
+                                                        "example": "What is Laravel?"
                                                     },
                                                     "content": {
-                                                        "description": "The content of the forum question",
-                                                        "type": "string"
-                                                    },
-                                                    "created_at": {
-                                                        "description": "Creation timestamp of the forum question",
                                                         "type": "string",
-                                                        "format": "date-time"
-                                                    },
-                                                    "updated_at": {
-                                                        "description": "Last update timestamp of the forum question",
-                                                        "type": "string",
-                                                        "format": "date-time"
+                                                        "example": "Laravel is a PHP framework..."
                                                     }
                                                 },
                                                 "type": "object"
+                                            },
+                                            "student": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 101
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "John Doe"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "example": "johndoe@example.com"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-03-17T10:00:00.000000Z"
                                             }
                                         },
                                         "type": "object"
@@ -907,12 +908,6 @@
                                 }
                             }
                         }
-                    },
-                    "404": {
-                        "description": "No bookmarks found"
-                    },
-                    "500": {
-                        "description": "Internal server error"
                     }
                 }
             },
