@@ -49,7 +49,7 @@ class BookmarkController extends Controller
     public function index(): JsonResponse
     {
         // Eager load the related 'ForumQuestion' using the 'question' relationship
-        $bookmarks = Bookmark::with('question', 'student')->get();
+        $bookmarks = Bookmark::with('questions', 'student')->get();
         return response()->json($bookmarks);
     }
 

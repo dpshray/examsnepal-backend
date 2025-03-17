@@ -26,7 +26,7 @@ class Bookmark extends Model
         return $this->belongsTo(StudentProfile::class, 'student_id');
     }
 
-    public function question()
+    public function questions()
     {
         return $this->belongsTo(Question::class, 'question_id');
     }
