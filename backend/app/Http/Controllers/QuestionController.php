@@ -236,13 +236,13 @@ class QuestionController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
-    
+
         // Fetch the student's profile
         $studentProfile = StudentProfile::find($user->id);
         if (!$studentProfile) {
             return response()->json(['message' => 'Student profile not found'], 404);
         }
-    
+
         $userExamType = $studentProfile->exam_type;
         $examType = ExamType::where('name', $userExamType)->first();
         if (!$examType) {
@@ -251,7 +251,7 @@ class QuestionController extends Controller
                 'message' => 'Exam type not found in the system.'
             ], 404);
         }
-    
+
         $examIds = Exam::where('exam_type_id', $examType->id)->pluck('id');
         if ($examIds->isEmpty()) {
             return response()->json([
@@ -259,7 +259,7 @@ class QuestionController extends Controller
                 'message' => 'No exams found for this exam type.'
             ], 404);
         }
-    
+
         $keyword = $request->query('keyword'); // Get the keyword from the query parameter
         if (!$keyword) {
             return response()->json(['message' => 'Keyword is required'], 400);
@@ -270,19 +270,19 @@ class QuestionController extends Controller
                 'message' => 'Keyword must be at least 3 characters long.',
             ], 400);
         }
-    
+
         // Use LIKE for flexible partial text search within the user's exam_ids
         $questions = Question::whereIn('exam_id', $examIds)
             ->where('question', 'LIKE', '%' . $keyword . '%')
             ->paginate(10);
-    
+
         if ($questions->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'No Results Found...',
             ], 404);
         }
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Questions retrieved successfully!',
@@ -411,6 +411,23 @@ class QuestionController extends Controller
             'uploader' => 'nullable|exists:users,id',
             'mark_type' => 'nullable|string|max:255',
         ]);
+
+        // Ensure only one `option_value_*` is true
+        $trueOptionCount = collect([
+            $validatedData['option_value_1'],
+            $validatedData['option_value_2'],
+            $validatedData['option_value_3'] ?? false,
+            $validatedData['option_value_4'] ?? false,
+        ])->filter(function ($value) {
+            return $value === true;
+        })->count();
+
+        if ($trueOptionCount !== 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Exactly one option must have a true value.',
+            ], 422); // HTTP 422 Unprocessable Entity
+        }
 
         try {
             // Create a new Question record
@@ -638,8 +655,32 @@ class QuestionController extends Controller
                 'mark_type' => 'nullable|string|max:255',
             ]);
 
+            // Ensure exactly one option is true
+            $trueOptionCount = collect([
+                $validatedData['option_value_1'],
+                $validatedData['option_value_2'],
+                $validatedData['option_value_3'] ?? false,
+                $validatedData['option_value_4'] ?? false,
+            ])->filter(function ($value) {
+                return $value === true;
+            })->count();
+
+            if ($trueOptionCount !== 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Exactly one option must have a true value.',
+                ], 422); // HTTP 422 Unprocessable Entity
+            }
+
             // Find the question by ID
-            $question = Question::findOrFail($id);
+            $question = Question::find($id);
+
+            if (!$question) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Question not found',
+                ], 404); // HTTP 404 Not Found
+            }
 
             // Update the question with validated data
             $question->update($validatedData);
@@ -649,19 +690,17 @@ class QuestionController extends Controller
                 'success' => true,
                 'message' => 'Question updated successfully!',
                 'data' => $question,
-            ], 200);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Question not found',
-            ], 404);
+            ], 200); // HTTP 200 OK
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update the question. Please try again.',
-            ], 500);
+                'error' => $e->getMessage(),
+            ], 500); // HTTP 500 Internal Server Error
         }
     }
+
 
 
 
