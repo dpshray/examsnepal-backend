@@ -253,7 +253,7 @@ class BookmarkController extends Controller
         }
 
         // Fetch bookmarks for the given student_id
-        $bookmarks = Bookmark::with('question')
+        $bookmarks = Bookmark::with('questions')
             ->where('student_id', $student_id)
             ->get();
 
@@ -318,7 +318,7 @@ class BookmarkController extends Controller
         }
 
         // Fetch bookmarks for the given student_id
-        $bookmarks = Bookmark::with('question')
+        $bookmarks = Bookmark::with('questions')
             ->where('student_id', $userId)
             ->get();
 
