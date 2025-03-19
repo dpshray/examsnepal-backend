@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://192.168.1.162:8000/api",
+            "url": "http://192.168.1.67:8000/api",
             "description": "Localhost API Server"
         }
     ],
@@ -1224,6 +1224,225 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/doubts": {
+            "get": {
+                "tags": [
+                    "Doubts"
+                ],
+                "summary": "Get all doubts",
+                "operationId": "4aea25c6dd2c9637f46829567b591f38",
+                "responses": {
+                    "200": {
+                        "description": "Fetched all doubts successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Fetched all doubts successfully."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doubt": {
+            "post": {
+                "tags": [
+                    "Doubts"
+                ],
+                "summary": "Store a new doubt",
+                "operationId": "b817bdf04909422feee1bf3f3cb8b8ca",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "What is Laravel?"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "I want to know about Laravel."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Resource stored successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Resource stored successfully."
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doubt/{id}": {
+            "get": {
+                "tags": [
+                    "Doubts"
+                ],
+                "summary": "Get a specific doubt",
+                "operationId": "dc8bef1ba9a39658d6c13a2f7ef3ccc1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Doubt ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetched resource successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Fetched resource successfully."
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Doubts"
+                ],
+                "summary": "Update a doubt",
+                "operationId": "16a706bc9523813e328b00bca05bbc08",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Doubt ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Updated Doubt Title"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated Description"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Resource updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Resource updated successfully."
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Doubts"
+                ],
+                "summary": "Delete a doubt",
+                "operationId": "739228250413233e0bd2b19afc1dd97f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Doubt ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resource deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Resource deleted successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/exam": {
@@ -4063,6 +4282,10 @@
         {
             "name": "Bookmarks",
             "description": "Bookmarks"
+        },
+        {
+            "name": "Doubts",
+            "description": "Doubts"
         },
         {
             "name": "Exams",

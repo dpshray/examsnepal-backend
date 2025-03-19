@@ -75,6 +75,13 @@ Route::middleware(['auth:api'])->group(function () {
     Route::delete('/questions/{id}', [QuestionController::class, 'destroy']);
     Route::get('/search-questions', [QuestionController::class, 'searchQuestions']);
 
+    // for Doubts
+    Route::post('/doubt', [QuestionController::class, 'store']);
+    Route::get('/doubts', [QuestionController::class, 'index']);
+    Route::get('/doubt/{id}', [QuestionController::class, 'show']);
+    Route::put('/doubt/{id}', [QuestionController::class, 'update']);
+    Route::delete('/doubt/{id}', [QuestionController::class, 'destroy']);
+
 });
 
 // for exam type
