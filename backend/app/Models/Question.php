@@ -41,4 +41,8 @@ class Question extends Model
         return $this->belongsTo(Exam::class, 'exam_id');
     }
 
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class, 'question_id');
+    }
 }

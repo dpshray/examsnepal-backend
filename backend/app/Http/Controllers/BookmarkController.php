@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Question;
 
 class BookmarkController extends Controller
 {
@@ -49,8 +50,22 @@ class BookmarkController extends Controller
     public function index(): JsonResponse
     {
         // Eager load the related 'ForumQuestion' using the 'question' relationship
-        $bookmarks = Bookmark::with('questions', 'student')->get();
-        return response()->json($bookmarks);
+        // $bookmarks = Bookmark::with('questions')->get();
+        // $uniqueQuestions=Question::with('bookmark')->get();
+
+        // $uniqueQuestions = $bookmarks->pluck('questions.*.id')->flatten()->unique();
+        $questionsWithStudents = Question::withCount('bookmarks')
+            ->with(['bookmarks.student' => function ($query) {
+                $query->select('id', 'name'); // Load specific student fields
+            }])
+            ->get()
+            ->map(function ($question) {
+                // Extract students from bookmarks and add to top-level 'students'
+                $question['students'] = $question->bookmarks->pluck('student')->unique('id')->values();
+                unset($question->bookmarks); // Optional: Remove bookmarks if not needed
+                return $question;
+            });
+        return response()->json($questionsWithStudents);
     }
 
 

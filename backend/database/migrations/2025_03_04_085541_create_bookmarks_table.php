@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('exam_id')->constrained('exams')->onDelete('cascade');
             $table->foreignId('student_id')->constrained('student_profiles')->onDelete('cascade'); 
-            $table->foreignId('question_id')->constrained('forum_questions')->onDelete('cascade'); 
+            $table->foreignId('question_id')->constrained()->onDelete('cascade'); 
             $table->timestamps();
         });
     }

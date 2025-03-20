@@ -229,7 +229,7 @@ class AuthController extends Controller
     {
         try {
             $newToken = Auth::guard('api')->refresh();
-            return $this->respondWithToken($newToken);
+            return $this->respondRefreshWithToken($newToken);
         } catch (\Exception $e) {
             \Log::error('JWT Refresh Error: ' . $e->getMessage());
             return response()->json(['error' => 'Could not refresh token'], 500);
@@ -240,6 +240,18 @@ class AuthController extends Controller
 
 
     protected function respondWithToken($token)
+    {
+        $student = Auth::guard('api')->user();
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 1,
+            'student' => $student,
+        ]);
+    }
+
+    protected function respondRefreshWithToken($token)
     {
         $student = Auth::guard('api')->user();
 

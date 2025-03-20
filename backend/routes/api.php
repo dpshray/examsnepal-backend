@@ -8,6 +8,10 @@ use App\Http\Controllers\ExamTypeController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\QuizController;
+
+
 
 use Illuminate\Support\Facades\Route;
 
@@ -74,6 +78,26 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/questions/{id}', [QuestionController::class, 'update']);
     Route::delete('/questions/{id}', [QuestionController::class, 'destroy']);
     Route::get('/search-questions', [QuestionController::class, 'searchQuestions']);
+
+    // for Doubts
+    Route::post('/doubt', [QuestionController::class, 'store']);
+    Route::get('/doubts', [QuestionController::class, 'index']);
+    Route::get('/doubt/{id}', [QuestionController::class, 'show']);
+    Route::put('/doubt/{id}', [QuestionController::class, 'update']);
+    Route::delete('/doubt/{id}', [QuestionController::class, 'destroy']);
+
+    // for subjects
+    Route::post('/subject', [SubjectController::class, 'store']);
+    Route::get('/subjects', [SubjectController::class, 'index']);
+    Route::get('/subject/{id}', [SubjectController::class, 'show']);
+    Route::put('/subject/{id}', [SubjectController::class, 'update']);
+    Route::delete('/subject/{id}', [SubjectController::class, 'destroy']);
+
+    Route::get('/free-quiz', [QuizController::class, 'getFreeQuiz']);
+    Route::get('/sprint-quiz', [QuizController::class, 'getSprintQuiz']);
+    Route::get('/mock-test', [QuizController::class, 'getMockTest']);
+
+
 
 });
 
