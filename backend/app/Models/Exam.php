@@ -33,4 +33,9 @@ class Exam extends Model
     {
         return $this->hasMany(Bookmark::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id'); // Defines the relationship
+    }
 }

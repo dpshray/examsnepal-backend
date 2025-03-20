@@ -85,4 +85,5 @@ class StudentProfileController extends Controller
             'student' => $student
         ], 201);
     }
+
 }
