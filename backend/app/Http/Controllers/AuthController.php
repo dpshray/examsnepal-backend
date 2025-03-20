@@ -13,6 +13,56 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
+
+    /**
+     * @OA\Post(
+     *     path="/register",
+     *     summary="User Registration",
+     *     description="Register a new user with username, password, fullname, email, and role. Triggers email verification.",
+     *     operationId="registerUser",
+     *     tags={"Users"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"username", "password", "password_confirmation", "fullname", "email", "role"},
+     *             @OA\Property(property="username", type="string", example="john_doe"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", example="password123"),
+     *             @OA\Property(property="fullname", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com"),
+     *             @OA\Property(property="role", type="string", example="teacher")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="User registered successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="User registered successfully. Please verify your email.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=409,
+     *         description="User already registered with this email",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="User already registered with this email.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
     public function register(Request $request)
     {
         // Validate the incoming request
@@ -152,9 +202,170 @@ class AuthController extends Controller
         }
 
         return $this->respondWithToken($token);
-        // return $this->respondWithToken($credentials);
+        // // return $this->respondWithToken($credentials);
+
+        // Validate the incoming request
 
     }
+
+
+    /**
+     * @OA\Post(
+     *     path="/admin/login",
+     *     summary="Login Admin",
+     *     description="Authenticate a admin and return a JWT token",
+     *     operationId="loginAdmin",
+     *     tags={"Admin Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="admin@examsnepal.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="Nepal123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful Login",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="access_token", type="string", example="your_generated_jwt_token"),
+     *             @OA\Property(property="token_type", type="string", example="bearer"),
+     *             @OA\Property(property="expires_in", type="integer", example=3600)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Incorrect password")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="user Not Found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="user not found")
+     *         )
+     *     )
+     * )
+     */
+
+    public function AdminLogin(Request $request)
+    {
+        // Validate the input fields
+        $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only('email', 'password');
+
+        // Retrieve the user by email
+        $admin = User::where('email', $credentials['email'])->first();
+
+        if (!$admin) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        // Ensure the user is an admin
+        if ($admin->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized: Not an admin user'], 403);
+        }
+
+        // // Verify that the password is correct
+        if (!Hash::check($credentials['password'], $admin->password)) {
+            return response()->json(['error' => 'Incorrect password'], 401);
+        }
+
+        // Attempt token generation using the admin guard
+        // if (!$token = Auth::guard('users')->attempt($credentials)) {
+        //     return response()->json(['error' => 'Unauthorized'], 401);
+        // }
+        $token = JWTAuth::fromUser($admin);
+
+        return $this->respondWithToken($token);
+        // return response()->json(['data' => $admin]);
+    }
+
+     /**
+     * @OA\Post(
+     *     path="/teacher/login",
+     *     summary="Login Teachers",
+     *     description="Authenticate a admin and return a JWT token",
+     *     operationId="loginTeachers",
+     *     tags={"Teacher Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful Login",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="access_token", type="string", example="your_generated_jwt_token"),
+     *             @OA\Property(property="token_type", type="string", example="bearer"),
+     *             @OA\Property(property="expires_in", type="integer", example=3600)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Incorrect password")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="user Not Found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="user not found")
+     *         )
+     *     )
+     * )
+     */
+
+     public function teacherLogin(Request $request)
+     {
+         // Validate the input fields
+         $request->validate([
+             'email'    => 'required|email',
+             'password' => 'required|string',
+         ]);
+ 
+         $credentials = $request->only('email', 'password');
+ 
+         // Retrieve the user by email
+         $teacher = User::where('email', $credentials['email'])->first();
+ 
+         if (!$teacher) {
+             return response()->json(['error' => 'User not found'], 404);
+         }
+ 
+         // Ensure the user is an admin
+         if ($teacher->role !== 'teacher') {
+             return response()->json(['error' => 'Unauthorized: Not an admin user'], 403);
+         }
+ 
+         // // Verify that the password is correct
+         if (!Hash::check($credentials['password'], $teacher->password)) {
+             return response()->json(['error' => 'Incorrect password'], 401);
+         }
+ 
+         // Attempt token generation using the admin guard
+        //  if (!$token = Auth::guard('users')->attempt($credentials)) {
+        //      return response()->json(['error' => 'Unauthorized'], 401);
+        //  }
+        $token = JWTAuth::fromUser($teacher);
+
+ 
+         return $this->respondWithToken($token);
+        //  return response()->json(['data' => $admin]);
+     }
+
 
 
     public function me()

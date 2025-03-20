@@ -86,4 +86,47 @@ class StudentProfileController extends Controller
         ], 201);
     }
 
+
+    /**
+     * @OA\Get(
+     *     path="/all-students",
+     *     summary="Get all students",
+     *     description="Retrieve a list of all students from the StudentProfile model.",
+     *     operationId="getAllStudents",
+     *     tags={"Students"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Students list fetched successfully.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Students List fetched successfully."),
+     *             @OA\Property(
+     *                 property="students",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="fullname", type="string", example="John Doe"),
+     *                     @OA\Property(property="email", type="string", format="email", example="johndoe@example.com"),
+     *                     @OA\Property(property="phone", type="string", example="+977-9800000000"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function allStudents()
+    {
+        $students = StudentProfile::select(['id', 'name', 'email', 'phone', 'created_at', 'updated_at'])->get();
+        return response()->json([
+            'message' => 'Students List fetched successfully.',
+            'students' => $students
+        ], 200);
+    }
 }

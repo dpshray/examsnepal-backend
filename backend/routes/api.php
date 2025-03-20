@@ -26,6 +26,10 @@ Route::post('/student/register', [StudentProfileController::class, 'register']);
 
 // Student login
 Route::post('/student/login', [AuthController::class, 'loginStudent'])->name('login');
+Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('loginAdmin');
+Route::post('/teacher/login', [AuthController::class, 'teacherLogin'])->name('loginTeacher');
+
+
 
 // Protected Routes (for authenticated students)
 Route::middleware('auth:api')->group(function () {
@@ -58,7 +62,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::delete('/organization/{id}', [OrganizationController::class, 'destroy']);
 
     // for Exam
-    Route::get('/exam', [ExamController::class, 'index']);
+    // Route::get('/exam', [ExamController::class, 'index']);
     Route::delete('/exam/{id}', [ExamController::class, 'destroy']);
     Route::post('/exam', [ExamController::class, 'store']);
     Route::get('/exam/{id}', [ExamController::class, 'show']);
@@ -86,12 +90,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/doubt/{id}', [QuestionController::class, 'update']);
     Route::delete('/doubt/{id}', [QuestionController::class, 'destroy']);
 
-    // for subjects
-    Route::post('/subject', [SubjectController::class, 'store']);
-    Route::get('/subjects', [SubjectController::class, 'index']);
-    Route::get('/subject/{id}', [SubjectController::class, 'show']);
-    Route::put('/subject/{id}', [SubjectController::class, 'update']);
-    Route::delete('/subject/{id}', [SubjectController::class, 'destroy']);
+    
 
     Route::get('/free-quiz', [QuizController::class, 'getFreeQuiz']);
     Route::get('/sprint-quiz', [QuizController::class, 'getSprintQuiz']);
@@ -107,3 +106,20 @@ Route::get('/exam-types', [ExamTypeController::class, 'index']);
 // Route::get('/documentation', function () {
 //     return view('vendor.l5-swagger.index');
 // })->withoutMiddleware('auth:api');
+
+Route::middleware(['auth:users', 'role:admin'])->group(function () {
+
+    // for subjects
+    Route::get('/subjects', [SubjectController::class, 'index']);
+    Route::post('/subject', [SubjectController::class, 'store']);
+    Route::get('/subject/{id}', [SubjectController::class, 'show']);
+    Route::put('/subject/{id}', [SubjectController::class, 'update']);
+    Route::delete('/subject/{id}', [SubjectController::class, 'destroy']);
+
+    Route::get('/all-students', [StudentProfileController::class, 'allStudents']);
+
+});
+
+Route::middleware(['auth:users', 'role:teacher'])->group(function () {
+    // Route::get('/subjects', [SubjectController::class, 'index']);
+});
