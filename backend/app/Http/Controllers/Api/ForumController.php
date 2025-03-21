@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ForumQuestion;
+use App\Models\ForumAnswer;
 use App\Models\StudentProfile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
+
 
 /**
  * @OA\Info(
@@ -18,7 +20,7 @@ use Illuminate\Http\JsonResponse;
  * )
  * 
  * @OA\Server( 
- *    url="https://api.examsnepal.dworklabs.com/api",
+ *   url="https://api.examsnepal.dworklabs.com/api",
  *     description="Localhost API Server"
  * )
  * 
@@ -589,6 +591,111 @@ class ForumController extends Controller
             return response()->json(['message' => 'Question deleted successfully']);
         } else {
             return response()->json(['message' => 'Unauthorized or Question not found'], 403);
+        }
+    }
+
+    // forum answers
+    /**
+     * @OA\Post(
+     *     path="/student/answers",
+     *     summary="Add an answer to a question",
+     *     description="Allows authenticated students to add an answer to a specified question in the forum.",
+     *     operationId="addAnswer",
+     *     tags={"Forum"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             required={"question_id", "answer"},
+     *             @OA\Property(
+     *                 property="question_id",
+     *                 type="integer",
+     *                 description="ID of the question being answered.",
+     *                 example=1
+     *             ),
+     *             @OA\Property(
+     *                 property="answer",
+     *                 type="string",
+     *                 description="The answer to the question.",
+     *                 example="To improve your coding skills, practice daily and engage with community projects."
+     *             ),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Answer added successfully.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Answer added successfully!"),
+     *             @OA\Property(property="answer", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="question_id", type="integer", example=1),
+     *                 @OA\Property(property="user_id", type="integer", example=123),
+     *                 @OA\Property(property="answer", type="string", example="To improve your coding skills, practice daily and engage with community projects."),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-03-21T12:00:00Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-03-21T12:00:00Z")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Unauthorized")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Question not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Question not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="question_id", type="array", @OA\Items(type="string", example="The question id field is required")),
+     *                 @OA\Property(property="answer", type="array", @OA\Items(type="string", example="The answer field is required"))
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function addAnswer(Request $request)
+    {
+        // Validate the request input
+        $validated = $request->validate([
+            'question_id' => 'required|exists:forum_questions,id',
+            'answer' => 'required|string',
+        ]);
+
+        // Get the authenticated user's ID
+        $userId = Auth::id();
+
+        try {
+            // Create and store the answer
+            $answer = ForumAnswer::create([
+                'question_id' => $validated['question_id'],
+                'user_id' => $userId,
+                'answer' => $validated['answer'],
+            ]);
+
+            // Return a success response
+            return response()->json([
+                'message' => 'Answer added successfully!',
+                'answer' => $answer,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while adding the answer.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 }
