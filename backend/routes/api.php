@@ -10,6 +10,8 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\TeacherController;
+
 
 
 
@@ -47,6 +49,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/student/questions/their/{id}', [ForumController::class, 'getQuestionByTheirId']);
     Route::get('/student/questions/{subStream}', [ForumController::class, 'fetchQuestionsBySubstream']);
     Route::delete('/student/questions/{id}', [ForumController::class, 'deleteTheirQuestionCreated']);
+
+    Route::post('/student/answers', [ForumController::class, 'addAnswer']);
+
 
     // for exam type
     Route::post('/exam-types', [ExamTypeController::class, 'store']);
@@ -117,6 +122,9 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::delete('/subject/{id}', [SubjectController::class, 'destroy']);
 
     Route::get('/all-students', [StudentProfileController::class, 'allStudents']);
+
+    Route::get('/teachers', [TeacherController::class, 'index']);
+    
 
 });
 
