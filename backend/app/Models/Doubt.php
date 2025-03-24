@@ -11,11 +11,13 @@ class Doubt extends Model
     use HasFactory;
 
     protected $fillable = [
+        'email',
         'exam_id',
         'student_id',
         'question_id',
-        'organization_id',
+        'org_id',
         'doubt',
+        'date',
         'remarks',
         'status',
         'solved_by',

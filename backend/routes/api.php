@@ -11,6 +11,8 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\BankQuestionController;
+
 
 
 
@@ -80,12 +82,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/bookmarks/allmy', [BookmarkController::class, 'getAllMyBookmarks']);
 
     // for Questions
-    Route::post('/questions', [QuestionController::class, 'store']);
     Route::get('/questions', [QuestionController::class, 'index']);
-    Route::get('/questions/all', [QuestionController::class, 'getAllQuestion']);
     Route::get('/questions/{id}', [QuestionController::class, 'show']);
-    Route::put('/questions/{id}', [QuestionController::class, 'update']);
-    Route::delete('/questions/{id}', [QuestionController::class, 'destroy']);
     Route::get('/search-questions', [QuestionController::class, 'searchQuestions']);
 
     // for Doubts
@@ -100,6 +98,13 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/free-quiz', [QuizController::class, 'getFreeQuiz']);
     Route::get('/sprint-quiz', [QuizController::class, 'getSprintQuiz']);
     Route::get('/mock-test', [QuizController::class, 'getMockTest']);
+
+    Route::get('/free-quiz/questions/{exam_id}', [QuestionController::class, 'freeQuizQuestions']);
+    Route::get('/sprint-quiz/questions/{exam_id}', [QuestionController::class, 'sprintQuizQuestions']);
+    Route::get('/mock-test/questions/{exam_id}', [QuestionController::class, 'mockTestQuestions']);
+
+
+
 
 
 
@@ -124,6 +129,33 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('/all-students', [StudentProfileController::class, 'allStudents']);
 
     Route::get('/teachers', [TeacherController::class, 'index']);
+    Route::get('/all-question-banks', [BankQuestionController::class, 'index']);
+    Route::post('/question-bank',[BankQuestionController::class,'store']);
+    Route::get('/question-bank/{id}', [BankQuestionController::class, 'show']);
+    Route::put('/question-bank/{id}',[BankQuestionController::class,'update']);
+    Route::delete('/question-bank/{id}',[BankQuestionController::class,'destroy']);
+
+
+    Route::post('/create-quiz',[QuizController::class,'examAsQuizStore']);
+    Route::get('/quiz/{id}',[QuizController::class,'show']);
+    Route::put('/update-quiz',[QuizController::class,'updateExamAsQuiz']);
+    Route::delete('/quiz/{id}',[QuizController::class,'destroy']);
+
+     // for Questions
+     Route::post('/questions', [QuestionController::class, 'store']);
+     Route::get('/questions', [QuestionController::class, 'index']);
+     Route::get('/questions/all', [QuestionController::class, 'getAllQuestion']);
+     Route::get('/questions/{id}', [QuestionController::class, 'show']);
+     Route::put('/questions/{id}', [QuestionController::class, 'update']);
+     Route::delete('/questions/{id}', [QuestionController::class, 'destroy']);
+     Route::get('/search-questions', [QuestionController::class, 'searchQuestions']);
+
+    //  for question bank question
+    Route::post('/question-bank/questions', [QuestionController::class, 'storeOnQuestionBank']);
+
+
+
+
     
 
 });

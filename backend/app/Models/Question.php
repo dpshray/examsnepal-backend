@@ -29,6 +29,7 @@ class Question extends Model
         'old_exam_id',
         'uploader',
         'mark_type',
+        'from_question_bank',
     ];
 
     public function uploader()

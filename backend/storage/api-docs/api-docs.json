@@ -1281,6 +1281,536 @@
                 ]
             }
         },
+        "/all-question-banks": {
+            "get": {
+                "tags": [
+                    "Question Banks"
+                ],
+                "summary": "Get all question banks",
+                "description": "Returns a list of exams that are marked as question banks",
+                "operationId": "getQuestionBanks",
+                "responses": {
+                    "200": {
+                        "description": "List of all Question Banks retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "exam_name": {
+                                                "type": "string",
+                                                "example": "Math Final"
+                                            },
+                                            "exam_date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2025-06-10"
+                                            },
+                                            "is_question_bank": {
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "organization": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "ABC University"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "examType": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Final Exam"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/question-bank": {
+            "post": {
+                "tags": [
+                    "Question Banks"
+                ],
+                "summary": "Create a new Question Bank",
+                "description": "Creates a question bank by storing it in the exams table with is_question_bank set to true.",
+                "operationId": "storeQuestionBank",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "assign_id",
+                                    "question_bank_name",
+                                    "exam_type_id"
+                                ],
+                                "properties": {
+                                    "assign_id": {
+                                        "description": "Assigned user's ID",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "question_bank_name": {
+                                        "description": "Name of the question bank",
+                                        "type": "string",
+                                        "example": "Physics MCQs Bank"
+                                    },
+                                    "exam_type_id": {
+                                        "description": "Type ID of the exam (foreign key)",
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Question Bank created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question Bank created successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "exam_name": {
+                                                    "type": "string",
+                                                    "example": "Physics MCQs Bank"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": null
+                                                },
+                                                "assign_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "is_question_bank": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "exam_type_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to store Question Bank",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Failed to store Question Bank"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "SQLSTATE[23000]: Integrity constraint violation ..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/question-bank/{id}": {
+            "get": {
+                "tags": [
+                    "Question Banks"
+                ],
+                "summary": "Get a specific Question Bank",
+                "description": "Fetch a Question Bank by its ID",
+                "operationId": "getQuestionBankById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the Question Bank",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Question Bank fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question Bank fetched successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "exam_name": {
+                                                    "type": "string",
+                                                    "example": "General Knowledge Bank"
+                                                },
+                                                "assign_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "exam_type_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "is_question_bank": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Question Bank not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Question Bank not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Question Banks"
+                ],
+                "summary": "Update a Question Bank",
+                "description": "Update the details of a specific Question Bank by its ID",
+                "operationId": "updateQuestionBank",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the Question Bank to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "assign_id",
+                                    "question_bank_name",
+                                    "exam_type_id"
+                                ],
+                                "properties": {
+                                    "assign_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "question_bank_name": {
+                                        "type": "string",
+                                        "example": "Updated Bank Title"
+                                    },
+                                    "exam_type_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Question Bank updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question Bank updated successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "exam_name": {
+                                                    "type": "string",
+                                                    "example": "Updated Bank Title"
+                                                },
+                                                "assign_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "exam_type_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "is_question_bank": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Question Bank not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Question Bank not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to update Question Bank",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Failed to update Question Bank"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Exception message..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Question Banks"
+                ],
+                "summary": "Delete a Question Bank",
+                "description": "Deletes a specific question bank by its ID.",
+                "operationId": "deleteQuestionBank",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the Question Bank to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bank deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Bank deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Bank not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Bank not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to delete bank",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Failed to delete bank"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Exception message..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/bookmarks": {
             "get": {
                 "tags": [
@@ -3654,8 +4184,8 @@
                 "tags": [
                     "MCQs"
                 ],
-                "summary": "Create a new question",
-                "description": "This endpoint allows users to create a new question.",
+                "summary": "Create a new question To Exams",
+                "description": "This endpoint allows users to create a new question To Exams.",
                 "operationId": "storeQuestion",
                 "requestBody": {
                     "required": true,
@@ -4136,6 +4666,277 @@
                 }
             }
         },
+        "/question-bank/questions": {
+            "post": {
+                "tags": [
+                    "MCQs"
+                ],
+                "summary": "Create a new question for the question bank",
+                "description": "This endpoint allows users to create a new question in a valid question bank. The exam must be a question bank.",
+                "operationId": "storeOnQuestionBank",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "exam_id",
+                                    "question",
+                                    "option_1",
+                                    "option_value_1",
+                                    "option_2",
+                                    "option_value_2"
+                                ],
+                                "properties": {
+                                    "exam_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "question": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "What is the capital of Nepal?"
+                                    },
+                                    "option_1": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Kathmandu"
+                                    },
+                                    "option_value_1": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "option_2": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Pokhara"
+                                    },
+                                    "option_value_2": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "option_3": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Lalitpur",
+                                        "nullable": true
+                                    },
+                                    "option_value_3": {
+                                        "type": "boolean",
+                                        "example": true,
+                                        "nullable": true
+                                    },
+                                    "option_4": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Bhaktapur",
+                                        "nullable": true
+                                    },
+                                    "option_value_4": {
+                                        "type": "boolean",
+                                        "example": false,
+                                        "nullable": true
+                                    },
+                                    "explanation": {
+                                        "type": "string",
+                                        "example": "Kathmandu is the capital of Nepal.",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Question created successfully in the question bank.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question created successfully!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "exam_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question": {
+                                                    "type": "string",
+                                                    "example": "What is the capital of Nepal?"
+                                                },
+                                                "option_1": {
+                                                    "type": "string",
+                                                    "example": "Kathmandu"
+                                                },
+                                                "option_value_1": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "option_2": {
+                                                    "type": "string",
+                                                    "example": "Pokhara"
+                                                },
+                                                "option_value_2": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "option_3": {
+                                                    "type": "string",
+                                                    "example": "Lalitpur",
+                                                    "nullable": true
+                                                },
+                                                "option_value_3": {
+                                                    "type": "boolean",
+                                                    "example": true,
+                                                    "nullable": true
+                                                },
+                                                "option_4": {
+                                                    "type": "string",
+                                                    "example": "Bhaktapur",
+                                                    "nullable": true
+                                                },
+                                                "option_value_4": {
+                                                    "type": "boolean",
+                                                    "example": false,
+                                                    "nullable": true
+                                                },
+                                                "explanation": {
+                                                    "type": "string",
+                                                    "example": "Kathmandu is the capital of Nepal.",
+                                                    "nullable": true
+                                                },
+                                                "subject": {
+                                                    "type": "string",
+                                                    "example": "Geography",
+                                                    "nullable": true
+                                                },
+                                                "exam_type": {
+                                                    "type": "string",
+                                                    "example": "MCQ",
+                                                    "nullable": true
+                                                },
+                                                "remark": {
+                                                    "type": "string",
+                                                    "example": "Important question",
+                                                    "nullable": true
+                                                },
+                                                "serial": {
+                                                    "type": "integer",
+                                                    "example": 1,
+                                                    "nullable": true
+                                                },
+                                                "old_exam_id": {
+                                                    "type": "integer",
+                                                    "example": 123,
+                                                    "nullable": true
+                                                },
+                                                "mark_type": {
+                                                    "type": "string",
+                                                    "example": "Numerical",
+                                                    "nullable": true
+                                                },
+                                                "uploader": {
+                                                    "type": "integer",
+                                                    "example": 1,
+                                                    "nullable": true
+                                                },
+                                                "from_question_bank": {
+                                                    "type": "boolean",
+                                                    "example": true,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Unable to find question bank.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unable to find question bank."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Exactly one option must have a true value."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to create Question. Please try again."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Database error or other internal error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/questions/{id}": {
             "get": {
                 "tags": [
@@ -4584,46 +5385,668 @@
                 }
             }
         },
+        "/free-quiz/questions/{exam_id}": {
+            "get": {
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Get all active questions for a specific exam",
+                "description": "This endpoint retrieves all active questions (status = 1) for a given exam by its ID.",
+                "operationId": "freeQuizQuestions",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "exam_id",
+                        "in": "path",
+                        "description": "ID of the exam to retrieve questions for",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Questions retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Questions retrieved successfully!"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "exam_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "question": {
+                                                        "type": "string",
+                                                        "example": "What is the capital of Nepal?"
+                                                    },
+                                                    "option_1": {
+                                                        "type": "string",
+                                                        "example": "Kathmandu"
+                                                    },
+                                                    "option_value_1": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "option_2": {
+                                                        "type": "string",
+                                                        "example": "Pokhara"
+                                                    },
+                                                    "option_value_2": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "option_3": {
+                                                        "type": "string",
+                                                        "example": "Lalitpur",
+                                                        "nullable": true
+                                                    },
+                                                    "option_value_3": {
+                                                        "type": "boolean",
+                                                        "example": true,
+                                                        "nullable": true
+                                                    },
+                                                    "option_4": {
+                                                        "type": "string",
+                                                        "example": "Bhaktapur",
+                                                        "nullable": true
+                                                    },
+                                                    "option_value_4": {
+                                                        "type": "boolean",
+                                                        "example": false,
+                                                        "nullable": true
+                                                    },
+                                                    "explanation": {
+                                                        "type": "string",
+                                                        "example": "Kathmandu is the capital of Nepal.",
+                                                        "nullable": true
+                                                    },
+                                                    "subject": {
+                                                        "type": "string",
+                                                        "example": "Geography",
+                                                        "nullable": true
+                                                    },
+                                                    "exam_type": {
+                                                        "type": "string",
+                                                        "example": "MCQ",
+                                                        "nullable": true
+                                                    },
+                                                    "remark": {
+                                                        "type": "string",
+                                                        "example": "Important question",
+                                                        "nullable": true
+                                                    },
+                                                    "serial": {
+                                                        "type": "integer",
+                                                        "example": 1,
+                                                        "nullable": true
+                                                    },
+                                                    "old_exam_id": {
+                                                        "type": "integer",
+                                                        "example": 123,
+                                                        "nullable": true
+                                                    },
+                                                    "mark_type": {
+                                                        "type": "string",
+                                                        "example": "Numerical",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No active questions found for the specified exam ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No active questions found for this exam."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to retrieve questions. Please try again."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Database error or other internal error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/mock-test/questions/{exam_id}": {
+            "get": {
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Get all active questions for a specific exam",
+                "description": "This endpoint retrieves all active questions (status = 4) for a given exam by its ID.",
+                "operationId": "mockTestQuestions",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "exam_id",
+                        "in": "path",
+                        "description": "ID of the exam to retrieve questions for",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Questions retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Questions retrieved successfully!"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "exam_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "question": {
+                                                        "type": "string",
+                                                        "example": "What is the capital of Nepal?"
+                                                    },
+                                                    "option_1": {
+                                                        "type": "string",
+                                                        "example": "Kathmandu"
+                                                    },
+                                                    "option_value_1": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "option_2": {
+                                                        "type": "string",
+                                                        "example": "Pokhara"
+                                                    },
+                                                    "option_value_2": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "option_3": {
+                                                        "type": "string",
+                                                        "example": "Lalitpur",
+                                                        "nullable": true
+                                                    },
+                                                    "option_value_3": {
+                                                        "type": "boolean",
+                                                        "example": true,
+                                                        "nullable": true
+                                                    },
+                                                    "option_4": {
+                                                        "type": "string",
+                                                        "example": "Bhaktapur",
+                                                        "nullable": true
+                                                    },
+                                                    "option_value_4": {
+                                                        "type": "boolean",
+                                                        "example": false,
+                                                        "nullable": true
+                                                    },
+                                                    "explanation": {
+                                                        "type": "string",
+                                                        "example": "Kathmandu is the capital of Nepal.",
+                                                        "nullable": true
+                                                    },
+                                                    "subject": {
+                                                        "type": "string",
+                                                        "example": "Geography",
+                                                        "nullable": true
+                                                    },
+                                                    "exam_type": {
+                                                        "type": "string",
+                                                        "example": "MCQ",
+                                                        "nullable": true
+                                                    },
+                                                    "remark": {
+                                                        "type": "string",
+                                                        "example": "Important question",
+                                                        "nullable": true
+                                                    },
+                                                    "serial": {
+                                                        "type": "integer",
+                                                        "example": 1,
+                                                        "nullable": true
+                                                    },
+                                                    "old_exam_id": {
+                                                        "type": "integer",
+                                                        "example": 123,
+                                                        "nullable": true
+                                                    },
+                                                    "mark_type": {
+                                                        "type": "string",
+                                                        "example": "Numerical",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No active questions found for the specified exam ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No active questions found for this exam."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to retrieve questions. Please try again."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Database error or other internal error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/sprint-quiz/questions/{exam_id}": {
+            "get": {
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Get all active questions for a specific exam",
+                "description": "This endpoint retrieves all active questions (status = 3) for a given exam by its ID.",
+                "operationId": "sprintQuizQuestions",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "exam_id",
+                        "in": "path",
+                        "description": "ID of the exam to retrieve questions for",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Questions retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Questions retrieved successfully!"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "exam_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "question": {
+                                                        "type": "string",
+                                                        "example": "What is the capital of Nepal?"
+                                                    },
+                                                    "option_1": {
+                                                        "type": "string",
+                                                        "example": "Kathmandu"
+                                                    },
+                                                    "option_value_1": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "option_2": {
+                                                        "type": "string",
+                                                        "example": "Pokhara"
+                                                    },
+                                                    "option_value_2": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "option_3": {
+                                                        "type": "string",
+                                                        "example": "Lalitpur",
+                                                        "nullable": true
+                                                    },
+                                                    "option_value_3": {
+                                                        "type": "boolean",
+                                                        "example": true,
+                                                        "nullable": true
+                                                    },
+                                                    "option_4": {
+                                                        "type": "string",
+                                                        "example": "Bhaktapur",
+                                                        "nullable": true
+                                                    },
+                                                    "option_value_4": {
+                                                        "type": "boolean",
+                                                        "example": false,
+                                                        "nullable": true
+                                                    },
+                                                    "explanation": {
+                                                        "type": "string",
+                                                        "example": "Kathmandu is the capital of Nepal.",
+                                                        "nullable": true
+                                                    },
+                                                    "subject": {
+                                                        "type": "string",
+                                                        "example": "Geography",
+                                                        "nullable": true
+                                                    },
+                                                    "exam_type": {
+                                                        "type": "string",
+                                                        "example": "MCQ",
+                                                        "nullable": true
+                                                    },
+                                                    "remark": {
+                                                        "type": "string",
+                                                        "example": "Important question",
+                                                        "nullable": true
+                                                    },
+                                                    "serial": {
+                                                        "type": "integer",
+                                                        "example": 1,
+                                                        "nullable": true
+                                                    },
+                                                    "old_exam_id": {
+                                                        "type": "integer",
+                                                        "example": 123,
+                                                        "nullable": true
+                                                    },
+                                                    "mark_type": {
+                                                        "type": "string",
+                                                        "example": "Numerical",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No active questions found for the specified exam ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No active questions found for this exam."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to retrieve questions. Please try again."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Database error or other internal error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/free-quiz": {
             "get": {
                 "tags": [
                     "Quiz"
                 ],
-                "summary": "Get Free Quiz",
-                "description": "Retrieve a list of free quizzes based on their status.",
+                "summary": "Get Free Quiz (for users)",
+                "description": "Retrieve a paginated list of free quizzes.",
                 "operationId": "getFreeQuiz",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer",
-                                                "example": 1
-                                            },
-                                            "title": {
-                                                "type": "string",
-                                                "example": "Math Quiz"
-                                            },
-                                            "status": {
-                                                "type": "string",
-                                                "example": "free"
-                                            },
-                                            "created_at": {
-                                                "type": "string",
-                                                "format": "date-time"
-                                            },
-                                            "updated_at": {
-                                                "type": "string",
-                                                "format": "date-time"
-                                            }
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
                                         },
-                                        "type": "object"
-                                    }
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Free quizzes retrieved successfully."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "exam_name": {
+                                                                "type": "string",
+                                                                "example": "Math Quiz"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "free"
+                                                            },
+                                                            "user_id": {
+                                                                "type": "integer",
+                                                                "example": 12
+                                                            },
+                                                            "user": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 12
+                                                                    },
+                                                                    "fullname": {
+                                                                        "type": "string",
+                                                                        "example": "John Doe"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -4639,9 +6062,21 @@
                 "tags": [
                     "Quiz"
                 ],
-                "summary": "Get Sprint Quizzes",
+                "summary": "Get Sprint Quizzes (for users)",
                 "description": "Retrieve a list of sprint quizzes. Requires an active subscription.",
                 "operationId": "getSprintQuiz",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -4733,9 +6168,21 @@
                 "tags": [
                     "Quiz"
                 ],
-                "summary": "Get Mock Tests",
+                "summary": "Get Mock Tests (for users)",
                 "description": "Retrieve a list of Mock Tests. Requires an active subscription.",
                 "operationId": "getMockTests",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -4813,6 +6260,500 @@
                     },
                     "500": {
                         "description": "Internal Server Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/create-quiz": {
+            "post": {
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Create a quiz",
+                "description": "Creates a quiz. (Admin)",
+                "operationId": "examAsQuizStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "assign_id",
+                                    "quiz_name",
+                                    "status",
+                                    "exam_type_id"
+                                ],
+                                "properties": {
+                                    "assign_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "quiz_name": {
+                                        "type": "string",
+                                        "example": "Science Quiz A"
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "exam_type_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Quiz stored successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Quiz stored successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "exam_name": {
+                                                    "type": "string",
+                                                    "example": "Science Quiz A"
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "assign_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "exam_type_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "is_question_bank": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "quiz_name": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The quiz name field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/update-quiz/{id}": {
+            "put": {
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Update a Quiz (Admin)",
+                "description": "Update the details of an existing quiz by its ID",
+                "operationId": "updateExamAsQuiz",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the quiz to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "assign_id",
+                                    "quiz_name",
+                                    "status",
+                                    "exam_type_id"
+                                ],
+                                "properties": {
+                                    "assign_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "quiz_name": {
+                                        "type": "string",
+                                        "example": "Updated Quiz Name"
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "exam_type_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Quiz updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Quiz updated successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "exam_name": {
+                                                    "type": "string",
+                                                    "example": "Updated Quiz Name"
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "assign_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "exam_type_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Quiz not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Quiz not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "assign_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "quiz_name": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to update Quiz",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Failed to update Quiz"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Exception message..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/quiz/{id}": {
+            "get": {
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Get a Quiz by ID (Admin)",
+                "description": "Retrieve the details of a specific quiz (exam) by its ID",
+                "operationId": "getQuizById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the quiz to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Quiz found successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Quiz found successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "exam_name": {
+                                                    "type": "string",
+                                                    "example": "Sample Quiz"
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "assign_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "exam_type_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Quiz not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Quiz not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Delete a Quiz by ID (Admin)",
+                "description": "Delete a specific quiz (exam) by its ID",
+                "operationId": "deleteQuizById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the quiz to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Quiz deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Quiz deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Quiz not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Quiz not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to delete Quiz",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Failed to delete Quiz"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Exception message..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -5633,6 +7574,10 @@
         {
             "name": "Teacher Authentication",
             "description": "Teacher Authentication"
+        },
+        {
+            "name": "Question Banks",
+            "description": "Question Banks"
         },
         {
             "name": "Bookmarks",
