@@ -132,7 +132,6 @@ class ExamController extends Controller
     {
         // Validate the request data
         $validated = $request->validate([
-            'organization_id' => 'required|integer|exists:organizations,id',
             'exam_type_id' => 'required|integer|exists:exam_types,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',

@@ -9,15 +9,19 @@ class Exam extends Model
     //
 
     protected $fillable = [
-        'organization_id',
+        'user_id',
         'exam_type_id',
-        'name',
+        'exam_name',
+        'status',
         'description',
         'exam_date',
         'exam_time',
         'is_active',
         'price',
+        'assign_id',
+        'is_question_bank',
     ];
+    
 
     public function organization()
     {
