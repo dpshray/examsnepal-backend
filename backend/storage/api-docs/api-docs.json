@@ -4459,6 +4459,7 @@
                             "schema": {
                                 "required": [
                                     "exam_id",
+                                    "subject_id",
                                     "question",
                                     "option_1",
                                     "option_value_1",
@@ -4467,6 +4468,10 @@
                                 ],
                                 "properties": {
                                     "exam_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "subject_id": {
                                         "type": "integer",
                                         "example": 1
                                     },
@@ -4946,6 +4951,7 @@
                             "schema": {
                                 "required": [
                                     "exam_id",
+                                    "subject_id",
                                     "question",
                                     "option_1",
                                     "option_value_1",
@@ -4954,6 +4960,10 @@
                                 ],
                                 "properties": {
                                     "exam_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "subject_id": {
                                         "type": "integer",
                                         "example": 1
                                     },

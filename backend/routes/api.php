@@ -102,11 +102,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/sprint-quiz/questions/{exam_id}', [QuestionController::class, 'sprintQuizQuestions']);
     Route::get('/mock-test/questions/{exam_id}', [QuestionController::class, 'mockTestQuestions']);
 
-
-
-
-
-
 });
 
 // for exam type
@@ -154,12 +149,6 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
 
     // for doubts
     Route::get('/doubts', [DoubtController::class, 'index']);
-
-
-
-
-    
-
 });
 
 Route::middleware(['auth:users', 'role:teacher'])->group(function () {

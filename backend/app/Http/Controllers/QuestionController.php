@@ -314,8 +314,9 @@ class QuestionController extends Controller
      *             mediaType="application/json",
      *             @OA\Schema(
      *                 type="object",
-     *                 required={"exam_id", "question", "option_1", "option_value_1", "option_2", "option_value_2"},
+     *                 required={"exam_id","subject_id", "question", "option_1", "option_value_1", "option_2", "option_value_2"},
      *                 @OA\Property(property="exam_id", type="integer", example=1),
+     *                 @OA\Property(property="subject_id", type="integer", example=1),
      *                 @OA\Property(property="question", type="string", maxLength=255, example="What is the capital of Nepal?"),
      *                 @OA\Property(property="option_1", type="string", maxLength=255, example="Kathmandu"),
      *                 @OA\Property(property="option_value_1", type="boolean", example=true),
@@ -393,6 +394,7 @@ class QuestionController extends Controller
         // Validate incoming request data
         $validatedData = $request->validate([
             'exam_id' => 'required|exists:exams,id',
+            'subject_id'=>'required|exists:subjects,id',
             'question' => 'required|string|max:255',
             'option_1' => 'required|string|max:255',
             'option_value_1' => 'required|boolean',
@@ -463,8 +465,10 @@ class QuestionController extends Controller
      *             mediaType="application/json",
      *             @OA\Schema(
      *                 type="object",
-     *                 required={"exam_id", "question", "option_1", "option_value_1", "option_2", "option_value_2"},
+     *                 required={"exam_id","subject_id", "question", "option_1", "option_value_1", "option_2", "option_value_2"},
+     * 
      *                 @OA\Property(property="exam_id", type="integer", example=1),
+     *                 @OA\Property(property="subject_id", type="integer", example=1),
      *                 @OA\Property(property="question", type="string", maxLength=255, example="What is the capital of Nepal?"),
      *                 @OA\Property(property="option_1", type="string", maxLength=255, example="Kathmandu"),
      *                 @OA\Property(property="option_value_1", type="boolean", example=true),
@@ -548,6 +552,7 @@ class QuestionController extends Controller
         $userId = Auth::id();
         $validatedData = $request->validate([
             'exam_id' => 'required|exists:exams,id',
+            'subject_id'=>'required|exists:subjects,id',
             'question' => 'required|string|max:255',
             'option_1' => 'required|string|max:255',
             'option_value_1' => 'required|boolean',
@@ -558,6 +563,7 @@ class QuestionController extends Controller
             'option_4' => 'nullable|string|max:255',
             'option_value_4' => 'nullable|boolean',
             'explanation' => 'nullable|string',
+            
         ]);
 
         // Ensure only one `option_value_*` is true
