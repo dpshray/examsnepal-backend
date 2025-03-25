@@ -50,4 +50,5 @@ class Question extends Model
     {
         return $this->hasMany(Doubt::class, 'question_id');
     }
+    
 }

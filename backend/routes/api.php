@@ -141,13 +141,13 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::delete('/quiz/{id}',[QuizController::class,'destroy']);
 
      // for Questions
-     Route::post('/questions', [QuestionController::class, 'store']);
-     Route::get('/questions', [QuestionController::class, 'index']);
-     Route::get('/questions/all', [QuestionController::class, 'getAllQuestion']);
-     Route::get('/questions/{id}', [QuestionController::class, 'show']);
-     Route::put('/questions/{id}', [QuestionController::class, 'update']);
-     Route::delete('/questions/{id}', [QuestionController::class, 'destroy']);
-     Route::get('/search-questions', [QuestionController::class, 'searchQuestions']);
+    //  Route::post('/questions', [QuestionController::class, 'store']);
+    //  Route::get('/questions', [QuestionController::class, 'index']);
+    //  Route::get('/questions/all', [QuestionController::class, 'getAllQuestion']);
+    //  Route::get('/questions/{id}', [QuestionController::class, 'show']);
+    //  Route::put('/questions/{id}', [QuestionController::class, 'update']);
+    //  Route::delete('/questions/{id}', [QuestionController::class, 'destroy']);
+    //  Route::get('/search-questions', [QuestionController::class, 'searchQuestions']);
 
     //  for question bank question
     Route::post('/question-bank/questions', [QuestionController::class, 'storeOnQuestionBank']);

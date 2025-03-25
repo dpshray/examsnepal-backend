@@ -2237,28 +2237,41 @@
                         }
                     }
                 }
-            }
-        },
-        "/doubt": {
+            },
             "post": {
                 "tags": [
                     "Doubts"
                 ],
-                "summary": "Store a new doubt",
-                "operationId": "b817bdf04909422feee1bf3f3cb8b8ca",
+                "summary": "Create a new doubt",
+                "description": "Creates a new doubt in the system.",
+                "operationId": "a326ecb6372367de47d933065dae9358",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
+                                "required": [
+                                    "doubt",
+                                    "exam_id",
+                                    "org_id",
+                                    "question_id"
+                                ],
                                 "properties": {
-                                    "title": {
+                                    "doubt": {
                                         "type": "string",
-                                        "example": "What is Laravel?"
+                                        "example": "This is a sample doubt."
                                     },
-                                    "description": {
-                                        "type": "string",
-                                        "example": "I want to know about Laravel."
+                                    "exam_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "org_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "question_id": {
+                                        "type": "integer",
+                                        "example": 101
                                     }
                                 },
                                 "type": "object"
@@ -2268,17 +2281,134 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Resource stored successfully",
+                        "description": "Doubt successfully created",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "Resource stored successfully."
+                                            "example": "Doubt successfully created"
                                         },
                                         "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "doubt": {
+                                                    "type": "string",
+                                                    "example": "This is a sample doubt."
+                                                },
+                                                "exam_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "org_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_id": {
+                                                    "type": "integer",
+                                                    "example": 101
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "1"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-03-25T00:00:00.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-03-25T00:00:00.000000Z"
+                                                }
+                                            },
                                             "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "doubt": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The doubt field is required."
+                                                    }
+                                                },
+                                                "exam_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The exam id must exist in the exams table."
+                                                    }
+                                                },
+                                                "org_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The org id must exist in the organizations table."
+                                                    }
+                                                },
+                                                "question_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The question id must exist in the questions table."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected error occurred",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "An unexpected error occurred"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error message"
                                         }
                                     },
                                     "type": "object"
@@ -2329,65 +2459,6 @@
                     }
                 }
             },
-            "put": {
-                "tags": [
-                    "Doubts"
-                ],
-                "summary": "Update a doubt",
-                "operationId": "16a706bc9523813e328b00bca05bbc08",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Doubt ID",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "title": {
-                                        "type": "string",
-                                        "example": "Updated Doubt Title"
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "example": "Updated Description"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Resource updated successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Resource updated successfully."
-                                        },
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
             "delete": {
                 "tags": [
                     "Doubts"
@@ -2415,6 +2486,200 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Resource deleted successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doubts/{id}": {
+            "put": {
+                "tags": [
+                    "Doubts"
+                ],
+                "summary": "Update a specific doubt",
+                "description": "Updates the details of a specific doubt if it has not been solved already.",
+                "operationId": "updateDoubt",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of the doubt to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "doubt",
+                                    "exam_id",
+                                    "org_id",
+                                    "question_id"
+                                ],
+                                "properties": {
+                                    "doubt": {
+                                        "type": "string",
+                                        "example": "This is a new doubt."
+                                    },
+                                    "exam_id": {
+                                        "type": "integer",
+                                        "example": 123
+                                    },
+                                    "org_id": {
+                                        "type": "integer",
+                                        "example": 456
+                                    },
+                                    "question_id": {
+                                        "type": "integer",
+                                        "example": 789
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Doubt successfully updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Doubt successfully updated"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "doubt": {
+                                                    "type": "string",
+                                                    "example": "This is a new doubt."
+                                                },
+                                                "exam_id": {
+                                                    "type": "integer",
+                                                    "example": 123
+                                                },
+                                                "org_id": {
+                                                    "type": "integer",
+                                                    "example": 456
+                                                },
+                                                "question_id": {
+                                                    "type": "integer",
+                                                    "example": 789
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "1"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The doubt cannot be updated because it has already been solved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This doubt has already been solved and cannot be updated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Doubt not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Doubt not found."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An unexpected error occurred",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "An unexpected error occurred"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error message"
                                         }
                                     },
                                     "type": "object"
