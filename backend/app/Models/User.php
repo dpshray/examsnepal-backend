@@ -68,4 +68,9 @@ class User extends Authenticatable implements JWTSubject{
             'password' => 'hashed',
         ];
     }
+
+    public function doubts()
+    {
+        return $this->hasMany(Doubt::class, 'org_id');
+    }
 }

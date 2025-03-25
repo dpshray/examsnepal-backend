@@ -42,4 +42,9 @@ class Exam extends Model
     {
         return $this->belongsTo(User::class, 'user_id'); // Defines the relationship
     }
+
+    public function doubts()
+    {
+        return $this->hasMany(Doubt::class);
+    }
 }

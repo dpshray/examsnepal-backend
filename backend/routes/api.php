@@ -12,7 +12,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\BankQuestionController;
-
+use App\Http\Controllers\DoubtController;
 
 
 
@@ -88,7 +88,6 @@ Route::middleware(['auth:api'])->group(function () {
 
     // for Doubts
     Route::post('/doubt', [QuestionController::class, 'store']);
-    Route::get('/doubts', [QuestionController::class, 'index']);
     Route::get('/doubt/{id}', [QuestionController::class, 'show']);
     Route::put('/doubt/{id}', [QuestionController::class, 'update']);
     Route::delete('/doubt/{id}', [QuestionController::class, 'destroy']);
@@ -152,6 +151,9 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
 
     //  for question bank question
     Route::post('/question-bank/questions', [QuestionController::class, 'storeOnQuestionBank']);
+
+    // for doubts
+    Route::get('/doubts', [DoubtController::class, 'index']);
 
 
 

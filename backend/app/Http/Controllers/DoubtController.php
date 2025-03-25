@@ -32,9 +32,14 @@ class DoubtController extends Controller
     public function index()
     {
         //
+        $doubts = Doubt::select('id','doubt','created_at','updated_at','status','exam_id','student_id','org_id','question_id')
+        ->where('status','1')
+        ->with('exam:id,exam_name','student:id,name','organization:id,fullname','question:id,question')
+        ->get();
+        
         return response()->json([
             'message' => 'Fetched all doubts successfully.',
-            'data' => []
+            'data' => $doubts,
         ], 200);
     }
 
@@ -196,7 +201,17 @@ class DoubtController extends Controller
     public function destroy(string $id)
     {
         //
+        $doubt=Doubt::find($id);
+        if(!$doubt){
+            return response()->json([
+                'success'=>false,
+            'message'=>'Doubt not found',
+            ],404);
+        }
+        $doubt->delete();
+
         return response()->json([
+            'success'=>true,
             'message' => "Resource with ID $id deleted successfully."
         ], 200);
     }

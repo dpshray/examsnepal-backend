@@ -23,4 +23,24 @@ class Doubt extends Model
         'solved_by',
     ];
 
+    public function exam()
+    {
+        return $this->belongsTo(Exam::class);
+    }
+
+    public function student()
+    {
+        return $this->belongsTo(StudentProfile::class);
+    }
+
+    public function organization()
+    {
+        return $this->belongsTo(User::class, 'org_id');
+    }
+
+    public function question()
+    {
+        return $this->belongsTo(Question::class, 'question_id');
+    }
+
 }

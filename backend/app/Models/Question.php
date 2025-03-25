@@ -46,4 +46,8 @@ class Question extends Model
     {
         return $this->hasMany(Bookmark::class, 'question_id');
     }
+    public function doubts()
+    {
+        return $this->hasMany(Doubt::class, 'question_id');
+    }
 }
