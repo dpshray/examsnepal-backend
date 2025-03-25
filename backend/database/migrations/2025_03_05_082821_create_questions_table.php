@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('exam_id')->constrained()->onDelete('cascade'); // Foreign key to exams table
-            $table->text('question'); // Main question text
+            $table->foreignId('exam_id')->constrained()->onDelete('cascade');
+            $table->text('question'); 
             $table->string('option_1');
             $table->boolean('option_value_1')->default(0);
             $table->string('option_2');
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->text('remark')->nullable();
             $table->integer('serial')->nullable();
             $table->unsignedBigInteger('old_exam_id')->nullable();
-            $table->foreignId('uploader')->constrained('users')->onDelete('cascade'); // Assuming uploader is a user
+            $table->foreignId('uploader')->constrained('users')->onDelete('cascade');
             $table->string('mark_type')->nullable();
             $table->fullText('question');
 

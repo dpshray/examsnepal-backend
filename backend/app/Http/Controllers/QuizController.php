@@ -86,6 +86,7 @@ class QuizController extends Controller
         $freeQuiz = Exam::where('status', $this->quizTypes['freeQuiz'])
             ->select(['id', 'exam_name', 'status', 'user_id'])
             ->with(['user:id,fullname'])
+            ->withCount('questions')
             ->paginate(10);
 
 
@@ -162,7 +163,8 @@ class QuizController extends Controller
 
         $sprintQuiz = Exam::where('status', $this->quizTypes['sprintQuiz'])
             ->select(['id', 'exam_name', 'status', 'user_id'])
-            ->with(['user:id,fullname'])  // Eager load related user details (if needed)
+            ->with(['user:id,fullname'])
+            ->withCount('questions')
             ->paginate(10);
 
 
@@ -239,7 +241,8 @@ class QuizController extends Controller
 
         $mockTest = Exam::where('status', $this->quizTypes['mockTest'])
             ->select(['id', 'exam_name', 'status', 'user_id'])
-            ->with(['user:id,fullname'])  // Eager load related user details (if needed)
+            ->with(['user:id,fullname']) 
+            ->withCount('questions')
             ->paginate(10);
 
         return response()->json([

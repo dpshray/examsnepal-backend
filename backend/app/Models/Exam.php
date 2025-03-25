@@ -21,7 +21,7 @@ class Exam extends Model
         'assign_id',
         'is_question_bank',
     ];
-    
+
 
     public function organization()
     {
@@ -41,5 +41,14 @@ class Exam extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id'); // Defines the relationship
+    }
+
+    public function doubts()
+    {
+        return $this->hasMany(Doubt::class);
+    }
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
     }
 }
