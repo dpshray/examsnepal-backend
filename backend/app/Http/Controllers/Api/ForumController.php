@@ -20,7 +20,7 @@ use Illuminate\Http\JsonResponse;
  * )
  * 
  * @OA\Server( 
- *  url="http://192.168.1.67:8000/api",
+ *      url="https://api.examsnepal.dworklabs.com/api",
  *     description="Localhost API Server"
  * )
  * 
