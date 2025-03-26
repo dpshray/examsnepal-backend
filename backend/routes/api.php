@@ -13,6 +13,8 @@ use App\Http\Controllers\QuizController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\BankQuestionController;
 use App\Http\Controllers\DoubtController;
+use App\Http\Controllers\AnswerSheetController;
+
 
 
 
@@ -101,6 +103,17 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/free-quiz/questions/{exam_id}', [QuestionController::class, 'freeQuizQuestions']);
     Route::get('/sprint-quiz/questions/{exam_id}', [QuestionController::class, 'sprintQuizQuestions']);
     Route::get('/mock-test/questions/{exam_id}', [QuestionController::class, 'mockTestQuestions']);
+    Route::post('/submit-answers', [AnswerSheetController::class, 'store']);
+    Route::get('/view-solutions/{exam_id}', [AnswerSheetController::class, 'getResultsWithExam']);
+
+    // solutions
+    Route::get('/solution/free-quiz',[AnswerSheetController::class,'getFreeQuizSolutions']);
+    Route::get('/solution/sprint-quiz',[AnswerSheetController::class,'getDoneSprintQuiz']);
+    Route::get('/solution/mock-test',[AnswerSheetController::class,'getDoneMockTest']);
+
+    
+
+
 
 });
 

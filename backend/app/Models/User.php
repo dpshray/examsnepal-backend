@@ -8,7 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable implements JWTSubject{
+class User extends Authenticatable implements JWTSubject
+{
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
@@ -18,7 +19,7 @@ class User extends Authenticatable implements JWTSubject{
      * @var list<string>
      */
     protected $fillable = [
-       'username',
+        'username',
         'password',
         'fullname',
         'role',
@@ -72,5 +73,9 @@ class User extends Authenticatable implements JWTSubject{
     public function doubts()
     {
         return $this->hasMany(Doubt::class, 'org_id');
+    }
+    public function answerSheets()
+    {
+        return $this->hasMany(AnswerSheet::class);
     }
 }

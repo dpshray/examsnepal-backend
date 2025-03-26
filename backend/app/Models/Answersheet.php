@@ -18,5 +18,14 @@ class Answersheet extends Model
         'correct_answer_submitted',
         'choosed_option_value',
     ];
-    
+
+    public function exam()
+    {
+        return $this->belongsTo(Exam::class);
+    }
+
+    public function student()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

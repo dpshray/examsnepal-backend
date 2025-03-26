@@ -12,6 +12,557 @@
         }
     ],
     "paths": {
+        "/submit-answer": {
+            "post": {
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Submit answers for a quiz",
+                "description": "Stores answers submitted by a student for a particular exam.",
+                "operationId": "submitStudentAnswers",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "exam_id",
+                                    "student_id",
+                                    "question_id",
+                                    "choosed_option_value",
+                                    "correct_answer_submitted"
+                                ],
+                                "properties": {
+                                    "exam_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "student_id": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "question_id": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 101
+                                        },
+                                        "example": [
+                                            101,
+                                            102,
+                                            103
+                                        ]
+                                    },
+                                    "choosed_option_value": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "enum": [
+                                                1,
+                                                2,
+                                                3,
+                                                4
+                                            ],
+                                            "example": 2
+                                        },
+                                        "example": [
+                                            2,
+                                            4,
+                                            1
+                                        ]
+                                    },
+                                    "correct_answer_submitted": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "example": [
+                                            true,
+                                            false,
+                                            true
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Answers submitted successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Answers submitted successfully!"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "exam_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "student_id": {
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "question_id": {
+                                                        "type": "integer",
+                                                        "example": 101
+                                                    },
+                                                    "choosed_option_value": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "correct_answer_submitted": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Student has already submitted answers for this exam.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Student has already submitted answers for this exam."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error - array lengths don't match.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "All arrays (question_id, choosed_option_value, correct_answer_submitted) must have the same number of elements."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/view-solutions/{exam_id}": {
+            "get": {
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Fetch answers for a specific exam",
+                "description": "Fetch all answers for the given exam for the authenticated student.",
+                "operationId": "getResultsWithExam",
+                "parameters": [
+                    {
+                        "name": "exam_id",
+                        "in": "path",
+                        "description": "The unique identifier of the exam",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved solutions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Solutions retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "exam_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "student_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "answer": {
+                                                        "type": "string"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No solutions found for this exam",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No solutions found for this exam."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - The user is not authenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/solution/free-quiz": {
+            "get": {
+                "tags": [
+                    "Solution"
+                ],
+                "summary": "Get Free Quizzes Done by the Student",
+                "description": "Retrieve all free quizzes that have been completed by the authenticated student.",
+                "operationId": "e686190ea17b4c410634b2da526adddc",
+                "responses": {
+                    "200": {
+                        "description": "Free quizzes retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Free quizzes retrieved successfully."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "exam_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "exam_name": {
+                                                        "type": "string",
+                                                        "example": "Math Quiz"
+                                                    },
+                                                    "status": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-03-26T12:00:00Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Something went wrong."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/solution/sprint-quiz": {
+            "get": {
+                "tags": [
+                    "Solution"
+                ],
+                "summary": "Get Sprint Quizzes Done by the Student",
+                "description": "Retrieve all Sprint quizzes that have been completed by the authenticated student.",
+                "operationId": "786858b2cc9d09db9a3de255d1bd694e",
+                "responses": {
+                    "200": {
+                        "description": "Sprint quizzes retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sprint quizzes retrieved successfully."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "exam_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "exam_name": {
+                                                        "type": "string",
+                                                        "example": "Math Quiz"
+                                                    },
+                                                    "status": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-03-26T12:00:00Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Something went wrong."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/solution/mock-test": {
+            "get": {
+                "tags": [
+                    "Solution"
+                ],
+                "summary": "Get Mock Tests Done by the Student",
+                "description": "Retrieve all Mock Tests that have been completed by the authenticated student.",
+                "operationId": "139b1c7a08caf54255e56d11cb3505e1",
+                "responses": {
+                    "200": {
+                        "description": "Mock Tests retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Mock Tests retrieved successfully."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "exam_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "exam_name": {
+                                                        "type": "string",
+                                                        "example": "Math Quiz"
+                                                    },
+                                                    "status": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-03-26T12:00:00Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Something went wrong."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/student/questions": {
             "get": {
                 "tags": [
@@ -7835,6 +8386,14 @@
             "description": "API Endpoints for Managing Forum Questions"
         },
         {
+            "name": "Quiz",
+            "description": "Quiz"
+        },
+        {
+            "name": "Solution",
+            "description": "Solution"
+        },
+        {
             "name": "Users",
             "description": "Users"
         },
@@ -7877,10 +8436,6 @@
         {
             "name": "MCQs",
             "description": "MCQs"
-        },
-        {
-            "name": "Quiz",
-            "description": "Quiz"
         },
         {
             "name": "Students",
