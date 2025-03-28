@@ -57,7 +57,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/student/questions/{subStream}', [ForumController::class, 'fetchQuestionsBySubstream']);
     Route::delete('/student/questions/{id}', [ForumController::class, 'deleteTheirQuestionCreated']);
 
-    Route::post('/student/answers', [ForumController::class, 'addAnswer']);
+    Route::post('/student/answer', [ForumController::class, 'addAnswer']);
 
 
     // for exam type
