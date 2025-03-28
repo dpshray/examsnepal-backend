@@ -57,7 +57,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/student/questions/{subStream}', [ForumController::class, 'fetchQuestionsBySubstream']);
     Route::delete('/student/questions/{id}', [ForumController::class, 'deleteTheirQuestionCreated']);
 
-    Route::post('/student/answer', [ForumController::class, 'addAnswer']);
+    Route::post('/student/answers', [ForumController::class, 'addAnswer']);
 
 
     // for exam type
@@ -106,7 +106,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/free-quiz/questions/{exam_id}', [QuestionController::class, 'freeQuizQuestions']);
     Route::get('/sprint-quiz/questions/{exam_id}', [QuestionController::class, 'sprintQuizQuestions']);
     Route::get('/mock-test/questions/{exam_id}', [QuestionController::class, 'mockTestQuestions']);
-    Route::post('/submit-answers', [AnswerSheetController::class, 'store']);
+    Route::post('/submit-answer', [AnswerSheetController::class, 'store']);
     Route::get('/view-solutions/{exam_id}', [AnswerSheetController::class, 'getResultsWithExam']);
 
     // solutions
