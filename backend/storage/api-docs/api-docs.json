@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://192.168.1.67:8000/api",
+            "url": "https://api.examsnepal.dworklabs.com/api",
             "description": "Localhost API Server"
         }
     ],
@@ -616,18 +616,6 @@
                 ],
                 "summary": "Fetch all questions based on the user's stream",
                 "operationId": "5f8975f74f0dd4ec19f65c2eea3847af",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number for pagination",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "List of questions"
@@ -650,18 +638,6 @@
                 ],
                 "summary": "Fetch all questions created by me",
                 "operationId": "c9e58b3446dbf1f37afac09db1dcf2c6",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number for pagination",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "List of questions created by me"
