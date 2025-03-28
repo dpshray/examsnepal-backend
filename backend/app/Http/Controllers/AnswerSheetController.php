@@ -164,6 +164,13 @@ class AnswerSheetController extends Controller
      *     description="Fetch all answers for the given exam for the authenticated student.",
      *     operationId="getResultsWithExam",
      *     tags={"Quiz"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Parameter(
      *         name="exam_id",
      *         in="path",
@@ -229,7 +236,7 @@ class AnswerSheetController extends Controller
         // Fetch all answers for the given exam
         $answers = Answersheet::where('exam_id', $exam_id)
             ->where('student_id', $student_id)
-            ->get();
+            ->paginate(10);
 
         // need to send as Required format 
 
@@ -255,6 +262,13 @@ class AnswerSheetController extends Controller
      *     summary="Get Free Quizzes Done by the Student",
      *     description="Retrieve all free quizzes that have been completed by the authenticated student.",
      *     tags={"Solution"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     security={{"bearerAuth": {}}},
      *     @OA\Response(
      *         response=200,
@@ -299,7 +313,7 @@ class AnswerSheetController extends Controller
                 $query->where('status', 1);
             })
             ->with('exam')
-            ->get();
+            ->paginate(10);
 
         if ($freeQuizzesGivenByStudent->isEmpty()) {
             return response()->json([
@@ -323,6 +337,13 @@ class AnswerSheetController extends Controller
      *     summary="Get Sprint Quizzes Done by the Student",
      *     description="Retrieve all Sprint quizzes that have been completed by the authenticated student.",
      *     tags={"Solution"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     security={{"bearerAuth": {}}},
      *     @OA\Response(
      *         response=200,
@@ -368,7 +389,7 @@ class AnswerSheetController extends Controller
                 $query->where('status', 3);
             })
             ->with('exam')
-            ->get();
+            ->paginate(10);
         if ($sprintQuizzesGivenByStudent->isEmpty()) {
             return response()->json([
                 'success' => false,
@@ -389,6 +410,13 @@ class AnswerSheetController extends Controller
      *     summary="Get Mock Tests Done by the Student",
      *     description="Retrieve all Mock Tests that have been completed by the authenticated student.",
      *     tags={"Solution"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     security={{"bearerAuth": {}}},
      *     @OA\Response(
      *         response=200,
@@ -433,7 +461,7 @@ class AnswerSheetController extends Controller
                 $query->where('status', 4);
             })
             ->with('exam')
-            ->get();
+            ->paginate(10);
         if ($mockTestsGivenByStudent->isEmpty()) {
             return response()->json([
                 'success' => false,

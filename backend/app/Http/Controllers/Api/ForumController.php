@@ -55,6 +55,13 @@ class ForumController extends Controller
      * @OA\Get(
      *     path="/student/questions",
      *     tags={"Forum"},
+     *      @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     summary="Fetch all questions based on the user's stream",
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(
@@ -88,7 +95,7 @@ class ForumController extends Controller
             ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
             ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
             ->withCount('answers')
-            ->get();
+            ->paginate(10);
 
         return response()->json($questions);
     }
@@ -97,6 +104,13 @@ class ForumController extends Controller
      * @OA\Get(
      *     path="/student/myquestions",
      *     tags={"Forum"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     summary="Fetch all questions created by me",
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(
@@ -132,7 +146,7 @@ class ForumController extends Controller
             ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
             ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
             ->withCount('answers')
-            ->get();
+            ->paginate(10);
 
         return response()->json($questions);
     }
@@ -150,7 +164,7 @@ class ForumController extends Controller
             ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
             ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
             ->withCount('answers')
-            ->get();
+            ->paginate(10);
         return response()->json($questions);
     }
 

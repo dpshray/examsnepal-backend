@@ -18,6 +18,13 @@ class DoubtController extends Controller
      *     path="/doubts",
      *     summary="Get all doubts",
      *     tags={"Doubts"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Fetched all doubts successfully",
@@ -35,7 +42,7 @@ class DoubtController extends Controller
         $doubts = Doubt::select('id', 'doubt', 'created_at', 'updated_at', 'status', 'exam_id', 'student_id', 'org_id', 'question_id')
             ->where('status', '1')
             ->with('exam:id,exam_name', 'student:id,name', 'organization:id,fullname', 'question:id,question')
-            ->get();
+            ->paginate(10);
 
         return response()->json([
             'message' => 'Fetched all doubts successfully.',

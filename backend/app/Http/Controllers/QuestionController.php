@@ -20,6 +20,13 @@ class QuestionController extends Controller
      *     path="/questions",
      *     operationId="getQuestions",
      *     tags={"MCQs"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     summary="Get questions based on user exam type with pagination",
      *     description="Fetches questions for the authenticated user based on their exam type, with pagination support.",
      *     @OA\Response(
@@ -115,6 +122,13 @@ class QuestionController extends Controller
      *     path="/questions/all",
      *     operationId="getAllQuestions",
      *     tags={"MCQs"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     summary="Get all questions",
      *     description="Fetches all the questions from the database.",
      *     @OA\Response(
@@ -150,7 +164,7 @@ class QuestionController extends Controller
 
     public function getAllQuestion()
     {
-        $questions = Question::all();
+        $questions = Question::paginate(25);
         if ($questions->isEmpty()) {
             return response()->json([
                 'success' => false,
@@ -394,7 +408,7 @@ class QuestionController extends Controller
         // Validate incoming request data
         $validatedData = $request->validate([
             'exam_id' => 'required|exists:exams,id',
-            'subject_id'=>'required|exists:subjects,id',
+            'subject_id' => 'required|exists:subjects,id',
             'question' => 'required|string|max:255',
             'option_1' => 'required|string|max:255',
             'option_value_1' => 'required|boolean',
@@ -552,7 +566,7 @@ class QuestionController extends Controller
         $userId = Auth::id();
         $validatedData = $request->validate([
             'exam_id' => 'required|exists:exams,id',
-            'subject_id'=>'required|exists:subjects,id',
+            'subject_id' => 'required|exists:subjects,id',
             'question' => 'required|string|max:255',
             'option_1' => 'required|string|max:255',
             'option_value_1' => 'required|boolean',
@@ -563,7 +577,7 @@ class QuestionController extends Controller
             'option_4' => 'nullable|string|max:255',
             'option_value_4' => 'nullable|boolean',
             'explanation' => 'nullable|string',
-            
+
         ]);
 
         // Ensure only one `option_value_*` is true

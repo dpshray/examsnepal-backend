@@ -19,7 +19,13 @@ class BankQuestionController extends Controller
      *     description="Returns a list of exams that are marked as question banks",
      *     operationId="getQuestionBanks",
      *     tags={"Question Banks"},
-     *
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="List of all Question Banks retrieved successfully",
@@ -59,7 +65,7 @@ class BankQuestionController extends Controller
     {
         //
         $questionBanks = Exam::where('is_question_bank', true)
-            ->get(['id', 'exam_name as bank_name']);
+        ->paginate(10, ['id', 'exam_name as bank_name']);
         return response()->json($questionBanks);
     }
 

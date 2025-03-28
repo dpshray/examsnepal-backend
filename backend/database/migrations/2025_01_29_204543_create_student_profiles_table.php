@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('student_profiles', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email');
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
             $table->text('description')->nullable();
