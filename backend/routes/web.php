@@ -11,6 +11,6 @@ Route::get('/', function () {
 // })->withoutMiddleware('auth:api');
 
 Route::get('/doc', function () {
-    Artisan::call('l5-swagger:generate'); // Run the Swagger generate command
-    return redirect('/api/documentation'); // Redirect to Swagger UI
+    Artisan::call('l5-swagger:generate');
+    return redirect('/api/documentation');
 });

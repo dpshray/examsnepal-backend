@@ -19,6 +19,13 @@ class BookmarkController extends Controller
      *     path="/bookmarks",
      *     summary="Get all bookmarks with question and student details",
      *     tags={"Bookmarks"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="List of bookmarks",
@@ -58,7 +65,7 @@ class BookmarkController extends Controller
             ->with(['bookmarks.student' => function ($query) {
                 $query->select('id', 'name'); // Load specific student fields
             }])
-            ->get()
+            ->paginate(10)
             ->map(function ($question) {
                 // Extract students from bookmarks and add to top-level 'students'
                 $question['students'] = $question->bookmarks->pluck('student')->unique('id')->values();
@@ -270,7 +277,7 @@ class BookmarkController extends Controller
         // Fetch bookmarks for the given student_id
         $bookmarks = Bookmark::with('questions')
             ->where('student_id', $student_id)
-            ->get();
+            ->paginate(10);
 
         // Check if any bookmarks exist for the student
         if ($bookmarks->isEmpty()) {
@@ -286,6 +293,13 @@ class BookmarkController extends Controller
      *     description="Fetches all bookmarks for the authenticated user.",
      *     operationId="getAllMyBookmarks",
      *     tags={"Bookmarks"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     security={{"bearerAuth": {}}},
      *     @OA\Response(
      *         response=200,
@@ -335,7 +349,7 @@ class BookmarkController extends Controller
         // Fetch bookmarks for the given student_id
         $bookmarks = Bookmark::with('questions')
             ->where('student_id', $userId)
-            ->get();
+            ->paginate(10);
 
         // Check if any bookmarks exist for the student
         if ($bookmarks->isEmpty()) {

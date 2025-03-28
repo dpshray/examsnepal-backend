@@ -187,6 +187,16 @@
                 "operationId": "getResultsWithExam",
                 "parameters": [
                     {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
                         "name": "exam_id",
                         "in": "path",
                         "description": "The unique identifier of the exam",
@@ -289,6 +299,18 @@
                 "summary": "Get Free Quizzes Done by the Student",
                 "description": "Retrieve all free quizzes that have been completed by the authenticated student.",
                 "operationId": "e686190ea17b4c410634b2da526adddc",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Free quizzes retrieved successfully.",
@@ -383,6 +405,18 @@
                 "summary": "Get Sprint Quizzes Done by the Student",
                 "description": "Retrieve all Sprint quizzes that have been completed by the authenticated student.",
                 "operationId": "786858b2cc9d09db9a3de255d1bd694e",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Sprint quizzes retrieved successfully.",
@@ -477,6 +511,18 @@
                 "summary": "Get Mock Tests Done by the Student",
                 "description": "Retrieve all Mock Tests that have been completed by the authenticated student.",
                 "operationId": "139b1c7a08caf54255e56d11cb3505e1",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Mock Tests retrieved successfully.",
@@ -570,6 +616,18 @@
                 ],
                 "summary": "Fetch all questions based on the user's stream",
                 "operationId": "5f8975f74f0dd4ec19f65c2eea3847af",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of questions"
@@ -592,6 +650,18 @@
                 ],
                 "summary": "Fetch all questions created by me",
                 "operationId": "c9e58b3446dbf1f37afac09db1dcf2c6",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of questions created by me"
@@ -1840,6 +1910,18 @@
                 "summary": "Get all question banks",
                 "description": "Returns a list of exams that are marked as question banks",
                 "operationId": "getQuestionBanks",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of all Question Banks retrieved successfully",
@@ -2369,6 +2451,18 @@
                 ],
                 "summary": "Get all bookmarks with question and student details",
                 "operationId": "e324077332db101556bb3d52193f34e4",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of bookmarks",
@@ -2662,6 +2756,18 @@
                 "summary": "Get all bookmarks for the authenticated user",
                 "description": "Fetches all bookmarks for the authenticated user.",
                 "operationId": "getAllMyBookmarks",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Bookmarks retrieved successfully",
@@ -2764,6 +2870,18 @@
                 ],
                 "summary": "Get all doubts",
                 "operationId": "4aea25c6dd2c9637f46829567b591f38",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Fetched all doubts successfully",
@@ -3249,6 +3367,18 @@
                 "summary": "Get all exams",
                 "description": "Fetches a list of exams along with their associated organizations and exam types.",
                 "operationId": "getExams",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of exams retrieved successfully",
@@ -4405,6 +4535,66 @@
                 }
             }
         },
+        "/migrate": {
+            "get": {
+                "tags": [
+                    "AnswerSheet Migration"
+                ],
+                "summary": "Migrate old answer sheet data to new format",
+                "description": "This endpoint migrates legacy answer sheet records from the old format (answersheet table) into the new answersheets table format.",
+                "operationId": "migrateAnswersheets",
+                "responses": {
+                    "200": {
+                        "description": "Migration completed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Migration completed successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Old answer sheet or student not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Old answer sheet or student not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Migration failed: {error_message}"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/organization": {
             "get": {
                 "tags": [
@@ -4887,6 +5077,18 @@
                 "summary": "Get questions based on user exam type with pagination",
                 "description": "Fetches questions for the authenticated user based on their exam type, with pagination support.",
                 "operationId": "getQuestions",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Questions retrieved successfully",
@@ -5293,6 +5495,18 @@
                 "summary": "Get all questions",
                 "description": "Fetches all the questions from the database.",
                 "operationId": "getAllQuestions",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Questions retrieved successfully",
@@ -8428,6 +8642,10 @@
         {
             "name": "Exam Types",
             "description": "Exam Types"
+        },
+        {
+            "name": "AnswerSheet Migration",
+            "description": "AnswerSheet Migration"
         },
         {
             "name": "Organizations",

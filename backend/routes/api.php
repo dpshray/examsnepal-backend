@@ -14,6 +14,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\BankQuestionController;
 use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
+use App\Http\Controllers\MigrationController;
 
 
 
@@ -23,6 +24,8 @@ use Illuminate\Support\Facades\Route;
 
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
+Route::get('/migrate', [MigrationController::class, 'migrateNext']);
+
 
 // Email verification route
 Route::get('/email/verify/{id}', [AuthController::class, 'verifyEmail'])->name('verification.verify');

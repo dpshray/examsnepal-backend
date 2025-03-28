@@ -18,7 +18,13 @@ class ExamController extends Controller
      *     description="Fetches a list of exams along with their associated organizations and exam types.",
      *     operationId="getExams",
      *     tags={"Exams"},
-     *
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="List of exams retrieved successfully",
@@ -56,7 +62,7 @@ class ExamController extends Controller
     public function index()
     {
         //
-        $exams = Exam::with(['organization', 'examType'])->get();
+        $exams = Exam::with(['organization', 'examType'])->paginate(10);
         return response()->json($exams);
     }
 
