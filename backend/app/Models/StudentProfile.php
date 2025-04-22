@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class StudentProfile extends Authenticatable implements JWTSubject
 {
-    public $table = "student_profile";
     use HasFactory;
 
     protected $fillable = [
