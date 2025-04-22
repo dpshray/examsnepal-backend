@@ -6,6 +6,7 @@ use App\Enums\ExamTypeEnum;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Exam extends Model
 {
@@ -38,6 +39,22 @@ class Exam extends Model
     
     function scopeMockType(Builder $query) : Builder {
         return $query->where('status', ExamTypeEnum::MOCK_TEST->value);
+    }
+
+    function scopeUserPending(Builder $query) : Builder{
+        return $query->where(function ($query) {
+                $query->whereHas('players', function ($q) {
+                    $q->where('student_id', Auth::guard('api')->id())
+                        ->where('completed', 0);
+                })->orWhereDoesntHave('players', function ($q) {
+                    $q->where('student_id', Auth::guard('api')->id());
+                });
+            });
+    }
+
+    function scopeUserCompleted(Builder $query): Builder {
+        return $query->whereRelation('players', 'student_id', Auth::guard('api')->id())
+            ->whereRelation('players', 'completed', 1);
     }
 
     public function organization()
