@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExamTypeEnum;
+use App\Http\Resources\QuestionCollection;
 use Illuminate\Http\Request;
 use App\Models\Question;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StudentProfile;
 use App\Models\Exam;
 use App\Models\ExamType;
+use App\Models\OptionQuestion;
+use App\Models\StudentExam;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Response;
 
 class QuestionController extends Controller
 {
@@ -887,7 +893,7 @@ class QuestionController extends Controller
      *     description="This endpoint retrieves all active questions (status = 1) for a given exam by its ID.",
      *     operationId="freeQuizQuestions",
      *     tags={"Quiz"},
-     * @OA\Parameter(
+     *    @OA\Parameter(
      *         name="page",
      *         in="query",
      *         required=false,
@@ -963,24 +969,42 @@ class QuestionController extends Controller
         $exam = Exam::find($exam_id);
 
         // Check if the exam exists and has an active status
-        if (!$exam || $exam->status != 1) {
+        if (!$exam || $exam->status != ExamTypeEnum::FREE_QUIZ->value) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid Exam Id for Free Quiz Questions',
             ], 404);
         }
 
-        // Retrieve questions for the given exam
-        $questionsFreeQuiz = Question::where('exam_id', $exam_id)
-            ->select('id', 'exam_id', 'question', 'option_1', 'option_value_1', 'option_2', 'option_value_2', 'option_3', 'option_value_3', 'option_4', 'option_value_4', 'explanation', 'created_at', 'updated_at')
-            ->paginate(10);
+        $user = Auth::user();
+        $user_exam = $user->student_exams()->firstWhere('exam_id', $exam_id);
+        if ($user_exam) { # if already started
+            $is_quiz_pending = $user_exam->completed == 0; 
+            if ($is_quiz_pending) {
+                
+            }else {
+                return  Response::apiSuccess('user have already completed the quiz');
+            }
+        }
+        // return Auth::guard('api')->user();
+        $questions = \App\Models\Exam::find($exam_id)
+                        ->questions()->with('options')
+                        ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
+                        ->paginate(10);
+        
+        $pagination_data    = $questions->toArray();
+        
+        
+        ['links' => $links] = $pagination_data;
+        $data               = new QuestionCollection($questions);
+        
+        $links['current_page'] = $questions->currentPage();
+        $links['last_page'] = $questions->lastPage();
+        $links['total'] = $questions->total();
 
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Questions retrieved successfully!',
-            'data' => $questionsFreeQuiz,
-        ], 200);
+        $data    = compact('data', 'links');
+        
+        return Response::apiSuccess('Questions retrieved successfully!', $data);
     }
 
     /**
