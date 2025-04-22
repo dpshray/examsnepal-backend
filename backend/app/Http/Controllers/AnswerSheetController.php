@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AnswerStoreRequest;
+use App\Http\Resources\QuestionCollection;
 use Illuminate\Http\Request;
 use App\Models\Answersheet;
 use App\Models\Exam;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 
 class AnswerSheetController extends Controller
 {
@@ -30,130 +33,215 @@ class AnswerSheetController extends Controller
      * Store a newly created resource in storage.
      */
     /**
+     * Store a newly created resource in storage.
+     *
      * @OA\Post(
      *     path="/submit-answer",
      *     operationId="submitStudentAnswers",
      *     tags={"Quiz"},
-     *     summary="Submit answers for a quiz",
+     *     summary="Saves question and option based on exam_id",
      *     description="Stores answers submitted by a student for a particular exam.",
      * 
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"exam_id", "student_id", "question_id", "choosed_option_value", "correct_answer_submitted"},
-     *             @OA\Property(property="exam_id", type="integer", example=1),
-     *             @OA\Property(property="student_id", type="integer", example=5),
+     *             required={"exam_id", "question_id", "answer_id"},
+     *             @OA\Property(
+     *                 property="exam_id",
+     *                 type="integer",
+     *                 example=1
+     *             ),
+     *             @OA\Property(
+     *                 property="question_ids",
+     *                 type="array",
+     *                 @OA\Items(type="integer"),
+     *                 example={100, 101, 102}
+     *             ),
      *             @OA\Property(
      *                 property="question_id",
      *                 type="array",
-     *                 @OA\Items(type="integer", example=101),
-     *                 example={101, 102, 103}
+     *                 @OA\Items(type="integer"),
+     *                 example={100, 101, 102}
      *             ),
      *             @OA\Property(
-     *                 property="choosed_option_value",
+     *                 property="option_id",
      *                 type="array",
-     *                 @OA\Items(type="integer", enum={1,2,3,4}, example=2),
-     *                 example={2, 4, 1}
-     *             ),
-     *             @OA\Property(
-     *                 property="correct_answer_submitted",
-     *                 type="array",
-     *                 @OA\Items(type="boolean", example=true),
-     *                 example={true, false, true}
+     *                 @OA\Items(type="integer"),
+     *                 example={10, null, 12}
      *             )
      *         )
      *     ),
      * 
      *     @OA\Response(
-     *         response=200,
-     *         description="Answers submitted successfully.",
+     *         response=409,
+     *         description="If student exam has been completed or the requested question has already been answered.",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Answers submitted successfully!"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="exam_id", type="integer", example=1),
-     *                     @OA\Property(property="student_id", type="integer", example=5),
-     *                     @OA\Property(property="question_id", type="integer", example=101),
-     *                     @OA\Property(property="choosed_option_value", type="integer", example=2),
-     *                     @OA\Property(property="correct_answer_submitted", type="boolean", example=true),
-     *                     @OA\Property(property="created_at", type="string", format="date-time"),
-     *                     @OA\Property(property="updated_at", type="string", format="date-time"),
-     *                 )
+     *         oneOf={
+     *             @OA\Schema(
+     *                 @OA\Property(property="message", type="string", example="Student has already submitted answers for this exam.")
+     *             ),
+     *             @OA\Schema(
+     *                 @OA\Property(property="message", type="string", example="Requested questions has already been answered.")
      *             )
-     *         )
-     *     ),
-     * 
-     *     @OA\Response(
-     *         response=400,
-     *         description="Student has already submitted answers for this exam.",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Student has already submitted answers for this exam.")
+     *         }
      *         )
      *     ),
      * 
      *     @OA\Response(
      *         response=422,
-     *         description="Validation error - array lengths don't match.",
+     *         description="Form validation error / Request question and answer Array lengths don't match.",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="All arrays (question_id, choosed_option_value, correct_answer_submitted) must have the same number of elements.")
+     *             oneOf={
+     *             @OA\Schema(
+     *                 @OA\Property(property="message", type="string", example="No. of questions must be equal to No. of options.")
+     *             ),
+     *             @OA\Schema(
+     *                 @OA\Property(property="message", type="string", example="Validation Errror."),
+     *                 @OA\Property(property="status", type="boolean", example="false."),
+     *                 @OA\Property(property="data", type="object", example="")
+     *             )
+     *         }
      *         )
+     *     ),
+     * 
+     *     @OA\Response(
+     *         response=201,
+     *         description="If answered saved.",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Answer Saved Successfully.")
+     *         )
+     *     ),
+     *     
+     *      @OA\Response(
+     *         response=200,
+     *         description="If All questions has been answered",
+     *         @OA\JsonContent(
+     *             oneOf={
+     *             @OA\Schema(
+     *                 @OA\Property(property="message", type="string", example="All questions has been answered")
+     *             ),
+     *             @OA\Schema(
+     *              @OA\Property(property="message", type="string", example="Answers submitted successfully!")
+     * 
+     *             )
+     *         }
+     *        )
      *     )
      * )
      */
-
-
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'exam_id' => 'required|integer|exists:exams,id',
-            'student_id' => 'required|integer|exists:students,id',
-            'question_id' => 'required|array',
-            'question_id.*' => 'required|integer|exists:questions,id',
-            'choosed_option_value' => 'required|array',
-            'choosed_option_value.*' => 'required|string|in:1,2,3,4',
-            'correct_answer_submitted' => 'required|array',
-            'correct_answer_submitted.*' => 'required|boolean',
+        try {
+            $validatedData = $request->validate([
+                'exam_id' => 'required|integer|exists:exams,id',
+                'question_id' => 'nullable|array',
+                'question_id.*' => 'required|integer|exists:questions,id',
+                'option_id' => 'nullable|array',
+                'option_id.*' => 'nullable|integer|exists:option_questions,id',
+                'question_ids' => 'required|array',
+                'question_ids.*' => 'integer|exists:option_questions,id'
+            ]);
+        } catch (\Exception $e) {
+            $flattenedErrors = collect($e->errors())->map(function ($messages) {
+                return $messages[0]; // get first error message per field
+            });
+            return Response::apiError('Validation Error', $flattenedErrors);
+        }
+        
+        $exam_id = $request->exam_id;
+        $student = Auth::guard('api')->user();
+        
+        $received_questions = $validatedData['question_id'];
+        $received_answers = $validatedData['option_id'];
+        $all_question_ids = $validatedData['question_ids'];
+
+        if (count($received_answers) != count($received_questions)) {
+            return Response::apiError('No. of questions does not match with the No. of options.', null, 422);
+        }
+
+        $student_exam = $student->student_exams()->firstWhere('exam_id',$exam_id);
+        if ($student_exam) {
+            if ($student_exam->completed) {
+                return Response::apiError('This exam has already been completed by this user.',null,409);
+            }
+            
+            $already_answered = $student_exam->answers()->whereIn('question_id', $received_questions)->exists();
+            if ($already_answered) {
+                return Response::apiError('Requested questions has already been answered', null, 409);
+            }
+        }
+        /**
+         * this code is commented so that response must
+         * contains expected question_id and option_id
+         * based on received exam_id
+         */
+        // $expected_options_and_questions = DB::table('exams')
+        //     ->join('questions', 'exams.id', 'questions.exam_id')
+        //     ->join('option_questions', 'questions.id', 'option_questions.question_id')
+        //     ->select('questions.id as qid', 'option_questions.id as oid')
+        //     ->where('exams.id', $exam_id)
+        //     ->pluck('qid', 'oid')
+        //     ->all();
+
+        // $expected_option_ids = array_keys($expected_options_and_questions);
+        // $expected_question_ids = array_unique($expected_options_and_questions);
+
+
+
+        $student_exam = $student->student_exams()->updateOrCreate([
+            'exam_id' => $exam_id,
+            'completed' => false
+        ],[
+
         ]);
 
-        $alreadySubmitted = Answersheet::where('student_id', $validatedData['student_id'])
-            ->where('exam_id', $validatedData['exam_id'])
-            ->exists();
 
-        if ($alreadySubmitted) {
-            return response()->json([
-                'message' => 'Student has already submitted answers for this exam.',
-            ], 400);
-        }
-        $totalQuestions = count($validatedData['question_id']);
-        if (
-            $totalQuestions !== count($validatedData['choosed_option_value']) ||
-            $totalQuestions !== count($validatedData['correct_answer_submitted'])
-        ) {
-            return response()->json([
-                'message' => 'All arrays (question_id, choosed_option_value, correct_answer_submitted) must have the same number of elements.',
-            ], 422);
-        }
+        /**
+         * Received Questions Correct Answers
+         * {question_id: option_id(correct)}
+         */
+        $questions_right_answers = DB::table('option_questions')
+                                    ->whereIn('question_id', $all_question_ids)
+                                    ->where('value',1)
+                                    ->pluck('id', 'question_id');
+        $received_questions_answers = array_combine($received_questions, $received_answers);
+        
+        $temp = [];
+        // return $received_questions_answers;
+        foreach ($questions_right_answers as $question_id =>$option_id) {
+            $is_correct_value = null;
+            if (array_key_exists($question_id, $received_questions_answers)) {
+                $is_correct_value = $received_questions_answers[$question_id] == $option_id;
+            }
 
-        $answers = [];
-
-        for ($i = 0; $i < $totalQuestions; $i++) {
-            $answers[] = [
-                'exam_id' => $validatedData['exam_id'],
-                'student_id' => $validatedData['student_id'],
-                'question_id' => $validatedData['question_id'][$i],
-                'choosed_option_value' => (int) $validatedData['choosed_option_value'][$i],
-                'correct_answer_submitted' => $validatedData['correct_answer_submitted'][$i],
+            $data = [
+                'student_exam_id' => $student_exam->id,
+                'question_id' => $question_id,
+                'is_correct' => $is_correct_value
             ];
+            $temp[] = $data;
         }
+        $total_exam_questions = DB::table('questions')->Where('exam_id', $exam_id)->count();
+        $is_user_exam_completed = false;
 
-        Answersheet::insert($answers);
+        DB::transaction(function() use($student_exam, $temp, $total_exam_questions, &$is_user_exam_completed){
+            $student_exam->answers()->createMany($temp);
+            $student_exam->refresh();
+            if ($student_exam->answers()->count() >= $total_exam_questions) {
+                $student_exam->update(['completed' => true]);
+                $is_user_exam_completed = true;
+            }
+        });
 
-        return response()->json([
-            'message' => 'Answers submitted successfully!',
-            'data' => $answers,
-        ]);
+        if ($is_user_exam_completed) {
+            $scores = [
+                'exam_id' => $exam_id,
+                'total_question' => $total_exam_questions,
+                'correct_answered' => $student_exam->answers()->where('is_correct', true)->count()
+            ];
+            return Response::apiSuccess('All questions has been answered', $scores, 200);
+        }
+        return Response::apiSuccess('Answer Saved Successfully', null, 201);
     }
 
 
