@@ -15,14 +15,14 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('exam_id')->nullable();
             $table->unsignedBigInteger('question_id')->nullable();
-            $table->unsignedBigInteger('student_id')->nullable();
+            $table->integer('student_id')->nullable();
             $table->boolean('correct_answer_submitted')->nullable()->default(null);
             $table->integer('choosed_option_value')->nullable();
             $table->timestamps();
 
             $table->foreign('exam_id')->references('id')->on('exams')->onDelete('set null');
             $table->foreign('question_id')->references('id')->on('questions')->onDelete('set null');
-            $table->foreign('student_id')->references('id')->on('student_profiles')->onDelete('set null');
+            $table->foreign('student_id')->references('id')->on('student_profile')->onDelete('set null');
 
         });
     }
