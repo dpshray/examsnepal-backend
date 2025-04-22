@@ -2,11 +2,17 @@
 
 namespace App\Models;
 
+use App\Enums\ExamTypeEnum;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class Exam extends Model
 {
-    //
+    /**
+     * the column name of this table/model indicates this exams another type which is described in ExamTypeEnum::class
+     * 
+     */
 
     protected $fillable = [
         'user_id',
@@ -22,6 +28,17 @@ class Exam extends Model
         'is_question_bank',
     ];
 
+    function scopeFreeType(Builder $query) : Builder {
+        return $query->where('status', ExamTypeEnum::FREE_QUIZ->value);
+    }    
+    
+    function scopeSprintType(Builder $query) : Builder {
+        return $query->where('status', ExamTypeEnum::SPRINT_QUIZ->value);
+    }    
+    
+    function scopeMockType(Builder $query) : Builder {
+        return $query->where('status', ExamTypeEnum::MOCK_TEST->value);
+    }
 
     public function organization()
     {
@@ -37,7 +54,9 @@ class Exam extends Model
     {
         return $this->hasMany(Bookmark::class);
     }
-
+    /**
+     * this actually should be renamed as added_by_id
+     */
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id'); // Defines the relationship
@@ -54,5 +73,9 @@ class Exam extends Model
     public function answerSheets()
     {
         return $this->hasMany(AnswerSheet::class);
+    }
+
+    public function players(){
+        return $this->hasMany(StudentExam::class);
     }
 }

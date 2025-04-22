@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class StudentProfile extends Authenticatable implements JWTSubject
 {
+    public $table = "student_profile";
     use HasFactory;
 
     protected $fillable = [
@@ -40,5 +41,9 @@ class StudentProfile extends Authenticatable implements JWTSubject
     public function doubts()
     {
         return $this->hasMany(Doubt::class);
+    }
+
+    public function student_exams(){
+        return $this->hasMany(StudentExam::class,'student_id');
     }
 }
