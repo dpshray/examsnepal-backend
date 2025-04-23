@@ -22,6 +22,8 @@ return new class extends Migration
             $table->unsignedBigInteger('student_exam_id')->after('id');
             $table->foreign('student_exam_id')->references('id')->on('student_exams')->onDelete('cascade')->onUpdate('cascade');
             $table->boolean('is_correct')->nullable()->after('question_id');
+            $table->unsignedBigInteger('option_id')->after('question_id');
+            $table->foreign('option_id')->references('id')->on('option_questions')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -34,7 +36,7 @@ return new class extends Migration
             $table->unsignedBigInteger('exam_id')->nullable();
             $table->foreign('exam_id')->references('id')->on('exams')->onDelete('set null');
             $table->unsignedBigInteger('student_id')->nullable();
-            $table->foreign('student_id')->references('id')->on('student_profile')->onDelete('set null');
+            $table->foreign('student_id')->references('id')->on('student_profiles')->onDelete('set null');
             
             $table->boolean('correct_answer_submitted')->nullable()->default(null);
             $table->integer('choosed_option_value')->nullable();
