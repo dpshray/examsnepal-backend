@@ -26,9 +26,16 @@ class ExamResource extends JsonResource
             "questions_count" => $this->whenCounted('questions'),
             "user" => $this->whenLoaded('user')
         ];
-        if ($is_student_exam_loaded && str_contains($request->url(), '/completed')) {
-            $data['players'] = $this->student_exams->map(fn($item) => ['id' => $item->student->id, 'name' => $item->student->name]);
-        }
+        $data['players'] = $this->student_exams->where('completed',1)->map(fn($item) => [
+            'id' => $item->student->id, 
+            'name' => $item->student->name,
+            'solutions' => [
+                'corrected' => optional($item->answers)->where('is_correct',1)->count(),
+                'total' => $item->answers->count()
+            ]
+        ])
+        ->sortByDesc(fn($player) => $player['solutions']['corrected'])
+        ->values();
         return $data;
     }
 }
