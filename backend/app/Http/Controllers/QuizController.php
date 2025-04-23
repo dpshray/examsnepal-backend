@@ -70,23 +70,23 @@ class QuizController extends Controller
         $perPage = 10;
         $take = $page * $perPage;
 
-        $freeQuiz = Exam::freeType()
+        $free_quiz_query = Exam::freeType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
             ->with(['user:id,fullname','student_exams.student' => fn($qry) => $qry->select('id', 'name')])
             ->withCount('questions')
-            ->userCompleted()
-            ->take($take)
-            ->get();
+            ->userCompleted();
+        
+        $total_items = $free_quiz_query->count();
+        $free_quiz_for_resource = $free_quiz_query->take($take)->get();
 
-        $freeQuiz = new ExamCollection($freeQuiz);
-        $total = Exam::count();
-        $last_page = (int) ceil($total / $perPage);
+        $freeQuiz = new ExamCollection($free_quiz_for_resource);
+        $total_page = (int) ceil($total_items / $perPage);
 
         $data = [
             'data' => $freeQuiz,
             'current_page' => (int) $page,
-            'total' => $total,
-            'last_page' => $last_page
+            'completed' => $total_items,
+            'last_page' => $total_page
         ];
         return Response::apiSuccess('Free completed quizzes retrieved successfully.', $data);
     }
@@ -150,24 +150,23 @@ class QuizController extends Controller
         $perPage = 10;
         $take = $page * $perPage;
 
-        $freeQuiz = Exam::freeType()
+        $free_quiz_query = Exam::freeType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
             ->with(['user:id,fullname'])
             ->withCount('questions')
-            ->userPending()
-            ->orderBy('id')
-            ->take($take)
-            ->get();
+            ->userPending();
 
-        $freeQuiz = new ExamCollection($freeQuiz);
-        $total = Exam::count();
-        $last_page = (int) ceil($total / $perPage);
+        $total_items = $free_quiz_query->count();
+        $free_quiz_for_resource = $free_quiz_query->take($take)->get();
+
+        $freeQuiz = new ExamCollection($free_quiz_for_resource);
+        $total_page = (int) ceil($total_items / $perPage);
 
         $data = [
             'data' => $freeQuiz,
             'current_page' => (int) $page,
-            'total' => $total,
-            'last_page' => $last_page
+            'last_page' => $total_page,
+            'total' => $total_items
         ];
         return Response::apiSuccess('Free pending quizzes retrieved successfully.', $data);
     }
@@ -300,23 +299,23 @@ class QuizController extends Controller
         $perPage = 10;
         $take = $page * $perPage;
 
-        $freeQuiz = Exam::sprintType()
+        $sprint_quiz_query = Exam::sprintType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
             ->with(['user:id,fullname', 'student_exams'])
             ->withCount('questions')
-            ->userCompleted()
-            ->take($take)
-            ->get();
+            ->userCompleted();
 
-        $freeQuiz = new ExamCollection($freeQuiz);
-        $total = Exam::count();
-        $last_page = (int) ceil($total / $perPage);
+        $total_items = $sprint_quiz_query->count();
+        $sprint_quiz_for_resource = $sprint_quiz_query->take($take)->get();
+
+        $sprint_quiz = new ExamCollection($sprint_quiz_for_resource);
+        $total_page = (int) ceil($total_items / $perPage);
 
         $data = [
-            'data' => $freeQuiz,
+            'data' => $sprint_quiz,
             'current_page' => (int) $page,
-            'total' => $total,
-            'last_page' => $last_page
+            'completed' => $total_items,
+            'last_page' => $total_page
         ];
         return Response::apiSuccess('Sprint completed quizzes retrieved successfully.', $data);
     }    
@@ -380,23 +379,23 @@ class QuizController extends Controller
         $perPage = 10;
         $take = $page * $perPage;
 
-        $freeQuiz = Exam::sprintType()
+        $sprint_quiz_query = Exam::sprintType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
             ->with(['user:id,fullname', 'student_exams.student'])
             ->withCount('questions')
-            ->userPending()
-            ->take($take)
-            ->get();
+            ->userPending();
 
-        $freeQuiz = new ExamCollection($freeQuiz);
-        $total = Exam::count();
-        $last_page = (int) ceil($total / $perPage);
+        $total_items = $sprint_quiz_query->count();
+        $sprint_quiz_for_resource = $sprint_quiz_query->take($take)->get();
+
+        $sprint_quiz = new ExamCollection($sprint_quiz_for_resource);
+        $total_page = (int) ceil($total_items / $perPage);
 
         $data = [
-            'data' => $freeQuiz,
+            'data' => $sprint_quiz,
             'current_page' => (int) $page,
-            'total' => $total,
-            'last_page' => $last_page
+            'last_page' => $total_page,
+            'total' => $total_items,
         ];
         return Response::apiSuccess('Sprint pending quizzes retrieved successfully.', $data);
     }
@@ -536,23 +535,23 @@ class QuizController extends Controller
         $perPage = 10;
         $take = $page * $perPage;
 
-        $freeQuiz = Exam::mockType()
+        $mock_quiz_query = Exam::mockType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
             ->with(['user:id,fullname', 'student_exams'])
             ->withCount('questions')
-            ->userCompleted()
-            ->take($take)
-            ->get();
+            ->userCompleted();
 
-        $freeQuiz = new ExamCollection($freeQuiz);
-        $total = Exam::count();
-        $last_page = (int) ceil($total / $perPage);
+        $total_items = $mock_quiz_query->count();
+        $mock_quiz_for_resource = $mock_quiz_query->take($take)->get();
+
+        $mock_quiz = new ExamCollection($mock_quiz_for_resource);
+        $total_page = (int) ceil($total_items / $perPage);
 
         $data = [
-            'data' => $freeQuiz,
+            'data' => $mock_quiz,
             'current_page' => (int) $page,
-            'total' => $total,
-            'last_page' => $last_page
+            'last_page' => $total_page,
+            'completed' => $total_items,
         ];
         return Response::apiSuccess('Mock completed quizzes retrieved successfully.', $data);
     }
@@ -617,23 +616,23 @@ class QuizController extends Controller
         $perPage = 10;
         $take = $page * $perPage;
 
-        $freeQuiz = Exam::mockType()
+        $mock_quiz_query = Exam::mockType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
             ->with(['user:id,fullname', 'student_exams.student'])
             ->withCount('questions')
-            ->userPending()
-            ->take($take)
-            ->get();
+            ->userPending();
 
-        $freeQuiz = new ExamCollection($freeQuiz);
-        $total = Exam::count();
-        $last_page = (int) ceil($total / $perPage);
+        $total_items = $mock_quiz_query->count();
+        $mock_quiz_for_resource = $mock_quiz_query->take($take)->get();
+
+        $mock_quiz = new ExamCollection($mock_quiz_for_resource);
+        $total_page = (int) ceil($total_items / $perPage);
 
         $data = [
-            'data' => $freeQuiz,
+            'data' => $mock_quiz,
             'current_page' => (int) $page,
-            'total' => $total,
-            'last_page' => $last_page
+            'last_page' => $total_page,
+            'total' => $total_items,
         ];
         return Response::apiSuccess('Mock pending quizzes retrieved successfully.', $data);
     }
