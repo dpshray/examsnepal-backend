@@ -55,19 +55,19 @@ class AnswerSheetController extends Controller
      *                 property="question_ids",
      *                 type="array",
      *                 @OA\Items(type="integer"),
-     *                 example={100, 101, 102}
+     *                 example={180665, 180666}
      *             ),
      *             @OA\Property(
      *                 property="question_id",
      *                 type="array",
      *                 @OA\Items(type="integer"),
-     *                 example={100, 101, 102}
+     *                 example={180665, 180666}
      *             ),
      *             @OA\Property(
      *                 property="option_id",
      *                 type="array",
      *                 @OA\Items(type="integer"),
-     *                 example={10, null, 12}
+     *                 example={684213, 684220}
      *             )
      *         )
      *     ),
