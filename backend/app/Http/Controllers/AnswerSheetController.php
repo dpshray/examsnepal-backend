@@ -7,6 +7,7 @@ use App\Http\Resources\QuestionCollection;
 use Illuminate\Http\Request;
 use App\Models\Answersheet;
 use App\Models\Exam;
+use App\Models\StudentExam;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
@@ -133,14 +134,13 @@ class AnswerSheetController extends Controller
     {
         $validatedData = $request->validate([
             'exam_id' => 'required|integer|exists:exams,id',
-            'question_id' => 'required|array',
-            'question_id.*' => 'required|integer|exists:questions,id',
-            'option_id' => 'required|array',
-            'option_id.*' => 'nullable|integer|exists:option_questions,id',
+            'question_id' => 'nullable|array',
+            'question_id.*' => 'integer|exists:questions,id',
+            'option_id' => 'nullable|array',
+            'option_id.*' => 'integer|exists:option_questions,id',
             'question_ids' => 'required|array',
             'question_ids.*' => 'integer|exists:option_questions,id'
         ]);
-        
         $exam_id = $request->exam_id;
         $student = Auth::guard('api')->user();
         
@@ -210,6 +210,7 @@ class AnswerSheetController extends Controller
             $data = [
                 'student_exam_id' => $student_exam->id,
                 'question_id' => $question_id,
+                'selected_option_id' => $is_correct_value ? $received_questions_answers[$question_id] : null,
                 'is_correct' => $is_correct_value
             ];
             $temp[] = $data;
@@ -304,36 +305,43 @@ class AnswerSheetController extends Controller
 
     public function getResultsWithExam($exam_id)
     {
-        // Check if exam exists
-        $student_id = Auth::id();
-        $examExists = Exam::where('id', $exam_id)->exists();
-
-        if (!$examExists) {
-            return response()->json([
-                'message' => 'Exam not found.',
-            ], 404);
+        $student_exam = Auth::guard('api')->user()->student_exams()->firstWhere('exam_id', $exam_id);
+        if ($student_exam == null || $student_exam->completed == 0) {
+            return Response::apiSuccess('This exam is not completed', null, 403);
         }
+        $questions = Exam::find($exam_id)
+                        ->questions()
+                        ->with([
+                            'options'
+                        ])
+                        ->paginate(10);
 
-        // Fetch all answers for the given exam
-        $answers = Answersheet::where('exam_id', $exam_id)
-            ->where('student_id', $student_id)
-            ->paginate(10);
-
-        // need to send as Required format 
+        $pagination_data    = $questions->toArray();
 
 
+        ['links' => $links] = $pagination_data;
+        $data               = new QuestionCollection($questions);
 
+        // $this_page_questions = $data->pluck('id');
+        $user_choosed = StudentExam::where([['exam_id','=',$exam_id],['student_id','=',Auth::guard('api')->id()]])
+                                ->first()
+                                ->answers
+                                ->pluck('selected_option_id','question_id');
 
-        if ($answers->isEmpty()) {
-            return response()->json([
-                'message' => 'No solutions found for this exam.',
-            ], 404);
-        }
+        $resource_data_to_array = $data->resolve();
+        $data = collect($resource_data_to_array)->map(function ($question) use($user_choosed) {
+            $question['user_choosed'] = $user_choosed[$question['id']];
+            return $question;
+        });
 
-        return response()->json([
-            'message' => 'Solutions retrieved successfully',
-            'data' => $answers,
-        ], 200);
+        $links['current_page'] = $questions->currentPage();
+        $links['last_page'] = $questions->lastPage();
+        $links['total'] = $questions->total();
+
+        $data    = compact('data', 'links');
+
+        return Response::apiSuccess('User Exam Solutions', $data);
+
     }
 
 
