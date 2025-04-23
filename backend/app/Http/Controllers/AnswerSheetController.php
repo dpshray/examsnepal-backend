@@ -200,7 +200,8 @@ class AnswerSheetController extends Controller
         $received_questions_answers = array_combine($received_questions, $received_answers);
         
         $temp = [];
-        // return $received_questions_answers;
+        // return $questions_right_answers;
+        // return [$questions_right_answers,$received_questions_answers];
         foreach ($questions_right_answers as $question_id =>$option_id) {
             $is_correct_value = null;
             if (array_key_exists($question_id, $received_questions_answers)) {
@@ -210,11 +211,12 @@ class AnswerSheetController extends Controller
             $data = [
                 'student_exam_id' => $student_exam->id,
                 'question_id' => $question_id,
-                'selected_option_id' => $is_correct_value ? $received_questions_answers[$question_id] : null,
+                'selected_option_id' => is_bool($is_correct_value) ? $received_questions_answers[$question_id] : null,
                 'is_correct' => $is_correct_value
             ];
             $temp[] = $data;
         }
+        // return $temp;
         $total_exam_questions = DB::table('questions')->Where('exam_id', $exam_id)->count();
         $is_user_exam_completed = false;
 
