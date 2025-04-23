@@ -15,16 +15,66 @@ use App\Http\Controllers\BankQuestionController;
 use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
 use App\Http\Controllers\MigrationController;
-
-
-
-
-
+use App\Models\Answersheet;
+use App\Models\Question;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
+Route::get('remove-completed-exam/{exam_id}', function($exam_id){
+    // dd([['exam_id', '=', $exam_id], ['student_id', '=', Auth::guard('api')->id()]]);
+    DB::table('student_exams')->where([['exam_id','=', $exam_id],['student_id','=', 12127]])->delete();
+    return 'deleted';
+});
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/migrate', [MigrationController::class, 'migrateNext']);
+
+Route::get('migrate-question-option', function(){
+
+$batchSize = 1000; // insert in chunks of 1000 rows
+
+Question::chunk(500, function ($questions) use ($batchSize) {
+    $insertData = [];
+
+    foreach ($questions as $qn) {
+        $insertData[] = [
+            'question_id' => $qn->id,
+            'option' => $qn->option_1,
+            'value' => $qn->option_value_1,
+        ];
+        $insertData[] = [
+            'question_id' => $qn->id,
+            'option' => $qn->option_2,
+            'value' => $qn->option_value_2,
+        ];
+        $insertData[] = [
+            'question_id' => $qn->id,
+            'option' => $qn->option_3,
+            'value' => $qn->option_value_3,
+        ];
+        $insertData[] = [
+            'question_id' => $qn->id,
+            'option' => $qn->option_4,
+            'value' => $qn->option_value_4,
+        ];
+
+        // Insert when batch reaches the size
+        if (count($insertData) >= $batchSize) {
+            DB::table('option_questions')->insert($insertData);
+            $insertData = []; // reset for next batch
+        }
+    }
+
+    // Insert remaining data
+    if (!empty($insertData)) {
+        DB::table('option_questions')->insert($insertData);
+    }
+});
+
+echo "DONE";
+
+});
 
 
 // Email verification route
@@ -97,11 +147,19 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/doubt/{id}', [QuestionController::class, 'update']);
     Route::delete('/doubt/{id}', [QuestionController::class, 'destroy']);
 
-    
+    #free quiz
+    Route::get('/free-quiz/pending', [QuizController::class, 'getPendingFreeQuiz']);
+    Route::get('/free-quiz/completed', [QuizController::class, 'getCompletedFreeQuiz']);
 
-    Route::get('/free-quiz', [QuizController::class, 'getFreeQuiz']);
+    #sprint quiz
     Route::get('/sprint-quiz', [QuizController::class, 'getSprintQuiz']);
+    Route::get('/sprint-quiz/pending', [QuizController::class, 'getPendingSprintQuiz']);
+    Route::get('/sprint-quiz/completed', [QuizController::class, 'getCompletedSprintQuiz']);
+    
+    #mock quiz
     Route::get('/mock-test', [QuizController::class, 'getMockTest']);
+    Route::get('/mock-test/pending', [QuizController::class, 'getPendingMockTest']);
+    Route::get('/mock-test/completed', [QuizController::class, 'getCompletedMockTest']);
 
     Route::get('/free-quiz/questions/{exam_id}', [QuestionController::class, 'freeQuizQuestions']);
     Route::get('/sprint-quiz/questions/{exam_id}', [QuestionController::class, 'sprintQuizQuestions']);

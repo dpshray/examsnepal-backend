@@ -2,34 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ExamCollection;
 use Illuminate\Http\Request;
 use App\Models\Exam;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
 
 class QuizController extends Controller
 {
-    private $quizTypes = [
-        'freeQuiz' => '1',
-        'sprintQuiz' => '3',
-        'mockTest' => '4',
-    ];
-
-    /**
-     * Display a listing of the resource.
-     */
-
-    public function index()
-    {
-        //
-    }
-
     /**
      * @OA\Get(
-     *     path="/free-quiz",
-     *     summary="Get Free Quiz (for users)",
+     *     path="/free-quiz/completed",
+     *     summary="Get Completed Free Quiz",
      *     description="Retrieve a paginated list of free quizzes.",
-     *     operationId="getFreeQuiz",
+     *     operationId="getCompletedFreeQuiz",
      *     tags={"Quiz"},
      *     @OA\Parameter(
      *         name="page",
@@ -77,24 +64,112 @@ class QuizController extends Controller
      *     )
      * )
      */
-    public function getFreeQuiz()
+    public function getCompletedFreeQuiz()
     {
-        // $freeQuiz = Exam::where('status', $this->quizTypes['free quiz'])
-        // ->where('is_question_bank', true) // Filtering only where is_question_bank is true
-        // ->select(['id', 'exam_name', 'status']) 
-        // ->get();
-        $freeQuiz = Exam::where('status', $this->quizTypes['freeQuiz'])
+        $page = request('page', 1); // get current page (default to 1)
+        $perPage = 10;
+        $take = $page * $perPage;
+
+        $freeQuiz = Exam::freeType()
+            ->select(['id', 'exam_name', 'status', 'user_id'])
+            ->with(['user:id,fullname','student_exams.student' => fn($qry) => $qry->select('id', 'name')])
+            ->withCount('questions')
+            ->userCompleted()
+            ->take($take)
+            ->get();
+
+        $freeQuiz = new ExamCollection($freeQuiz);
+        $total = Exam::count();
+        $last_page = (int) ceil($total / $perPage);
+
+        $data = [
+            'data' => $freeQuiz,
+            'current_page' => (int) $page,
+            'total' => $total,
+            'last_page' => $last_page
+        ];
+        return Response::apiSuccess('Free completed quizzes retrieved successfully.', $data);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/free-quiz/pending",
+     *     summary="Get Pending Free Quiz",
+     *     description="Retrieve a paginated list of free quizzes.",
+     *     operationId="getPendingFreeQuiz",
+     *     tags={"Quiz"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Free quizzes retrieved successfully."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="exam_name", type="string", example="Math Quiz"),
+     *                         @OA\Property(property="status", type="string", example="free"),
+     *                         @OA\Property(property="user_id", type="integer", example=12),
+     *                         @OA\Property(
+     *                             property="user",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=12),
+     *                             @OA\Property(property="fullname", type="string", example="John Doe")
+     *                         )
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="last_page", type="integer", example=5),
+     *                 @OA\Property(property="per_page", type="integer", example=10),
+     *                 @OA\Property(property="total", type="integer", example=50)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function getPendingFreeQuiz()
+    {
+        $page = request('page', 1); // get current page (default to 1)
+        $perPage = 10;
+        $take = $page * $perPage;
+
+        $freeQuiz = Exam::freeType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
             ->with(['user:id,fullname'])
             ->withCount('questions')
-            ->paginate(10);
+            ->userPending()
+            ->orderBy('id')
+            ->take($take)
+            ->get();
 
+        $freeQuiz = new ExamCollection($freeQuiz);
+        $total = Exam::count();
+        $last_page = (int) ceil($total / $perPage);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Free quizzes retrieved successfully.',
-            'data' => $freeQuiz
-        ], 200);
+        $data = [
+            'data' => $freeQuiz,
+            'current_page' => (int) $page,
+            'total' => $total,
+            'last_page' => $last_page
+        ];
+        return Response::apiSuccess('Free pending quizzes retrieved successfully.', $data);
     }
 
     /**
@@ -150,18 +225,9 @@ class QuizController extends Controller
      *     )
      * )
      */
-
     public function getSprintQuiz()
     {
-        $student = Auth::user();
-        if (!$student->is_subscripted) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Your subscription is inactive. Please subscribe to access sprint quizzes.',
-            ], 403);
-        }
-
-        $sprintQuiz = Exam::where('status', $this->quizTypes['sprintQuiz'])
+        $sprintQuiz = Exam::sprintType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
             ->with(['user:id,fullname'])
             ->withCount('questions')
@@ -173,6 +239,166 @@ class QuizController extends Controller
             'message' => 'Sprint quizzes retrieved successfully.',
             'data' => $sprintQuiz
         ], 200);
+    }    
+    
+    /**
+     * @OA\Get(
+     *     path="/sprint-quiz/completed",
+     *     summary="Get Completed Sprint Quizzes (for users)",
+     *     description="Retrieve a list of sprint quizzes. Requires an active subscription.",
+     *     operationId="getCompletedSprintQuiz",
+     *     tags={"Quiz"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     security={{ "bearerAuth":{} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Sprint quizzes retrieved successfully."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="exam_name", type="string", example="Sprint Test 1"),
+     *                     @OA\Property(property="status", type="string", example="3"),
+     *                     @OA\Property(property="user", type="object", nullable=true,
+     *                         @OA\Property(property="id", type="integer", example=5),
+     *                         @OA\Property(property="fullname", type="string", example="John Doe")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Subscription Inactive",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Your subscription is inactive. Please subscribe to access sprint quizzes.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function getCompletedSprintQuiz()
+    {
+        $page = request('page', 1); // get current page (default to 1)
+        $perPage = 10;
+        $take = $page * $perPage;
+
+        $freeQuiz = Exam::sprintType()
+            ->select(['id', 'exam_name', 'status', 'user_id'])
+            ->with(['user:id,fullname', 'student_exams'])
+            ->withCount('questions')
+            ->userCompleted()
+            ->take($take)
+            ->get();
+
+        $freeQuiz = new ExamCollection($freeQuiz);
+        $total = Exam::count();
+        $last_page = (int) ceil($total / $perPage);
+
+        $data = [
+            'data' => $freeQuiz,
+            'current_page' => (int) $page,
+            'total' => $total,
+            'last_page' => $last_page
+        ];
+        return Response::apiSuccess('Sprint completed quizzes retrieved successfully.', $data);
+    }    
+    
+    /**
+     * @OA\Get(
+     *     path="/sprint-quiz/pending",
+     *     summary="Get Pending Sprint Quizzes (for users)",
+     *     description="Retrieve a list of pending sprint quizzes. Requires an active subscription.",
+     *     operationId="getPendingSprintQuiz",
+     *     tags={"Quiz"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     security={{ "bearerAuth":{} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Sprint quizzes retrieved successfully."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="exam_name", type="string", example="Sprint Test 1"),
+     *                     @OA\Property(property="status", type="string", example="3"),
+     *                     @OA\Property(property="user", type="object", nullable=true,
+     *                         @OA\Property(property="id", type="integer", example=5),
+     *                         @OA\Property(property="fullname", type="string", example="John Doe")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Subscription Inactive",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Your subscription is inactive. Please subscribe to access sprint quizzes.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function getPendingSprintQuiz()
+    {
+        $page = request('page', 1); // get current page (default to 1)
+        $perPage = 10;
+        $take = $page * $perPage;
+
+        $freeQuiz = Exam::sprintType()
+            ->select(['id', 'exam_name', 'status', 'user_id'])
+            ->with(['user:id,fullname', 'student_exams.student'])
+            ->withCount('questions')
+            ->userPending()
+            ->take($take)
+            ->get();
+
+        $freeQuiz = new ExamCollection($freeQuiz);
+        $total = Exam::count();
+        $last_page = (int) ceil($total / $perPage);
+
+        $data = [
+            'data' => $freeQuiz,
+            'current_page' => (int) $page,
+            'total' => $total,
+            'last_page' => $last_page
+        ];
+        return Response::apiSuccess('Sprint pending quizzes retrieved successfully.', $data);
     }
 
     /**
@@ -228,7 +454,6 @@ class QuizController extends Controller
      *     )
      * )
      */
-
     public function getMockTest()
     {
         $student = Auth::user();
@@ -241,7 +466,7 @@ class QuizController extends Controller
 
         $mockTest = Exam::where('status', $this->quizTypes['mockTest'])
             ->select(['id', 'exam_name', 'status', 'user_id'])
-            ->with(['user:id,fullname']) 
+            ->with(['user:id,fullname'])
             ->withCount('questions')
             ->paginate(10);
 
@@ -253,21 +478,165 @@ class QuizController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * @OA\Get(
+     *     path="/mock-test/completed",
+     *     summary="Get Completed Mock Tests (for users)",
+     *     description="Retrieve a list of Completed Mock Tests.",
+     *     operationId="getCompletedMockTests",
+     *     tags={"Quiz"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     security={{ "bearerAuth":{} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Mock Tests retrieved successfully."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="exam_name", type="string", example="Mock Tests 1"),
+     *                     @OA\Property(property="status", type="string", example="3"),
+     *                     @OA\Property(property="user", type="object", nullable=true,
+     *                         @OA\Property(property="id", type="integer", example=5),
+     *                         @OA\Property(property="fullname", type="string", example="John Doe")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Subscription Inactive",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Your subscription is inactive. Please subscribe to access Mock Tests.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
      */
-    public function create()
+    public function getCompletedMockTest()
     {
-        //
+        $page = request('page', 1); // get current page (default to 1)
+        $perPage = 10;
+        $take = $page * $perPage;
+
+        $freeQuiz = Exam::mockType()
+            ->select(['id', 'exam_name', 'status', 'user_id'])
+            ->with(['user:id,fullname', 'student_exams'])
+            ->withCount('questions')
+            ->userCompleted()
+            ->take($take)
+            ->get();
+
+        $freeQuiz = new ExamCollection($freeQuiz);
+        $total = Exam::count();
+        $last_page = (int) ceil($total / $perPage);
+
+        $data = [
+            'data' => $freeQuiz,
+            'current_page' => (int) $page,
+            'total' => $total,
+            'last_page' => $last_page
+        ];
+        return Response::apiSuccess('Mock completed quizzes retrieved successfully.', $data);
     }
+
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Get(
+     *     path="/mock-test/pending",
+     *     summary="Get Pending Mock Tests (for users)",
+     *     description="Retrieve a list of Pending Mock Tests.",
+     *     operationId="getPendingMockTests",
+     *     tags={"Quiz"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     security={{ "bearerAuth":{} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Mock Tests retrieved successfully."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="exam_name", type="string", example="Mock Tests 1"),
+     *                     @OA\Property(property="status", type="string", example="3"),
+     *                     @OA\Property(property="user", type="object", nullable=true,
+     *                         @OA\Property(property="id", type="integer", example=5),
+     *                         @OA\Property(property="fullname", type="string", example="John Doe")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Subscription Inactive",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Your subscription is inactive. Please subscribe to access Mock Tests.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
      */
-    public function store(Request $request)
+    public function getPendingMockTest()
     {
-        //
-    }
+        $page = request('page', 1); // get current page (default to 1)
+        $perPage = 10;
+        $take = $page * $perPage;
 
+        $freeQuiz = Exam::mockType()
+            ->select(['id', 'exam_name', 'status', 'user_id'])
+            ->with(['user:id,fullname', 'student_exams.student'])
+            ->withCount('questions')
+            ->userPending()
+            ->take($take)
+            ->get();
+
+        $freeQuiz = new ExamCollection($freeQuiz);
+        $total = Exam::count();
+        $last_page = (int) ceil($total / $perPage);
+
+        $data = [
+            'data' => $freeQuiz,
+            'current_page' => (int) $page,
+            'total' => $total,
+            'last_page' => $last_page
+        ];
+        return Response::apiSuccess('Mock pending quizzes retrieved successfully.', $data);
+    }
 
     /**
      * @OA\Post(
@@ -322,8 +691,6 @@ class QuizController extends Controller
      *     )
      * )
      */
-
-
     public function examAsQuizStore(Request $request)
     {
         $userId = Auth::id();
@@ -465,9 +832,6 @@ class QuizController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    /**
      * @OA\Get(
      *     path="/quiz/{id}",
      *     summary="Get a Quiz by ID (Admin)",
@@ -511,7 +875,6 @@ class QuizController extends Controller
      *     )
      * )
      */
-
     public function show(string $id)
     {
         //
@@ -528,22 +891,6 @@ class QuizController extends Controller
             'message' => 'Quiz found successfully',
             'data' => $quiz,
         ], 200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
     }
 
     /**
