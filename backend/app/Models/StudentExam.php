@@ -15,4 +15,8 @@ class StudentExam extends Model
     public function answers(){
         return $this->hasMany(Answersheet::class,'student_exam_id');
     }
+
+    function student() {
+        return $this->belongsTo(StudentProfile::class,'student_id');
+    }
 }
