@@ -131,22 +131,15 @@ class AnswerSheetController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $validatedData = $request->validate([
-                'exam_id' => 'required|integer|exists:exams,id',
-                'question_id' => 'nullable|array',
-                'question_id.*' => 'required|integer|exists:questions,id',
-                'option_id' => 'nullable|array',
-                'option_id.*' => 'nullable|integer|exists:option_questions,id',
-                'question_ids' => 'required|array',
-                'question_ids.*' => 'integer|exists:option_questions,id'
-            ]);
-        } catch (\Exception $e) {
-            $flattenedErrors = collect($e->errors())->map(function ($messages) {
-                return $messages[0]; // get first error message per field
-            });
-            return Response::apiError('Validation Error', $flattenedErrors);
-        }
+        $validatedData = $request->validate([
+            'exam_id' => 'required|integer|exists:exams,id',
+            'question_id' => 'required|array',
+            'question_id.*' => 'required|integer|exists:questions,id',
+            'option_id' => 'required|array',
+            'option_id.*' => 'nullable|integer|exists:option_questions,id',
+            'question_ids' => 'required|array',
+            'question_ids.*' => 'integer|exists:option_questions,id'
+        ]);
         
         $exam_id = $request->exam_id;
         $student = Auth::guard('api')->user();
