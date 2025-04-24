@@ -1306,24 +1306,45 @@ class QuestionController extends Controller
     private function checkIfExamHasBeenStarted(Exam $exam, Int $exam_id, $page_no = 1, $FTT){
         $user = Auth::user();
         $user_exam = $user->student_exams()->firstWhere('exam_id', $exam_id);
-        $first_time_token = str()->random(25);
-        if ($page_no == 1) {
-            if ($user_exam == null) {
-                $data = $exam->questions->pluck('id')->map(fn($id) => ['question_id' => $id]);
-                $user->student_exams()->create([
-                    'exam_id' => $exam_id,
-                    'completed' => false,
-                    'first_time_token' => $first_time_token
-                ])
-                ->answers()
-                ->createMany($data);
-            } else {
-                if ($user_exam->first_time_token !== $FTT) {
-                    throw new \Exception('This exam has already been started/initialized');                
-                }
-                return $FTT;
+        
+        
+        if ($user_exam == null) {
+            $first_time_token = str()->random(25);
+            $data = $exam->questions->pluck('id')->map(fn($id) => ['question_id' => $id]);
+            $user->student_exams()->create([
+                'exam_id' => $exam_id,
+                'completed' => false,
+                'first_time_token' => $first_time_token
+            ])
+            ->answers()
+            ->createMany($data);
+            return $first_time_token;
+        } else {
+            if ($user_exam->first_time_token !== $FTT) {
+                throw new \Exception('This exam has already been started/initialized');
             }
+            return $FTT;
         }
+        
+        
+        
+        // if ($page_no == 1) {
+        //     if ($user_exam == null) {
+        //         $data = $exam->questions->pluck('id')->map(fn($id) => ['question_id' => $id]);
+        //         $user->student_exams()->create([
+        //             'exam_id' => $exam_id,
+        //             'completed' => false,
+        //             'first_time_token' => $first_time_token
+        //         ])
+        //         ->answers()
+        //         ->createMany($data);
+        //     } else {
+        //         if ($user_exam->first_time_token !== $FTT) {
+        //             throw new \Exception('This exam has already been started/initialized');                
+        //         }
+        //         return $FTT;
+        //     }
+        // }
         return $first_time_token;
     }
 
