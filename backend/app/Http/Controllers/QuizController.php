@@ -77,7 +77,7 @@ class QuizController extends Controller
             ->userCompleted();
         
         $total_items = $free_quiz_query->count();
-        $free_quiz_for_resource = $free_quiz_query->take($take)->get();
+        $free_quiz_for_resource = $free_quiz_query->skip($take)->take($perPage)->get();
 
         $freeQuiz = new ExamCollection($free_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -157,7 +157,7 @@ class QuizController extends Controller
             ->userPending();
 
         $total_items = $free_quiz_query->count();
-        $free_quiz_for_resource = $free_quiz_query->take($take)->get();
+        $free_quiz_for_resource = $free_quiz_query->skip($take)->take($perPage)->get();
 
         $freeQuiz = new ExamCollection($free_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -306,7 +306,7 @@ class QuizController extends Controller
             ->userCompleted();
 
         $total_items = $sprint_quiz_query->count();
-        $sprint_quiz_for_resource = $sprint_quiz_query->take($take)->get();
+        $sprint_quiz_for_resource = $sprint_quiz_query->skip($take)->take($perPage)->get();
 
         $sprint_quiz = new ExamCollection($sprint_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -386,7 +386,7 @@ class QuizController extends Controller
             ->userPending();
 
         $total_items = $sprint_quiz_query->count();
-        $sprint_quiz_for_resource = $sprint_quiz_query->take($take)->get();
+        $sprint_quiz_for_resource = $sprint_quiz_query->skip($take)->take($perPage)->get();
 
         $sprint_quiz = new ExamCollection($sprint_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -542,7 +542,7 @@ class QuizController extends Controller
             ->userCompleted();
 
         $total_items = $mock_quiz_query->count();
-        $mock_quiz_for_resource = $mock_quiz_query->take($take)->get();
+        $mock_quiz_for_resource = $mock_quiz_query->skip($take)->take($perPage)->get();
 
         $mock_quiz = new ExamCollection($mock_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -623,7 +623,7 @@ class QuizController extends Controller
             ->userPending();
 
         $total_items = $mock_quiz_query->count();
-        $mock_quiz_for_resource = $mock_quiz_query->take($take)->get();
+        $mock_quiz_for_resource = $mock_quiz_query->skip($take)->take($perPage)->get();
 
         $mock_quiz = new ExamCollection($mock_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);

@@ -42,19 +42,21 @@ class Exam extends Model
     }
 
     function scopeUserPending(Builder $query) : Builder{
-        return $query->where(function ($query) {
-                $query->whereHas('student_exams', function ($q) {
-                    $q->where('student_id', Auth::guard('api')->id())
-                        ->where('completed', 0);
-                })->orWhereDoesntHave('student_exams', function ($q) {
-                    $q->where('student_id', Auth::guard('api')->id());
-                });
-            });
+        return $query->whereDoesntHave('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()));
+        // return $query->where(function ($query) {
+        //         $query->whereHas('student_exams', function ($q) {
+        //             $q->where('student_id', Auth::guard('api')->id())
+        //                 ->where('completed', 0);
+        //         })->orWhereDoesntHave('student_exams', function ($q) {
+        //             $q->where('student_id', Auth::guard('api')->id());
+        //         });
+        //     });
     }
 
     function scopeUserCompleted(Builder $query): Builder {
-        return $query->whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
-            ->whereRelation('student_exams', 'completed', 1);
+        return $query->whereHas('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()));
+        // return $query->whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
+        //     ->whereRelation('student_exams', 'completed', 1);
     }
 
     public function organization()
