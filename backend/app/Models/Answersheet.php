@@ -12,11 +12,13 @@ class Answersheet extends Model
 
 
     protected $fillable = [
-        'exam_id',
+        'student_exam_id',
         'question_id',
-        'student_id',
-        'correct_answer_submitted',
-        'choosed_option_value',
+        'selected_option_id',
+        'is_correct'
+        // 'student_id',
+        // 'correct_answer_submitted',
+        // 'choosed_option_value',
     ];
 
     public function exam()

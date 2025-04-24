@@ -74,8 +74,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Doubt::class, 'org_id');
     }
+
     public function answerSheets()
     {
         return $this->hasMany(AnswerSheet::class);
     }
+
 }

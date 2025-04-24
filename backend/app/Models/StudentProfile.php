@@ -41,4 +41,8 @@ class StudentProfile extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Doubt::class);
     }
+
+    public function student_exams(){
+        return $this->hasMany(StudentExam::class,'student_id');
+    }
 }
