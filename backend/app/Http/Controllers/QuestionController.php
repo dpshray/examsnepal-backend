@@ -1114,9 +1114,10 @@ class QuestionController extends Controller
             ], 404);
         }
 
+        $first_time_token = null;
         try {
             $page_no = request('page', 1);
-            $this->checkIfExamHasBeenStarted($exam, $exam_id, $page_no);
+            $first_time_token = $this->checkIfExamHasBeenStarted($exam, $exam_id, $page_no, request('token', null));
         } catch (\Exception $e) {
             return Response::apiError($e->getMessage(), null, 409);
         }
@@ -1157,8 +1158,9 @@ class QuestionController extends Controller
         $links['current_page'] = $questionsMockTest->currentPage();
         $links['last_page'] = $questionsMockTest->lastPage();
         $links['total'] = $questionsMockTest->total();
+        $token = $first_time_token;
 
-        $data    = compact('data', 'links');
+        $data    = compact('data', 'links', 'token');
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
 
@@ -1267,9 +1269,10 @@ class QuestionController extends Controller
             ], 404);
         }
 
+        $first_time_token = null;
         try {
             $page_no = request('page', 1);
-            $this->checkIfExamHasBeenStarted($exam, $exam_id, $page_no);
+            $first_time_token = $this->checkIfExamHasBeenStarted($exam, $exam_id, $page_no, request('token', null));
         } catch (\Exception $e) {
             return Response::apiError($e->getMessage(), null, 409);
         }
@@ -1291,8 +1294,9 @@ class QuestionController extends Controller
         $links['current_page'] = $questionsSprintQuiz->currentPage();
         $links['last_page'] = $questionsSprintQuiz->lastPage();
         $links['total'] = $questionsSprintQuiz->total();
+        $token = $first_time_token;
 
-        $data    = compact('data', 'links');
+        $data    = compact('data', 'links', 'token');
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
 

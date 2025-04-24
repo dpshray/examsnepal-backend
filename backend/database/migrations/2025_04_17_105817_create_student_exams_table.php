@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('student_id');
             $table->foreign('student_id')->references('id')->on('student_profiles')->onDelete('cascade')->onUpdate('cascade');
             $table->boolean('completed')->default(0);
+            $table->text('first_time_token')->nullable();
             $table->timestamps();
         });
     }
