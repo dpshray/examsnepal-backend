@@ -153,16 +153,19 @@ class AnswerSheetController extends Controller
         }
 
         $student_exam = $student->student_exams()->firstWhere('exam_id',$exam_id);
-        if ($student_exam) {
-            if ($student_exam->completed) {
-                return Response::apiError('This exam has already been completed by this user.',null,409);
-            }
-            
-            $already_answered = $student_exam->answers()->whereIn('question_id', $received_questions)->exists();
-            if ($already_answered) {
-                return Response::apiError('Requested questions has already been answered', null, 409);
-            }
+        if ($student_exam == null) {
+            return Response::apiError('This exam has not been initialized properly(from page 1)', null, 422);
         }
+        // if ($student_exam) {
+        //     if ($student_exam->completed) {
+        //         return Response::apiError('This exam has already been completed by this user.',null,409);
+        //     }
+            
+        //     $already_answered = $student_exam->answers()->whereIn('question_id', $received_questions)->exists();
+        //     if ($already_answered) {
+        //         return Response::apiError('Requested questions has already been answered', null, 409);
+        //     }
+        // }
         /**
          * this code is commented so that response must
          * contains expected question_id and option_id
@@ -181,22 +184,34 @@ class AnswerSheetController extends Controller
 
 
 
-        $student_exam = $student->student_exams()->updateOrCreate([
-            'exam_id' => $exam_id,
-            'completed' => false
-        ],[
+        // $student_exam = $student->student_exams()->updateOrCreate([
+        //     'exam_id' => $exam_id,
+        //     'completed' => false
+        // ],[
 
-        ]);
+        // ]);
 
+        $questions_right_answers = Exam::find($exam_id)
+                ->questions()
+                ->with(['options' => fn($qry) => $qry->where('value',1)])
+                ->get()
+                ->mapWithKeys(function($item){
+                    $option_id = null;
+                    if ($item->options != null && count($item->options)) {
+                        $option_id = $item->options->first()->id;
+                    }
+                    return [$item->id => $option_id];
+                });
 
         /**
          * Received Questions Correct Answers
          * {question_id: option_id(correct)}
          */
-        $questions_right_answers = DB::table('option_questions')
-                                    ->whereIn('question_id', $all_question_ids)
-                                    ->where('value',1)
-                                    ->pluck('id', 'question_id');
+        // $questions_right_answers = DB::table('option_questions')
+        //                             ->whereIn('question_id', $all_question_ids)
+        //                             ->where('value',1)
+        //                             ->pluck('id', 'question_id');
+        
         $received_questions_answers = array_combine($received_questions, $received_answers);
         
         $temp = [];
@@ -216,28 +231,41 @@ class AnswerSheetController extends Controller
             ];
             $temp[] = $data;
         }
-        // return $temp;
+        // return ($temp);
         $total_exam_questions = DB::table('questions')->Where('exam_id', $exam_id)->count();
         $is_user_exam_completed = false;
 
-        DB::transaction(function() use($student_exam, $temp, $total_exam_questions, &$is_user_exam_completed){
+        // return collect($temp)->pluck('')
+        // $student_exam->answers()->upsert($temp, ["student_exam_id","question_id"],['selected_option_id','is_correct']);
+        // return 'ok';
+
+        DB::transaction(function() use($student, $student_exam, $temp, $total_exam_questions, &$is_user_exam_completed){
+            $student_exam->answers()->delete();
             $student_exam->answers()->createMany($temp);
             $student_exam->refresh();
-            if ($student_exam->answers()->count() >= $total_exam_questions) {
-                $student_exam->update(['completed' => true]);
-                $is_user_exam_completed = true;
-            }
+            $student_exam->update(['completed' => true]);
+            $is_user_exam_completed = true;
+            // if ($student_exam->answers()->count() >= $total_exam_questions) {
+            //     $student_exam->update(['completed' => true]);
+            //     $is_user_exam_completed = true;
+            // }
         });
 
-        if ($is_user_exam_completed) {
-            $scores = [
-                'exam_id' => $exam_id,
-                'total_question' => $total_exam_questions,
-                'correct_answered' => $student_exam->answers()->where('is_correct', true)->count()
-            ];
-            return Response::apiSuccess('All questions has been answered', $scores, 200);
-        }
-        return Response::apiSuccess('Answer Saved Successfully', null, 201);
+        $scores = [
+            'exam_id' => $exam_id,
+            'total_question' => $total_exam_questions,
+            'correct_answered' => $student_exam->answers()->where('is_correct', true)->count()
+        ];
+        return Response::apiSuccess('Answer Saved Successfully', $scores, 200);
+        // if ($is_user_exam_completed) {
+        //     $scores = [
+        //         'exam_id' => $exam_id,
+        //         'total_question' => $total_exam_questions,
+        //         'correct_answered' => $student_exam->answers()->where('is_correct', true)->count()
+        //     ];
+        //     return Response::apiSuccess('All questions has been answered', $scores, 200);
+        // }
+        // return Response::apiSuccess('Answer Saved Successfully', null, 201);
     }
 
 
