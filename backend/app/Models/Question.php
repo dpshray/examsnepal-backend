@@ -54,5 +54,9 @@ class Question extends Model
     public function options(){
         return $this->hasMany(OptionQuestion::class);
     }
-    
+
+    public function student_answers() {
+        return $this->hasMany(Answersheet::class);
+    }
+   
 }

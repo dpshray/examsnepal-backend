@@ -9,7 +9,8 @@ class StudentExam extends Model
     protected $fillable = [
         'exam_id',
         'student_id',
-        'completed'
+        'completed',
+        'first_time_token'
     ];
 
     public function answers(){
@@ -18,5 +19,9 @@ class StudentExam extends Model
 
     function student() {
         return $this->belongsTo(StudentProfile::class,'student_id');
+    }
+
+    function exams() {
+        return $this->hasMany(Exam::class);
     }
 }

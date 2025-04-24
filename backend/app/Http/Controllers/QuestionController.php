@@ -910,6 +910,16 @@ class QuestionController extends Controller
      *             example=1
      *         )
      *     ),
+     *     @OA\Parameter(
+     *         name="token",
+     *         in="query",
+     *         required=false,
+     *         description="pagination token",
+     *         @OA\Schema(
+     *             type="string",
+     *             example="kj8s7afd"
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Questions retrieved successfully",
@@ -976,19 +986,18 @@ class QuestionController extends Controller
             ], 404);
         }
 
-        $user = Auth::user();
-        $user_exam = $user->student_exams()->firstWhere('exam_id', $exam_id);
-        if ($user_exam) { # if already started
-            $is_quiz_pending = $user_exam->completed == 0; 
-            if ($is_quiz_pending) {
-                
-            }else {
-                return  Response::apiSuccess('user have already completed the quiz');
-            }
+        $first_time_token = null;
+        // return request('token');
+        try {
+            $page_no = request('page',1);
+            $first_time_token = $this->checkIfExamHasBeenStarted($exam, $exam_id, $page_no, request('token',null));
+        } catch (\Exception $e) {
+            return Response::apiError($e->getMessage(),null,409);
         }
+
         // return Auth::guard('api')->user();
-        $questions = \App\Models\Exam::find($exam_id)
-                        ->questions()->with('options')
+        $questions = $exam->questions()
+                        ->with('options')
                         ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
                         ->paginate(10);
         
@@ -1001,8 +1010,9 @@ class QuestionController extends Controller
         $links['current_page'] = $questions->currentPage();
         $links['last_page'] = $questions->lastPage();
         $links['total'] = $questions->total();
+        $token = $first_time_token;
 
-        $data    = compact('data', 'links');
+        $data    = compact('data', 'links','token');
         
         return Response::apiSuccess('Questions retrieved successfully!', $data);
     }
@@ -1029,6 +1039,16 @@ class QuestionController extends Controller
      *         @OA\Schema(
      *             type="integer",
      *             example=1
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="token",
+     *         in="query",
+     *         required=false,
+     *         description="pagination token",
+     *         @OA\Schema(
+     *             type="string",
+     *             example="kj8s7afd"
      *         )
      *     ),
      *     @OA\Response(
@@ -1087,22 +1107,67 @@ class QuestionController extends Controller
     public function mockTestQuestions($exam_id)
     {
         $exam = Exam::find($exam_id);
-        if (!$exam || $exam->status != 4) {
+        if (!$exam || $exam->status != ExamTypeEnum::MOCK_TEST->value) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid Exam Id for Sprint Quiz Questions',
             ], 404);
         }
-        $questionsMockTest = Question::where('exam_id', $exam_id)
-            ->select('id', 'exam_id', 'question', 'option_1', 'option_value_1', 'option_2', 'option_value_2', 'option_3', 'option_value_3', 'option_4', 'option_value_4', 'explanation', 'created_at', 'updated_at')
+
+        try {
+            $page_no = request('page', 1);
+            $this->checkIfExamHasBeenStarted($exam, $exam_id, $page_no);
+        } catch (\Exception $e) {
+            return Response::apiError($e->getMessage(), null, 409);
+        }
+
+        // $user = Auth::user();
+        // $user_exam = $user->student_exams()->firstWhere('exam_id', $exam_id);
+        // $page_no = request('page', 1);
+        // if ($page_no == 1) {
+        //     if ($user_exam == null) {
+        //         $data = $exam->questions->pluck('id')->map(fn($id) => ['question_id' => $id]);
+        //         $user->student_exams()->create([
+        //             'exam_id' => $exam_id,
+        //             'completed' => false
+        //         ])->answers()
+        //             ->createMany($data);
+        //     } else {
+        //         return Response::apiSuccess('This exam has already been started/initialized');
+        //     }
+        // }
+
+        $questionsMockTest = $exam
+            ->questions()
+            ->with('options')
+            ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
             ->paginate(10);
+        // $questionsMockTest = Question::where('exam_id', $exam_id)
+        //     ->select('id', 'exam_id', 'question', 'option_1', 'option_value_1', 'option_2', 'option_value_2', 'option_3', 'option_value_3', 'option_4', 'option_value_4', 'explanation', 'created_at', 'updated_at')
+        //     ->paginate(10);
 
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Questions retrieved successfully!',
-            'data' => $questionsMockTest,
-        ], 200);
+
+        $pagination_data    = $questionsMockTest->toArray();
+
+
+        ['links' => $links] = $pagination_data;
+        $data               = new QuestionCollection($questionsMockTest);
+
+        $links['current_page'] = $questionsMockTest->currentPage();
+        $links['last_page'] = $questionsMockTest->lastPage();
+        $links['total'] = $questionsMockTest->total();
+
+        $data    = compact('data', 'links');
+
+        return Response::apiSuccess('Questions retrieved successfully!', $data);
+
+
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'Questions retrieved successfully!',
+        //     'data' => $questionsMockTest,
+        // ], 200);
     }
 
     /**
@@ -1112,7 +1177,7 @@ class QuestionController extends Controller
      *     description="This endpoint retrieves all active questions (status = 3) for a given exam by its ID.",
      *     operationId="sprintQuizQuestions",
      *     tags={"Quiz"},
-     * @OA\Parameter(
+     *     @OA\Parameter(
      *         name="page",
      *         in="query",
      *         required=false,
@@ -1127,6 +1192,16 @@ class QuestionController extends Controller
      *         @OA\Schema(
      *             type="integer",
      *             example=1
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="token",
+     *         in="query",
+     *         required=false,
+     *         description="pagination token",
+     *         @OA\Schema(
+     *             type="string",
+     *             example="kj8s7afd"
      *         )
      *     ),
      *     @OA\Response(
@@ -1185,22 +1260,71 @@ class QuestionController extends Controller
     public function sprintQuizQuestions($exam_id)
     {
         $exam = Exam::find($exam_id);
-        if (!$exam || $exam->status != 3) {
+        if (!$exam || $exam->status != ExamTypeEnum::SPRINT_QUIZ->value) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid Exam Id for Sprint Quiz Questions',
             ], 404);
         }
-        $questionsSprintQuiz = Question::where('exam_id', $exam_id)
-            ->select('id', 'exam_id', 'question', 'option_1', 'option_value_1', 'option_2', 'option_value_2', 'option_3', 'option_value_3', 'option_4', 'option_value_4', 'explanation', 'created_at', 'updated_at')
+
+        try {
+            $page_no = request('page', 1);
+            $this->checkIfExamHasBeenStarted($exam, $exam_id, $page_no);
+        } catch (\Exception $e) {
+            return Response::apiError($e->getMessage(), null, 409);
+        }
+
+        $questionsSprintQuiz = $exam->questions()
+            ->with('options')
+            ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
             ->paginate(10);
+        // $questionsSprintQuiz = Question::where('exam_id', $exam_id)
+        //     ->select('id', 'exam_id', 'question', 'option_1', 'option_value_1', 'option_2', 'option_value_2', 'option_3', 'option_value_3', 'option_4', 'option_value_4', 'explanation', 'created_at', 'updated_at')
+        //     ->paginate(10);
+
+        $pagination_data    = $questionsSprintQuiz->toArray();
 
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Questions retrieved successfully!',
-            'data' => $questionsSprintQuiz,
-        ], 200);
+        ['links' => $links] = $pagination_data;
+        $data               = new QuestionCollection($questionsSprintQuiz);
+
+        $links['current_page'] = $questionsSprintQuiz->currentPage();
+        $links['last_page'] = $questionsSprintQuiz->lastPage();
+        $links['total'] = $questionsSprintQuiz->total();
+
+        $data    = compact('data', 'links');
+
+        return Response::apiSuccess('Questions retrieved successfully!', $data);
+
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'Questions retrieved successfully!',
+        //     'data' => $questionsSprintQuiz,
+        // ], 200);
+    }
+
+    private function checkIfExamHasBeenStarted(Exam $exam, Int $exam_id, $page_no = 1, $FTT){
+        $user = Auth::user();
+        $user_exam = $user->student_exams()->firstWhere('exam_id', $exam_id);
+        $first_time_token = str()->random(25);
+        if ($page_no == 1) {
+            if ($user_exam == null) {
+                $data = $exam->questions->pluck('id')->map(fn($id) => ['question_id' => $id]);
+                $user->student_exams()->create([
+                    'exam_id' => $exam_id,
+                    'completed' => false,
+                    'first_time_token' => $first_time_token
+                ])
+                ->answers()
+                ->createMany($data);
+            } else {
+                if ($user_exam->first_time_token !== $FTT) {
+                    throw new \Exception('This exam has already been started/initialized');                
+                }
+                return $FTT;
+            }
+        }
+        return $first_time_token;
     }
 
 
