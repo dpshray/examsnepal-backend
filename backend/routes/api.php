@@ -170,7 +170,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/solution/sprint-quiz',[AnswerSheetController::class,'getDoneSprintQuiz']);
     Route::get('/solution/mock-test',[AnswerSheetController::class,'getDoneMockTest']);
 
-    
+    Route::get('user-exams-status', [QuizController::class, 'getExamStatus']);
 
 
 

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExamTypeEnum;
 use App\Http\Resources\ExamCollection;
 use Illuminate\Http\Request;
 use App\Models\Exam;
 use App\Models\StudentExam;
+use App\Models\StudentProfile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
@@ -815,5 +817,64 @@ class QuizController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+
+    /**
+     * @OA\Get(
+     *     path="/user-exams-status",
+     *     summary="Get user's each exams completed status",
+     *     description="Fetches a list of exams(no of exam completed)",
+     *     operationId="getExamStatus",
+     *     tags={"Quiz"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of exams retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
+     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
+     *                 @OA\Property(
+     *                     property="organization",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="ABC University")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="examType",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Final Exam")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
+     */
+    public function getExamStatus()
+    {
+        $user = Auth::guard('api')->user();
+        $student_id = $user->id;
+        $exam_status = $user->exams
+            ->groupBy('status')
+            ->map(function ($items, $status) {
+                return [
+                    'exam' => ExamTypeEnum::getKeyByValue($status),
+                    'count' => $items->count()
+                ];
+            })
+            ->pluck('count','exam');
+        $data = compact('student_id','exam_status');
+        return Response::apiSuccess('Student\'s exam completed status', $data);
     }
 }
