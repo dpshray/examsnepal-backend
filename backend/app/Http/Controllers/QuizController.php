@@ -9,6 +9,7 @@ use App\Models\Exam;
 use App\Models\StudentExam;
 use App\Models\StudentProfile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
 
@@ -863,18 +864,17 @@ class QuizController extends Controller
      */
     public function getExamStatus()
     {
-        $user = Auth::guard('api')->user();
-        $student_id = $user->id;
-        $exam_status = $user->exams
-            ->groupBy('status')
-            ->map(function ($items, $status) {
-                return [
-                    'exam' => ExamTypeEnum::getKeyByValue($status),
-                    'count' => $items->count()
-                ];
-            })
-            ->pluck('count','exam');
-        $data = compact('student_id','exam_status');
-        return Response::apiSuccess('Student\'s exam completed status', $data);
+        $student_id = Auth::guard('api')->id();
+
+        $exam_status = DB::table('student_exams')
+            ->join('exams', 'student_exams.exam_id', '=', 'exams.id')
+            ->select('exams.status', DB::raw('count(*) as count'))
+            ->where('student_exams.student_id', $student_id)
+            ->groupBy('exams.status')
+            ->get()
+            ->mapWithKeys(fn ($row) => [ExamTypeEnum::getKeyByValue($row->status) => $row->count]);
+
+        $data = compact('student_id', 'exam_status');
+        return Response::apiSuccess("Student's exam completed status", $data);
     }
 }
