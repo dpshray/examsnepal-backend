@@ -336,8 +336,8 @@ class AnswerSheetController extends Controller
     public function getResultsWithExam($exam_id)
     {
         $student_exam = Auth::guard('api')->user()->student_exams()->firstWhere('exam_id', $exam_id);
-        if ($student_exam == null || $student_exam->completed == 0) {
-            return Response::apiSuccess('This exam is not completed', null, 403);
+        if ($student_exam == null) {
+            return Response::apiSuccess('This exam is not started', null, 403);
         }
         $questions = Exam::find($exam_id)
                         ->questions()
