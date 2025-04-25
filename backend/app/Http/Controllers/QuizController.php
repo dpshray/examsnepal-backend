@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\ExamCollection;
 use Illuminate\Http\Request;
 use App\Models\Exam;
+use App\Models\StudentExam;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
@@ -68,7 +69,7 @@ class QuizController extends Controller
     {
         $page = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $take = $page * $perPage;
+        $skip = ($page - 1) * $perPage;
 
         $free_quiz_query = Exam::freeType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
@@ -77,7 +78,7 @@ class QuizController extends Controller
             ->userCompleted();
         
         $total_items = $free_quiz_query->count();
-        $free_quiz_for_resource = $free_quiz_query->skip($take)->take($perPage)->get();
+        $free_quiz_for_resource = $free_quiz_query->skip($skip)->take($perPage)->get();
 
         $freeQuiz = new ExamCollection($free_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -148,7 +149,7 @@ class QuizController extends Controller
     {
         $page = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $take = $page * $perPage;
+        $skip = ($page - 1) * $perPage;
 
         $free_quiz_query = Exam::freeType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
@@ -157,7 +158,7 @@ class QuizController extends Controller
             ->userPending();
 
         $total_items = $free_quiz_query->count();
-        $free_quiz_for_resource = $free_quiz_query->skip($take)->take($perPage)->get();
+        $free_quiz_for_resource = $free_quiz_query->skip($skip)->take($perPage)->get();
 
         $freeQuiz = new ExamCollection($free_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -228,7 +229,7 @@ class QuizController extends Controller
     {
         $page = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $take = $page * $perPage;
+        $skip = ($page - 1) * $perPage;
 
         $sprint_quiz_query = Exam::sprintType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
@@ -237,7 +238,7 @@ class QuizController extends Controller
             ->userCompleted();
 
         $total_items = $sprint_quiz_query->count();
-        $sprint_quiz_for_resource = $sprint_quiz_query->skip($take)->take($perPage)->get();
+        $sprint_quiz_for_resource = $sprint_quiz_query->skip($skip)->take($perPage)->get();
 
         $sprint_quiz = new ExamCollection($sprint_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -308,7 +309,7 @@ class QuizController extends Controller
     {
         $page = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $take = $page * $perPage;
+        $skip = ($page - 1) * $perPage;
 
         $sprint_quiz_query = Exam::sprintType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
@@ -317,7 +318,7 @@ class QuizController extends Controller
             ->userPending();
 
         $total_items = $sprint_quiz_query->count();
-        $sprint_quiz_for_resource = $sprint_quiz_query->skip($take)->take($perPage)->get();
+        $sprint_quiz_for_resource = $sprint_quiz_query->skip($skip)->take($perPage)->get();
 
         $sprint_quiz = new ExamCollection($sprint_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -388,7 +389,7 @@ class QuizController extends Controller
     {
         $page = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $take = $page * $perPage;
+        $skip = ($page - 1) * $perPage;
 
         $mock_quiz_query = Exam::mockType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
@@ -397,7 +398,7 @@ class QuizController extends Controller
             ->userCompleted();
 
         $total_items = $mock_quiz_query->count();
-        $mock_quiz_for_resource = $mock_quiz_query->skip($take)->take($perPage)->get();
+        $mock_quiz_for_resource = $mock_quiz_query->skip($skip)->take($perPage)->get();
 
         $mock_quiz = new ExamCollection($mock_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -469,7 +470,7 @@ class QuizController extends Controller
     {
         $page = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $take = $page * $perPage;
+        $skip = ($page - 1) * $perPage;
 
         $mock_quiz_query = Exam::mockType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
@@ -478,7 +479,7 @@ class QuizController extends Controller
             ->userPending();
 
         $total_items = $mock_quiz_query->count();
-        $mock_quiz_for_resource = $mock_quiz_query->skip($take)->take($perPage)->get();
+        $mock_quiz_for_resource = $mock_quiz_query->skip($skip)->take($perPage)->get();
 
         $mock_quiz = new ExamCollection($mock_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
