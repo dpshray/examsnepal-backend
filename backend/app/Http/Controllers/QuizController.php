@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExamTypeEnum;
 use App\Http\Resources\ExamCollection;
 use Illuminate\Http\Request;
 use App\Models\Exam;
+use App\Models\StudentExam;
+use App\Models\StudentProfile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
 
@@ -68,7 +72,7 @@ class QuizController extends Controller
     {
         $page = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $take = $page * $perPage;
+        $skip = ($page - 1) * $perPage;
 
         $free_quiz_query = Exam::freeType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
@@ -77,7 +81,7 @@ class QuizController extends Controller
             ->userCompleted();
         
         $total_items = $free_quiz_query->count();
-        $free_quiz_for_resource = $free_quiz_query->skip($take)->take($perPage)->get();
+        $free_quiz_for_resource = $free_quiz_query->skip($skip)->take($perPage)->get();
 
         $freeQuiz = new ExamCollection($free_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -148,7 +152,7 @@ class QuizController extends Controller
     {
         $page = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $take = $page * $perPage;
+        $skip = ($page - 1) * $perPage;
 
         $free_quiz_query = Exam::freeType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
@@ -157,7 +161,7 @@ class QuizController extends Controller
             ->userPending();
 
         $total_items = $free_quiz_query->count();
-        $free_quiz_for_resource = $free_quiz_query->skip($take)->take($perPage)->get();
+        $free_quiz_for_resource = $free_quiz_query->skip($skip)->take($perPage)->get();
 
         $freeQuiz = new ExamCollection($free_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -169,76 +173,7 @@ class QuizController extends Controller
             'total' => $total_items
         ];
         return Response::apiSuccess('Free pending quizzes retrieved successfully.', $data);
-    }
-
-    /**
-     * @OA\Get(
-     *     path="/sprint-quiz",
-     *     summary="Get Sprint Quizzes (for users)",
-     *     description="Retrieve a list of sprint quizzes. Requires an active subscription.",
-     *     operationId="getSprintQuiz",
-     *     tags={"Quiz"},
-     * @OA\Parameter(
-     *         name="page",
-     *         in="query",
-     *         required=false,
-     *         description="Page number for pagination",
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     security={{ "bearerAuth":{} }},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Sprint quizzes retrieved successfully."),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="exam_name", type="string", example="Sprint Test 1"),
-     *                     @OA\Property(property="status", type="string", example="3"),
-     *                     @OA\Property(property="user", type="object", nullable=true,
-     *                         @OA\Property(property="id", type="integer", example=5),
-     *                         @OA\Property(property="fullname", type="string", example="John Doe")
-     *                     )
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Subscription Inactive",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Your subscription is inactive. Please subscribe to access sprint quizzes.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal Server Error"
-     *     )
-     * )
-     */
-    public function getSprintQuiz()
-    {
-        $sprintQuiz = Exam::sprintType()
-            ->select(['id', 'exam_name', 'status', 'user_id'])
-            ->with(['user:id,fullname'])
-            ->withCount('questions')
-            ->paginate(10);
-
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Sprint quizzes retrieved successfully.',
-            'data' => $sprintQuiz
-        ], 200);
-    }    
+    }   
     
     /**
      * @OA\Get(
@@ -297,7 +232,7 @@ class QuizController extends Controller
     {
         $page = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $take = $page * $perPage;
+        $skip = ($page - 1) * $perPage;
 
         $sprint_quiz_query = Exam::sprintType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
@@ -306,7 +241,7 @@ class QuizController extends Controller
             ->userCompleted();
 
         $total_items = $sprint_quiz_query->count();
-        $sprint_quiz_for_resource = $sprint_quiz_query->skip($take)->take($perPage)->get();
+        $sprint_quiz_for_resource = $sprint_quiz_query->skip($skip)->take($perPage)->get();
 
         $sprint_quiz = new ExamCollection($sprint_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -377,7 +312,7 @@ class QuizController extends Controller
     {
         $page = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $take = $page * $perPage;
+        $skip = ($page - 1) * $perPage;
 
         $sprint_quiz_query = Exam::sprintType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
@@ -386,7 +321,7 @@ class QuizController extends Controller
             ->userPending();
 
         $total_items = $sprint_quiz_query->count();
-        $sprint_quiz_for_resource = $sprint_quiz_query->skip($take)->take($perPage)->get();
+        $sprint_quiz_for_resource = $sprint_quiz_query->skip($skip)->take($perPage)->get();
 
         $sprint_quiz = new ExamCollection($sprint_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -398,82 +333,6 @@ class QuizController extends Controller
             'total' => $total_items,
         ];
         return Response::apiSuccess('Sprint pending quizzes retrieved successfully.', $data);
-    }
-
-    /**
-     * @OA\Get(
-     *     path="/mock-test",
-     *     summary="Get Mock Tests (for users)",
-     *     description="Retrieve a list of Mock Tests. Requires an active subscription.",
-     *     operationId="getMockTests",
-     *     tags={"Quiz"},
-     * @OA\Parameter(
-     *         name="page",
-     *         in="query",
-     *         required=false,
-     *         description="Page number for pagination",
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     security={{ "bearerAuth":{} }},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Mock Tests retrieved successfully."),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="exam_name", type="string", example="Mock Tests 1"),
-     *                     @OA\Property(property="status", type="string", example="3"),
-     *                     @OA\Property(property="user", type="object", nullable=true,
-     *                         @OA\Property(property="id", type="integer", example=5),
-     *                         @OA\Property(property="fullname", type="string", example="John Doe")
-     *                     )
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Subscription Inactive",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Your subscription is inactive. Please subscribe to access Mock Tests.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal Server Error"
-     *     )
-     * )
-     */
-    public function getMockTest()
-    {
-        $student = Auth::user();
-        if (!$student->is_subscripted) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Your subscription is inactive. Please subscribe to access Mock Tests.',
-            ], 403);
-        }
-
-        $mockTest = Exam::where('status', $this->quizTypes['mockTest'])
-            ->select(['id', 'exam_name', 'status', 'user_id'])
-            ->with(['user:id,fullname'])
-            ->withCount('questions')
-            ->paginate(10);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Mock Tests retrieved successfully.',
-            'data' => $mockTest
-        ], 200);
     }
 
     /**
@@ -533,7 +392,7 @@ class QuizController extends Controller
     {
         $page = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $take = $page * $perPage;
+        $skip = ($page - 1) * $perPage;
 
         $mock_quiz_query = Exam::mockType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
@@ -542,7 +401,7 @@ class QuizController extends Controller
             ->userCompleted();
 
         $total_items = $mock_quiz_query->count();
-        $mock_quiz_for_resource = $mock_quiz_query->skip($take)->take($perPage)->get();
+        $mock_quiz_for_resource = $mock_quiz_query->skip($skip)->take($perPage)->get();
 
         $mock_quiz = new ExamCollection($mock_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -614,7 +473,7 @@ class QuizController extends Controller
     {
         $page = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $take = $page * $perPage;
+        $skip = ($page - 1) * $perPage;
 
         $mock_quiz_query = Exam::mockType()
             ->select(['id', 'exam_name', 'status', 'user_id'])
@@ -623,7 +482,7 @@ class QuizController extends Controller
             ->userPending();
 
         $total_items = $mock_quiz_query->count();
-        $mock_quiz_for_resource = $mock_quiz_query->skip($take)->take($perPage)->get();
+        $mock_quiz_for_resource = $mock_quiz_query->skip($skip)->take($perPage)->get();
 
         $mock_quiz = new ExamCollection($mock_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
@@ -959,5 +818,63 @@ class QuizController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+
+    /**
+     * @OA\Get(
+     *     path="/user-exams-status",
+     *     summary="Get user's each exams completed status",
+     *     description="Fetches a list of exams(no of exam completed)",
+     *     operationId="getExamStatus",
+     *     tags={"Quiz"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of exams retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
+     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
+     *                 @OA\Property(
+     *                     property="organization",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="ABC University")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="examType",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Final Exam")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
+     */
+    public function getExamStatus()
+    {
+        $student_id = Auth::guard('api')->id();
+
+        $exam_status = DB::table('student_exams')
+            ->join('exams', 'student_exams.exam_id', '=', 'exams.id')
+            ->select('exams.status', DB::raw('count(*) as count'))
+            ->where('student_exams.student_id', $student_id)
+            ->groupBy('exams.status')
+            ->get()
+            ->mapWithKeys(fn ($row) => [ExamTypeEnum::getKeyByValue($row->status) => $row->count]);
+
+        $data = compact('student_id', 'exam_status');
+        return Response::apiSuccess("Student's exam completed status", $data);
     }
 }

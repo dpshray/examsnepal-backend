@@ -152,12 +152,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/free-quiz/completed', [QuizController::class, 'getCompletedFreeQuiz']);
 
     #sprint quiz
-    Route::get('/sprint-quiz', [QuizController::class, 'getSprintQuiz']);
     Route::get('/sprint-quiz/pending', [QuizController::class, 'getPendingSprintQuiz']);
     Route::get('/sprint-quiz/completed', [QuizController::class, 'getCompletedSprintQuiz']);
     
     #mock quiz
-    Route::get('/mock-test', [QuizController::class, 'getMockTest']);
     Route::get('/mock-test/pending', [QuizController::class, 'getPendingMockTest']);
     Route::get('/mock-test/completed', [QuizController::class, 'getCompletedMockTest']);
 
@@ -172,7 +170,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/solution/sprint-quiz',[AnswerSheetController::class,'getDoneSprintQuiz']);
     Route::get('/solution/mock-test',[AnswerSheetController::class,'getDoneMockTest']);
 
-    
+    Route::get('user-exams-status', [QuizController::class, 'getExamStatus']);
 
 
 
