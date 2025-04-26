@@ -1,18 +1,14 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Enums\ExamTypeEnum;
 use App\Http\Resources\QuestionCollection;
-use Illuminate\Http\Request;
-use App\Models\Question;
-use Illuminate\Support\Facades\Auth;
-use App\Models\StudentProfile;
 use App\Models\Exam;
 use App\Models\ExamType;
-use App\Models\OptionQuestion;
-use App\Models\StudentExam;
-use Illuminate\Support\Facades\Cache;
+use App\Models\Question;
+use App\Models\StudentProfile;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 
 class QuestionController extends Controller
@@ -86,40 +82,39 @@ class QuestionController extends Controller
      * )
      */
 
-
     public function index()
     {
         // Get authenticated user
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
         // Fetch student's profile
         $studentProfile = StudentProfile::find($user->id);
-        if (!$studentProfile) {
+        if (! $studentProfile) {
             return response()->json(['message' => 'Student profile not found'], 404);
         }
         $userExamType = $studentProfile->exam_type;
-        $examType = ExamType::where('name', $userExamType)->first();
-        if (!$examType) {
+        $examType     = ExamType::where('name', $userExamType)->first();
+        if (! $examType) {
             return response()->json([
                 'success' => false,
-                'message' => 'Exam type not found in the system.'
+                'message' => 'Exam type not found in the system.',
             ], 404);
         }
         $examIds = Exam::where('exam_type_id', $examType->id)->pluck('id');
         if ($examIds->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No exams found for this exam type.'
+                'message' => 'No exams found for this exam type.',
             ], 404);
         }
         // Get all questions that belong to these exams
-        $questions = Question::whereIn('exam_id', $examIds)->paginate(25);;
+        $questions = Question::whereIn('exam_id', $examIds)->paginate(25);
         return response()->json([
             'success' => true,
             'message' => 'Questions retrieved successfully!',
-            'data' => $questions
+            'data'    => $questions,
         ], 200);
     }
 
@@ -174,13 +169,13 @@ class QuestionController extends Controller
         if ($questions->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No questions found'
+                'message' => 'No questions found',
             ], 404);
         }
         return response()->json([
             'success' => true,
             'message' => 'Questions retrieved successfully!',
-            'data' => $questions,
+            'data'    => $questions,
         ], 200);
     }
 
@@ -191,7 +186,7 @@ class QuestionController extends Controller
      *     description="Searches for multiple-choice questions (MCQs) based on a keyword using Full-Text Search.",
      *     operationId="searchQuestions",
      *     tags={"MCQs"},
-     * 
+     *
      *     @OA\Parameter(
      *         name="keyword",
      *         in="query",
@@ -199,7 +194,7 @@ class QuestionController extends Controller
      *         description="The keyword to search for MCQs",
      *         @OA\Schema(type="string")
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Questions retrieved successfully",
@@ -229,7 +224,7 @@ class QuestionController extends Controller
      *             )
      *         )
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Keyword is required",
@@ -238,7 +233,7 @@ class QuestionController extends Controller
      *             @OA\Property(property="message", type="string", example="Keyword is required")
      *         )
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=404,
      *         description="No questions found",
@@ -253,22 +248,22 @@ class QuestionController extends Controller
     public function searchQuestions(Request $request)
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
         // Fetch the student's profile
         $studentProfile = StudentProfile::find($user->id);
-        if (!$studentProfile) {
+        if (! $studentProfile) {
             return response()->json(['message' => 'Student profile not found'], 404);
         }
 
         $userExamType = $studentProfile->exam_type;
-        $examType = ExamType::where('name', $userExamType)->first();
-        if (!$examType) {
+        $examType     = ExamType::where('name', $userExamType)->first();
+        if (! $examType) {
             return response()->json([
                 'success' => false,
-                'message' => 'Exam type not found in the system.'
+                'message' => 'Exam type not found in the system.',
             ], 404);
         }
 
@@ -276,12 +271,12 @@ class QuestionController extends Controller
         if ($examIds->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'No exams found for this exam type.'
+                'message' => 'No exams found for this exam type.',
             ], 404);
         }
 
         $keyword = $request->query('keyword'); // Get the keyword from the query parameter
-        if (!$keyword) {
+        if (! $keyword) {
             return response()->json(['message' => 'Keyword is required'], 400);
         }
         if (strlen($keyword) < 3) {
@@ -306,7 +301,7 @@ class QuestionController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Questions retrieved successfully!',
-            'data' => $questions,
+            'data'    => $questions,
         ], 200);
     }
 
@@ -364,7 +359,7 @@ class QuestionController extends Controller
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Question created successfully!"),
-     *             @OA\Property(property="data", type="object", 
+     *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="exam_id", type="integer", example=1),
      *                 @OA\Property(property="question", type="string", example="What is the capital of Nepal?"),
@@ -413,25 +408,25 @@ class QuestionController extends Controller
     {
         // Validate incoming request data
         $validatedData = $request->validate([
-            'exam_id' => 'required|exists:exams,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'question' => 'required|string|max:255',
-            'option_1' => 'required|string|max:255',
+            'exam_id'        => 'required|exists:exams,id',
+            'subject_id'     => 'required|exists:subjects,id',
+            'question'       => 'required|string|max:255',
+            'option_1'       => 'required|string|max:255',
             'option_value_1' => 'required|boolean',
-            'option_2' => 'required|string|max:255',
+            'option_2'       => 'required|string|max:255',
             'option_value_2' => 'required|boolean',
-            'option_3' => 'nullable|string|max:255',
+            'option_3'       => 'nullable|string|max:255',
             'option_value_3' => 'nullable|boolean',
-            'option_4' => 'nullable|string|max:255',
+            'option_4'       => 'nullable|string|max:255',
             'option_value_4' => 'nullable|boolean',
-            'explanation' => 'nullable|string',
-            'subject' => 'nullable|string|max:255',
-            'exam_type' => 'nullable|string|max:255',
-            'remark' => 'nullable|string|max:255',
-            'serial' => 'nullable|integer',
-            'old_exam_id' => 'nullable|integer',
-            'uploader' => 'nullable|exists:users,id',
-            'mark_type' => 'nullable|string|max:255',
+            'explanation'    => 'nullable|string',
+            'subject'        => 'nullable|string|max:255',
+            'exam_type'      => 'nullable|string|max:255',
+            'remark'         => 'nullable|string|max:255',
+            'serial'         => 'nullable|integer',
+            'old_exam_id'    => 'nullable|integer',
+            'uploader'       => 'nullable|exists:users,id',
+            'mark_type'      => 'nullable|string|max:255',
         ]);
 
         // Ensure only one `option_value_*` is true
@@ -459,18 +454,17 @@ class QuestionController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Question created successfully!',
-                'data' => $question, // The `data` field is directly included here
-            ], 201); // HTTP 201 Created
+                'data'    => $question, // The `data` field is directly included here
+            ], 201);                // HTTP 201 Created
         } catch (\Exception $e) {
             // Return a failure response if there's an error
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create Question. Please try again.',
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
             ], 500); // HTTP 500 Internal Server Error
         }
     }
-
 
     /**
      * @OA\Post(
@@ -486,7 +480,7 @@ class QuestionController extends Controller
      *             @OA\Schema(
      *                 type="object",
      *                 required={"exam_id","subject_id", "question", "option_1", "option_value_1", "option_2", "option_value_2"},
-     * 
+     *
      *                 @OA\Property(property="exam_id", type="integer", example=1),
      *                 @OA\Property(property="subject_id", type="integer", example=1),
      *                 @OA\Property(property="question", type="string", maxLength=255, example="What is the capital of Nepal?"),
@@ -509,7 +503,7 @@ class QuestionController extends Controller
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Question created successfully!"),
-     *             @OA\Property(property="data", type="object", 
+     *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="exam_id", type="integer", example=1),
      *                 @OA\Property(property="question", type="string", example="What is the capital of Nepal?"),
@@ -565,24 +559,23 @@ class QuestionController extends Controller
      * )
      */
 
-
     public function storeOnQuestionBank(Request $request)
     {
         // Validate incoming request data
-        $userId = Auth::id();
+        $userId        = Auth::id();
         $validatedData = $request->validate([
-            'exam_id' => 'required|exists:exams,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'question' => 'required|string|max:255',
-            'option_1' => 'required|string|max:255',
+            'exam_id'        => 'required|exists:exams,id',
+            'subject_id'     => 'required|exists:subjects,id',
+            'question'       => 'required|string|max:255',
+            'option_1'       => 'required|string|max:255',
             'option_value_1' => 'required|boolean',
-            'option_2' => 'required|string|max:255',
+            'option_2'       => 'required|string|max:255',
             'option_value_2' => 'required|boolean',
-            'option_3' => 'nullable|string|max:255',
+            'option_3'       => 'nullable|string|max:255',
             'option_value_3' => 'nullable|boolean',
-            'option_4' => 'nullable|string|max:255',
+            'option_4'       => 'nullable|string|max:255',
             'option_value_4' => 'nullable|boolean',
-            'explanation' => 'nullable|string',
+            'explanation'    => 'nullable|string',
 
         ]);
 
@@ -613,8 +606,8 @@ class QuestionController extends Controller
                 ], 404);
             }
 
-            $validatedData['exam_id'] = $exam->id;
-            $validatedData['uploader'] = $userId;
+            $validatedData['exam_id']            = $exam->id;
+            $validatedData['uploader']           = $userId;
             $validatedData['from_question_bank'] = true;
 
             $question = Question::create($validatedData);
@@ -622,19 +615,16 @@ class QuestionController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Question created successfully!',
-                'data' => $question,
+                'data'    => $question,
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create Question. Please try again.',
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }
-
-
-
 
     /**
      * Display the specified resource.
@@ -663,7 +653,7 @@ class QuestionController extends Controller
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Question retrieved successfully!"),
-     *             @OA\Property(property="data", type="object", 
+     *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="exam_id", type="integer", example=1),
      *                 @OA\Property(property="question", type="string", example="What is the capital of Nepal?"),
@@ -718,25 +708,24 @@ class QuestionController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Question retrieved successfully!',
-                'data' => $question,
+                'data'    => $question,
             ], 200); // HTTP 200 OK
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Return a failure response if the question is not found
             return response()->json([
                 'success' => false,
                 'message' => 'Question not found',
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
             ], 404); // HTTP 404 Not Found
         } catch (\Exception $e) {
             // Return a failure response for other errors
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve the question. Please try again.',
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
             ], 500); // HTTP 500 Internal Server Error
         }
     }
-
 
     /**
      * Show the form for editing the specified resource.
@@ -819,24 +808,24 @@ class QuestionController extends Controller
         try {
             // Validate incoming request data
             $validatedData = $request->validate([
-                'exam_id' => 'required|exists:exams,id',
-                'question' => 'required|string|max:255',
-                'option_1' => 'required|string|max:255',
+                'exam_id'        => 'required|exists:exams,id',
+                'question'       => 'required|string|max:255',
+                'option_1'       => 'required|string|max:255',
                 'option_value_1' => 'required|boolean',
-                'option_2' => 'required|string|max:255',
+                'option_2'       => 'required|string|max:255',
                 'option_value_2' => 'required|boolean',
-                'option_3' => 'nullable|string|max:255',
+                'option_3'       => 'nullable|string|max:255',
                 'option_value_3' => 'nullable|boolean',
-                'option_4' => 'nullable|string|max:255',
+                'option_4'       => 'nullable|string|max:255',
                 'option_value_4' => 'nullable|boolean',
-                'explanation' => 'nullable|string',
-                'subject' => 'nullable|string|max:255',
-                'exam_type' => 'nullable|string|max:255',
-                'remark' => 'nullable|string|max:255',
-                'serial' => 'nullable|integer',
-                'old_exam_id' => 'nullable|integer',
-                'uploader' => 'nullable|exists:users,id',
-                'mark_type' => 'nullable|string|max:255',
+                'explanation'    => 'nullable|string',
+                'subject'        => 'nullable|string|max:255',
+                'exam_type'      => 'nullable|string|max:255',
+                'remark'         => 'nullable|string|max:255',
+                'serial'         => 'nullable|integer',
+                'old_exam_id'    => 'nullable|integer',
+                'uploader'       => 'nullable|exists:users,id',
+                'mark_type'      => 'nullable|string|max:255',
             ]);
 
             // Ensure exactly one option is true
@@ -859,7 +848,7 @@ class QuestionController extends Controller
             // Find the question by ID
             $question = Question::find($id);
 
-            if (!$question) {
+            if (! $question) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Question not found',
@@ -873,18 +862,17 @@ class QuestionController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Question updated successfully!',
-                'data' => $question,
+                'data'    => $question,
             ], 200); // HTTP 200 OK
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update the question. Please try again.',
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
             ], 500); // HTTP 500 Internal Server Error
         }
     }
-
 
     /**
      * @OA\Get(
@@ -973,13 +961,12 @@ class QuestionController extends Controller
      *     )
      * )
      */
-    public function freeQuizQuestions($exam_id)
+    public function freeQuizQuestions(Exam $exam_id)
     {
-        // Find the exam by ID
-        $exam = Exam::find($exam_id);
+        $exam = $exam_id;
 
         // Check if the exam exists and has an active status
-        if (!$exam || $exam->status != ExamTypeEnum::FREE_QUIZ->value) {
+        if ($exam->status != ExamTypeEnum::FREE_QUIZ->value) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid Exam Id for Free Quiz Questions',
@@ -987,33 +974,29 @@ class QuestionController extends Controller
         }
 
         $first_time_token = null;
-        // return request('token');
         try {
-            $page_no = request('page',1);
-            $first_time_token = $this->checkIfExamHasBeenStarted($exam, $exam_id, $page_no, request('token',null));
+            $first_time_token = $this->checkIfExamHasBeenStartedPreviously($exam, request('token', null));
         } catch (\Exception $e) {
-            return Response::apiError($e->getMessage(),null,409);
+            return Response::apiError($e->getMessage(), null, 409);
         }
 
-        // return Auth::guard('api')->user();
         $questions = $exam->questions()
-                        ->with('options')
-                        ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
-                        ->paginate(10);
-        
-        $pagination_data    = $questions->toArray();
-        
-        
+            ->with('options')
+            ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
+            ->paginate(10);
+
+        $pagination_data = $questions->toArray();
+
         ['links' => $links] = $pagination_data;
         $data               = new QuestionCollection($questions);
-        
-        $links['current_page'] = $questions->currentPage();
-        $links['last_page'] = $questions->lastPage();
-        $links['total'] = $questions->total();
-        $token = $first_time_token;
 
-        $data    = compact('data', 'links','token');
-        
+        $links['current_page'] = $questions->currentPage();
+        $links['last_page']    = $questions->lastPage();
+        $links['total']        = $questions->total();
+        $token                 = $first_time_token;
+
+        $data = compact('data', 'links', 'token');
+
         return Response::apiSuccess('Questions retrieved successfully!', $data);
     }
 
@@ -1104,72 +1087,42 @@ class QuestionController extends Controller
      *     )
      * )
      */
-    public function mockTestQuestions($exam_id)
+    public function mockTestQuestions(Exam $exam_id)
     {
-        $exam = Exam::find($exam_id);
-        if (!$exam || $exam->status != ExamTypeEnum::MOCK_TEST->value) {
+        $exam = $exam_id;
+        if ($exam->status != ExamTypeEnum::MOCK_TEST->value) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid Exam Id for Sprint Quiz Questions',
+                'message' => 'Invalid Exam Id for Mock Quiz Questions',
             ], 404);
         }
 
         $first_time_token = null;
         try {
-            $page_no = request('page', 1);
-            $first_time_token = $this->checkIfExamHasBeenStarted($exam, $exam_id, $page_no, request('token', null));
+            $first_time_token = $this->checkIfExamHasBeenStartedPreviously($exam, request('token', null));
         } catch (\Exception $e) {
             return Response::apiError($e->getMessage(), null, 409);
         }
-
-        // $user = Auth::user();
-        // $user_exam = $user->student_exams()->firstWhere('exam_id', $exam_id);
-        // $page_no = request('page', 1);
-        // if ($page_no == 1) {
-        //     if ($user_exam == null) {
-        //         $data = $exam->questions->pluck('id')->map(fn($id) => ['question_id' => $id]);
-        //         $user->student_exams()->create([
-        //             'exam_id' => $exam_id,
-        //             'completed' => false
-        //         ])->answers()
-        //             ->createMany($data);
-        //     } else {
-        //         return Response::apiSuccess('This exam has already been started/initialized');
-        //     }
-        // }
 
         $questionsMockTest = $exam
             ->questions()
             ->with('options')
             ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
             ->paginate(10);
-        // $questionsMockTest = Question::where('exam_id', $exam_id)
-        //     ->select('id', 'exam_id', 'question', 'option_1', 'option_value_1', 'option_2', 'option_value_2', 'option_3', 'option_value_3', 'option_4', 'option_value_4', 'explanation', 'created_at', 'updated_at')
-        //     ->paginate(10);
 
-
-
-        $pagination_data    = $questionsMockTest->toArray();
-
+        $pagination_data = $questionsMockTest->toArray();
 
         ['links' => $links] = $pagination_data;
         $data               = new QuestionCollection($questionsMockTest);
 
         $links['current_page'] = $questionsMockTest->currentPage();
-        $links['last_page'] = $questionsMockTest->lastPage();
-        $links['total'] = $questionsMockTest->total();
-        $token = $first_time_token;
+        $links['last_page']    = $questionsMockTest->lastPage();
+        $links['total']        = $questionsMockTest->total();
+        $token                 = $first_time_token;
 
-        $data    = compact('data', 'links', 'token');
+        $data = compact('data', 'links', 'token');
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
-
-
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => 'Questions retrieved successfully!',
-        //     'data' => $questionsMockTest,
-        // ], 200);
     }
 
     /**
@@ -1259,10 +1212,10 @@ class QuestionController extends Controller
      *     )
      * )
      */
-    public function sprintQuizQuestions($exam_id)
+    public function sprintQuizQuestions(Exam $exam_id)
     {
-        $exam = Exam::find($exam_id);
-        if (!$exam || $exam->status != ExamTypeEnum::SPRINT_QUIZ->value) {
+        $exam = $exam_id;
+        if ($exam->status != ExamTypeEnum::SPRINT_QUIZ->value) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid Exam Id for Sprint Quiz Questions',
@@ -1271,8 +1224,7 @@ class QuestionController extends Controller
 
         $first_time_token = null;
         try {
-            $page_no = request('page', 1);
-            $first_time_token = $this->checkIfExamHasBeenStarted($exam, $exam_id, $page_no, request('token', null));
+            $first_time_token = $this->checkIfExamHasBeenStartedPreviously($exam, request('token', null));
         } catch (\Exception $e) {
             return Response::apiError($e->getMessage(), null, 409);
         }
@@ -1281,78 +1233,43 @@ class QuestionController extends Controller
             ->with('options')
             ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
             ->paginate(10);
-        // $questionsSprintQuiz = Question::where('exam_id', $exam_id)
-        //     ->select('id', 'exam_id', 'question', 'option_1', 'option_value_1', 'option_2', 'option_value_2', 'option_3', 'option_value_3', 'option_4', 'option_value_4', 'explanation', 'created_at', 'updated_at')
-        //     ->paginate(10);
 
-        $pagination_data    = $questionsSprintQuiz->toArray();
-
+        $pagination_data = $questionsSprintQuiz->toArray();
 
         ['links' => $links] = $pagination_data;
         $data               = new QuestionCollection($questionsSprintQuiz);
 
         $links['current_page'] = $questionsSprintQuiz->currentPage();
-        $links['last_page'] = $questionsSprintQuiz->lastPage();
-        $links['total'] = $questionsSprintQuiz->total();
-        $token = $first_time_token;
+        $links['last_page']    = $questionsSprintQuiz->lastPage();
+        $links['total']        = $questionsSprintQuiz->total();
+        $token                 = $first_time_token;
 
-        $data    = compact('data', 'links', 'token');
+        $data = compact('data', 'links', 'token');
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
-
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => 'Questions retrieved successfully!',
-        //     'data' => $questionsSprintQuiz,
-        // ], 200);
     }
 
-    private function checkIfExamHasBeenStarted(Exam $exam, Int $exam_id, $page_no = 1, $FTT){
-        $user = Auth::user();
-        $user_exam = $user->student_exams()->firstWhere('exam_id', $exam_id);
-        
-        
+    private function checkIfExamHasBeenStartedPreviously(Exam $exam, $FTT): String
+    {
+        $user      = Auth::guard('api')->user();
+        $user_exam = $user->student_exams()->firstWhere('exam_id', $exam->id);
+
         if ($user_exam == null) {
+            # this is the first time user giving this exam
             $first_time_token = str()->random(25);
-            $data = $exam->questions->pluck('id')->map(fn($id) => ['question_id' => $id]);
-            $user->student_exams()->create([
-                'exam_id' => $exam_id,
-                'completed' => false,
-                'first_time_token' => $first_time_token
-            ])
-            ->answers()
-            ->createMany($data);
+            $data             = $exam->questions->pluck('id')->map(fn($id) => ['question_id' => $id]);
+            $user->student_exams()->create(['exam_id' => $exam->id, 'first_time_token' => $first_time_token])
+                ->answers()
+                ->createMany($data);
             return $first_time_token;
         } else {
+            # check token to verify if this is first time user attending this exam via token
             if ($user_exam->first_time_token !== $FTT) {
-                throw new \Exception('This exam has already been started/initialized');
+                throw new \Exception('This exam has already been completed by the user.');
             }
             return $FTT;
         }
-        
-        
-        
-        // if ($page_no == 1) {
-        //     if ($user_exam == null) {
-        //         $data = $exam->questions->pluck('id')->map(fn($id) => ['question_id' => $id]);
-        //         $user->student_exams()->create([
-        //             'exam_id' => $exam_id,
-        //             'completed' => false,
-        //             'first_time_token' => $first_time_token
-        //         ])
-        //         ->answers()
-        //         ->createMany($data);
-        //     } else {
-        //         if ($user_exam->first_time_token !== $FTT) {
-        //             throw new \Exception('This exam has already been started/initialized');                
-        //         }
-        //         return $FTT;
-        //     }
-        // }
-        return $first_time_token;
     }
-
-
 
     /**
      * Remove the specified resource from storage.
