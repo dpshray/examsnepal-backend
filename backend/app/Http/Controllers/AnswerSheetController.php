@@ -274,30 +274,22 @@ class AnswerSheetController extends Controller
      * )
      */
 
-    public function getResultsWithExam($exam_id)
+    public function getResultsWithExam(Exam $exam_id)
     {
-        $student_exam = Auth::guard('api')->user()->student_exams()->firstWhere('exam_id', $exam_id);
+        $exam = $exam_id;
+        $student_exam = Auth::guard('api')->user()->student_exams()->firstWhere('exam_id', $exam->id);
         if ($student_exam == null) {
             return Response::apiSuccess('This exam is not started', null, 403);
         }
-        $questions = Exam::find($exam_id)
-                        ->questions()
-                        ->with([
-                            'options'
-                        ])
-                        ->paginate(10);
+
+        $questions = $exam->questions()->with('options')->paginate(10);
 
         $pagination_data    = $questions->toArray();
-
 
         ['links' => $links] = $pagination_data;
         $data               = new QuestionCollection($questions);
 
-        // $this_page_questions = $data->pluck('id');
-        $user_choosed = StudentExam::where([['exam_id','=',$exam_id],['student_id','=',Auth::guard('api')->id()]])
-                                ->first()
-                                ->answers
-                                ->pluck('selected_option_id','question_id');
+        $user_choosed = $student_exam->answers->pluck('selected_option_id','question_id');
 
         $resource_data_to_array = $data->resolve();
         $data = collect($resource_data_to_array)->map(function ($question) use($user_choosed) {
