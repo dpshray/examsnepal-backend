@@ -11,6 +11,7 @@ use App\Models\StudentExam;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\ValidationException;
 
 class AnswerSheetController extends Controller
 {
@@ -138,15 +139,21 @@ class AnswerSheetController extends Controller
             'question_id.*' => 'integer|exists:questions,id',
             'option_id' => 'nullable|array',
             'option_id.*' => 'integer|exists:option_questions,id',
-            'question_ids' => 'required|array',
-            'question_ids.*' => 'integer|exists:option_questions,id'
+            // 'question_ids' => 'required|array',
+            // 'question_ids.*' => 'integer|exists:option_questions,id'
         ]);
+
+        if ($request->question_id === null) {
+            throw ValidationException::withMessages(['question_id' => 'Question id cannot be of type null']);
+        }else if($request->option_id === null){
+            throw ValidationException::withMessages(['option_id' => 'Option id cannot be of type null']);
+        }
+
         $exam_id = $request->exam_id;
         $student = Auth::guard('api')->user();
         
         $received_questions = $validatedData['question_id'];
         $received_answers = $validatedData['option_id'];
-        $all_question_ids = $validatedData['question_ids'];
 
         if (count($received_answers) != count($received_questions)) {
             return Response::apiError('No. of questions does not match with the No. of options.', null, 422);
@@ -154,120 +161,54 @@ class AnswerSheetController extends Controller
 
         $student_exam = $student->student_exams()->firstWhere('exam_id',$exam_id);
         if ($student_exam == null) {
-            return Response::apiError('This exam has not been initialized properly(from page 1)', null, 422);
+            return Response::apiError('This exam has not been initialized properly', null, 422);
         }
-        // if ($student_exam) {
-        //     if ($student_exam->completed) {
-        //         return Response::apiError('This exam has already been completed by this user.',null,409);
-        //     }
-            
-        //     $already_answered = $student_exam->answers()->whereIn('question_id', $received_questions)->exists();
-        //     if ($already_answered) {
-        //         return Response::apiError('Requested questions has already been answered', null, 409);
-        //     }
-        // }
+
         /**
          * this code is commented so that response must
          * contains expected question_id and option_id
          * based on received exam_id
          */
-        // $expected_options_and_questions = DB::table('exams')
-        //     ->join('questions', 'exams.id', 'questions.exam_id')
-        //     ->join('option_questions', 'questions.id', 'option_questions.question_id')
-        //     ->select('questions.id as qid', 'option_questions.id as oid')
-        //     ->where('exams.id', $exam_id)
-        //     ->pluck('qid', 'oid')
-        //     ->all();
 
-        // $expected_option_ids = array_keys($expected_options_and_questions);
-        // $expected_question_ids = array_unique($expected_options_and_questions);
-
-
-
-        // $student_exam = $student->student_exams()->updateOrCreate([
-        //     'exam_id' => $exam_id,
-        //     'completed' => false
-        // ],[
-
-        // ]);
-
-        $questions_right_answers = Exam::find($exam_id)
-                ->questions()
-                ->with(['options' => fn($qry) => $qry->where('value',1)])
-                ->get()
-                ->mapWithKeys(function($item){
-                    $option_id = null;
-                    if ($item->options != null && count($item->options)) {
-                        $option_id = $item->options->first()->id;
-                    }
-                    return [$item->id => $option_id];
-                });
-
-        /**
-         * Received Questions Correct Answers
-         * {question_id: option_id(correct)}
-         */
-        // $questions_right_answers = DB::table('option_questions')
-        //                             ->whereIn('question_id', $all_question_ids)
-        //                             ->where('value',1)
-        //                             ->pluck('id', 'question_id');
+        $exam_question_option = Exam::select('id','exam_name')
+                                ->with(['questions' => fn($qry) => $qry->select('id','exam_id')->with(['options' => fn($qry) => $qry->select('id','question_id','option','value')])])
+                                ->firstWhere('id',$exam_id);
+        $excepted_questions = $exam_question_option->questions->pluck('id')->all();
+        $expected_options =  $exam_question_option->questions->flatMap(fn($item) => $item->options)->pluck('id')->all();
         
+        if(!empty(array_diff($received_questions, $excepted_questions))){
+            throw ValidationException::withMessages(['question_id' => 'question id does not exists within this exam question id.']);
+        }else if(!empty(array_diff($received_answers, $expected_options))){
+            throw ValidationException::withMessages(['option_id' => 'option id does not exists within this exam questions option id.']);
+        }
+
         $received_questions_answers = array_combine($received_questions, $received_answers);
         
         $temp = [];
-        // return $questions_right_answers;
-        // return [$questions_right_answers,$received_questions_answers];
-        foreach ($questions_right_answers as $question_id =>$option_id) {
-            $is_correct_value = null;
-            if (array_key_exists($question_id, $received_questions_answers)) {
-                $is_correct_value = $received_questions_answers[$question_id] == $option_id;
+        $answersheets = $student_exam->answers->pluck('id','question_id');
+        foreach ($exam_question_option->questions as $question) {
+            if (array_key_exists($question->id, $received_questions_answers)) {
+                $selected_option = $received_questions_answers[$question->id];
+                $is_correct = $question->options->firstWhere('id', $selected_option)->value == 1 ? true : false;
+                $temp[] = [
+                    'id' => $answersheets[$question->id],
+                    'student_exam_id' => $student_exam->id,
+                    'question_id' => $question->id,
+                    'selected_option_id' => $selected_option,
+                    'is_correct' => $is_correct
+                ];
             }
-
-            $data = [
-                'student_exam_id' => $student_exam->id,
-                'question_id' => $question_id,
-                'selected_option_id' => is_bool($is_correct_value) ? $received_questions_answers[$question_id] : null,
-                'is_correct' => $is_correct_value
-            ];
-            $temp[] = $data;
         }
-        // return ($temp);
-        $total_exam_questions = DB::table('questions')->Where('exam_id', $exam_id)->count();
-        $is_user_exam_completed = false;
-
-        // return collect($temp)->pluck('')
-        // $student_exam->answers()->upsert($temp, ["student_exam_id","question_id"],['selected_option_id','is_correct']);
-        // return 'ok';
-
-        DB::transaction(function() use($student, $student_exam, $temp, $total_exam_questions, &$is_user_exam_completed){
-            $student_exam->answers()->delete();
-            $student_exam->answers()->createMany($temp);
-            $student_exam->refresh();
-            $student_exam->update(['completed' => true]);
-            $is_user_exam_completed = true;
-            // if ($student_exam->answers()->count() >= $total_exam_questions) {
-            //     $student_exam->update(['completed' => true]);
-            //     $is_user_exam_completed = true;
-            // }
-        });
+        // return $temp;
+        DB::transaction(fn() => $student_exam->answers()->upsert($temp,['student_exam_id','question_id'],['selected_option_id','is_correct']));
 
         $scores = [
             'exam_id' => $exam_id,
-            'total_question' => $total_exam_questions,
+            'total_question' => $exam_question_option->questions->count(),
             'correct_answered' => $student_exam->answers()->where('is_correct', true)->count()
         ];
         return Response::apiSuccess('Answer Saved Successfully', $scores, 200);
-        // if ($is_user_exam_completed) {
-        //     $scores = [
-        //         'exam_id' => $exam_id,
-        //         'total_question' => $total_exam_questions,
-        //         'correct_answered' => $student_exam->answers()->where('is_correct', true)->count()
-        //     ];
-        //     return Response::apiSuccess('All questions has been answered', $scores, 200);
-        // }
-        // return Response::apiSuccess('Answer Saved Successfully', null, 201);
     }
-
 
     /**
      * @OA\Get(
