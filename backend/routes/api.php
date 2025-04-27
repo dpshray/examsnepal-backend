@@ -163,12 +163,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/sprint-quiz/questions/{exam_id}', [QuestionController::class, 'sprintQuizQuestions']);
     Route::get('/mock-test/questions/{exam_id}', [QuestionController::class, 'mockTestQuestions']);
     Route::post('/submit-answer', [AnswerSheetController::class, 'store']);
+    
+    # solutions
     Route::get('/view-solutions/{exam_id}', [AnswerSheetController::class, 'getResultsWithExam']);
-
-    // solutions
-    Route::get('/solution/free-quiz',[AnswerSheetController::class,'getFreeQuizSolutions']);
-    Route::get('/solution/sprint-quiz',[AnswerSheetController::class,'getDoneSprintQuiz']);
-    Route::get('/solution/mock-test',[AnswerSheetController::class,'getDoneMockTest']);
 
     Route::get('user-exams-status', [QuizController::class, 'getExamStatus']);
 
