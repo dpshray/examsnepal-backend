@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class Exam extends Model
 {
+    public $timestamps = false;
     /**
      * the column name of this table/model indicates this exams another type which is described in ExamTypeEnum::class
      *

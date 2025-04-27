@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class QuizController extends Controller
@@ -523,12 +524,12 @@ class QuizController extends Controller
      */
     public function examAsQuizStore(Request $request)
     {
-        $userId = Auth::id();
+        $userId = Auth::guard('users')->id();
         try {
             $validatedData = $request->validate([
                 'assign_id'    => 'required|integer|exists:users,id',
                 'quiz_name'    => 'required|string|max:255',
-                'status'       => 'required|integer',
+                'status'       => ['required', Rule::enum(ExamTypeEnum::class)],
                 'exam_type_id' => 'required|integer|exists:exam_types,id',
             ]);
         } catch (ValidationException $e) {
