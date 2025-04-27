@@ -14,6 +14,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\BankQuestionController;
 use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
+use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
 use App\Models\Answersheet;
 use App\Models\Question;
@@ -30,52 +31,8 @@ Route::get('remove-completed-exam/{exam_id}', function($exam_id){
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/migrate', [MigrationController::class, 'migrateNext']);
 
-Route::get('migrate-question-option', function(){
-
-$batchSize = 1000; // insert in chunks of 1000 rows
-
-Question::chunk(500, function ($questions) use ($batchSize) {
-    $insertData = [];
-
-    foreach ($questions as $qn) {
-        $insertData[] = [
-            'question_id' => $qn->id,
-            'option' => $qn->option_1,
-            'value' => $qn->option_value_1,
-        ];
-        $insertData[] = [
-            'question_id' => $qn->id,
-            'option' => $qn->option_2,
-            'value' => $qn->option_value_2,
-        ];
-        $insertData[] = [
-            'question_id' => $qn->id,
-            'option' => $qn->option_3,
-            'value' => $qn->option_value_3,
-        ];
-        $insertData[] = [
-            'question_id' => $qn->id,
-            'option' => $qn->option_4,
-            'value' => $qn->option_value_4,
-        ];
-
-        // Insert when batch reaches the size
-        if (count($insertData) >= $batchSize) {
-            DB::table('option_questions')->insert($insertData);
-            $insertData = []; // reset for next batch
-        }
-    }
-
-    // Insert remaining data
-    if (!empty($insertData)) {
-        DB::table('option_questions')->insert($insertData);
-    }
-});
-
-echo "DONE";
-
-});
-
+Route::get('migrate-question-option', [MigrationController::class, 'migrateNext']);
+Route::get('migrate-question-option', [TableMigrateController::class, 'migrateQuestionOption']);
 
 // Email verification route
 Route::get('/email/verify/{id}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
