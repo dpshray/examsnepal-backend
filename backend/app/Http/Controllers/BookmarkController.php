@@ -66,7 +66,8 @@ class BookmarkController extends Controller
         // $uniqueQuestions = $bookmarks->pluck('questions.*.id')->flatten()->unique();
         
         
-        $questionsWithStudents = Question::withCount('bookmarks')
+        $questionsWithStudents = Question::has('bookmarks')
+            ->withCount('bookmarks')
             ->with(['options','bookmarks.student' => function ($query) {
                 $query->select('id', 'name'); // Load specific student fields
             }])
