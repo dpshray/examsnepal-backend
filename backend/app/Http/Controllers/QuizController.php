@@ -793,14 +793,21 @@ class QuizController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/user-exams-status",
-     *     summary="Get user's each exams completed status",
-     *     description="Fetches a list of exams(no of exam completed)",
-     *     operationId="getExamStatus",
+     *     path="/user-free-exams-status",
+     *     summary="Get user's each free exams completed status",
+     *     description="Fetches list of free exams(no of free exam completed)",
+     *     operationId="userFreeExamsStatus",
      *     tags={"Quiz"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="List of exams retrieved successfully",
+     *         description="List of completed free exams retrieved successfully",
      *         @OA\JsonContent(
      *             type="array",
      *             @OA\Items(
@@ -832,19 +839,160 @@ class QuizController extends Controller
      *     )
      * )
      */
-    public function getExamStatus()
+    public function getFreeExamStatus()
     {
-        $student_id = Auth::guard('api')->id();
+        $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
+                    ->freeType()
+                    ->paginate(10);
 
-        $exam_status = DB::table('student_exams')
-            ->join('exams', 'student_exams.exam_id', '=', 'exams.id')
-            ->select('exams.status', DB::raw('count(*) as count'))
-            ->where('student_exams.student_id', $student_id)
-            ->groupBy('exams.status')
-            ->get()
-            ->mapWithKeys(fn($row) => [ExamTypeEnum::getKeyByValue($row->status) => $row->count]);
+        $pagination_data = $exams->toArray();
+        ['links' => $links] = $pagination_data;
 
-        $data = compact('student_id', 'exam_status');
-        return Response::apiSuccess("Student's exam completed status", $data);
+
+        $data = new ExamCollection($exams);
+        $links['current_page'] = $exams->currentPage();
+        $links['last_page']    = $exams->lastPage();
+        $links['total']        = $exams->total();
+
+        $data = compact('data', 'links');
+
+        return Response::apiSuccess("Student's free exam completed status", $data);
+
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/user-sprint-exams-status",
+     *     summary="Get user's each sprint exams completed status",
+     *     description="Fetches list of sprint exams(no of sprint exam completed)",
+     *     operationId="userSprintExamsStatus",
+     *     tags={"Quiz"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of completed sprint exams retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
+     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
+     *                 @OA\Property(
+     *                     property="organization",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="ABC University")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="examType",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Final Exam")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
+     */
+    public function getSprintExamStatus()
+    {
+        $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
+            ->sprintType()
+            ->paginate(10);
+
+        $pagination_data = $exams->toArray();
+        ['links' => $links] = $pagination_data;
+
+
+        $data = new ExamCollection($exams);
+        $links['current_page'] = $exams->currentPage();
+        $links['last_page']    = $exams->lastPage();
+        $links['total']        = $exams->total();
+
+        $data = compact('data', 'links');
+
+        return Response::apiSuccess("Student's sprint exam completed status", $data);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/user-mock-exams-status",
+     *     summary="Get user's each mock exams completed status",
+     *     description="Fetches list of mock exams(no of mock exam completed)",
+     *     operationId="userMockExamsStatus",
+     *     tags={"Quiz"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of completed sprint exams retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
+     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
+     *                 @OA\Property(
+     *                     property="organization",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="ABC University")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="examType",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Final Exam")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
+     */
+    public function getMockExamStatus()
+    {
+        $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
+            ->mockType()
+            ->paginate(10);
+
+        $pagination_data = $exams->toArray();
+        ['links' => $links] = $pagination_data;
+
+
+        $data = new ExamCollection($exams);
+        $links['current_page'] = $exams->currentPage();
+        $links['last_page']    = $exams->lastPage();
+        $links['total']        = $exams->total();
+
+        $data = compact('data', 'links');
+
+        return Response::apiSuccess("Student's mock exam completed status", $data);
     }
 }

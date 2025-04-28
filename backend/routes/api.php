@@ -124,7 +124,9 @@ Route::middleware(['auth:api'])->group(function () {
     # solutions
     Route::get('/view-solutions/{exam_id}', [AnswerSheetController::class, 'getResultsWithExam']);
 
-    Route::get('user-exams-status', [QuizController::class, 'getExamStatus']);
+    Route::get('user-free-exams-status', [QuizController::class, 'getFreeExamStatus']);
+    Route::get('user-sprint-exams-status', [QuizController::class, 'getSprintExamStatus']);
+    Route::get('user-mock-exams-status', [QuizController::class, 'getMockExamStatus']);
 
 
 
