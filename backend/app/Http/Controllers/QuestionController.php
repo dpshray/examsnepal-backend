@@ -978,7 +978,7 @@ class QuestionController extends Controller
         $exam = $exam_id;
 
         // Check if the exam exists and has an active status
-        if ($exam->status != ExamTypeEnum::FREE_QUIZ->value) {
+        if ($exam->status != ExamTypeEnum::FREE_QUIZ->value || $exam->exam_type_id != Auth::guard('api')->user()->exam_type_id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid Exam Id for Free Quiz Questions',
@@ -1102,7 +1102,7 @@ class QuestionController extends Controller
     public function mockTestQuestions(Exam $exam_id)
     {
         $exam = $exam_id;
-        if ($exam->status != ExamTypeEnum::MOCK_TEST->value) {
+        if ($exam->status != ExamTypeEnum::MOCK_TEST->value || $exam->exam_type_id != Auth::guard('api')->user()->exam_type_id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid Exam Id for Mock Quiz Questions',
@@ -1227,7 +1227,7 @@ class QuestionController extends Controller
     public function sprintQuizQuestions(Exam $exam_id)
     {
         $exam = $exam_id;
-        if ($exam->status != ExamTypeEnum::SPRINT_QUIZ->value) {
+        if ($exam->status != ExamTypeEnum::SPRINT_QUIZ->value || $exam->exam_type_id != Auth::guard('api')->user()->exam_type_id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid Exam Id for Sprint Quiz Questions',
