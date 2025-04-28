@@ -648,7 +648,6 @@ class QuizController extends Controller
                 'errors'  => $e->errors(),
             ], 422);
         }
-
         $exam->exam_name    = $validatedData['quiz_name'];
         $exam->status       = $validatedData['status'];
         $exam->assign_id    = $validatedData['assign_id'];

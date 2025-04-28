@@ -158,7 +158,7 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
 
     Route::post('/create-quiz',[QuizController::class,'examAsQuizStore']);
     Route::get('/quiz/{id}',[QuizController::class,'show']);
-    Route::put('/update-quiz',[QuizController::class,'updateExamAsQuiz']);
+    Route::put('/update-quiz/{exam}',[QuizController::class,'updateExamAsQuiz']);
     Route::delete('/quiz/{id}',[QuizController::class,'destroy']);
 
      // for Questions

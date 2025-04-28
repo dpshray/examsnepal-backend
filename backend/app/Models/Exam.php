@@ -15,7 +15,7 @@ class Exam extends Model
      */
 
     protected $fillable = [
-        'user_id',
+        'user_id', # added_by
         'exam_type_id',
         'exam_name',
         'status',
