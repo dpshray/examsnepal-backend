@@ -24,7 +24,7 @@ class Exam extends Model
         'exam_time',
         'is_active',
         'price',
-        'assign_id',
+        'assign_id',# ID belongs to users table
         'is_question_bank',
     ];
 
@@ -45,7 +45,9 @@ class Exam extends Model
 
     public function scopeAuthUserPending(Builder $query): Builder
     {
-        return $this->completedPendingQuery($query)->whereDoesntHave('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()));
+        return $this->completedPendingQuery($query)
+                ->whereDoesntHave('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))
+                ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id));
     }
 
     public function scopeAuthUserCompleted(Builder $query): Builder
@@ -61,13 +63,16 @@ class Exam extends Model
                     ])
                     ->orderBy('correct_answers_count', 'DESC'),
             ])
-            ->whereHas('exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()));
+            ->whereHas('exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))
+            ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id));
     }
 
     private function completedPendingQuery(Builder $query): Builder
     {
         return $query->select(['id', 'exam_name', 'status', 'user_id'])->with('user:id,fullname')->withCount('questions');
     }
+
+    
 
     public function exams()
     {
