@@ -247,33 +247,35 @@ class QuestionController extends Controller
      */
     public function searchQuestions(Request $request)
     {
-        $user = Auth::user();
-        if (! $user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
+        $user = Auth::guard('api')->user();
+        $exam_type_id = $user->exam_type_id;
+
+        // if (! $user) {
+        //     return response()->json(['message' => 'Unauthorized'], 401);
+        // }
 
         // Fetch the student's profile
-        $studentProfile = StudentProfile::find($user->id);
-        if (! $studentProfile) {
-            return response()->json(['message' => 'Student profile not found'], 404);
-        }
+        // $studentProfile = StudentProfile::find($user->id);
+        // if (! $studentProfile) {
+        //     return response()->json(['message' => 'Student profile not found'], 404);
+        // }
 
-        $userExamType = $studentProfile->exam_type;
-        $examType     = ExamType::where('name', $userExamType)->first();
-        if (! $examType) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Exam type not found in the system.',
-            ], 404);
-        }
+        // $userExamType = $studentProfile->exam_type;
+        // $examType     = ExamType::where('name', $userExamType)->first();
+        // if (! $examType) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Exam type not found in the system.',
+        //     ], 404);
+        // }
 
-        $examIds = Exam::where('exam_type_id', $examType->id)->pluck('id');
-        if ($examIds->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No exams found for this exam type.',
-            ], 404);
-        }
+        // return $examIds = Question::whereIn('exam_id',Exam::where('exam_type_id', $user->exam_type_id)->pluck('id')->toArray())->where('question','like','%what%')->count();
+        // if ($examIds->isEmpty()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'No exams found for this exam type.',
+        //     ], 404);
+        // }
 
         $keyword = $request->query('keyword'); // Get the keyword from the query parameter
         if (! $keyword) {
@@ -285,11 +287,21 @@ class QuestionController extends Controller
                 'message' => 'Keyword must be at least 3 characters long.',
             ], 400);
         }
-
         // Use LIKE for flexible partial text search within the user's exam_ids
-        $questions = Question::whereIn('exam_id', $examIds)
-            ->where('question', 'LIKE', '%' . $keyword . '%')
-            ->paginate(10);
+        $questions = Question::with('options')->whereRelation('exam','exam_type_id','=', $exam_type_id)
+                        ->where('question', 'LIKE', '%' . $keyword . '%')
+                        ->paginate(10);
+
+        $pagination_data = $questions->toArray();
+        ['links' => $links] = $pagination_data;
+
+
+        $data = new QuestionCollection($questions);
+        $links['current_page'] = $questions->currentPage();
+        $links['last_page']    = $questions->lastPage();
+        $links['total']        = $questions->total();
+
+        $data = compact('data', 'links');
 
         if ($questions->isEmpty()) {
             return response()->json([
@@ -301,7 +313,7 @@ class QuestionController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Questions retrieved successfully!',
-            'data'    => $questions,
+            'data'    => $data,
         ], 200);
     }
 
