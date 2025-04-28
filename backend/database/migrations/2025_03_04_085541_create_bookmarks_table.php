@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('bookmarks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('exam_id')->constrained('exams')->onDelete('cascade');
+            // $table->foreignId('exam_id')->constrained('exams')->onDelete('cascade');
             $table->foreignId('student_id')->constrained('student_profiles')->onDelete('cascade'); 
             $table->foreignId('question_id')->constrained()->onDelete('cascade'); 
             $table->timestamps();

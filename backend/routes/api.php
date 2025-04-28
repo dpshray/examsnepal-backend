@@ -89,7 +89,7 @@ Route::middleware(['auth:api'])->group(function () {
     // for bookmarks
     Route::get('/bookmarks', [BookmarkController::class, 'index']);
     Route::post('/bookmarks', [BookmarkController::class, 'store']);
-    Route::delete('/bookmarks/{id}', [BookmarkController::class, 'destroy']);
+    Route::delete('/bookmarks/{question_id}', [BookmarkController::class, 'destroy']);
     Route::get('/bookmarks/student/{student_id}', [BookmarkController::class, 'getBookmarksByStudent']);
     Route::get('/bookmarks/allmy', [BookmarkController::class, 'getAllMyBookmarks']);
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Auth;
 
 class Bookmark extends Model
 {
@@ -11,15 +12,15 @@ class Bookmark extends Model
     use HasFactory;
 
     protected $fillable = [
-        'exam_id',
+        // 'exam_id',
         'student_id',
         'question_id',
     ];
 
-    public function exam()
-    {
-        return $this->belongsTo(Exam::class);
-    }
+    // public function exam()
+    // {
+    //     return $this->belongsTo(Exam::class);
+    // }
 
     public function student()
     {
@@ -29,7 +30,19 @@ class Bookmark extends Model
     public function questions()
     {
         return $this->belongsTo(Question::class, 'question_id');
+    }    
+
+    public function question()
+    {
+        return $this->belongsTo(Question::class);
     }
 
+    public static function boot()
+    {
+        parent::boot();
+        static::creating(function ($product) {
+            $product->student_id = Auth::guard('api')->id();
+        });
+    }
 
 }
