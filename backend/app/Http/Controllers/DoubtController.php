@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\DoubtCollection;
 use Illuminate\Http\Request;
 use App\Models\Doubt;
 use App\Models\Question;
+use App\Models\StudentProfile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
@@ -13,6 +15,65 @@ use Illuminate\Support\Facades\Validator;
 class DoubtController extends Controller
 {
 
+    /**
+     * Display a listing of the resource.
+     */
+    /**
+     * @OA\Get(
+     *     path="/doubt/student",
+     *     summary="Get logged in student question doubts",
+     *     tags={"Doubts"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of bookmarks",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="student_id", type="integer", example=101),
+     *                 @OA\Property(property="exam_id", type="integer", example=55),
+     *                 @OA\Property(property="question_id", type="integer", example=302),
+     *                 @OA\Property(property="question", type="object",
+     *                     @OA\Property(property="id", type="integer", example=302),
+     *                     @OA\Property(property="title", type="string", example="What is Laravel?"),
+     *                     @OA\Property(property="content", type="string", example="Laravel is a PHP framework...")
+     *                 ),
+     *                 @OA\Property(property="student", type="object",
+     *                     @OA\Property(property="id", type="integer", example=101),
+     *                     @OA\Property(property="name", type="string", example="John Doe"),
+     *                     @OA\Property(property="email", type="string", example="johndoe@example.com")
+     *                 ),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-03-17T10:00:00.000000Z")
+     *             )
+     *         )
+     *     )
+     * )
+     */
+
+    public function fetchAuthStudentDoubt()
+    {
+       $user_doubt = Auth::guard('api')->user()->doubts()->with(['question','solver:id,username,fullname'])->paginate(10);
+        $pagination_data = $user_doubt->toArray();
+
+        ['links' => $links] = $pagination_data;
+        $data               = new DoubtCollection($user_doubt);
+
+        $links['current_page'] = $user_doubt->currentPage();
+        $links['last_page']    = $user_doubt->lastPage();
+        $links['total']        = $user_doubt->total();
+
+        $data = compact('data', 'links');
+
+        return Response::apiSuccess('User doubt retrieved successfully!', $data);
+    }
     
     /**
      * Display a listing of user own .
@@ -52,14 +113,6 @@ class DoubtController extends Controller
             'message' => 'Fetched all doubts successfully.',
             'data' => $doubts,
         ], 200);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -124,27 +177,20 @@ class DoubtController extends Controller
      */
     public function store(Request $request)
     {
-        return ['check'=>Auth::guard('api')->check()];
         $student = Auth::guard('api')->user();
         $validatedData = $request->validate([
             'doubt' => 'required|string',
             'question_id' => 'required|exists:questions,id',
         ]);
         $doubt = $student->doubts();
-        if ($doubt->firstWhere('question_id', $validatedData['question_id'])) {
-            return Response::apiError('This question doubt has already been added',null,409);
+        if ($doubt->where('status',1)->firstWhere('question_id', $validatedData['question_id'])) {
+            return Response::apiError('This question doubt has already been added',null,412);
         }
 
         $organization_id = Question::findOrFail($validatedData['question_id'])->exam->user_id;
         $validatedData['organization_id'] = $organization_id; 
         $data = $doubt->create($validatedData);
-        return Response::apiSuccess('Doubt added',$data);
-        // $doubt = Doubt::create($validatedData);
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => 'Doubt successfully created',
-        //     'data' => $doubt,
-        // ], 201);
+        return Response::apiSuccess('Doubt posted',$data);
     }
 
 
@@ -180,195 +226,6 @@ class DoubtController extends Controller
         return response()->json([
             'message' => "Fetched resource with ID $id successfully.",
             'data' => ['id' => $id, 'name' => 'Dummy Resource']
-        ], 200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    /**
-     * @OA\Put(
-     *     path="/doubts/{id}",
-     *     summary="Update a specific doubt",
-     *     description="Updates the details of a specific doubt if it has not been solved already.",
-     *     operationId="updateDoubt",
-     *     tags={"Doubts"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="The ID of the doubt to update",
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="application/json",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 required={"doubt", "exam_id", "org_id", "question_id"},
-     *                 @OA\Property(property="doubt", type="string", example="This is a new doubt."),
-     *                 @OA\Property(property="exam_id", type="integer", example=123),
-     *                 @OA\Property(property="org_id", type="integer", example=456),
-     *                 @OA\Property(property="question_id", type="integer", example=789)
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response="200",
-     *         description="Doubt successfully updated",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Doubt successfully updated"),
-     *             @OA\Property(property="data", type="object", 
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="doubt", type="string", example="This is a new doubt."),
-     *                 @OA\Property(property="exam_id", type="integer", example=123),
-     *                 @OA\Property(property="org_id", type="integer", example=456),
-     *                 @OA\Property(property="question_id", type="integer", example=789),
-     *                 @OA\Property(property="status", type="string", example="1")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response="400",
-     *         description="The doubt cannot be updated because it has already been solved",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="This doubt has already been solved and cannot be updated.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response="404",
-     *         description="Doubt not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Doubt not found.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response="422",
-     *         description="Validation failed",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Validation failed"),
-     *             @OA\Property(property="errors", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response="500",
-     *         description="An unexpected error occurred",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="An unexpected error occurred"),
-     *             @OA\Property(property="error", type="string", example="Error message")
-     *         )
-     *     )
-     * )
-     */
-
-    public function update(Request $request, $id)
-    {
-        try {
-            $doubt = Doubt::find($id);
-            if (!$doubt) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Doubt not found.',
-                ], 404);
-            }
-
-            $validatedData = $request->validate([
-                'doubt' => 'required|string',
-                'exam_id' => 'required|exists:exams,id',
-                'org_id' => 'required|exists:users,id',
-                'question_id' => 'required|exists:questions,id',
-            ]);
-
-            if ($doubt->status === '0' && !is_null($doubt->solved_by)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'This doubt has already been solved and cannot be updated.',
-                ], 400); // HTTP 400 Bad Request
-            }
-
-            $doubt->doubt = $validatedData['doubt'];
-            $doubt->exam_id = $validatedData['exam_id'];
-            $doubt->org_id = $validatedData['org_id'];
-            $doubt->question_id = $validatedData['question_id'];
-            $doubt->status = '1';
-
-            $doubt->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Doubt successfully updated',
-                'data' => $doubt,
-            ], 200);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'An unexpected error occurred',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    /**
-     * @OA\Delete(
-     *     path="/doubt/{id}",
-     *     summary="Delete a doubt",
-     *     tags={"Doubts"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="Doubt ID",
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Resource deleted successfully",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Resource deleted successfully.")
-     *         )
-     *     )
-     * )
-     */
-    public function destroy(string $id)
-    {
-        //
-        $doubt = Doubt::find($id);
-        if (!$doubt) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Doubt not found',
-            ], 404);
-        }
-        $doubt->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => "Resource with ID $id deleted successfully."
         ], 200);
     }
 }

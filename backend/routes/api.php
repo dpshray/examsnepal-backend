@@ -99,10 +99,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/search-questions', [QuestionController::class, 'searchQuestions']);
 
     // for Doubts
-    Route::post('/doubt', [QuestionController::class, 'store']);
-    Route::get('/doubt/{id}', [QuestionController::class, 'show']);
-    Route::put('/doubt/{id}', [QuestionController::class, 'update']);
-    Route::delete('/doubt/{id}', [QuestionController::class, 'destroy']);
+    Route::post('/doubt', [DoubtController::class, 'store']);
+    Route::get('/doubt/student', [DoubtController::class, 'fetchAuthStudentDoubt']);
 
     #free quiz
     Route::get('/free-quiz/pending', [QuizController::class, 'getPendingFreeQuiz']);
@@ -177,6 +175,7 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
 
     // for doubts
     Route::get('/doubts', [DoubtController::class, 'index']);
+    Route::get('/doubt/{id}', [DoubtController::class, 'show']);
 });
 
 Route::middleware(['auth:users', 'role:teacher'])->group(function () {

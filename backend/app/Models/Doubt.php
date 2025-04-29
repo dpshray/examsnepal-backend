@@ -23,6 +23,10 @@ class Doubt extends Model
         'status',
         'solved_by',
     ];
+    
+    public function solver() {
+        return $this->belongsTo(User::class,'solved_by');
+    }
 
     public function exam()
     {
