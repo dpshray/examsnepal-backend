@@ -64,20 +64,19 @@ class StudentProfileController extends Controller
             'email' => 'required|string|email|unique:student_profiles',
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:8|confirmed',
-            'exam_type' => 'nullable|string',
+            'exam_type_id' => 'exists:exam_types,id',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
         // Create student profile
         $student = StudentProfile::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'exam_type' => $request->exam_type,
+            'exam_type_id' => $request->exam_type_id,
         ]);
 
         return response()->json([
