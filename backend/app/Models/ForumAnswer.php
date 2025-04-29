@@ -8,7 +8,7 @@ class ForumAnswer extends Model {
     use HasFactory;
 
     // Define the fillable attributes for mass assignment
-    protected $fillable = ['question_id', 'user_id', 'answer'];
+    protected $fillable = ['question_id', 'user_id', 'answer','forum_question_id'];
 
     /**
      * Define the relationship with the StudentProfile model.

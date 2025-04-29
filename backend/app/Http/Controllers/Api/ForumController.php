@@ -20,7 +20,7 @@ use Illuminate\Http\JsonResponse;
  * )
  * 
  * @OA\Server( 
- *     url="https://127.0.0.1:8000/api",
+ *     url="http://192.168.1.98:8000/api",
  *     description="Localhost API Server"
  * )
  * 
@@ -36,7 +36,7 @@ class ForumController extends Controller
     // Private method to check authentication and fetch student profile
     private function getAuthenticatedStudentProfile()
     {
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
 
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
@@ -70,25 +70,25 @@ class ForumController extends Controller
 
     public function fetchQuestions()
     {
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
 
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
+        // if (!$user) {
+        //     return response()->json(['message' => 'Unauthorized'], 401);
+        // }
 
         // Fetch the student profile using the logged-in user's id
-        $studentProfile = StudentProfile::find($user->id);
+        // $studentProfile = StudentProfile::find($user->id);
 
-        if (!$studentProfile) {
-            return response()->json(['message' => 'Student profile not found'], 404);
-        }
+        // if (!$studentProfile) {
+        //     return response()->json(['message' => 'Student profile not found'], 404);
+        // }
 
         // Fetch questions where the stream matches the student's exam_type
-        $questions = ForumQuestion::where('stream', $studentProfile->exam_type)
+        $questions = ForumQuestion::where('exam_type_id', $user->exam_type_id)
             ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
             ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
             ->withCount('answers')
-            ->get();
+            ->paginate(10);
 
         return response()->json($questions);
     }
@@ -112,27 +112,26 @@ class ForumController extends Controller
 
     public function fetchMyQuestions()
     {
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
 
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
+        // if (!$user) {
+        //     return response()->json(['message' => 'Unauthorized'], 401);
+        // }
 
         // Fetch the student profile using the logged-in user's id
-        $studentProfile = StudentProfile::find($user->id);
+        // $studentProfile = StudentProfile::find($user->id);
 
-        if (!$studentProfile) {
-            return response()->json(['message' => 'Student profile not found'], 404);
-        }
+        // if (!$studentProfile) {
+        //     return response()->json(['message' => 'Student profile not found'], 404);
+        // }
 
         // Fetch questions where the stream matches the student's exam_type
-        $questions = ForumQuestion::where('stream', $studentProfile->exam_type)
-            ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
-            ->where('user_id', $studentProfile->id)
+        $questions = ForumQuestion::where('exam_type_id', $user->exam_type_id)
+            ->where('user_id', $user->id)
             ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
             ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
             ->withCount('answers')
-            ->get();
+            ->paginate(10);
 
         return response()->json($questions);
     }
@@ -225,34 +224,14 @@ class ForumController extends Controller
     // Method to add a question
     public function addQuestion(Request $request)
     {
-        $user = Auth::user();
-
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
-
-        // Fetch the student profile using the logged-in user's id
-        $studentProfile = StudentProfile::find($user->id);
-
-        if (!$studentProfile) {
-            return response()->json(['message' => 'Student profile not found'], 404);
-        }
-
-        // Validate the request data
-        $validator = Validator::make($request->all(), [
+        $user = Auth::guard('api')->user();
+        
+        $validatedData = $request->validate([
             'question' => 'required|string|max:1000',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        // Create the question
-        $question = ForumQuestion::create([
-            'user_id' => $studentProfile->id, // Use the id from student_profiles
-            'question' => $request->input('question'),
-            'stream' => $studentProfile->exam_type, // Use the exam_type from student_profiles as the stream
-            'deleted' => '0', // Ensure deleted_at is null for new questions
+        $question = $validatedData['question']; 
+        $user->forum_questions()->create([
+            'question' => $question
         ]);
 
         return response()->json([
@@ -350,7 +329,7 @@ class ForumController extends Controller
             ->first();
 
         if (!$question) {
-            return response()->json(['message' => 'Question not found or already deleted'], 404);
+            return response()->json(['message' => 'Question not found / already deleted / belongs to another user'], 404);
         }
 
         // Validate the request data
@@ -374,7 +353,7 @@ class ForumController extends Controller
         }
 
         // Check if the student profile has a stream type
-        if (strcmp((string) $studentProfile->exam_type, (string) $question->stream) !== 0) {
+        if ($studentProfile->exam_type_id != $question->exam_type_id) {
             return response()->json(['message' => 'Stream type does not match for the student'], 400);
         }
 
@@ -447,7 +426,7 @@ class ForumController extends Controller
 
     public function getQuestionByTheirId($id): JsonResponse
     {
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
 
         if (!is_numeric($id)) {
             return response()->json(['message' => 'Invalid ID format'], 400);
@@ -523,7 +502,7 @@ class ForumController extends Controller
      */
     public function getQuestionById($id): JsonResponse
     {
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
 
         if (!is_numeric($id)) {
             return response()->json(['message' => 'Invalid ID format'], 400);
@@ -676,7 +655,7 @@ class ForumController extends Controller
         ]);
 
         // Get the authenticated user's ID
-        $userId = Auth::id();
+        $userId = Auth::guard('api')->id();
 
         try {
             // Create and store the answer
