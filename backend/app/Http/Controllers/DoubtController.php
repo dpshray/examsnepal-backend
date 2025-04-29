@@ -4,14 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Doubt;
+use App\Models\Question;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 
 class DoubtController extends Controller
 {
+
+    
     /**
-     * Display a listing of the resource.
+     * Display a listing of user own .
      */
     /**
      * @OA\Get(
@@ -40,9 +44,9 @@ class DoubtController extends Controller
     {
         //
         $doubts = Doubt::select('id', 'doubt', 'created_at', 'updated_at', 'status', 'exam_id', 'student_id', 'org_id', 'question_id')
-            ->where('status', '1')
-            ->with('exam:id,exam_name', 'student:id,name', 'organization:id,fullname', 'question:id,question')
-            ->paginate(10);
+                    ->where('status', '1')
+                    ->with('exam:id,exam_name', 'student:id,name', 'organization:id,fullname', 'question:id,question')
+                    ->paginate(10);
 
         return response()->json([
             'message' => 'Fetched all doubts successfully.',
@@ -63,8 +67,8 @@ class DoubtController extends Controller
      */
     /**
      * @OA\Post(
-     *     path="/doubts",
-     *     summary="Create a new doubt",
+     *     path="/doubt",
+     *     summary="Create a new doubt(Student)",
      *     description="Creates a new doubt in the system.",
      *     tags={"Doubts"},
      *     @OA\RequestBody(
@@ -72,8 +76,6 @@ class DoubtController extends Controller
      *         @OA\JsonContent(
      *             required={"doubt", "exam_id", "org_id", "question_id"},
      *             @OA\Property(property="doubt", type="string", example="This is a sample doubt."),
-     *             @OA\Property(property="exam_id", type="integer", example=1),
-     *             @OA\Property(property="org_id", type="integer", example=1),
      *             @OA\Property(property="question_id", type="integer", example=101),
      *         )
      *     ),
@@ -122,42 +124,27 @@ class DoubtController extends Controller
      */
     public function store(Request $request)
     {
-        $studentId=Auth::id();
-        try {
-            $validatedData = $request->validate([
-                'doubt' => 'required|string',
-                'exam_id' => 'required|exists:exams,id',
-                'org_id' => 'required|exists:users,id',
-                'question_id' => 'required|exists:questions,id',
-            ]);
-
-            $validatedData['status'] = '1';
-            $validatedData['student_id'] =$studentId;
-
-
-
-            $doubt = Doubt::create($validatedData);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Doubt successfully created',
-                'data' => $doubt,
-            ], 201);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            // Return validation errors in the response
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors(),
-            ], 422); // HTTP 422 Unprocessable Entity
-        } catch (\Exception $e) {
-            // Handle other unexpected errors
-            return response()->json([
-                'success' => false,
-                'message' => 'An unexpected error occurred',
-                'error' => $e->getMessage(),
-            ], 500); // HTTP 500 Internal Server Error
+        return ['check'=>Auth::guard('api')->check()];
+        $student = Auth::guard('api')->user();
+        $validatedData = $request->validate([
+            'doubt' => 'required|string',
+            'question_id' => 'required|exists:questions,id',
+        ]);
+        $doubt = $student->doubts();
+        if ($doubt->firstWhere('question_id', $validatedData['question_id'])) {
+            return Response::apiError('This question doubt has already been added',null,409);
         }
+
+        $organization_id = Question::findOrFail($validatedData['question_id'])->exam->user_id;
+        $validatedData['organization_id'] = $organization_id; 
+        $data = $doubt->create($validatedData);
+        return Response::apiSuccess('Doubt added',$data);
+        // $doubt = Doubt::create($validatedData);
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'Doubt successfully created',
+        //     'data' => $doubt,
+        // ], 201);
     }
 
 

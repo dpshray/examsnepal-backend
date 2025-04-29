@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Auth;
 
 class Doubt extends Model
 {
@@ -41,6 +42,15 @@ class Doubt extends Model
     public function question()
     {
         return $this->belongsTo(Question::class, 'question_id');
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+        static::creating(function ($doubt) {
+            $doubt->status = 1;
+            $doubt->student_id = Auth::guard('api')->id();
+        });
     }
 
 }
