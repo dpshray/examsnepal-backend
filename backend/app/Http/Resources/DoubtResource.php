@@ -19,9 +19,10 @@ class DoubtResource extends JsonResource
             "id" =>  $this->id,
             "solved_by" =>  $this->whenLoaded('solver', $this->solver),
             "doubt" =>  $this->doubt,
-            "date" =>  $this->created_at,
+            "created_at" =>  $this->created_at,
+            "updated_at" =>  $this->updated_at,
             "status" =>  $this->status,
-            "remark" =>  $this->remarks,
+            "remark" =>  $this->remark,
             "question" => $this->whenLoaded('question', new QuestionResource($this->question))
         ];
     }
