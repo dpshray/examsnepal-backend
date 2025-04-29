@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,16 @@ class Doubt extends Model
         'status',
         'solved_by',
     ];
+
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->setTimezone('Asia/Kathmandu')->format('Y-m-d H:i:s');
+    }
+
+    public function getUpdatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->setTimezone('Asia/Kathmandu')->format('Y-m-d H:i:s');
+    }
     
     public function solver() {
         return $this->belongsTo(User::class,'solved_by');
