@@ -357,17 +357,14 @@ class BookmarkController extends Controller
         //     ->freeType()
         //     ->paginate(10);
 
-        $pagination_data = $user_bookmarks->toArray();
-        ['links' => $links] = $pagination_data;
+        // $pagination_data = $user_bookmarks->toArray();
+        // ['links' => $links] = $pagination_data;
 
 
-        $data = new BookmarkCollection($user_bookmarks);
-        $links['current_page'] = $user_bookmarks->currentPage();
-        $links['last_page']    = $user_bookmarks->lastPage();
-        $links['total']        = $user_bookmarks->total();
-
-        $data = compact('data', 'links');
-
+        $data['data'] = new BookmarkCollection($user_bookmarks->items());
+        $data['current_page'] = $user_bookmarks->currentPage();
+        $data['last_page']    = $user_bookmarks->lastPage();
+        $data['total']        = $user_bookmarks->total();
 
         return Response::apiSuccess('User bookmarks', $data);
         // Check if any bookmarks exist for the student

@@ -11,6 +11,8 @@ class Bookmark extends Model
     //
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         // 'exam_id',
         'student_id',
@@ -40,8 +42,10 @@ class Bookmark extends Model
     public static function boot()
     {
         parent::boot();
-        static::creating(function ($product) {
-            $product->student_id = Auth::guard('api')->id();
+        static::creating(function ($bookmark) {
+            $bookmark->student_id = Auth::guard('api')->id();
+            $bookmark->date = now()->format('Y-m-d');
+
         });
     }
 
