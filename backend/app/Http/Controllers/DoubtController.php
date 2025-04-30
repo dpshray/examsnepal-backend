@@ -14,14 +14,10 @@ use Illuminate\Support\Facades\Validator;
 
 class DoubtController extends Controller
 {
-
-    /**
-     * Display a listing of the resource.
-     */
     /**
      * @OA\Get(
-     *     path="/doubt/student",
-     *     summary="Get logged in student question doubts",
+     *     path="/doubt/student/solved",
+     *     summary="Get logged in student question solved doubts",
      *     tags={"Doubts"},
      * @OA\Parameter(
      *         name="page",
@@ -58,19 +54,86 @@ class DoubtController extends Controller
      * )
      */
 
-    public function fetchAuthStudentDoubt()
+    public function fetchAuthStudentDoubtSolved()
     {
-       $user_doubt = Auth::guard('api')->user()->doubts()->with(['question','solver:id,username,fullname'])->paginate(10);
-        $pagination_data = $user_doubt->toArray();
+       $user_doubt = Auth::guard('api')
+                        ->user()
+                        ->doubts()
+                        ->where('status',0)
+                        ->with(['question','solver:id,username,fullname'])
+                        ->paginate(10);
+        // $pagination_data = $user_doubt->toArray();
+        // return $user_doubt->items();
+        // ['links' => $links] = $pagination_data;
+        $data['data']               = new DoubtCollection($user_doubt->items());
 
-        ['links' => $links] = $pagination_data;
-        $data               = new DoubtCollection($user_doubt);
+        $data['current_page'] = $user_doubt->currentPage();
+        $data['last_page']    = $user_doubt->lastPage();
+        $data['total']        = $user_doubt->total();
 
-        $links['current_page'] = $user_doubt->currentPage();
-        $links['last_page']    = $user_doubt->lastPage();
-        $links['total']        = $user_doubt->total();
+        // $data = compact('data');
 
-        $data = compact('data', 'links');
+        return Response::apiSuccess('User doubt retrieved successfully!', $data);
+    }    
+    
+    /**
+     * @OA\Get(
+     *     path="/doubt/student/unsolved",
+     *     summary="Get logged in student question unsolved doubts",
+     *     tags={"Doubts"},
+     * @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of bookmarks",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="student_id", type="integer", example=101),
+     *                 @OA\Property(property="exam_id", type="integer", example=55),
+     *                 @OA\Property(property="question_id", type="integer", example=302),
+     *                 @OA\Property(property="question", type="object",
+     *                     @OA\Property(property="id", type="integer", example=302),
+     *                     @OA\Property(property="title", type="string", example="What is Laravel?"),
+     *                     @OA\Property(property="content", type="string", example="Laravel is a PHP framework...")
+     *                 ),
+     *                 @OA\Property(property="student", type="object",
+     *                     @OA\Property(property="id", type="integer", example=101),
+     *                     @OA\Property(property="name", type="string", example="John Doe"),
+     *                     @OA\Property(property="email", type="string", example="johndoe@example.com")
+     *                 ),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-03-17T10:00:00.000000Z")
+     *             )
+     *         )
+     *     )
+     * )
+     */
+
+    public function fetchAuthStudentDoubtUnsolved()
+    {
+       $user_doubt = Auth::guard('api')
+                        ->user()
+                        ->doubts()
+                        ->where('status',1)
+                        ->with(['question','solver:id,username,fullname'])
+                        ->paginate(10);
+        // $pagination_data = $user_doubt->toArray();
+
+        // ['links' => $links] = $pagination_data;
+        $data['data']               = new DoubtCollection($user_doubt->items());
+
+        $data['current_page'] = $user_doubt->currentPage();
+        $data['last_page']    = $user_doubt->lastPage();
+        $data['total']        = $user_doubt->total();
+
+        // $data = compact('data', 'links');
 
         return Response::apiSuccess('User doubt retrieved successfully!', $data);
     }

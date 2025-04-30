@@ -65,21 +65,24 @@ class BookmarkController extends Controller
 
         // $uniqueQuestions = $bookmarks->pluck('questions.*.id')->flatten()->unique();
         
-        
-        $questionsWithStudents = Question::has('bookmarks')
+        $questionsWithStudents = Question::select("id","exam_id","exam_type_id","question","explanation")->has('bookmarks')
             ->withCount('bookmarks')
             ->with(['options','bookmarks.student' => function ($query) {
                 $query->select('id', 'name'); // Load specific student fields
             }])
-            ->paginate(10)
-            ->map(function ($question) {
-                // Extract students from bookmarks and add to top-level 'students'
-                $question['students'] = $question->bookmarks->pluck('student')->unique('id')->values();
-                $question['options'] = $question->options;
-                unset($question->bookmarks); // Optional: Remove bookmarks if not needed
-                return $question;
-            });
-        return response()->json($questionsWithStudents);
+            ->paginate(10);
+            $data['data'] = $questionsWithStudents->map(function ($question) {
+                    // Extract students from bookmarks and add to top-level 'students'
+                    $question['students'] = $question->bookmarks->pluck('student')->unique('id')->values();
+                    $question['options'] = $question->options;
+                    unset($question->bookmarks); // Optional: Remove bookmarks if not needed
+                    return $question;
+                });
+        $data['current_page'] = $questionsWithStudents->currentPage();
+        $data['last_page']    = $questionsWithStudents->lastPage();
+        $data['total']        = $questionsWithStudents->total();
+            return Response::apiSuccess('All Bookmarks', $data);
+        // return response()->json($questionsWithStudents);
 
         // $question = Question::has('bookmarks')->with('options','bookmark.student');
         // return  Question::has('bookmarks')->with(['bookmarks.question.options', 'bookmarks.student'])->get();

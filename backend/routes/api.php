@@ -22,18 +22,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-Route::get('remove-completed-exam/{exam_id}', function($exam_id){
-    // dd([['exam_id', '=', $exam_id], ['student_id', '=', Auth::guard('api')->id()]]);
-    DB::table('student_exams')->where([['exam_id','=', $exam_id],['student_id','=', 12127]])->delete();
-    return 'deleted';
-});
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/migrate', [MigrationController::class, 'migrateNext']);
 
-Route::get('migrate-question-option', [MigrationController::class, 'migrateNext']);
+// Route::get('migrate-question-option', [MigrationController::class, 'migrateNext']);
 Route::get('migrate-question-option', [TableMigrateController::class, 'migrateQuestionOption']);
-
+Route::get('migrate-pools', [TableMigrateController::class, 'migratePool']);
+Route::get('password-encryptor', [TableMigrateController::class, 'passwordHasher']);
 // Email verification route
 Route::get('/email/verify/{id}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
 
@@ -100,7 +96,8 @@ Route::middleware(['auth:api'])->group(function () {
 
     // for Doubts
     Route::post('/doubt', [DoubtController::class, 'store']);
-    Route::get('/doubt/student', [DoubtController::class, 'fetchAuthStudentDoubt']);
+    Route::get('/doubt/student/solved', [DoubtController::class, 'fetchAuthStudentDoubtSolved']);
+    Route::get('/doubt/student/unsolved', [DoubtController::class, 'fetchAuthStudentDoubtUnsolved']);
 
     #free quiz
     Route::get('/free-quiz/pending', [QuizController::class, 'getPendingFreeQuiz']);
@@ -127,7 +124,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('user-mock-exams-status', [QuizController::class, 'getMockExamStatus']);
 
 
-
+    Route::get('student-profile-fetcher', [StudentProfileController::class,'getStudentProfile']);
+    Route::put('update-student-profile', [StudentProfileController::class,'studentProfileUpdater']);
 });
 
 // for exam type

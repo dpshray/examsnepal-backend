@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class StudentProfile extends Authenticatable implements JWTSubject
 {
     use HasFactory;
+    public $timestamps = false;
 
     protected $fillable = [
         'name',

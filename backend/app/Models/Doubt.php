@@ -36,7 +36,7 @@ class Doubt extends Model
     }
     
     public function solver() {
-        return $this->belongsTo(User::class,'solved_by');
+        return $this->belongsTo(User::class,'user_id');
     }
 
     public function exam()
