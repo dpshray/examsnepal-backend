@@ -12,9 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('exams', function (Blueprint $table) {
-            $table->dropColumn(['assign']);
-            $table->unsignedBigInteger('assign_id')->after('exam_type')->nullable();
-            $table->foreign('assign_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('exam_type_id')->after('user')->nullable();
             $table->foreign('exam_type_id')->references('id')->on('exam_types')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('user_id')->after('live')->nullable();
@@ -28,9 +25,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('exams', function (Blueprint $table) {
-            $table->string('assign', 255)->nullable();
-            $table->dropForeign(['assign_id','exam_type_id','user_id']);
-            $table->dropColumn(['assign_id','exam_type_id','user_id']);
+            $table->dropForeign(['exam_type_id','user_id']);
+            $table->dropColumn(['exam_type_id','user_id']);
         });
     }
 };

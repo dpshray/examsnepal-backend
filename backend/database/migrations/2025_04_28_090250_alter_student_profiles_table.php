@@ -15,6 +15,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('exam_type_id')->after('id')->nullable();
             $table->foreign('exam_type_id')->references('id')->on('exam_types')->onDelete('cascade')->onUpdate('cascade');
+            $table->boolean('is_subscripted')->default(0);
         });
     }
 
@@ -26,7 +27,7 @@ return new class extends Migration
         Schema::table('student_profiles', function (Blueprint $table) {
 
             $table->dropForeign(['exam_type_id']);
-            $table->dropColumn(['exam_type_id']);
+            $table->dropColumn(['exam_type_id', 'is_subscripted']);
         });
     }
 };
