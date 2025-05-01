@@ -85,24 +85,24 @@ class QuestionController extends Controller
     public function index()
     {
         // Get authenticated user
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
         if (! $user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
         // Fetch student's profile
-        $studentProfile = StudentProfile::find($user->id);
-        if (! $studentProfile) {
-            return response()->json(['message' => 'Student profile not found'], 404);
-        }
-        $userExamType = $studentProfile->exam_type;
-        $examType     = ExamType::where('name', $userExamType)->first();
+        // $studentProfile = StudentProfile::find($user->id);
+        // if (! $studentProfile) {
+        //     return response()->json(['message' => 'Student profile not found'], 404);
+        // }
+        $userExamTypeId = $user->exam_type_id;
+        $examType     = ExamType::find($userExamTypeId);
         if (! $examType) {
             return response()->json([
                 'success' => false,
                 'message' => 'Exam type not found in the system.',
             ], 404);
         }
-        $examIds = Exam::where('exam_type_id', $examType->id)->pluck('id');
+        $examIds = Exam::where('exam_type_id', $userExamTypeId)->pluck('id');
         if ($examIds->isEmpty()) {
             return response()->json([
                 'success' => false,
@@ -110,7 +110,7 @@ class QuestionController extends Controller
             ], 404);
         }
         // Get all questions that belong to these exams
-        $questions = Question::whereIn('exam_id', $examIds)->paginate(25);
+        $questions = Question::with('options')->whereIn('exam_id', $examIds)->paginate(10);
         return response()->json([
             'success' => true,
             'message' => 'Questions retrieved successfully!',
@@ -976,7 +976,6 @@ class QuestionController extends Controller
     public function freeQuizQuestions(Exam $exam_id)
     {
         $exam = $exam_id;
-
         // Check if the exam exists and has an active status
         if ($exam->status != ExamTypeEnum::FREE_QUIZ->value || $exam->exam_type_id != Auth::guard('api')->user()->exam_type_id) {
             return response()->json([
