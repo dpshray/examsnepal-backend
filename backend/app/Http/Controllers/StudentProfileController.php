@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\StudentProfile;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
@@ -25,13 +26,13 @@ class StudentProfileController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name", "email", "password"},
+     *             required={"name", "email", "password", "exam_type_id"},
      *             @OA\Property(property="name", type="string", example="John Doe"),
      *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com"),
      *             @OA\Property(property="phone", type="string", example="+1234567890"),
      *             @OA\Property(property="password", type="string", format="password", example="password123"),
      *             @OA\Property(property="password_confirmation", type="string", format="password", example="password123"),
-     *             @OA\Property(property="exam_type", type="string", example="mdms")
+     *             @OA\Property(property="exam_type_id", type="integer", example="1")
      *         )
      *     ),
      *     @OA\Response(
@@ -82,6 +83,7 @@ class StudentProfileController extends Controller
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'exam_type_id' => $request->exam_type_id,
+            'date' => Carbon::now()->format('m/d/Y h:i:s a')
         ]);
 
         return response()->json([

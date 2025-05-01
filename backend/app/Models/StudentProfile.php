@@ -17,7 +17,8 @@ class StudentProfile extends Authenticatable implements JWTSubject
         'email',
         'phone',
         'password',
-        'exam_type_id'
+        'exam_type_id',
+        'date'
     ];
 
     protected $hidden = ['password'];
