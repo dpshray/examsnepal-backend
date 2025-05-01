@@ -9,6 +9,8 @@ use App\Models\StudentProfile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\ValidationException;
 
 class StudentProfileController extends Controller
 {
@@ -166,27 +168,11 @@ class StudentProfileController extends Controller
      *     )
      * )
      */
-    public function studentProfileUpdater(Request $request) {
-        // return $request->all();
-        $validatedData = $request->validate([
-                "name" => 'required',
-                "email" => 'required',
-                "previous_password" => 'required',
-                "password" => 'required|confirmed',
-                "password_confirmation" => 'required',
-        ]);
-        $student_id = Auth::guard('api')->id();
-        $student = DB::table('student_profiles')->find($student_id);
-        if (!Hash::check($validatedData['previous_password'], $student->password)) {
-           return Response::apiError('previous password does not match',null,401);
-        }
-        StudentProfile::find($student_id)->update([
-            "name" => $validatedData["name"],
-            "email" => $validatedData["email"],
-            "password" => Hash::make($validatedData["password"]),
-        ]);
-        return Response::apiSuccess('User profile updated');
+    public function getStudentProfile()
+    {
+        return Response::apiSuccess('User data fetch successfully', Auth::guard('api')->user());
     }
+
 
     /**
      * @OA\Put(
@@ -198,12 +184,13 @@ class StudentProfileController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name", "email", "previous_password", "password", "password_confirmation"},
+     *             required={"name", "phone"},
      *             @OA\Property(property="name", type="string", example="John Doe"),
      *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com"),
+     *             @OA\Property(property="phone", type="integer", format="number", example="123456789"),
      *             @OA\Property(property="previous_password", type="string", format="password", example="password123previous"),
-     *             @OA\Property(property="password", type="string", format="password", example="password123"),
-     *             @OA\Property(property="password_confirmation", type="string", format="password", example="password123"),
+     *             @OA\Property(property="new_password", type="string", format="password", example="password123"),
+     *             @OA\Property(property="new_password_confirmation", type="string", format="password", example="password123"),
      *         )
      *     ),
      *     @OA\Response(
@@ -233,8 +220,35 @@ class StudentProfileController extends Controller
      *     )
      * )
      */
-
-    public function getStudentProfile(){
-        return Response::apiSuccess('User data fetch successfully', Auth::guard('api')->user());
+    public function studentProfileUpdater(Request $request)
+    {
+        // return $request->all();
+        $validatedData = $request->validate([
+            "name" => 'required',
+            // "email" => 'required',
+            "phone" => "required",
+            "previous_password" => 'nullable',
+            "new_password" => 'nullable|confirmed',
+            "new_password_confirmation" => 'nullable',
+        ]);
+        $student_id = Auth::guard('api')->id();
+        $student = DB::table('student_profiles')->find($student_id);
+        
+        $data = [
+            "name" => $validatedData["name"],
+            // "email" => $validatedData["email"],
+            "phone" => $validatedData['phone']
+        ];
+        if (array_key_exists('previous_password', $validatedData)) {
+            if (!Hash::check($validatedData['previous_password'], $student->password)) {
+                return Response::apiError('previous password does not match', null, 402);
+            }else if (!array_key_exists('new_password', $validatedData) || !array_key_exists('new_password_confirmation', $validatedData)) {
+                throw ValidationException::withMessages(['new_password_confirmation' => 'New Password/confirmation field is required.']);
+            }else{
+                $data['password'] = Hash::make($validatedData['new_password']);
+            }
+        }
+        StudentProfile::find($student_id)->update($data);
+        return Response::apiSuccess('User profile updated');
     }
 }
