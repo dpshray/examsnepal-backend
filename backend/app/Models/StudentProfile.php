@@ -55,4 +55,8 @@ class StudentProfile extends Authenticatable implements JWTSubject
     public function forum_questions() {
         return $this->hasMany(ForumQuestion::class,'user_id');
     }
+
+    public function student_pools(){
+        return $this->hasMany(StudentPool::class,'student_id');
+    }
 }
