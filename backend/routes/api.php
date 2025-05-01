@@ -16,6 +16,7 @@ use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
 use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
+use App\Http\Middleware\isStudentSubscribedMiddleware;
 use App\Models\Answersheet;
 use App\Models\Question;
 use Illuminate\Support\Facades\Auth;
@@ -30,6 +31,7 @@ Route::get('/migrate', [MigrationController::class, 'migrateNext']);
 Route::get('migrate-question-option', [TableMigrateController::class, 'migrateQuestionOption']);
 Route::get('migrate-pools', [TableMigrateController::class, 'migratePool']);
 Route::get('password-encryptor', [TableMigrateController::class, 'passwordHasher']);
+Route::get('migrate-answersheets', [TableMigrateController::class, 'migrateAnswersheets']);
 // Email verification route
 Route::get('/email/verify/{id}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
 
@@ -112,8 +114,12 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/mock-test/completed', [QuizController::class, 'getCompletedMockTest']);
 
     Route::get('/free-quiz/questions/{exam_id}', [QuestionController::class, 'freeQuizQuestions']);
-    Route::get('/sprint-quiz/questions/{exam_id}', [QuestionController::class, 'sprintQuizQuestions']);
-    Route::get('/mock-test/questions/{exam_id}', [QuestionController::class, 'mockTestQuestions']);
+    Route::middleware(isStudentSubscribedMiddleware::class)->group(function(){
+        Route::get('/sprint-quiz/questions/{exam_id}', [QuestionController::class, 'sprintQuizQuestions']);
+        Route::get('/mock-test/questions/{exam_id}', [QuestionController::class, 'mockTestQuestions']);
+    });
+    
+    
     Route::post('/submit-answer', [AnswerSheetController::class, 'store']);
     
     # solutions
@@ -126,6 +132,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::get('student-profile-fetcher', [StudentProfileController::class,'getStudentProfile']);
     Route::put('update-student-profile', [StudentProfileController::class,'studentProfileUpdater']);
+
 });
 
 // for exam type
