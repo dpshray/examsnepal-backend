@@ -660,7 +660,7 @@ class ForumController extends Controller
         try {
             // Create and store the answer
             $answer = ForumAnswer::create([
-                'question_id' => $validated['question_id'],
+                'forum_question_id' => $validated['question_id'],
                 'user_id' => $userId,
                 'answer' => $validated['answer'],
             ]);
