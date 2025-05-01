@@ -10,13 +10,15 @@ use Illuminate\Database\Eloquent\Model;
 class StudentProfile extends Authenticatable implements JWTSubject
 {
     use HasFactory;
+    public $timestamps = false;
 
     protected $fillable = [
         'name',
         'email',
         'phone',
         'password',
-        'exam_type'
+        'exam_type_id',
+        'date'
     ];
 
     protected $hidden = ['password'];
@@ -39,14 +41,18 @@ class StudentProfile extends Authenticatable implements JWTSubject
 
     public function doubts()
     {
-        return $this->hasMany(Doubt::class);
+        return $this->hasMany(Doubt::class,'student_id');
     }
 
     public function student_exams(){
         return $this->hasMany(StudentExam::class,'student_id');
     }
 
-    public function exams(){
+    public function exams(){ # exams completed
         return $this->belongsToMany(Exam::class,'student_exams','student_id','exam_id');
+    }
+
+    public function forum_questions() {
+        return $this->hasMany(ForumQuestion::class,'user_id');
     }
 }

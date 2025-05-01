@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BookmarkCollection;
 use App\Models\Bookmark;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Question;
+use App\Models\StudentProfile;
+use Illuminate\Support\Facades\Response;
 
 class BookmarkController extends Controller
 {
@@ -54,25 +57,35 @@ class BookmarkController extends Controller
      * )
      */
 
-    public function index(): JsonResponse
+    public function index()
     {
         // Eager load the related 'ForumQuestion' using the 'question' relationship
         // $bookmarks = Bookmark::with('questions')->get();
         // $uniqueQuestions=Question::with('bookmark')->get();
 
         // $uniqueQuestions = $bookmarks->pluck('questions.*.id')->flatten()->unique();
-        $questionsWithStudents = Question::withCount('bookmarks')
-            ->with(['bookmarks.student' => function ($query) {
+        
+        $questionsWithStudents = Question::select("id","exam_id","exam_type_id","question","explanation")->has('bookmarks')
+            ->withCount('bookmarks')
+            ->with(['options','bookmarks.student' => function ($query) {
                 $query->select('id', 'name'); // Load specific student fields
             }])
-            ->paginate(10)
-            ->map(function ($question) {
-                // Extract students from bookmarks and add to top-level 'students'
-                $question['students'] = $question->bookmarks->pluck('student')->unique('id')->values();
-                unset($question->bookmarks); // Optional: Remove bookmarks if not needed
-                return $question;
-            });
-        return response()->json($questionsWithStudents);
+            ->paginate(10);
+            $data['data'] = $questionsWithStudents->map(function ($question) {
+                    // Extract students from bookmarks and add to top-level 'students'
+                    $question['students'] = $question->bookmarks->pluck('student')->unique('id')->values();
+                    $question['options'] = $question->options;
+                    unset($question->bookmarks); // Optional: Remove bookmarks if not needed
+                    return $question;
+                });
+        $data['current_page'] = $questionsWithStudents->currentPage();
+        $data['last_page']    = $questionsWithStudents->lastPage();
+        $data['total']        = $questionsWithStudents->total();
+            return Response::apiSuccess('All Bookmarks', $data);
+        // return response()->json($questionsWithStudents);
+
+        // $question = Question::has('bookmarks')->with('options','bookmark.student');
+        // return  Question::has('bookmarks')->with(['bookmarks.question.options', 'bookmarks.student'])->get();
     }
 
 
@@ -97,9 +110,8 @@ class BookmarkController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"user_id", "exam_id", "question_id"},
+     *             required={"user_id","question_id"},
      *             @OA\Property(property="student_id", type="integer", example=1),
-     *             @OA\Property(property="exam_id", type="integer", example=1),
      *             @OA\Property(property="question_id", type="integer", example=101)
      *         )
      *     ),
@@ -125,45 +137,27 @@ class BookmarkController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'student_id' => 'required|integer|exists:student_profiles,id',
-            'exam_id' => 'required|integer|exists:exams,id',
-            'question_id' => 'required|integer|exists:questions,id',
+        $validated = $request->validate([
+            'question_id' => 'required|exists:questions,id',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => 'Validation failed',
-                'messages' => $validator->errors()
-            ], 422);
-        }
-
-        $validated = $validator->validated();
-        if ($validated['student_id'] !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
         // Check if the bookmark already exists
-        if (Bookmark::where('student_id', $validated['student_id'])
-            ->where('question_id', $validated['question_id'])
-            ->exists()
-        ) {
+        $student_bookmark = Auth::guard('api')
+                                ->user()
+                                ->bookmarks();
+        if ($student_bookmark->firstWhere('question_id', $validated['question_id'])) {
             return response()->json([
                 'error' => 'Duplicate Bookmark',
                 'message' => 'This bookmark already exists'
             ], 409);
         }
-        try {
-            $bookmark = Bookmark::create($validated);
-            return response()->json([
-                'message' => 'Bookmark created successfully',
-                'data' => $bookmark
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to create bookmark',
-                'message' => $e->getMessage()
-            ], 500);
-        }
+        $new_student_bookmark = $student_bookmark->create([
+            'question_id' => $validated['question_id']
+        ]);
+        return response()->json([
+            'message' => 'Bookmark created successfully',
+            'data' => $new_student_bookmark
+        ], 201);
     }
 
 
@@ -206,19 +200,15 @@ class BookmarkController extends Controller
      *     @OA\Response(response=500, description="Server error")
      * )
      */
-    public function destroy($id): JsonResponse
+    public function destroy($question_id)
     {
-        $bookmark = Bookmark::find($id);
-        if (!$bookmark) {
-            return response()->json(['error' => 'Bookmark not found'], 404);
+        $bookmark = Auth::guard('api')->user()->bookmarks()->firstWhere('question_id', $question_id);
+        if ($bookmark == null) {
+            return Response::apiError('Bookmark does not exists/belongs to another user',null,404);
         }
 
-        try {
-            $bookmark->delete();
-            return response()->json(['message' => 'Bookmark deleted successfully']);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to delete bookmark', 'message' => $e->getMessage()], 500);
-        }
+        $bookmark->delete();
+        return Response::apiSuccess('Bookmark removed.');
     }
 
     /**
@@ -267,8 +257,23 @@ class BookmarkController extends Controller
      *     security={{ "bearerAuth":{} }}
      * )
      */
-    public function getBookmarksByStudent($student_id)
+    public function getBookmarksByStudent(StudentProfile $student_id)
     {
+        $student_bookmarks = $student_id->bookmarks()->with('question.options')->paginate(10);
+
+        $pagination_data = $student_bookmarks->toArray();
+        ['links' => $links] = $pagination_data;
+
+
+        return $data = new BookmarkCollection($student_bookmarks);
+        $links['current_page'] = $student_bookmarks->currentPage();
+        $links['last_page']    = $student_bookmarks->lastPage();
+        $links['total']        = $student_bookmarks->total();
+
+        $data = compact('data', 'links');
+
+        return Response::apiSuccess('User bookmarks', $data);
+
         // Check if the student_id is valid (you can add more validation as needed)
         if (!is_numeric($student_id) || $student_id <= 0) {
             return response()->json(['error' => 'Invalid student ID'], 400);
@@ -340,22 +345,36 @@ class BookmarkController extends Controller
     public function getAllMyBookmarks()
     {
         // Get the authenticated user's ID
-        $userId = Auth::id();
+        $user = Auth::guard('api')->user();
 
-        if (!$userId) {
-            return response()->json(['error' => 'user not Authenticated'], 401);
-        }
-
+        // if (!$userId) {
+        //     return response()->json(['error' => 'user not Authenticated'], 401);
+        // }
+        $user_bookmarks = $user->bookmarks()->with('question.options')->paginate(10); 
         // Fetch bookmarks for the given student_id
-        $bookmarks = Bookmark::with('questions')
-            ->where('student_id', $userId)
-            ->paginate(10);
+        // $bookmarks = Bookmark::with('questions')
+        //     ->where('student_id', $userId)
+        //     ->paginate(10);
 
+        // $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
+        //     ->freeType()
+        //     ->paginate(10);
+
+        // $pagination_data = $user_bookmarks->toArray();
+        // ['links' => $links] = $pagination_data;
+
+
+        $data['data'] = new BookmarkCollection($user_bookmarks->items());
+        $data['current_page'] = $user_bookmarks->currentPage();
+        $data['last_page']    = $user_bookmarks->lastPage();
+        $data['total']        = $user_bookmarks->total();
+
+        return Response::apiSuccess('User bookmarks', $data);
         // Check if any bookmarks exist for the student
-        if ($bookmarks->isEmpty()) {
-            return response()->json(['error' => 'No bookmarks found for the given student ID'], 404);
-        }
+        // if ($bookmarks->isEmpty()) {
+        //     return response()->json(['error' => 'No bookmarks found for the given student ID'], 404);
+        // }
 
-        return response()->json($bookmarks);
+        // return response()->json($bookmarks);
     }
 }

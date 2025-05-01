@@ -1,16 +1,14 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Enums\ExamTypeEnum;
 use App\Http\Resources\ExamCollection;
-use Illuminate\Http\Request;
 use App\Models\Exam;
-use App\Models\StudentExam;
-use App\Models\StudentProfile;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class QuizController extends Controller
@@ -70,27 +68,23 @@ class QuizController extends Controller
      */
     public function getCompletedFreeQuiz()
     {
-        $page = request('page', 1); // get current page (default to 1)
+        $page    = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $skip = ($page - 1) * $perPage;
+        $skip    = ($page - 1) * $perPage;
 
-        $free_quiz_query = Exam::freeType()
-            ->select(['id', 'exam_name', 'status', 'user_id'])
-            ->with(['user:id,fullname','student_exams.student' => fn($qry) => $qry->select('id', 'name')])
-            ->withCount('questions')
-            ->userCompleted();
-        
-        $total_items = $free_quiz_query->count();
+        $free_quiz_query = Exam::freeType()->authUserCompleted();
+
+        $total_items            = $free_quiz_query->count();
         $free_quiz_for_resource = $free_quiz_query->skip($skip)->take($perPage)->get();
 
-        $freeQuiz = new ExamCollection($free_quiz_for_resource);
+        $freeQuiz   = new ExamCollection($free_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
 
         $data = [
-            'data' => $freeQuiz,
+            'data'         => $freeQuiz,
             'current_page' => (int) $page,
-            'completed' => $total_items,
-            'last_page' => $total_page
+            'completed'    => $total_items,
+            'last_page'    => $total_page,
         ];
         return Response::apiSuccess('Free completed quizzes retrieved successfully.', $data);
     }
@@ -150,31 +144,27 @@ class QuizController extends Controller
      */
     public function getPendingFreeQuiz()
     {
-        $page = request('page', 1); // get current page (default to 1)
+        $page    = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $skip = ($page - 1) * $perPage;
+        $skip    = ($page - 1) * $perPage;
 
-        $free_quiz_query = Exam::freeType()
-            ->select(['id', 'exam_name', 'status', 'user_id'])
-            ->with(['user:id,fullname'])
-            ->withCount('questions')
-            ->userPending();
+        $free_quiz_query = Exam::freeType()->authUserPending();
 
-        $total_items = $free_quiz_query->count();
+        $total_items            = $free_quiz_query->count();
         $free_quiz_for_resource = $free_quiz_query->skip($skip)->take($perPage)->get();
 
-        $freeQuiz = new ExamCollection($free_quiz_for_resource);
+        $freeQuiz   = new ExamCollection($free_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
 
         $data = [
-            'data' => $freeQuiz,
+            'data'         => $freeQuiz,
             'current_page' => (int) $page,
-            'last_page' => $total_page,
-            'total' => $total_items
+            'last_page'    => $total_page,
+            'total'        => $total_items,
         ];
         return Response::apiSuccess('Free pending quizzes retrieved successfully.', $data);
-    }   
-    
+    }
+
     /**
      * @OA\Get(
      *     path="/sprint-quiz/completed",
@@ -230,31 +220,27 @@ class QuizController extends Controller
      */
     public function getCompletedSprintQuiz()
     {
-        $page = request('page', 1); // get current page (default to 1)
+        $page    = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $skip = ($page - 1) * $perPage;
+        $skip    = ($page - 1) * $perPage;
 
-        $sprint_quiz_query = Exam::sprintType()
-            ->select(['id', 'exam_name', 'status', 'user_id'])
-            ->with(['user:id,fullname', 'student_exams'])
-            ->withCount('questions')
-            ->userCompleted();
+        $sprint_quiz_query = Exam::sprintType()->authUserCompleted();
 
-        $total_items = $sprint_quiz_query->count();
+        $total_items              = $sprint_quiz_query->count();
         $sprint_quiz_for_resource = $sprint_quiz_query->skip($skip)->take($perPage)->get();
 
         $sprint_quiz = new ExamCollection($sprint_quiz_for_resource);
-        $total_page = (int) ceil($total_items / $perPage);
+        $total_page  = (int) ceil($total_items / $perPage);
 
         $data = [
-            'data' => $sprint_quiz,
+            'data'         => $sprint_quiz,
             'current_page' => (int) $page,
-            'completed' => $total_items,
-            'last_page' => $total_page
+            'completed'    => $total_items,
+            'last_page'    => $total_page,
         ];
         return Response::apiSuccess('Sprint completed quizzes retrieved successfully.', $data);
-    }    
-    
+    }
+
     /**
      * @OA\Get(
      *     path="/sprint-quiz/pending",
@@ -310,27 +296,23 @@ class QuizController extends Controller
      */
     public function getPendingSprintQuiz()
     {
-        $page = request('page', 1); // get current page (default to 1)
+        $page    = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $skip = ($page - 1) * $perPage;
+        $skip    = ($page - 1) * $perPage;
 
-        $sprint_quiz_query = Exam::sprintType()
-            ->select(['id', 'exam_name', 'status', 'user_id'])
-            ->with(['user:id,fullname', 'student_exams.student'])
-            ->withCount('questions')
-            ->userPending();
+        $sprint_quiz_query = Exam::sprintType()->authUserPending();
 
-        $total_items = $sprint_quiz_query->count();
+        $total_items              = $sprint_quiz_query->count();
         $sprint_quiz_for_resource = $sprint_quiz_query->skip($skip)->take($perPage)->get();
 
         $sprint_quiz = new ExamCollection($sprint_quiz_for_resource);
-        $total_page = (int) ceil($total_items / $perPage);
+        $total_page  = (int) ceil($total_items / $perPage);
 
         $data = [
-            'data' => $sprint_quiz,
+            'data'         => $sprint_quiz,
             'current_page' => (int) $page,
-            'last_page' => $total_page,
-            'total' => $total_items,
+            'last_page'    => $total_page,
+            'total'        => $total_items,
         ];
         return Response::apiSuccess('Sprint pending quizzes retrieved successfully.', $data);
     }
@@ -390,31 +372,26 @@ class QuizController extends Controller
      */
     public function getCompletedMockTest()
     {
-        $page = request('page', 1); // get current page (default to 1)
+        $page    = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $skip = ($page - 1) * $perPage;
+        $skip    = ($page - 1) * $perPage;
 
-        $mock_quiz_query = Exam::mockType()
-            ->select(['id', 'exam_name', 'status', 'user_id'])
-            ->with(['user:id,fullname', 'student_exams'])
-            ->withCount('questions')
-            ->userCompleted();
+        $mock_quiz_query = Exam::mockType()->authUserCompleted();
 
-        $total_items = $mock_quiz_query->count();
+        $total_items            = $mock_quiz_query->count();
         $mock_quiz_for_resource = $mock_quiz_query->skip($skip)->take($perPage)->get();
 
-        $mock_quiz = new ExamCollection($mock_quiz_for_resource);
+        $mock_quiz  = new ExamCollection($mock_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
 
         $data = [
-            'data' => $mock_quiz,
+            'data'         => $mock_quiz,
             'current_page' => (int) $page,
-            'last_page' => $total_page,
-            'completed' => $total_items,
+            'last_page'    => $total_page,
+            'completed'    => $total_items,
         ];
         return Response::apiSuccess('Mock completed quizzes retrieved successfully.', $data);
     }
-
 
     /**
      * @OA\Get(
@@ -471,27 +448,23 @@ class QuizController extends Controller
      */
     public function getPendingMockTest()
     {
-        $page = request('page', 1); // get current page (default to 1)
+        $page    = request('page', 1); // get current page (default to 1)
         $perPage = 10;
-        $skip = ($page - 1) * $perPage;
+        $skip    = ($page - 1) * $perPage;
 
-        $mock_quiz_query = Exam::mockType()
-            ->select(['id', 'exam_name', 'status', 'user_id'])
-            ->with(['user:id,fullname', 'student_exams.student'])
-            ->withCount('questions')
-            ->userPending();
+        $mock_quiz_query = Exam::mockType()->authUserPending();
 
-        $total_items = $mock_quiz_query->count();
+        $total_items            = $mock_quiz_query->count();
         $mock_quiz_for_resource = $mock_quiz_query->skip($skip)->take($perPage)->get();
 
-        $mock_quiz = new ExamCollection($mock_quiz_for_resource);
+        $mock_quiz  = new ExamCollection($mock_quiz_for_resource);
         $total_page = (int) ceil($total_items / $perPage);
 
         $data = [
-            'data' => $mock_quiz,
+            'data'         => $mock_quiz,
             'current_page' => (int) $page,
-            'last_page' => $total_page,
-            'total' => $total_items,
+            'last_page'    => $total_page,
+            'total'        => $total_items,
         ];
         return Response::apiSuccess('Mock pending quizzes retrieved successfully.', $data);
     }
@@ -504,7 +477,7 @@ class QuizController extends Controller
      *     operationId="examAsQuizStore",
      *     tags={"Quiz"},
      *     security={{"bearerAuth":{}}},
-     * 
+     *
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -515,7 +488,7 @@ class QuizController extends Controller
      *             @OA\Property(property="exam_type_id", type="integer", example=2)
      *         )
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Quiz stored successfully",
@@ -534,7 +507,7 @@ class QuizController extends Controller
      *             )
      *         )
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Validation failed",
@@ -551,34 +524,33 @@ class QuizController extends Controller
      */
     public function examAsQuizStore(Request $request)
     {
-        $userId = Auth::id();
+        $userId = Auth::guard('users')->id();
         try {
             $validatedData = $request->validate([
-                'assign_id' => 'required|integer|exists:users,id',
-                'quiz_name' => 'required|string|max:255',
-                'status' => 'required|integer',
+                'assign_id'    => 'required|integer|exists:users,id',
+                'quiz_name'    => 'required|string|max:255',
+                'status'       => ['required', Rule::enum(ExamTypeEnum::class)],
                 'exam_type_id' => 'required|integer|exists:exam_types,id',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',
-                'errors' => $e->errors(),
+                'errors'  => $e->errors(),
             ], 422);
         }
-        $exam = new Exam();
-        $exam->exam_name = $validatedData['quiz_name'];
-        $exam->status = $validatedData['status'];
-        $exam->assign_id = $validatedData['assign_id'];
+        $exam               = new Exam();
+        $exam->exam_name    = $validatedData['quiz_name'];
+        $exam->status       = $validatedData['status'];
+        $exam->assign_id    = $validatedData['assign_id'];
         $exam->exam_type_id = $validatedData['exam_type_id'];
-        $exam->user_id = $userId;
+        $exam->user_id      = $userId;
         $exam->save();
 
         return response()->json([
             'message' => 'Quiz stored successfully',
-            'data' => $exam,
+            'data'    => $exam,
         ], 201);
     }
-
 
     /**
      * @OA\Put(
@@ -588,7 +560,7 @@ class QuizController extends Controller
      *     operationId="updateExamAsQuiz",
      *     tags={"Quiz"},
      *     security={{"bearerAuth":{}}},
-     * 
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -596,7 +568,7 @@ class QuizController extends Controller
      *         required=true,
      *         @OA\Schema(type="integer", example=3)
      *     ),
-     * 
+     *
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -607,7 +579,7 @@ class QuizController extends Controller
      *             @OA\Property(property="exam_type_id", type="integer", example=2)
      *         )
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Quiz updated successfully",
@@ -624,7 +596,7 @@ class QuizController extends Controller
      *             )
      *         )
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Quiz not found",
@@ -632,7 +604,7 @@ class QuizController extends Controller
      *             @OA\Property(property="error", type="string", example="Quiz not found")
      *         )
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Validation failed",
@@ -644,7 +616,7 @@ class QuizController extends Controller
      *             )
      *         )
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Failed to update Quiz",
@@ -659,33 +631,32 @@ class QuizController extends Controller
     {
         $exam = Exam::find($id);
 
-        if (!$exam) {
+        if (! $exam) {
             return response()->json(['error' => 'Quiz not found'], 404);
         }
 
         try {
             $validatedData = $request->validate([
-                'assign_id' => 'required|integer|exists:users,id',
-                'quiz_name' => 'required|string|max:255',
-                'status' => 'required|integer',
+                'assign_id'    => 'required|integer|exists:users,id',
+                'quiz_name'    => 'required|string|max:255',
+                'status'       => 'required|integer',
                 'exam_type_id' => 'required|integer|exists:exam_types,id',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',
-                'errors' => $e->errors(),
+                'errors'  => $e->errors(),
             ], 422);
         }
-
-        $exam->exam_name = $validatedData['quiz_name'];
-        $exam->status = $validatedData['status'];
-        $exam->assign_id = $validatedData['assign_id'];
+        $exam->exam_name    = $validatedData['quiz_name'];
+        $exam->status       = $validatedData['status'];
+        $exam->assign_id    = $validatedData['assign_id'];
         $exam->exam_type_id = $validatedData['exam_type_id'];
         $exam->save();
 
         return response()->json([
             'message' => 'Quiz updated successfully',
-            'data' => $exam,
+            'data'    => $exam,
         ], 200);
     }
 
@@ -697,7 +668,7 @@ class QuizController extends Controller
      *     operationId="getQuizById",
      *     tags={"Quiz"},
      *     security={{"bearerAuth":{}}},
-     * 
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -705,7 +676,7 @@ class QuizController extends Controller
      *         required=true,
      *         @OA\Schema(type="integer", example=3)
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Quiz found successfully",
@@ -723,7 +694,7 @@ class QuizController extends Controller
      *             )
      *         )
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Quiz not found",
@@ -740,14 +711,14 @@ class QuizController extends Controller
         $quiz = Exam::find($id);
 
         // Check if the exam exists
-        if (!$quiz) {
+        if (! $quiz) {
             return response()->json(['error' => 'Quiz not found'], 404);
         }
 
         // Return the exam details
         return response()->json([
             'message' => 'Quiz found successfully',
-            'data' => $quiz,
+            'data'    => $quiz,
         ], 200);
     }
 
@@ -762,7 +733,7 @@ class QuizController extends Controller
      *     operationId="deleteQuizById",
      *     tags={"Quiz"},
      *     security={{"bearerAuth":{}}},
-     * 
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -770,7 +741,7 @@ class QuizController extends Controller
      *         required=true,
      *         @OA\Schema(type="integer", example=3)
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Quiz deleted successfully",
@@ -778,7 +749,7 @@ class QuizController extends Controller
      *             @OA\Property(property="message", type="string", example="Quiz deleted successfully")
      *         )
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Quiz not found",
@@ -786,7 +757,7 @@ class QuizController extends Controller
      *             @OA\Property(property="error", type="string", example="Quiz not found")
      *         )
      *     ),
-     * 
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Failed to delete Quiz",
@@ -804,7 +775,7 @@ class QuizController extends Controller
         $exam = Exam::find($id);
 
         // Check if the exam exists
-        if (!$exam) {
+        if (! $exam) {
             return response()->json(['error' => 'Quiz not found'], 404);
         }
 
@@ -814,23 +785,29 @@ class QuizController extends Controller
             return response()->json(['message' => 'Quiz deleted successfully'], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Failed to delete Quiz',
+                'error'   => 'Failed to delete Quiz',
                 'message' => $e->getMessage(),
             ], 500);
         }
     }
 
-
     /**
      * @OA\Get(
-     *     path="/user-exams-status",
-     *     summary="Get user's each exams completed status",
-     *     description="Fetches a list of exams(no of exam completed)",
-     *     operationId="getExamStatus",
+     *     path="/user-free-exams-status",
+     *     summary="Get user's each free exams completed status",
+     *     description="Fetches list of free exams(no of free exam completed)",
+     *     operationId="userFreeExamsStatus",
      *     tags={"Quiz"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="List of exams retrieved successfully",
+     *         description="List of completed free exams retrieved successfully",
      *         @OA\JsonContent(
      *             type="array",
      *             @OA\Items(
@@ -862,19 +839,160 @@ class QuizController extends Controller
      *     )
      * )
      */
-    public function getExamStatus()
+    public function getFreeExamStatus()
     {
-        $student_id = Auth::guard('api')->id();
+        $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
+                    ->freeType()
+                    ->paginate(10);
 
-        $exam_status = DB::table('student_exams')
-            ->join('exams', 'student_exams.exam_id', '=', 'exams.id')
-            ->select('exams.status', DB::raw('count(*) as count'))
-            ->where('student_exams.student_id', $student_id)
-            ->groupBy('exams.status')
-            ->get()
-            ->mapWithKeys(fn ($row) => [ExamTypeEnum::getKeyByValue($row->status) => $row->count]);
+        $pagination_data = $exams->toArray();
+        ['links' => $links] = $pagination_data;
 
-        $data = compact('student_id', 'exam_status');
-        return Response::apiSuccess("Student's exam completed status", $data);
+
+        $data = new ExamCollection($exams);
+        $links['current_page'] = $exams->currentPage();
+        $links['last_page']    = $exams->lastPage();
+        $links['total']        = $exams->total();
+
+        $data = compact('data', 'links');
+
+        return Response::apiSuccess("Student's free exam completed status", $data);
+
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/user-sprint-exams-status",
+     *     summary="Get user's each sprint exams completed status",
+     *     description="Fetches list of sprint exams(no of sprint exam completed)",
+     *     operationId="userSprintExamsStatus",
+     *     tags={"Quiz"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of completed sprint exams retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
+     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
+     *                 @OA\Property(
+     *                     property="organization",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="ABC University")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="examType",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Final Exam")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
+     */
+    public function getSprintExamStatus()
+    {
+        $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
+            ->sprintType()
+            ->paginate(10);
+
+        $pagination_data = $exams->toArray();
+        ['links' => $links] = $pagination_data;
+
+
+        $data = new ExamCollection($exams);
+        $links['current_page'] = $exams->currentPage();
+        $links['last_page']    = $exams->lastPage();
+        $links['total']        = $exams->total();
+
+        $data = compact('data', 'links');
+
+        return Response::apiSuccess("Student's sprint exam completed status", $data);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/user-mock-exams-status",
+     *     summary="Get user's each mock exams completed status",
+     *     description="Fetches list of mock exams(no of mock exam completed)",
+     *     operationId="userMockExamsStatus",
+     *     tags={"Quiz"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of completed sprint exams retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
+     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
+     *                 @OA\Property(
+     *                     property="organization",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="ABC University")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="examType",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Final Exam")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
+     */
+    public function getMockExamStatus()
+    {
+        $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
+            ->mockType()
+            ->paginate(10);
+
+        $pagination_data = $exams->toArray();
+        ['links' => $links] = $pagination_data;
+
+
+        $data = new ExamCollection($exams);
+        $links['current_page'] = $exams->currentPage();
+        $links['last_page']    = $exams->lastPage();
+        $links['total']        = $exams->total();
+
+        $data = compact('data', 'links');
+
+        return Response::apiSuccess("Student's mock exam completed status", $data);
     }
 }

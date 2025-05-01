@@ -21,7 +21,6 @@ return new class extends Migration
                 'choosed_option_value']);
             $table->unsignedBigInteger('student_exam_id')->after('id');
             $table->foreign('student_exam_id')->references('id')->on('student_exams')->onDelete('cascade')->onUpdate('cascade');
-            $table->boolean('is_correct')->nullable()->after('question_id');
             $table->unsignedBigInteger('selected_option_id')->nullable()->after('question_id');
             $table->foreign('selected_option_id')->references('id')->on('option_questions')->onDelete('cascade')->onUpdate('cascade');
         });

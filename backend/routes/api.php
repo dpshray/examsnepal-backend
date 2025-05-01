@@ -14,69 +14,24 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\BankQuestionController;
 use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
+use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
+use App\Http\Middleware\isStudentSubscribedMiddleware;
 use App\Models\Answersheet;
 use App\Models\Question;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-Route::get('remove-completed-exam/{exam_id}', function($exam_id){
-    // dd([['exam_id', '=', $exam_id], ['student_id', '=', Auth::guard('api')->id()]]);
-    DB::table('student_exams')->where([['exam_id','=', $exam_id],['student_id','=', 12127]])->delete();
-    return 'deleted';
-});
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/migrate', [MigrationController::class, 'migrateNext']);
 
-Route::get('migrate-question-option', function(){
-
-$batchSize = 1000; // insert in chunks of 1000 rows
-
-Question::chunk(500, function ($questions) use ($batchSize) {
-    $insertData = [];
-
-    foreach ($questions as $qn) {
-        $insertData[] = [
-            'question_id' => $qn->id,
-            'option' => $qn->option_1,
-            'value' => $qn->option_value_1,
-        ];
-        $insertData[] = [
-            'question_id' => $qn->id,
-            'option' => $qn->option_2,
-            'value' => $qn->option_value_2,
-        ];
-        $insertData[] = [
-            'question_id' => $qn->id,
-            'option' => $qn->option_3,
-            'value' => $qn->option_value_3,
-        ];
-        $insertData[] = [
-            'question_id' => $qn->id,
-            'option' => $qn->option_4,
-            'value' => $qn->option_value_4,
-        ];
-
-        // Insert when batch reaches the size
-        if (count($insertData) >= $batchSize) {
-            DB::table('option_questions')->insert($insertData);
-            $insertData = []; // reset for next batch
-        }
-    }
-
-    // Insert remaining data
-    if (!empty($insertData)) {
-        DB::table('option_questions')->insert($insertData);
-    }
-});
-
-echo "DONE";
-
-});
-
-
+// Route::get('migrate-question-option', [MigrationController::class, 'migrateNext']);
+Route::get('migrate-question-option', [TableMigrateController::class, 'migrateQuestionOption']);
+Route::get('migrate-pools', [TableMigrateController::class, 'migratePool']);
+Route::get('password-encryptor', [TableMigrateController::class, 'passwordHasher']);
+Route::get('migrate-answersheets', [TableMigrateController::class, 'migrateAnswersheets']);
 // Email verification route
 Route::get('/email/verify/{id}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
 
@@ -132,7 +87,7 @@ Route::middleware(['auth:api'])->group(function () {
     // for bookmarks
     Route::get('/bookmarks', [BookmarkController::class, 'index']);
     Route::post('/bookmarks', [BookmarkController::class, 'store']);
-    Route::delete('/bookmarks/{id}', [BookmarkController::class, 'destroy']);
+    Route::delete('/bookmarks/{question_id}', [BookmarkController::class, 'destroy']);
     Route::get('/bookmarks/student/{student_id}', [BookmarkController::class, 'getBookmarksByStudent']);
     Route::get('/bookmarks/allmy', [BookmarkController::class, 'getAllMyBookmarks']);
 
@@ -142,10 +97,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/search-questions', [QuestionController::class, 'searchQuestions']);
 
     // for Doubts
-    Route::post('/doubt', [QuestionController::class, 'store']);
-    Route::get('/doubt/{id}', [QuestionController::class, 'show']);
-    Route::put('/doubt/{id}', [QuestionController::class, 'update']);
-    Route::delete('/doubt/{id}', [QuestionController::class, 'destroy']);
+    Route::post('/doubt', [DoubtController::class, 'store']);
+    Route::get('/doubt/student/solved', [DoubtController::class, 'fetchAuthStudentDoubtSolved']);
+    Route::get('/doubt/student/unsolved', [DoubtController::class, 'fetchAuthStudentDoubtUnsolved']);
 
     #free quiz
     Route::get('/free-quiz/pending', [QuizController::class, 'getPendingFreeQuiz']);
@@ -160,19 +114,24 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/mock-test/completed', [QuizController::class, 'getCompletedMockTest']);
 
     Route::get('/free-quiz/questions/{exam_id}', [QuestionController::class, 'freeQuizQuestions']);
-    Route::get('/sprint-quiz/questions/{exam_id}', [QuestionController::class, 'sprintQuizQuestions']);
-    Route::get('/mock-test/questions/{exam_id}', [QuestionController::class, 'mockTestQuestions']);
+    Route::middleware(isStudentSubscribedMiddleware::class)->group(function(){
+        Route::get('/sprint-quiz/questions/{exam_id}', [QuestionController::class, 'sprintQuizQuestions']);
+        Route::get('/mock-test/questions/{exam_id}', [QuestionController::class, 'mockTestQuestions']);
+    });
+    
+    
     Route::post('/submit-answer', [AnswerSheetController::class, 'store']);
+    
+    # solutions
     Route::get('/view-solutions/{exam_id}', [AnswerSheetController::class, 'getResultsWithExam']);
 
-    // solutions
-    Route::get('/solution/free-quiz',[AnswerSheetController::class,'getFreeQuizSolutions']);
-    Route::get('/solution/sprint-quiz',[AnswerSheetController::class,'getDoneSprintQuiz']);
-    Route::get('/solution/mock-test',[AnswerSheetController::class,'getDoneMockTest']);
-
-    Route::get('user-exams-status', [QuizController::class, 'getExamStatus']);
+    Route::get('user-free-exams-status', [QuizController::class, 'getFreeExamStatus']);
+    Route::get('user-sprint-exams-status', [QuizController::class, 'getSprintExamStatus']);
+    Route::get('user-mock-exams-status', [QuizController::class, 'getMockExamStatus']);
 
 
+    Route::get('student-profile-fetcher', [StudentProfileController::class,'getStudentProfile']);
+    Route::put('update-student-profile', [StudentProfileController::class,'studentProfileUpdater']);
 
 });
 
@@ -204,7 +163,7 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
 
     Route::post('/create-quiz',[QuizController::class,'examAsQuizStore']);
     Route::get('/quiz/{id}',[QuizController::class,'show']);
-    Route::put('/update-quiz',[QuizController::class,'updateExamAsQuiz']);
+    Route::put('/update-quiz/{exam}',[QuizController::class,'updateExamAsQuiz']);
     Route::delete('/quiz/{id}',[QuizController::class,'destroy']);
 
      // for Questions
@@ -221,6 +180,7 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
 
     // for doubts
     Route::get('/doubts', [DoubtController::class, 'index']);
+    Route::get('/doubt/{id}', [DoubtController::class, 'show']);
 });
 
 Route::middleware(['auth:users', 'role:teacher'])->group(function () {

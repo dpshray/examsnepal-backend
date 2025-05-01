@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ExamType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 
 class ExamTypeController extends Controller
 {
@@ -43,8 +44,9 @@ class ExamTypeController extends Controller
      */
     public function index()
     {
-        //
-        return response()->json(ExamType::all());
+        $exam_types = ExamType::select('id','name')->where('is_active',1)->get();
+        return Response::apiSuccess('Active exam types', $exam_types);
+        // return response()->json($exam_types);
     }
 
     /**
