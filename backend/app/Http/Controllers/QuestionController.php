@@ -993,7 +993,7 @@ class QuestionController extends Controller
 
         $questions = $exam->questions()
             ->with('options')
-            ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
+            ->select('id', 'exam_id', 'question', 'explanation')
             ->paginate(10);
 
         $pagination_data = $questions->toArray();
