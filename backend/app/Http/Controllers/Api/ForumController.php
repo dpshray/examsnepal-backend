@@ -100,6 +100,7 @@ class ForumController extends Controller
             ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
             ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
             ->withCount('answers')
+            ->orderBy('id','DESC')
             ->paginate(10);
 
         $data['data'] = new ForumQuestionCollection($questions->items());
