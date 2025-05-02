@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Question extends Model
 {
-    //
+    public $timestamps = false;
     use HasFactory;
 
     protected $fillable = [
