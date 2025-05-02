@@ -4,9 +4,9 @@ namespace App\Enums;
 
 enum ExamTypeEnum: Int
 {
-    case FREE_QUIZ = 1;
-    case SPRINT_QUIZ = 3;
-    case MOCK_TEST = 4;
+    case FREE_QUIZ = 3;
+    case SPRINT_QUIZ = 4;
+    case MOCK_TEST = 1;
 
     public static function getKeyByValue(int $value): ?string
     {
