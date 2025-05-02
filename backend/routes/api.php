@@ -22,6 +22,8 @@ use App\Models\Question;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PoolController;
+
 
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
@@ -132,6 +134,10 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::get('student-profile-fetcher', [StudentProfileController::class,'getStudentProfile']);
     Route::put('update-student-profile', [StudentProfileController::class,'studentProfileUpdater']);
+
+        #pool
+    Route::get('request-pool-question', [PoolController::class, 'getPoolQuestions']);
+    Route::post('send-pool-response', [PoolController::class, 'sendPoolQuestionResponse']);
 
 });
 

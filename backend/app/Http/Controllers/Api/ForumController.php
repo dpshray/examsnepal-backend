@@ -20,7 +20,7 @@ use Illuminate\Http\JsonResponse;
  * )
  * 
  * @OA\Server( 
- *     url="http://192.168.1.98:8000/api",
+ *     url="https://api.examsnepal.dworklabs.com/api",
  *     description="Localhost API Server"
  * )
  * 
@@ -57,6 +57,16 @@ class ForumController extends Controller
      *     tags={"Forum"},
      *     summary="Fetch all questions based on the user's stream",
      *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="token",
+     *         in="query",
+     *         required=false,
+     *         description="pagination token",
+     *         @OA\Schema(
+     *             type="string",
+     *             example="kj8s7afd"
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="List of questions"
@@ -99,6 +109,16 @@ class ForumController extends Controller
      *     tags={"Forum"},
      *     summary="Fetch all questions created by me",
      *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="token",
+     *         in="query",
+     *         required=false,
+     *         description="pagination token",
+     *         @OA\Schema(
+     *             type="string",
+     *             example="kj8s7afd"
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="List of questions created by me"
