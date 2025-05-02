@@ -344,12 +344,12 @@ class ForumController extends Controller
         }
 
         // Find the question that the user wants to update
-        $question = ForumQuestion::where('id', $id)
+        $forum_question = ForumQuestion::where('id', $id)
             ->where('user_id', $studentProfile->id)
             ->where('deleted', '0')
             ->first();
 
-        if (!$question) {
+        if (!$forum_question) {
             return response()->json(['message' => 'Question not found / already deleted / belongs to another user'], 404);
         }
 
@@ -374,18 +374,18 @@ class ForumController extends Controller
         }
 
         // Check if the student profile has a stream type
-        if ($studentProfile->exam_type_id != $question->exam_type_id) {
-            return response()->json(['message' => 'Stream type does not match for the student'], 400);
-        }
+        // if ($studentProfile->exam_type_id != $forum_question->exam_type_id) {
+        //     return response()->json(['message' => 'Stream type does not match for the student'], 400);
+        // }
 
         // // Update the question
-        $question->update([
+        $forum_question->update([
             'question' => $request->input('question'),
         ]);
 
         return response()->json([
             'message' => 'Question updated successfully',
-            'question' => $question,
+            'question' => $forum_question,
         ], 200);
     }
 
