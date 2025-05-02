@@ -10,7 +10,7 @@ class ForumQuestion extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'question', 'stream', 'exam_type_id','deleted_at'];
+    protected $fillable = ['user_id', 'question', 'deleted_at'];
 
     public static function boot()
     {
@@ -18,7 +18,6 @@ class ForumQuestion extends Model
         static::creating(function ($forum_question) {
             $user = Auth::guard('api')->user();
             $forum_question->user_id = $user->id;
-            $forum_question->exam_type_id = $user->exam_type_id;
             $forum_question->deleted = 0;
         });
     }
