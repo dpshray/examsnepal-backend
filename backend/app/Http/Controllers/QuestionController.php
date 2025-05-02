@@ -914,10 +914,10 @@ class QuestionController extends Controller
      *         name="token",
      *         in="query",
      *         required=false,
-     *         description="pagination token",
+     *         description="pagination",
      *         @OA\Schema(
-     *             type="string",
-     *             example="kj8s7afd"
+     *             type="integer",
+     *             example="1"
      *         )
      *     ),
      *     @OA\Response(
