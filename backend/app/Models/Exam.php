@@ -48,6 +48,7 @@ class Exam extends Model
         return $this->completedPendingQuery($query)
                 ->whereDoesntHave('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))
                 ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id)) # for student load specific exams
+                ->where('live',1)
                 ->orderBy('id','DESC'); 
     }
 
@@ -66,6 +67,7 @@ class Exam extends Model
             ])
             ->whereHas('exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))
             ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id)) # for student load specific exams
+            ->where('live',1)
             ->orderBy('id','DESC'); 
     }
 
