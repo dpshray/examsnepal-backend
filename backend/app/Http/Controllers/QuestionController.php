@@ -186,7 +186,16 @@ class QuestionController extends Controller
      *     description="Searches for multiple-choice questions (MCQs) based on a keyword using Full-Text Search.",
      *     operationId="searchQuestions",
      *     tags={"MCQs"},
-     *
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="pagination",
+     *         @OA\Schema(
+     *             type="string",
+     *             example="1"
+     *         )
+     *     ),
      *     @OA\Parameter(
      *         name="keyword",
      *         in="query",
@@ -292,16 +301,16 @@ class QuestionController extends Controller
                         ->where('question', 'LIKE', '%' . $keyword . '%')
                         ->paginate(10);
 
-        $pagination_data = $questions->toArray();
-        ['links' => $links] = $pagination_data;
+        // $pagination_data = $questions->toArray();
+        // ['links' => $links] = $pagination_data;
 
 
-        $data = new QuestionCollection($questions);
-        $links['current_page'] = $questions->currentPage();
-        $links['last_page']    = $questions->lastPage();
-        $links['total']        = $questions->total();
+        $data['data'] = new QuestionCollection($questions);
+        $data['current_page'] = $questions->currentPage();
+        $data['last_page']    = $questions->lastPage();
+        $data['total']        = $questions->total();
 
-        $data = compact('data', 'links');
+        // $data = compact('data');
 
         if ($questions->isEmpty()) {
             return response()->json([
