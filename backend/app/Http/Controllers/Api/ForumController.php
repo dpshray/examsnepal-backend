@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ForumQuestionCollection;
 use Illuminate\Http\Request;
 use App\Models\ForumQuestion;
 use App\Models\ForumAnswer;
@@ -94,15 +95,21 @@ class ForumController extends Controller
         // }
 
         // Fetch questions where the stream matches the student's exam_type
-        $questions = ForumQuestion::query()
-        ->whereRelation('studentProfile','exam_type_id', $user->exam_type_id)
+        $questions = ForumQuestion::whereRelation('studentProfile','exam_type_id', $user->exam_type_id)
         // ->where('exam_type_id', $user->exam_type_id)
             ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
             ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
             ->withCount('answers')
             ->paginate(10);
 
-        return response()->json($questions);
+        $data['data'] = new ForumQuestionCollection($questions->items());
+        $data['current_page'] = $questions->currentPage();
+        $data['last_page']    = $questions->lastPage();
+        $data['total']        = $questions->total();
+
+        $data = compact('data');
+
+        return response()->json($data);
     }
 
     /**
@@ -112,13 +119,13 @@ class ForumController extends Controller
      *     summary="Fetch all questions created by me",
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
-     *         name="token",
+     *         name="page",
      *         in="query",
      *         required=false,
-     *         description="pagination token",
+     *         description="pagination",
      *         @OA\Schema(
-     *             type="string",
-     *             example="kj8s7afd"
+     *             type="integer",
+     *             example="1"
      *         )
      *     ),
      *     @OA\Response(
@@ -154,7 +161,14 @@ class ForumController extends Controller
             ->withCount('answers')
             ->paginate(10);
 
-        return response()->json($questions);
+        $data['data'] = new ForumQuestionCollection($questions);
+        $data['current_page'] = $questions->currentPage();
+        $data['last_page']    = $questions->lastPage();
+        $data['total']        = $questions->total();
+
+        $data = compact('data');
+
+        return response()->json($data);
     }
     // Method to fetch questions by substream
     public function fetchQuestionsBySubstream($subStream)
@@ -337,33 +351,38 @@ class ForumController extends Controller
      */
     public function updateQuestion(Request $request, $id)
     {
-        $studentProfile = $this->getAuthenticatedStudentProfile();
+        $student = Auth::guard('api')->user();
+        $forum_question = $student->forum_questions()->where('id', $id)->where('deleted',0)->first();
+        // $studentProfile = $this->getAuthenticatedStudentProfile();
 
-        if ($studentProfile instanceof \Illuminate\Http\JsonResponse) {
-            return $studentProfile; // Return the unauthorized or not found response
-        }
+        // if ($studentProfile instanceof \Illuminate\Http\JsonResponse) {
+        //     return $studentProfile; // Return the unauthorized or not found response
+        // }
 
         // Find the question that the user wants to update
-        $forum_question = ForumQuestion::where('id', $id)
-            ->where('user_id', $studentProfile->id)
-            ->where('deleted', '0')
-            ->first();
+        // $forum_question = ForumQuestion::where('id', $id)
+        //     ->where('user_id', $studentProfile->id)
+        //     ->where('deleted', '0')
+        //     ->first();
 
-        if (!$forum_question) {
+        if (empty($forum_question)) {
             return response()->json(['message' => 'Question not found / already deleted / belongs to another user'], 404);
         }
 
         // Validate the request data
-        $validator = Validator::make($request->all(), [
+        // $validator = Validator::make($request->all(), [
+        //     'question' => 'required|string|max:1000',
+        // ]);
+        $validated_data = $request->validate([
             'question' => 'required|string|max:1000',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+        // if ($validator->fails()) {
+        //     return response()->json(['errors' => $validator->errors()], 422);
+        // }
 
         // Check if the updated question already exists for the user
-        $existingQuestion = ForumQuestion::where('user_id', $studentProfile->id)
+        $existingQuestion = ForumQuestion::where('user_id', $student->id)
             ->where('question', $request->input('question'))
             ->where('id', '!=', $id)
             ->where('deleted', '0')
@@ -373,14 +392,14 @@ class ForumController extends Controller
             return response()->json(['message' => 'You have already created this question'], 409);
         }
 
-        // Check if the student profile has a stream type
-        // if ($studentProfile->exam_type_id != $forum_question->exam_type_id) {
-        //     return response()->json(['message' => 'Stream type does not match for the student'], 400);
-        // }
+        // // Check if the student profile has a stream type
+        // // if ($studentProfile->exam_type_id != $forum_question->exam_type_id) {
+        // //     return response()->json(['message' => 'Stream type does not match for the student'], 400);
+        // // }
 
-        // // Update the question
+        // // // Update the question
         $forum_question->update([
-            'question' => $request->input('question'),
+            'question' => $validated_data['question'],
         ]);
 
         return response()->json([
