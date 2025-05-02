@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('student_pools', function (Blueprint $table) {
-            $table->unsignedTinyInteger('strike', 1)->default(0);
+            $table->tinyInteger('strike')->default(0);
         });
     }
 

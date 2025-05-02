@@ -58,13 +58,13 @@ class ForumController extends Controller
      *     summary="Fetch all questions based on the user's stream",
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
-     *         name="token",
+     *         name="page",
      *         in="query",
      *         required=false,
-     *         description="pagination token",
+     *         description="pagination",
      *         @OA\Schema(
      *             type="string",
-     *             example="kj8s7afd"
+     *             example="1"
      *         )
      *     ),
      *     @OA\Response(
@@ -94,7 +94,9 @@ class ForumController extends Controller
         // }
 
         // Fetch questions where the stream matches the student's exam_type
-        $questions = ForumQuestion::where('exam_type_id', $user->exam_type_id)
+        $questions = ForumQuestion::query()
+        ->whereRelation('studentProfile','exam_type_id', $user->exam_type_id)
+        // ->where('exam_type_id', $user->exam_type_id)
             ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
             ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
             ->withCount('answers')
@@ -146,8 +148,7 @@ class ForumController extends Controller
         // }
 
         // Fetch questions where the stream matches the student's exam_type
-        $questions = ForumQuestion::where('exam_type_id', $user->exam_type_id)
-            ->where('user_id', $user->id)
+        $questions = ForumQuestion::where('user_id', $user->id)
             ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
             ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
             ->withCount('answers')
