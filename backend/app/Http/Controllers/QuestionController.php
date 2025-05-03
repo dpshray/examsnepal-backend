@@ -9,6 +9,7 @@ use App\Models\Question;
 use App\Models\StudentProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
 class QuestionController extends Controller
@@ -1127,7 +1128,7 @@ class QuestionController extends Controller
         $questionsMockTest = $exam
             ->questions()
             ->with('options')
-            ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
+            ->select('id', 'exam_id', 'question', 'explanation')
             ->paginate(10);
 
         $pagination_data = $questionsMockTest->toArray();
@@ -1251,7 +1252,7 @@ class QuestionController extends Controller
 
         $questionsSprintQuiz = $exam->questions()
             ->with('options')
-            ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
+            ->select('id', 'exam_id', 'question', 'explanation')
             ->paginate(10);
 
         $pagination_data = $questionsSprintQuiz->toArray();
@@ -1278,9 +1279,11 @@ class QuestionController extends Controller
             # this is the first time user giving this exam
             $first_time_token = str()->random(25);
             $data             = $exam->questions->pluck('id')->map(fn($id) => ['question_id' => $id]);
-            $user->student_exams()->create(['exam_id' => $exam->id, 'first_time_token' => $first_time_token])
-                ->answers()
-                ->createMany($data);
+            DB::transaction(function () use($user, $exam, $first_time_token,$data){
+                $user->student_exams()->create(['exam_id' => $exam->id, 'first_time_token' => $first_time_token])
+                    ->answers()
+                    ->createMany($data);
+            });
             return $first_time_token;
         } else {
             # check token to verify if this is first time user attending this exam via token
