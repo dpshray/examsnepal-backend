@@ -8,7 +8,7 @@ trait PaginatorTrait
 {
     public array $data = [];
 
-    public function setupPagination(LengthAwarePaginator $pagination, string $resourceClass = null): self
+    public function setupPagination(LengthAwarePaginator $pagination, string $resourceClass = null, array $append = []): self
     {
         $items = $pagination->items();
 
@@ -26,6 +26,10 @@ trait PaginatorTrait
         $this->data['current_page'] = $pagination->currentPage();
         $this->data['last_page']    = $pagination->lastPage();
         $this->data['total']        = $pagination->total();
+
+        foreach ($append as $key => $value) {
+            $this->data[$key] = $value;
+        }
 
         return $this;
     }
