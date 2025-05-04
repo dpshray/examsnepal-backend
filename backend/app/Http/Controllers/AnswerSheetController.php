@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Answersheet;
 use App\Models\Exam;
 use App\Models\StudentExam;
+use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
@@ -15,6 +16,7 @@ use Illuminate\Validation\ValidationException;
 
 class AnswerSheetController extends Controller
 {
+    use PaginatorTrait;
     /**
      * Store a newly created resource in storage.
      */
@@ -263,30 +265,19 @@ class AnswerSheetController extends Controller
         $exam = $exam_id;
         $student_exam = Auth::guard('api')->user()->student_exams()->firstWhere('exam_id', $exam->id);
         if ($student_exam == null) {
-            return Response::apiSuccess('This exam is not started', null, 403);
+            return Response::apiSuccess('User exam not found', null, 403);
         }
 
         $questions = $exam->questions()->with('options')->paginate(10);
-
-        $pagination_data    = $questions->toArray();
-
-        ['links' => $links] = $pagination_data;
-        $data               = new QuestionCollection($questions);
+        $data = $this->setupPagination($questions, QuestionCollection::class)->data;
 
         $user_choosed = $student_exam->answers->pluck('selected_option_id','question_id');
 
-        $resource_data_to_array = $data->resolve();
-        $data = collect($resource_data_to_array)->map(function ($question) use($user_choosed) {
-            $question['user_choosed'] = $user_choosed[$question['id']];
-            return $question;
-        });
-
-        $links['current_page'] = $questions->currentPage();
-        $links['last_page'] = $questions->lastPage();
-        $links['total'] = $questions->total();
-
-        $data    = compact('data', 'links');
-
+        $items = ($data['data'])->toArray(request());
+        foreach ($items as $key => $value) {
+            $items[$key]['user_choosed'] = $user_choosed[$items[$key]['id']];
+        }
+        $data['data'] = $items;
         return Response::apiSuccess('User Exam Solutions', $data);
 
     }
