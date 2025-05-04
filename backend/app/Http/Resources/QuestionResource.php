@@ -20,7 +20,7 @@ class QuestionResource extends JsonResource
             'exam_id' => $this->exam_id,
             'question' => $this->question,
             'explanation' => $this->explanation,
-            'options' => $this->whenLoaded('options', $this->options)
+            'options' => $this->whenLoaded('options')
         ];
     }
 }
