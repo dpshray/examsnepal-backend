@@ -756,20 +756,9 @@ class QuizController extends Controller
         $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
                     ->freeType()
                     ->paginate(10);
-
-        $pagination_data = $exams->toArray();
-        ['links' => $links] = $pagination_data;
-
-
-        $data = new ExamCollection($exams);
-        $links['current_page'] = $exams->currentPage();
-        $links['last_page']    = $exams->lastPage();
-        $links['total']        = $exams->total();
-
-        $data = compact('data', 'links');
+        $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's free exam completed status", $data);
-
     }
 
     /**
@@ -823,19 +812,9 @@ class QuizController extends Controller
     public function getSprintExamStatus()
     {
         $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
-            ->sprintType()
-            ->paginate(10);
-
-        $pagination_data = $exams->toArray();
-        ['links' => $links] = $pagination_data;
-
-
-        $data = new ExamCollection($exams);
-        $links['current_page'] = $exams->currentPage();
-        $links['last_page']    = $exams->lastPage();
-        $links['total']        = $exams->total();
-
-        $data = compact('data', 'links');
+                    ->sprintType()
+                    ->paginate(10);
+        $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's sprint exam completed status", $data);
     }
@@ -891,19 +870,9 @@ class QuizController extends Controller
     public function getMockExamStatus()
     {
         $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
-            ->mockType()
-            ->paginate(10);
-
-        $pagination_data = $exams->toArray();
-        ['links' => $links] = $pagination_data;
-
-
-        $data = new ExamCollection($exams);
-        $links['current_page'] = $exams->currentPage();
-        $links['last_page']    = $exams->lastPage();
-        $links['total']        = $exams->total();
-
-        $data = compact('data', 'links');
+                    ->mockType()
+                    ->paginate(10);
+        $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's mock exam completed status", $data);
     }
