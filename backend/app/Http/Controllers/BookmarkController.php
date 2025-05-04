@@ -10,10 +10,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Question;
 use App\Models\StudentProfile;
+use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Response;
 
 class BookmarkController extends Controller
 {
+    use PaginatorTrait;
     /**
      * Display a listing of the resource.
      */
@@ -64,13 +66,14 @@ class BookmarkController extends Controller
         // $uniqueQuestions=Question::with('bookmark')->get();
 
         // $uniqueQuestions = $bookmarks->pluck('questions.*.id')->flatten()->unique();
-        
+        $student_id = Auth::guard('api')->id();
         $questionsWithStudents = Question::select("id","exam_id","exam_type_id","question","explanation")->has('bookmarks')
-            ->withCount('bookmarks')
-            ->with(['options','bookmarks.student' => function ($query) {
-                $query->select('id', 'name'); // Load specific student fields
-            }])
-            ->paginate(10);
+                                    ->withCount('bookmarks')
+                                    ->with(['options','bookmarks.student' => function ($query) {
+                                        $query->select('id', 'name'); // Load specific student fields
+                                    }])
+                                    // ->whereRelation('exam','id',$student_id)
+                                    ->paginate(10);
             $data['data'] = $questionsWithStudents->map(function ($question) {
                     // Extract students from bookmarks and add to top-level 'students'
                     $question['students'] = $question->bookmarks->pluck('student')->unique('id')->values();
@@ -259,35 +262,39 @@ class BookmarkController extends Controller
      */
     public function getBookmarksByStudent(StudentProfile $student_id)
     {
-        $student_bookmarks = $student_id->bookmarks()->with('question.options')->paginate(10);
+        $student = $student_id;
+        $student_bookmarks = $student->bookmarks()->with('question.options')->paginate(10);
+        $data = $this->setupPagination($student_bookmarks, BookmarkCollection::class)->data;
+        $student_name = $student->name;
+        return Response::apiSuccess("User {$student_name} bookmark lists", $data);
 
-        $pagination_data = $student_bookmarks->toArray();
-        ['links' => $links] = $pagination_data;
+        // $pagination_data = $student_bookmarks->toArray();
+        // ['links' => $links] = $pagination_data;
 
 
-        return $data = new BookmarkCollection($student_bookmarks);
-        $links['current_page'] = $student_bookmarks->currentPage();
-        $links['last_page']    = $student_bookmarks->lastPage();
-        $links['total']        = $student_bookmarks->total();
+        // $data = new BookmarkCollection($student_bookmarks);
+        // $links['current_page'] = $student_bookmarks->currentPage();
+        // $links['last_page']    = $student_bookmarks->lastPage();
+        // $links['total']        = $student_bookmarks->total();
 
-        $data = compact('data', 'links');
+        // $data = compact('data', 'links');
 
-        return Response::apiSuccess('User bookmarks', $data);
+        // return Response::apiSuccess('User bookmarks', $data);
 
-        // Check if the student_id is valid (you can add more validation as needed)
-        if (!is_numeric($student_id) || $student_id <= 0) {
-            return response()->json(['error' => 'Invalid student ID'], 400);
-        }
+        // // Check if the student_id is valid (you can add more validation as needed)
+        // if (!is_numeric($student_id) || $student_id <= 0) {
+        //     return response()->json(['error' => 'Invalid student ID'], 400);
+        // }
 
-        // Fetch bookmarks for the given student_id
-        $bookmarks = Bookmark::with('questions')
-            ->where('student_id', $student_id)
-            ->paginate(10);
+        // // Fetch bookmarks for the given student_id
+        // $bookmarks = Bookmark::with('questions')
+        //     ->where('student_id', $student_id)
+        //     ->paginate(10);
 
-        // Check if any bookmarks exist for the student
-        if ($bookmarks->isEmpty()) {
-            return response()->json(['error' => 'No bookmarks found for the given student ID'], 404);
-        }
+        // // Check if any bookmarks exist for the student
+        // if ($bookmarks->isEmpty()) {
+        //     return response()->json(['error' => 'No bookmarks found for the given student ID'], 404);
+        // }
         return response()->json($bookmarks);
     }
 
@@ -346,35 +353,9 @@ class BookmarkController extends Controller
     {
         // Get the authenticated user's ID
         $user = Auth::guard('api')->user();
-
-        // if (!$userId) {
-        //     return response()->json(['error' => 'user not Authenticated'], 401);
-        // }
-        $user_bookmarks = $user->bookmarks()->with('question.options')->paginate(10); 
-        // Fetch bookmarks for the given student_id
-        // $bookmarks = Bookmark::with('questions')
-        //     ->where('student_id', $userId)
-        //     ->paginate(10);
-
-        // $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
-        //     ->freeType()
-        //     ->paginate(10);
-
-        // $pagination_data = $user_bookmarks->toArray();
-        // ['links' => $links] = $pagination_data;
-
-
-        $data['data'] = new BookmarkCollection($user_bookmarks->items());
-        $data['current_page'] = $user_bookmarks->currentPage();
-        $data['last_page']    = $user_bookmarks->lastPage();
-        $data['total']        = $user_bookmarks->total();
+        $user_bookmarks = $user->bookmarks()->with('question.options')->paginate(10);
+        $data = $this->setupPagination($user_bookmarks, BookmarkCollection::class)->data;
 
         return Response::apiSuccess('User bookmarks', $data);
-        // Check if any bookmarks exist for the student
-        // if ($bookmarks->isEmpty()) {
-        //     return response()->json(['error' => 'No bookmarks found for the given student ID'], 404);
-        // }
-
-        // return response()->json($bookmarks);
     }
 }
