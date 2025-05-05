@@ -1008,7 +1008,7 @@ class QuestionController extends Controller
                         ->select('id', 'exam_id', 'question', 'explanation')
                         ->paginate(10);
         $append = compact('token');
-        $data = $this->setupPagination($questions, QuestionCollection::class)->data;
+        $data = $this->setupPagination($questions, QuestionCollection::class, $append)->data;
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
     }
