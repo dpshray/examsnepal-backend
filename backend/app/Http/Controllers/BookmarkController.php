@@ -66,13 +66,13 @@ class BookmarkController extends Controller
         // $uniqueQuestions=Question::with('bookmark')->get();
 
         // $uniqueQuestions = $bookmarks->pluck('questions.*.id')->flatten()->unique();
-        $student_id = Auth::guard('api')->id();
+        $student = Auth::guard('api')->user();
         $questionsWithStudents = Question::select("id","exam_id","exam_type_id","question","explanation")->has('bookmarks')
                                     ->withCount('bookmarks')
                                     ->with(['options','bookmarks.student' => function ($query) {
                                         $query->select('id', 'name'); // Load specific student fields
                                     }])
-                                    // ->whereRelation('exam','id',$student_id)
+                                    ->whereRelation('exam','exam_type_id',$student->exam_type_id)
                                     ->paginate(10);
             $data['data'] = $questionsWithStudents->map(function ($question) {
                     // Extract students from bookmarks and add to top-level 'students'
