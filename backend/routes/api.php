@@ -46,6 +46,10 @@ Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('loginA
 Route::post('/teacher/login', [AuthController::class, 'teacherLogin'])->name('loginTeacher');
 
 
+#routes accessed by both api and users guards
+Route::middleware(['auth:api','auth:users'])->group(function(){
+    Route::get('/subjects', [SubjectController::class, 'index']);
+});
 
 // Protected Routes (for authenticated students)
 Route::middleware('auth:api')->group(function () {
@@ -138,7 +142,6 @@ Route::middleware(['auth:api'])->group(function () {
         #pool
     Route::get('request-pool-question', [PoolController::class, 'getPoolQuestions']);
     Route::post('send-pool-response', [PoolController::class, 'sendPoolQuestionResponse']);
-
 });
 
 // for exam type
@@ -151,7 +154,6 @@ Route::get('/exam-types', [ExamTypeController::class, 'index']);
 Route::middleware(['auth:users', 'role:admin'])->group(function () {
 
     // for subjects
-    Route::get('/subjects', [SubjectController::class, 'index']);
     Route::post('/subject', [SubjectController::class, 'store']);
     Route::get('/subject/{id}', [SubjectController::class, 'show']);
     Route::put('/subject/{id}', [SubjectController::class, 'update']);

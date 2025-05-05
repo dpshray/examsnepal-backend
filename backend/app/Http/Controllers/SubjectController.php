@@ -7,6 +7,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rule;
 
 class SubjectController extends Controller
@@ -44,8 +46,9 @@ class SubjectController extends Controller
     public function index(): JsonResponse
     {
         //
-        $subjects = Subject::all();
-        return response()->json(['success' => true, 'data' => $subjects]);
+        $subjects = Cache::get('subjects');
+        return Response::apiSuccess('List of available subjects', $subjects);
+        // return response()->json(['success' => true, 'data' => $subjects]);
     }
 
     /**
