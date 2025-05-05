@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PoolController;
-
+use App\Http\Middleware\AuthEitherUser;
 
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
@@ -47,7 +47,7 @@ Route::post('/teacher/login', [AuthController::class, 'teacherLogin'])->name('lo
 
 
 #routes accessed by both api and users guards
-Route::middleware(['auth:api','auth:users'])->group(function(){
+Route::middleware(AuthEitherUser::class)->group(function(){
     Route::get('/subjects', [SubjectController::class, 'index']);
 });
 
