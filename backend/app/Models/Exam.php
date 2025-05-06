@@ -40,7 +40,10 @@ class Exam extends Model
 
     public function scopeMockType(Builder $query): Builder
     {
-        return $query->where('status', ExamTypeEnum::MOCK_TEST->value);
+        /**
+         * question bank = where assign = 1 , status = 1 and live = 1
+         */
+        return $query->where('status', ExamTypeEnum::MOCK_TEST->value)->where('assign',1);
     }
 
     public function scopeAuthUserPending(Builder $query): Builder
