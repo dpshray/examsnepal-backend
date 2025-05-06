@@ -1223,7 +1223,7 @@ class QuestionController extends Controller
         } else {
             # check token to verify if this is first time user attending this exam via token
             if ($user_exam->first_time_token !== $FTT) {
-                throw new \Exception('This exam has already been completed by the user.');
+                throw new \Exception('This exam has already been completed by the user.(token is missing/incorrect)');
             }
             return $FTT;
         }
