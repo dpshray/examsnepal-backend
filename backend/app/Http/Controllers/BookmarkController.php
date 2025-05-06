@@ -149,10 +149,11 @@ class BookmarkController extends Controller
                                 ->user()
                                 ->bookmarks();
         if ($student_bookmark->firstWhere('question_id', $validated['question_id'])) {
-            return response()->json([
-                'error' => 'Duplicate Bookmark',
-                'message' => 'This bookmark already exists'
-            ], 409);
+           return Response::apiError('Duplicate Bookmark',null, 409);
+            // return response()->json([
+            //     'error' => 'Duplicate Bookmark',
+            //     'message' => 'This bookmark already exists'
+            // ], 409);
         }
         $new_student_bookmark = $student_bookmark->create([
             'question_id' => $validated['question_id']
