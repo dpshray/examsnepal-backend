@@ -76,7 +76,7 @@ class PoolController extends Controller
         $student_pool = $student->student_pools()->whereDate('played_at', $today)->first();
         $questions_to_ignore = [];
         if ($student_pool) {
-            if ($student_pool->token != $request->query('token')) {
+            if ($student_pool->strike == 3 || $student_pool->token != $request->query('token')) {
                 return Response::apiError('Only one pool per day is allowed',null,400);
             } else {
                 $questions_to_ignore = $student_pool->pools->pluck('question_id')->all();
@@ -181,6 +181,12 @@ class PoolController extends Controller
             'question_id' => 'required|exists:questions,id',
             'option_id' => 'required|exists:option_questions,id'
         ]);
+        $student = Auth::guard('api')->user();
+        $today = now()->today()->format('Y-m-d');
+        $student_pool = $student->student_pools()->whereDate('played_at', $today)->first();
+        if ($student_pool && $student_pool->strike >= 3) {
+            return Response::apiError('Only one pool per day is allowed', null, 400);
+        }
         $options = Question::with('options')
                     ->find($VD['question_id'])
                     ->options
@@ -189,32 +195,52 @@ class PoolController extends Controller
         if (!array_key_exists($VD['option_id'], $options)) {
             return Response::apiError('this option is does not belongs to the question.',null,400);
         }
-        $student = Auth::guard('api')->user();
-        $today = now()->today()->format('Y-m-d');
-
         $token = str()->random(25);
         $todays_student_pool = $student->student_pools()->updateOrCreate(
             ['student_id' => $student->id, 'played_at' => $today],
             ['token' => $token]
         );
-
-        if ($todays_student_pool->strikes == 3) {
-            return Response::apiError('All 3 strikes have been used', null, 400);
+        $has_pools = $todays_student_pool->pools;
+        if ($has_pools) {
+            $pool_questions_asked = $has_pools->pluck('question_id')->all();
+            if (in_array($request->question_id, $pool_questions_asked)) {
+                $token = compact('token');
+                return Response::apiError('This pool question has already been answered', $token, 400);
+            }
         }
+        // else if ($todays_student_pool->strikes == 3) {
+        //     return Response::apiError('All 3 strikes have been used', null, 400);
+        // }
 
         $is_correct = $options[$VD['option_id']] == 1;
 
         if ($is_correct) {
-            $todays_student_pool->pools()->create(['question_id' => $VD['question_id']]);
-            return Response::apiSuccess('Correct answered',['type' => 1, 'token' => $token]);
-        }else{
-            $todays_student_pool->increment('strike');
+            $todays_student_pool->pools()->create([
+                'question_id' => $request->question_id,
+                'option_id' => $request->option_id,
+                'is_correct' => true
+            ]);
             $todays_student_pool->refresh();
-            if ($todays_student_pool->strike == 3) {
-                $score = $todays_student_pool->pools->count();
-                return Response::apiError('Pool game is over',compact('score'),400);
+            return Response::apiSuccess('Correct answer',['type' => 1, 'strike' => $todays_student_pool->strike, 'token' => $token]);
+        }else{
+            tap($todays_student_pool, function ($TSP) use ($request) {
+                $TSP->increment('strike');
+
+                $TSP->pools()->create([
+                    'question_id' => $request->question_id,
+                    'option_id'   => $request->option_id,
+                    'is_correct'  => false,
+                ]);
+            });
+
+            $todays_student_pool->refresh();
+            $todays_student_pool_strikes = $todays_student_pool->strike;
+            if ($todays_student_pool_strikes == 3) {
+                $score = $todays_student_pool->pools->where('is_correct',1)->count();
+                $strike = $todays_student_pool_strikes;
+                return Response::apiError('Pool game is over',compact('score','strike'),400);
             }
-            return Response::apiSuccess('Wrong answer',['type' => 0, 'token' => $token]);
+            return Response::apiSuccess('Wrong answer',['type' => 0, 'strike' => $todays_student_pool_strikes, 'token' => $token]);
         }
     }
 }

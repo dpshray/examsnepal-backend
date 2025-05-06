@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PoolController;
-
+use App\Http\Middleware\AuthEitherUser;
 
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
@@ -46,6 +46,10 @@ Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('loginA
 Route::post('/teacher/login', [AuthController::class, 'teacherLogin'])->name('loginTeacher');
 
 
+#routes accessed by both api and users guards
+Route::middleware(AuthEitherUser::class)->group(function(){
+    Route::get('/subjects', [SubjectController::class, 'index']);
+});
 
 // Protected Routes (for authenticated students)
 Route::middleware('auth:api')->group(function () {
@@ -138,7 +142,6 @@ Route::middleware(['auth:api'])->group(function () {
         #pool
     Route::get('request-pool-question', [PoolController::class, 'getPoolQuestions']);
     Route::post('send-pool-response', [PoolController::class, 'sendPoolQuestionResponse']);
-
 });
 
 // for exam type
@@ -151,7 +154,6 @@ Route::get('/exam-types', [ExamTypeController::class, 'index']);
 Route::middleware(['auth:users', 'role:admin'])->group(function () {
 
     // for subjects
-    Route::get('/subjects', [SubjectController::class, 'index']);
     Route::post('/subject', [SubjectController::class, 'store']);
     Route::get('/subject/{id}', [SubjectController::class, 'show']);
     Route::put('/subject/{id}', [SubjectController::class, 'update']);

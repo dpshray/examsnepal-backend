@@ -7,12 +7,15 @@ use App\Models\Exam;
 use App\Models\ExamType;
 use App\Models\Question;
 use App\Models\StudentProfile;
+use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
 class QuestionController extends Controller
 {
+    use PaginatorTrait;
     /**
      * Display a listing of the resource.
      */
@@ -258,34 +261,7 @@ class QuestionController extends Controller
     {
         $user = Auth::guard('api')->user();
         $exam_type_id = $user->exam_type_id;
-
-        // if (! $user) {
-        //     return response()->json(['message' => 'Unauthorized'], 401);
-        // }
-
-        // Fetch the student's profile
-        // $studentProfile = StudentProfile::find($user->id);
-        // if (! $studentProfile) {
-        //     return response()->json(['message' => 'Student profile not found'], 404);
-        // }
-
-        // $userExamType = $studentProfile->exam_type;
-        // $examType     = ExamType::where('name', $userExamType)->first();
-        // if (! $examType) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Exam type not found in the system.',
-        //     ], 404);
-        // }
-
-        // return $examIds = Question::whereIn('exam_id',Exam::where('exam_type_id', $user->exam_type_id)->pluck('id')->toArray())->where('question','like','%what%')->count();
-        // if ($examIds->isEmpty()) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'No exams found for this exam type.',
-        //     ], 404);
-        // }
-
+        
         $keyword = $request->query('keyword'); // Get the keyword from the query parameter
         if (! $keyword) {
             return response()->json(['message' => 'Keyword is required'], 400);
@@ -300,17 +276,7 @@ class QuestionController extends Controller
         $questions = Question::with('options')->whereRelation('exam','exam_type_id','=', $exam_type_id)
                         ->where('question', 'LIKE', '%' . $keyword . '%')
                         ->paginate(10);
-
-        // $pagination_data = $questions->toArray();
-        // ['links' => $links] = $pagination_data;
-
-
-        $data['data'] = new QuestionCollection($questions);
-        $data['current_page'] = $questions->currentPage();
-        $data['last_page']    = $questions->lastPage();
-        $data['total']        = $questions->total();
-
-        // $data = compact('data');
+        $data = $this->setupPagination($questions, QuestionCollection::class)->data;
 
         if ($questions->isEmpty()) {
             return response()->json([
@@ -923,10 +889,10 @@ class QuestionController extends Controller
      *         name="token",
      *         in="query",
      *         required=false,
-     *         description="pagination",
+     *         description="token for security reason",
      *         @OA\Schema(
-     *             type="integer",
-     *             example="1"
+     *             type="string",
+     *             example="fja6meujqoRgSDQBn7SqaEZ7h"
      *         )
      *     ),
      *     @OA\Response(
@@ -993,29 +959,19 @@ class QuestionController extends Controller
             ], 404);
         }
 
-        $first_time_token = null;
+        $token = null;
         try {
-            $first_time_token = $this->checkIfExamHasBeenStartedPreviously($exam, request('token', null));
+            $token = $this->checkIfExamHasBeenStartedPreviously($exam, request('token', null));
         } catch (\Exception $e) {
             return Response::apiError($e->getMessage(), null, 409);
         }
 
         $questions = $exam->questions()
-            ->with('options')
-            ->select('id', 'exam_id', 'question', 'explanation')
-            ->paginate(10);
-
-        $pagination_data = $questions->toArray();
-
-        ['links' => $links] = $pagination_data;
-        $data               = new QuestionCollection($questions);
-
-        $links['current_page'] = $questions->currentPage();
-        $links['last_page']    = $questions->lastPage();
-        $links['total']        = $questions->total();
-        $token                 = $first_time_token;
-
-        $data = compact('data', 'links', 'token');
+                        ->with('options')
+                        ->select('id', 'exam_id', 'question', 'explanation')
+                        ->paginate(10);
+        $append = compact('token');
+        $data = $this->setupPagination($questions, QuestionCollection::class, $append)->data;
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
     }
@@ -1117,30 +1073,20 @@ class QuestionController extends Controller
             ], 404);
         }
 
-        $first_time_token = null;
+        $token = null;
         try {
-            $first_time_token = $this->checkIfExamHasBeenStartedPreviously($exam, request('token', null));
+            $token = $this->checkIfExamHasBeenStartedPreviously($exam, request('token', null));
         } catch (\Exception $e) {
             return Response::apiError($e->getMessage(), null, 409);
         }
 
         $questionsMockTest = $exam
-            ->questions()
-            ->with('options')
-            ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
-            ->paginate(10);
-
-        $pagination_data = $questionsMockTest->toArray();
-
-        ['links' => $links] = $pagination_data;
-        $data               = new QuestionCollection($questionsMockTest);
-
-        $links['current_page'] = $questionsMockTest->currentPage();
-        $links['last_page']    = $questionsMockTest->lastPage();
-        $links['total']        = $questionsMockTest->total();
-        $token                 = $first_time_token;
-
-        $data = compact('data', 'links', 'token');
+                                ->questions()
+                                ->with('options')
+                                ->select('id', 'exam_id', 'question', 'explanation')
+                                ->paginate(10);
+        $append = compact('token');
+        $data = $this->setupPagination($questionsMockTest, QuestionCollection::class, $append)->data;
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
     }
@@ -1242,29 +1188,19 @@ class QuestionController extends Controller
             ], 404);
         }
 
-        $first_time_token = null;
+        $token = null;
         try {
-            $first_time_token = $this->checkIfExamHasBeenStartedPreviously($exam, request('token', null));
+            $token = $this->checkIfExamHasBeenStartedPreviously($exam, request('token', null));
         } catch (\Exception $e) {
             return Response::apiError($e->getMessage(), null, 409);
         }
 
         $questionsSprintQuiz = $exam->questions()
             ->with('options')
-            ->select('id', 'exam_id', 'question', 'explanation', 'created_at', 'updated_at')
+            ->select('id', 'exam_id', 'question', 'explanation')
             ->paginate(10);
-
-        $pagination_data = $questionsSprintQuiz->toArray();
-
-        ['links' => $links] = $pagination_data;
-        $data               = new QuestionCollection($questionsSprintQuiz);
-
-        $links['current_page'] = $questionsSprintQuiz->currentPage();
-        $links['last_page']    = $questionsSprintQuiz->lastPage();
-        $links['total']        = $questionsSprintQuiz->total();
-        $token                 = $first_time_token;
-
-        $data = compact('data', 'links', 'token');
+        $append = compact('token');
+        $data = $this->setupPagination($questionsSprintQuiz, QuestionCollection::class, $append)->data;
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
     }
@@ -1278,9 +1214,11 @@ class QuestionController extends Controller
             # this is the first time user giving this exam
             $first_time_token = str()->random(25);
             $data             = $exam->questions->pluck('id')->map(fn($id) => ['question_id' => $id]);
-            $user->student_exams()->create(['exam_id' => $exam->id, 'first_time_token' => $first_time_token])
-                ->answers()
-                ->createMany($data);
+            DB::transaction(function () use($user, $exam, $first_time_token,$data){
+                $user->student_exams()->create(['exam_id' => $exam->id, 'first_time_token' => $first_time_token])
+                    ->answers()
+                    ->createMany($data);
+            });
             return $first_time_token;
         } else {
             # check token to verify if this is first time user attending this exam via token

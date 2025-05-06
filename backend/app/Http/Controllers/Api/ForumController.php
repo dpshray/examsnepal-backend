@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\ForumQuestion;
 use App\Models\ForumAnswer;
 use App\Models\StudentProfile;
+use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 
 
@@ -33,7 +33,7 @@ use Illuminate\Http\JsonResponse;
 
 class ForumController extends Controller
 {
-
+    use PaginatorTrait;
     // Private method to check authentication and fetch student profile
     private function getAuthenticatedStudentProfile()
     {
@@ -82,33 +82,15 @@ class ForumController extends Controller
     public function fetchQuestions()
     {
         $user = Auth::guard('api')->user();
-
-        // if (!$user) {
-        //     return response()->json(['message' => 'Unauthorized'], 401);
-        // }
-
-        // Fetch the student profile using the logged-in user's id
-        // $studentProfile = StudentProfile::find($user->id);
-
-        // if (!$studentProfile) {
-        //     return response()->json(['message' => 'Student profile not found'], 404);
-        // }
-
-        // Fetch questions where the stream matches the student's exam_type
         $questions = ForumQuestion::whereRelation('studentProfile','exam_type_id', $user->exam_type_id)
-        // ->where('exam_type_id', $user->exam_type_id)
-            ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
-            ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
+            // ->where('exam_type_id', $user->exam_type_id)
+            ->with(['studentProfile', 'answers.studentProfile'])
             ->withCount('answers')
+            ->where('deleted', '0') // Only fetch non-deleted questions
             ->orderBy('id','DESC')
             ->paginate(10);
 
-        $data['data'] = new ForumQuestionCollection($questions->items());
-        $data['current_page'] = $questions->currentPage();
-        $data['last_page']    = $questions->lastPage();
-        $data['total']        = $questions->total();
-
-        $data = compact('data');
+        $data = $this->setupPagination($questions, ForumQuestionCollection::class);
 
         return response()->json($data);
     }
@@ -144,31 +126,15 @@ class ForumController extends Controller
     {
         $user = Auth::guard('api')->user();
 
-        // if (!$user) {
-        //     return response()->json(['message' => 'Unauthorized'], 401);
-        // }
-
-        // Fetch the student profile using the logged-in user's id
-        // $studentProfile = StudentProfile::find($user->id);
-
-        // if (!$studentProfile) {
-        //     return response()->json(['message' => 'Student profile not found'], 404);
-        // }
-
         // Fetch questions where the stream matches the student's exam_type
         $questions = ForumQuestion::where('user_id', $user->id)
-            ->where('forum_questions.deleted', '0') // Only fetch non-deleted questions
-            ->with(['studentProfile:id,name,email', 'answers.studentProfile:id,name,email'])
+            ->with(['studentProfile', 'answers.studentProfile'])
             ->withCount('answers')
+            ->where('deleted', '0') // Only fetch non-deleted questions
             ->orderBy('id','DESC')
             ->paginate(10);
 
-        $data['data'] = new ForumQuestionCollection($questions);
-        $data['current_page'] = $questions->currentPage();
-        $data['last_page']    = $questions->lastPage();
-        $data['total']        = $questions->total();
-
-        $data = compact('data');
+        $data = $this->setupPagination($questions, ForumQuestionCollection::class);
 
         return response()->json($data);
     }
@@ -601,7 +567,7 @@ class ForumController extends Controller
     public function deleteTheirQuestionCreated($id)
     {
         // Get the currently authenticated user
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
         // Find the question by its ID
         $question = ForumQuestion::find($id);
         // Check if the question exists and if the authenticated user is the owner

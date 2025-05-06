@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Doubt;
 use App\Models\Question;
 use App\Models\StudentProfile;
+use App\Traits\PaginatorTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 
 class DoubtController extends Controller
 {
+    use PaginatorTrait;
     /**
      * @OA\Get(
      *     path="/doubt/student/solved",
@@ -62,17 +64,7 @@ class DoubtController extends Controller
                         ->where('status',0)
                         ->with(['question','solver:id,username,fullname'])
                         ->paginate(10);
-        // $pagination_data = $user_doubt->toArray();
-        // return $user_doubt->items();
-        // ['links' => $links] = $pagination_data;
-        $data['data']               = new DoubtCollection($user_doubt->items());
-
-        $data['current_page'] = $user_doubt->currentPage();
-        $data['last_page']    = $user_doubt->lastPage();
-        $data['total']        = $user_doubt->total();
-
-        // $data = compact('data');
-
+        $data = $this->setupPagination($user_doubt, DoubtCollection::class)->data;
         return Response::apiSuccess('User doubt retrieved successfully!', $data);
     }    
     
@@ -122,18 +114,9 @@ class DoubtController extends Controller
                         ->user()
                         ->doubts()
                         ->where('status',1)
-                        ->with(['question','solver:id,username,fullname'])
+                        ->with(['question.options','solver:id,username,fullname'])
                         ->paginate(10);
-        // $pagination_data = $user_doubt->toArray();
-
-        // ['links' => $links] = $pagination_data;
-        $data['data']               = new DoubtCollection($user_doubt->items());
-
-        $data['current_page'] = $user_doubt->currentPage();
-        $data['last_page']    = $user_doubt->lastPage();
-        $data['total']        = $user_doubt->total();
-
-        // $data = compact('data', 'links');
+        $data = $this->setupPagination($user_doubt, DoubtCollection::class)->data;
 
         return Response::apiSuccess('User doubt retrieved successfully!', $data);
     }

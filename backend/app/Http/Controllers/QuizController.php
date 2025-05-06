@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Enums\ExamTypeEnum;
 use App\Http\Resources\ExamCollection;
 use App\Models\Exam;
+use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,7 @@ use Illuminate\Validation\ValidationException;
 
 class QuizController extends Controller
 {
+    use PaginatorTrait;
     /**
      * @OA\Get(
      *     path="/free-quiz/completed",
@@ -68,24 +70,9 @@ class QuizController extends Controller
      */
     public function getCompletedFreeQuiz()
     {
-        $page    = request('page', 1); // get current page (default to 1)
-        $perPage = 10;
-        $skip    = ($page - 1) * $perPage;
+        $free_quiz_query = Exam::freeType()->authUserCompleted()->paginate(10);
+        $data = $this->setupPagination($free_quiz_query, ExamCollection::class)->data;
 
-        $free_quiz_query = Exam::freeType()->authUserCompleted();
-
-        $total_items            = $free_quiz_query->count();
-        $free_quiz_for_resource = $free_quiz_query->skip($skip)->take($perPage)->get();
-
-        $freeQuiz   = new ExamCollection($free_quiz_for_resource);
-        $total_page = (int) ceil($total_items / $perPage);
-
-        $data = [
-            'data'         => $freeQuiz,
-            'current_page' => (int) $page,
-            'completed'    => $total_items,
-            'last_page'    => $total_page,
-        ];
         return Response::apiSuccess('Free completed quizzes retrieved successfully.', $data);
     }
 
@@ -144,24 +131,9 @@ class QuizController extends Controller
      */
     public function getPendingFreeQuiz()
     {
-        $page    = request('page', 1); // get current page (default to 1)
-        $perPage = 10;
-        $skip    = ($page - 1) * $perPage;
+        $free_quiz_query = Exam::freeType()->authUserPending()->paginate();
+        $data = $this->setupPagination($free_quiz_query, ExamCollection::class)->data;
 
-        $free_quiz_query = Exam::freeType()->authUserPending();
-
-        $total_items            = $free_quiz_query->count();
-        $free_quiz_for_resource = $free_quiz_query->skip($skip)->take($perPage)->get();
-
-        $freeQuiz   = new ExamCollection($free_quiz_for_resource);
-        $total_page = (int) ceil($total_items / $perPage);
-
-        $data = [
-            'data'         => $freeQuiz,
-            'current_page' => (int) $page,
-            'last_page'    => $total_page,
-            'total'        => $total_items,
-        ];
         return Response::apiSuccess('Free pending quizzes retrieved successfully.', $data);
     }
 
@@ -220,24 +192,9 @@ class QuizController extends Controller
      */
     public function getCompletedSprintQuiz()
     {
-        $page    = request('page', 1); // get current page (default to 1)
-        $perPage = 10;
-        $skip    = ($page - 1) * $perPage;
+        $sprint_quiz_query = Exam::sprintType()->authUserCompleted()->paginate(10);
+        $data = $this->setupPagination($sprint_quiz_query, ExamCollection::class)->data;
 
-        $sprint_quiz_query = Exam::sprintType()->authUserCompleted();
-
-        $total_items              = $sprint_quiz_query->count();
-        $sprint_quiz_for_resource = $sprint_quiz_query->skip($skip)->take($perPage)->get();
-
-        $sprint_quiz = new ExamCollection($sprint_quiz_for_resource);
-        $total_page  = (int) ceil($total_items / $perPage);
-
-        $data = [
-            'data'         => $sprint_quiz,
-            'current_page' => (int) $page,
-            'completed'    => $total_items,
-            'last_page'    => $total_page,
-        ];
         return Response::apiSuccess('Sprint completed quizzes retrieved successfully.', $data);
     }
 
@@ -296,24 +253,9 @@ class QuizController extends Controller
      */
     public function getPendingSprintQuiz()
     {
-        $page    = request('page', 1); // get current page (default to 1)
-        $perPage = 10;
-        $skip    = ($page - 1) * $perPage;
+        $sprint_quiz_query = Exam::sprintType()->authUserPending()->paginate(10);
+        $data = $this->setupPagination($sprint_quiz_query, ExamCollection::class)->data;
 
-        $sprint_quiz_query = Exam::sprintType()->authUserPending();
-
-        $total_items              = $sprint_quiz_query->count();
-        $sprint_quiz_for_resource = $sprint_quiz_query->skip($skip)->take($perPage)->get();
-
-        $sprint_quiz = new ExamCollection($sprint_quiz_for_resource);
-        $total_page  = (int) ceil($total_items / $perPage);
-
-        $data = [
-            'data'         => $sprint_quiz,
-            'current_page' => (int) $page,
-            'last_page'    => $total_page,
-            'total'        => $total_items,
-        ];
         return Response::apiSuccess('Sprint pending quizzes retrieved successfully.', $data);
     }
 
@@ -372,24 +314,9 @@ class QuizController extends Controller
      */
     public function getCompletedMockTest()
     {
-        $page    = request('page', 1); // get current page (default to 1)
-        $perPage = 10;
-        $skip    = ($page - 1) * $perPage;
+        $mock_quiz_query = Exam::mockType()->authUserCompleted()->paginate();
+        $data = $this->setupPagination($mock_quiz_query, ExamCollection::class)->data;
 
-        $mock_quiz_query = Exam::mockType()->authUserCompleted();
-
-        $total_items            = $mock_quiz_query->count();
-        $mock_quiz_for_resource = $mock_quiz_query->skip($skip)->take($perPage)->get();
-
-        $mock_quiz  = new ExamCollection($mock_quiz_for_resource);
-        $total_page = (int) ceil($total_items / $perPage);
-
-        $data = [
-            'data'         => $mock_quiz,
-            'current_page' => (int) $page,
-            'last_page'    => $total_page,
-            'completed'    => $total_items,
-        ];
         return Response::apiSuccess('Mock completed quizzes retrieved successfully.', $data);
     }
 
@@ -448,24 +375,9 @@ class QuizController extends Controller
      */
     public function getPendingMockTest()
     {
-        $page    = request('page', 1); // get current page (default to 1)
-        $perPage = 10;
-        $skip    = ($page - 1) * $perPage;
+        $mock_quiz = Exam::mockType()->authUserPending()->paginate();
+        $data = $this->setupPagination($mock_quiz, ExamCollection::class)->data;
 
-        $mock_quiz_query = Exam::mockType()->authUserPending();
-
-        $total_items            = $mock_quiz_query->count();
-        $mock_quiz_for_resource = $mock_quiz_query->skip($skip)->take($perPage)->get();
-
-        $mock_quiz  = new ExamCollection($mock_quiz_for_resource);
-        $total_page = (int) ceil($total_items / $perPage);
-
-        $data = [
-            'data'         => $mock_quiz,
-            'current_page' => (int) $page,
-            'last_page'    => $total_page,
-            'total'        => $total_items,
-        ];
         return Response::apiSuccess('Mock pending quizzes retrieved successfully.', $data);
     }
 
@@ -844,20 +756,9 @@ class QuizController extends Controller
         $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
                     ->freeType()
                     ->paginate(10);
-
-        $pagination_data = $exams->toArray();
-        ['links' => $links] = $pagination_data;
-
-
-        $data = new ExamCollection($exams);
-        $links['current_page'] = $exams->currentPage();
-        $links['last_page']    = $exams->lastPage();
-        $links['total']        = $exams->total();
-
-        $data = compact('data', 'links');
+        $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's free exam completed status", $data);
-
     }
 
     /**
@@ -911,19 +812,9 @@ class QuizController extends Controller
     public function getSprintExamStatus()
     {
         $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
-            ->sprintType()
-            ->paginate(10);
-
-        $pagination_data = $exams->toArray();
-        ['links' => $links] = $pagination_data;
-
-
-        $data = new ExamCollection($exams);
-        $links['current_page'] = $exams->currentPage();
-        $links['last_page']    = $exams->lastPage();
-        $links['total']        = $exams->total();
-
-        $data = compact('data', 'links');
+                    ->sprintType()
+                    ->paginate(10);
+        $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's sprint exam completed status", $data);
     }
@@ -979,19 +870,9 @@ class QuizController extends Controller
     public function getMockExamStatus()
     {
         $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
-            ->mockType()
-            ->paginate(10);
-
-        $pagination_data = $exams->toArray();
-        ['links' => $links] = $pagination_data;
-
-
-        $data = new ExamCollection($exams);
-        $links['current_page'] = $exams->currentPage();
-        $links['last_page']    = $exams->lastPage();
-        $links['total']        = $exams->total();
-
-        $data = compact('data', 'links');
+                    ->mockType()
+                    ->paginate(10);
+        $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's mock exam completed status", $data);
     }

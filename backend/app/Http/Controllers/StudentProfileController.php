@@ -67,7 +67,7 @@ class StudentProfileController extends Controller
         // Validate the request
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:student_profiles',
+            'email' => 'required|string|email|unique:student_profiles,email',
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:8|confirmed',
             'exam_type_id' => 'exists:exam_types,id',
@@ -252,5 +252,19 @@ class StudentProfileController extends Controller
         }
         StudentProfile::find($student_id)->update($data);
         return Response::apiSuccess('User profile updated');
+    }
+
+    public function verifyStudentEmail($token) {
+        return 'OK';
+        $row = DB::table('password_reset_tokens')->whereToken($token);
+        abort_if($row->doesntExist(), 404, 'Token is invalid');
+
+        DB::transaction(function () use ($row) {
+            $email = $row->first()->email;
+            StudentProfile::firstWhere('email', $email)->update(['email_verified_at' => now()]);
+            $row->delete();
+        });
+        echo "Email has been verified";
+        // return to_route('admin.login')->withSuccess('Email has been successfully verified');
     }
 }
