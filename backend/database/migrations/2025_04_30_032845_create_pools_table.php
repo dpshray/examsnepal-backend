@@ -17,6 +17,9 @@ return new class extends Migration
             $table->foreign('student_pool_id')->references('id')->on('student_pools')->onDelete('cascade');
             $table->unsignedBigInteger('question_id');
             $table->foreign('question_id')->references('id')->on('questions')->onDelete('cascade');
+            $table->unsignedBigInteger('question_id');
+            $table->foreign('question_id')->references('id')->on('questions')->onDelete('cascade');
+            $table->boolean('is_correct')->defalut(false);
         });
     }
 
