@@ -64,18 +64,32 @@ class StudentProfileController extends Controller
      */
     public function register(Request $request)
     {
-        // Validate the request
+        // $email_link_expires_at = StudentProfile::EMAIL_LINK_EXPIRES_AT;
+        // $student = StudentProfile::where('email', $request->email)->first();
+        // if ($student) {
+        //     if ($student->email_verified_at == null) {
+        //         $time = Carbon::createFromFormat('d/m/Y h:i:s a', $student->date);
+        //         return ['ty'=>$time->diffInMinutes(now()) > 1];
+        //         if ($time->diffInMinutes(now()) > $email_link_expires_at) {
+        //             $student->delete();
+        //         } else {
+        //             return Response::apiError("A verification like has already been sent to your email.(or please wait for {$email_link_expires_at} minute(s))",null,400);
+        //         }
+        //     }
+        // }
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:student_profiles,email',
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:8|confirmed',
             'exam_type_id' => 'exists:exam_types,id',
-        ]);
-
+        ]); 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            $an_error = $validator->errors()->all();
+            return Response::apiError($an_error[0] ?? 'Validation error occurred',null,422);
         }
+        
         // Create student profile
         $student = StudentProfile::create([
             'name' => $request->name,
@@ -85,11 +99,8 @@ class StudentProfileController extends Controller
             'exam_type_id' => $request->exam_type_id,
             'date' => Carbon::now()->format('m/d/Y h:i:s a')
         ]);
+        return Response::apiSuccess('An verification link has been sent to your email.');
 
-        return response()->json([
-            'message' => 'Student registered successfully.',
-            'student' => $student
-        ], 201);
     }
 
 
@@ -255,7 +266,6 @@ class StudentProfileController extends Controller
     }
 
     public function verifyStudentEmail($token) {
-        return 'OK';
         $row = DB::table('password_reset_tokens')->whereToken($token);
         abort_if($row->doesntExist(), 404, 'Token is invalid');
 
@@ -264,7 +274,7 @@ class StudentProfileController extends Controller
             StudentProfile::firstWhere('email', $email)->update(['email_verified_at' => now()]);
             $row->delete();
         });
-        echo "Email has been verified";
+        echo "Email has been verified.Please goto to login page to continue.";
         // return to_route('admin.login')->withSuccess('Email has been successfully verified');
     }
 }
