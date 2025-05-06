@@ -39,6 +39,7 @@ Route::get('/email/verify/{id}', [AuthController::class, 'verifyEmail'])->name('
 
 // Student registration
 Route::post('/student/register', [StudentProfileController::class, 'register']);
+Route::get('student_email_confirmation/{token}', [StudentProfileController::class, 'verifyStudentEmail'])->name('student_email_confirmation')->middleware('signed');
 
 // Student login
 Route::post('/student/login', [AuthController::class, 'loginStudent'])->name('login');
