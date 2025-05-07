@@ -43,44 +43,44 @@ class Exam extends Model
         /**
          * question bank = where assign = 1 , status = 1 and live = 1
          */
-        return $query->where('status', ExamTypeEnum::MOCK_TEST->value);
-        // ->where('assign',1);
+        return $query->where('status', ExamTypeEnum::MOCK_TEST->value)->when(env('LIVE',1) == 1, fn($qry) => $qry->where('assign', 1));
     }
 
     public function scopeAuthUserPending(Builder $query): Builder
     {
-        return $this->completedPendingQuery($query)
-                ->whereDoesntHave('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))
-                ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id)) # for student load specific exams
-                ->where('live',1)
-                ->orderBy('id','DESC'); 
+        return $query->allAvailableExams()
+                ->when(
+                    Auth::guard('api')->check(), 
+                    fn($qry) => $qry->whereDoesntHave('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id())));
     }
 
     public function scopeAuthUserCompleted(Builder $query): Builder
     {
-        return $this->completedPendingQuery($query)
-            ->with([
-                'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])->with([
-                    'student:id,name',
-                    'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
-                ])
-                    ->withCount([
-                        'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
+        return $query->allAvailableExams()
+                ->with([
+                    'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])->with([
+                        'student:id,name',
+                        'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
+                        ])
+                        ->withCount([
+                            'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
+                            ])
+                        ->orderBy('correct_answers_count', 'DESC'),
                     ])
-                    ->orderBy('correct_answers_count', 'DESC'),
-            ])
-            ->whereHas('exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))
-            ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id)) # for student load specific exams
-            ->where('live',1)
-            ->orderBy('id','DESC'); 
+                ->when(
+                    Auth::guard('api')->check(), 
+                    fn($qry) => $qry->whereHas('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id())));
     }
 
-    private function completedPendingQuery(Builder $query): Builder
+    public function scopeAllAvailableExams(Builder $query): Builder
     {
         return $query->select(['id', 'exam_name', 'status', 'user_id'])
                 ->with('user:id,fullname')
                 ->withCount('questions')
-                ->has('questions');
+                ->has('questions')
+                ->where('live', 1)
+                ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id))
+                ->orderBy('id', 'DESC');
     }
 
     

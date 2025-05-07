@@ -38,9 +38,13 @@ Route::get('migrate-answersheets', [TableMigrateController::class, 'migrateAnswe
 Route::get('/email/verify/{id}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
 
 // Student registration
-Route::post('/student/register', [StudentProfileController::class, 'register']);
-Route::get('student_email_confirmation/{token}', [StudentProfileController::class, 'verifyStudentEmail'])->name('student_email_confirmation')->middleware('signed');
+Route::post('/student/register/', [StudentProfileController::class, 'register']);
+Route::get('student_email_confirmation/{email}', [StudentProfileController::class, 'verifyStudentEmail'])->name('student_email_confirmation');
 
+#Password Reset
+Route::post('student-password-reset', [StudentProfileController::class, 'sendPasswordResetMail']);
+Route::post('verify-password-reset-otp', [StudentProfileController::class, 'verifyPasswordReseToken']);
+Route::post('handle-password-reset-form', [StudentProfileController::class, 'passwordResetor']);
 // Student login
 Route::post('/student/login', [AuthController::class, 'loginStudent'])->name('login');
 Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('loginAdmin');
@@ -50,16 +54,15 @@ Route::post('/teacher/login', [AuthController::class, 'teacherLogin'])->name('lo
 #routes accessed by both api and users guards
 Route::middleware(AuthEitherUser::class)->group(function(){
     Route::get('/subjects', [SubjectController::class, 'index']);
+    Route::get('total-exam-count', [QuizController::class,'totalExamCounter']);
 });
 
 // Protected Routes (for authenticated students)
-Route::middleware('auth:api')->group(function () {
+Route::middleware(['auth:api','verified'])->group(function () {
     Route::post('/student/logout', [AuthController::class, 'logoutStudent']);
     Route::post('/student/refresh', [AuthController::class, 'refreshStudent']);
     Route::get('/student/me', [AuthController::class, 'me']);
-});
 
-Route::middleware(['auth:api'])->group(function () {
     Route::get('/student/questions', [ForumController::class, 'fetchQuestions']);
     Route::get('/student/myquestions', [ForumController::class, 'fetchMyQuestions']);
     Route::post('/student/addquestion', [ForumController::class, 'addQuestion']);

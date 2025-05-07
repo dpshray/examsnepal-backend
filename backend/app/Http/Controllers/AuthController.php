@@ -9,6 +9,7 @@ use Illuminate\Auth\Events\Registered;
 use App\Models\User;
 use App\Models\StudentProfile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -176,18 +177,25 @@ class AuthController extends Controller
 
     public function loginStudent(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:student_profiles,email',
             'password' => 'required|string',
         ]);
+        if ($validator->fails()) {
+            $an_error = $validator->errors()->all();
+            return Response::apiError($an_error[0] ?? 'Validation error occurred', null, 422);
+        }
 
         $credentials = $request->only('email', 'password');
         // Debugging: Check if the student exists
         $student = StudentProfile::where('email', $credentials['email'])->first();
-
-        if (!$student) {
-            return response()->json(['error' => 'Student not found'], 404);
+        $email_is_not_verified = !$student->hasVerifiedEmail();
+        if ($email_is_not_verified) {
+            return Response::apiError('Email is not verified.',null,403);
         }
+        // if (!$student) {
+        //     return response()->json(['error' => 'Student not found'], 404);
+        // }
 
         // Debugging: Check if the password is correct
         if (!Hash::check($credentials['password'], $student->password)) {
