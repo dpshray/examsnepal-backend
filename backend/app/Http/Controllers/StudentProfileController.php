@@ -64,19 +64,20 @@ class StudentProfileController extends Controller
      */
     public function register(Request $request)
     {
-        // $email_link_expires_at = StudentProfile::EMAIL_LINK_EXPIRES_AT;
-        // $student = StudentProfile::where('email', $request->email)->first();
-        // if ($student) {
-        //     if ($student->email_verified_at == null) {
-        //         $time = Carbon::createFromFormat('d/m/Y h:i:s a', $student->date);
-        //         return ['ty'=>$time->diffInMinutes(now()) > 1];
-        //         if ($time->diffInMinutes(now()) > $email_link_expires_at) {
-        //             $student->delete();
-        //         } else {
-        //             return Response::apiError("A verification like has already been sent to your email.(or please wait for {$email_link_expires_at} minute(s))",null,400);
-        //         }
-        //     }
-        // }
+        $email_link_expires_at = StudentProfile::EMAIL_LINK_EXPIRES_AT;
+        $student = StudentProfile::where('email', $request->email)->first();
+        if ($student) {
+            if ($student->email_verified_at == null) {
+                $time = Carbon::createFromFormat('m/d/Y h:i:s a', $student->date);
+                $minutesDiff = $time->diffInMinutes(now(), false);
+                if ($minutesDiff > $email_link_expires_at) {
+                    DB::table('password_reset_tokens')->where('email',$request->email)->delete();
+                    $student->delete();
+                } else {
+                    return Response::apiError("A verification like has already been sent to your email.(or please wait for {$email_link_expires_at} minute(s))",null,400);
+                }
+            }
+        }
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',

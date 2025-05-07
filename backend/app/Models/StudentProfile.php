@@ -16,7 +16,7 @@ class StudentProfile extends Authenticatable implements JWTSubject
 {
     use HasFactory;
     public $timestamps = false;
-    const EMAIL_LINK_EXPIRES_AT = 25;
+    const EMAIL_LINK_EXPIRES_AT = 25; #in minutes
 
     protected $fillable = [
         'name',
@@ -30,31 +30,33 @@ class StudentProfile extends Authenticatable implements JWTSubject
 
     protected $hidden = ['password'];
 
-
     public static function boot()
     {
         parent::boot();
         static::creating(function ($student) {
             $token    = Str::random(64);
-
             $link_expires_minute   = SELF::EMAIL_LINK_EXPIRES_AT;
             $url_expiration_minute = now()->addMinutes($link_expires_minute);
             $url                   = URL::temporarySignedRoute('student_email_confirmation', $url_expiration_minute, ['token' => $token]);
-            // Log::info("url {$url}");
-            Mail::send('mail.student.register', [
-                'name' => $student->name, 
-                'url' => $url, 
-                'expiration_period' => $url_expiration_minute->format('Y-m-d h:i:s a')
-            ], function ($message) use ($student) {
-                $message->to($student->email);
-                $message->subject('New Student Registration');
-            });
-
+            
             DB::table('password_reset_tokens')->insert([
                 'email'      => $student->email,
                 'token'      => $token,
                 'created_at' => now(),
             ]);
+            try {
+                Mail::send('mail.student.register', [
+                    'name' => $student->name, 
+                    'url' => $url, 
+                    'expiration_period' => $url_expiration_minute->format('Y-m-d h:i:s a')
+                ], function ($message) use ($student) {
+                    $message->to($student->email);
+                    $message->subject('New Student Registration');
+                });
+            } catch (\Exception $e) {
+                DB::table('password_reset_tokens')->where('email',$student->email)->delete();
+                throw new \Exception('Something went wrong while sending mail');
+            }
         });
     }
 
