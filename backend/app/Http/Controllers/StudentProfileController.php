@@ -71,7 +71,6 @@ class StudentProfileController extends Controller
                 $time = Carbon::createFromFormat('m/d/Y h:i:s a', $student->date);
                 $minutesDiff = $time->diffInMinutes(now(), false);
                 if ($minutesDiff > $email_link_expires_at) {
-                    DB::table('password_reset_tokens')->where('email',$request->email)->delete();
                     $student->delete();
                 } else {
                     return Response::apiError("A verification like has already been sent to your email.(or please wait for {$email_link_expires_at} minute(s))",null,400);
