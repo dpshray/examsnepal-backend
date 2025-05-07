@@ -39,7 +39,7 @@ Route::get('/email/verify/{id}', [AuthController::class, 'verifyEmail'])->name('
 
 // Student registration
 Route::post('/student/register/', [StudentProfileController::class, 'register']);
-Route::get('student_email_confirmation/{email}', [StudentProfileController::class, 'verifyStudentEmail'])->name('student_email_confirmation')->middleware('signed');
+Route::get('student_email_confirmation/{email}', [StudentProfileController::class, 'verifyStudentEmail'])->name('student_email_confirmation');
 
 #Password Reset
 Route::post('student-password-reset', [StudentProfileController::class, 'sendPasswordResetMail']);
@@ -54,6 +54,7 @@ Route::post('/teacher/login', [AuthController::class, 'teacherLogin'])->name('lo
 #routes accessed by both api and users guards
 Route::middleware(AuthEitherUser::class)->group(function(){
     Route::get('/subjects', [SubjectController::class, 'index']);
+    Route::get('total-exam-count', [QuizController::class,'totalExamCounter']);
 });
 
 // Protected Routes (for authenticated students)

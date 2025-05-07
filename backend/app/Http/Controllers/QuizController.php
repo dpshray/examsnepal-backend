@@ -876,4 +876,58 @@ class QuizController extends Controller
 
         return Response::apiSuccess("Student's mock exam completed status", $data);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/total-exam-count",
+     *     summary="Get total number of each exams",
+     *     description="get total number of each exams.",
+     *     operationId="totalExamCount",
+     *     tags={"Quiz"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Free quizzes retrieved successfully."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="exam_name", type="string", example="Math Quiz"),
+     *                         @OA\Property(property="status", type="string", example="free"),
+     *                         @OA\Property(property="user_id", type="integer", example=12),
+     *                         @OA\Property(
+     *                             property="user",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=12),
+     *                             @OA\Property(property="fullname", type="string", example="John Doe")
+     *                         )
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="last_page", type="integer", example=5),
+     *                 @OA\Property(property="per_page", type="integer", example=10),
+     *                 @OA\Property(property="total", type="integer", example=50)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error"
+     *     )
+     * )
+     */
+    public function totalExamCounter(){
+        $free = Exam::freeType()->allAvailableExams()->count();
+        $mock = Exam::sprintType()->allAvailableExams()->count();
+        $sprint = Exam::mockType()->allAvailableExams()->count();
+        $data = compact('free','sprint','mock');
+        return Response::apiSuccess('Available Exams with their total', $data);
+    }
 }

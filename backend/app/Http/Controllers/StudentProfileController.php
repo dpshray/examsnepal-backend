@@ -266,7 +266,10 @@ class StudentProfileController extends Controller
         return Response::apiSuccess('User profile updated');
     }
 
-    public function verifyStudentEmail($email) {
+    public function verifyStudentEmail(Request $request, $email) {
+        if (!$request->hasValidSignature()) {
+            return Response::apiError('Invalid signature', null, 410);
+        }
         DB::transaction(function () use($email){
             StudentProfile::firstWhere('email', $email)->markEmailAsVerified();
         });
