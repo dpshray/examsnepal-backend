@@ -17,7 +17,7 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
 {
     use HasFactory;
     public $timestamps = false;
-    const EMAIL_LINK_EXPIRES_AT = 25; #in minutes
+    const EMAIL_LINK_EXPIRES_AT = 2; #in minutes
     const PASSWORD_RESET_TOKEN_VALID_UNTIL = 2; #in minutes
 
     protected $fillable = [
