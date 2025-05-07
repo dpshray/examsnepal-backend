@@ -43,7 +43,8 @@ class Exam extends Model
         /**
          * question bank = where assign = 1 , status = 1 and live = 1
          */
-        return $query->where('status', ExamTypeEnum::MOCK_TEST->value)->where('assign',1);
+        return $query->where('status', ExamTypeEnum::MOCK_TEST->value);
+        // ->where('assign',1);
     }
 
     public function scopeAuthUserPending(Builder $query): Builder
@@ -76,7 +77,10 @@ class Exam extends Model
 
     private function completedPendingQuery(Builder $query): Builder
     {
-        return $query->select(['id', 'exam_name', 'status', 'user_id'])->with('user:id,fullname')->withCount('questions');
+        return $query->select(['id', 'exam_name', 'status', 'user_id'])
+                ->with('user:id,fullname')
+                ->withCount('questions')
+                ->has('questions');
     }
 
     
