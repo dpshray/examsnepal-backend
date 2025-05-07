@@ -266,16 +266,10 @@ class StudentProfileController extends Controller
         return Response::apiSuccess('User profile updated');
     }
 
-    public function verifyStudentEmail($token) {
-        $row = DB::table('password_reset_tokens')->whereToken($token);
-        abort_if($row->doesntExist(), 404, 'Token is invalid');
-
-        DB::transaction(function () use ($row) {
-            $email = $row->first()->email;
-            StudentProfile::firstWhere('email', $email)->update(['email_verified_at' => now()]);
-            $row->delete();
+    public function verifyStudentEmail($email) {
+        DB::transaction(function () use($email){
+            StudentProfile::firstWhere('email', $email)->markEmailAsVerified();
         });
         echo "Email has been verified.Please goto to login page to continue.";
-        // return to_route('admin.login')->withSuccess('Email has been successfully verified');
     }
 }

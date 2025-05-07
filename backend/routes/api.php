@@ -38,8 +38,8 @@ Route::get('migrate-answersheets', [TableMigrateController::class, 'migrateAnswe
 Route::get('/email/verify/{id}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
 
 // Student registration
-Route::post('/student/register', [StudentProfileController::class, 'register']);
-Route::get('student_email_confirmation/{token}', [StudentProfileController::class, 'verifyStudentEmail'])->name('student_email_confirmation')->middleware('signed');
+Route::post('/student/register/', [StudentProfileController::class, 'register']);
+Route::get('student_email_confirmation/{email}', [StudentProfileController::class, 'verifyStudentEmail'])->name('student_email_confirmation')->middleware('signed');
 
 // Student login
 Route::post('/student/login', [AuthController::class, 'loginStudent'])->name('login');
@@ -53,13 +53,11 @@ Route::middleware(AuthEitherUser::class)->group(function(){
 });
 
 // Protected Routes (for authenticated students)
-Route::middleware('auth:api')->group(function () {
+Route::middleware(['auth:api','verified'])->group(function () {
     Route::post('/student/logout', [AuthController::class, 'logoutStudent']);
     Route::post('/student/refresh', [AuthController::class, 'refreshStudent']);
     Route::get('/student/me', [AuthController::class, 'me']);
-});
 
-Route::middleware(['auth:api'])->group(function () {
     Route::get('/student/questions', [ForumController::class, 'fetchQuestions']);
     Route::get('/student/myquestions', [ForumController::class, 'fetchMyQuestions']);
     Route::post('/student/addquestion', [ForumController::class, 'addQuestion']);

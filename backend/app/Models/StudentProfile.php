@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
-class StudentProfile extends Authenticatable implements JWTSubject
+class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEmail
 {
     use HasFactory;
     public $timestamps = false;
@@ -34,16 +35,10 @@ class StudentProfile extends Authenticatable implements JWTSubject
     {
         parent::boot();
         static::creating(function ($student) {
-            $token    = Str::random(64);
             $link_expires_minute   = SELF::EMAIL_LINK_EXPIRES_AT;
             $url_expiration_minute = now()->addMinutes($link_expires_minute);
-            $url                   = URL::temporarySignedRoute('student_email_confirmation', $url_expiration_minute, ['token' => $token]);
+            $url                   = URL::temporarySignedRoute('student_email_confirmation', $url_expiration_minute, ['email' => $student->email]);
             
-            DB::table('password_reset_tokens')->insert([
-                'email'      => $student->email,
-                'token'      => $token,
-                'created_at' => now(),
-            ]);
             try {
                 Mail::send('mail.student.register', [
                     'name' => $student->name, 
@@ -54,7 +49,7 @@ class StudentProfile extends Authenticatable implements JWTSubject
                     $message->subject('New Student Registration');
                 });
             } catch (\Exception $e) {
-                DB::table('password_reset_tokens')->where('email',$student->email)->delete();
+                Log::error($e->getMessage());
                 throw new \Exception('Something went wrong while sending mail');
             }
         });
