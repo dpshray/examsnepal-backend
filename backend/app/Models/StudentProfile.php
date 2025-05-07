@@ -18,6 +18,7 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
     use HasFactory;
     public $timestamps = false;
     const EMAIL_LINK_EXPIRES_AT = 25; #in minutes
+    const PASSWORD_RESET_TOKEN_VALID_UNTIL = 2; #in minutes
 
     protected $fillable = [
         'name',
@@ -53,6 +54,26 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
                 throw new \Exception('Something went wrong while sending mail');
             }
         });
+    }
+
+    public function sendPasswordResetEmail(){
+        $token = strtoupper(str()->random(5));
+        try {
+            DB::table('password_reset_tokens')->insert([
+                'email' => $this->email,
+                'token' => $token,
+                'created_at' => now()
+            ]);
+            Mail::send('mail.student.password_reset', ['user' => $this->name, 'token' => $token], function ($message) {
+                $message->to($this->email);
+                $message->subject('Student Password Reset');
+            });
+        } catch (\Exception $e) {
+            DB::table('password_reset_tokens')->where('token', $token)->delete();
+            $err_message = $e->getMessage(); 
+            Log::error($err_message);
+            throw new \Exception($err_message);
+        }
     }
 
     // Required for JWT

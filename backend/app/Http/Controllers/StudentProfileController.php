@@ -272,4 +272,200 @@ class StudentProfileController extends Controller
         });
         echo "Email has been verified.Please goto to login page to continue.";
     }
+
+    /**
+     * @OA\Post(
+     *     path="/student-password-reset", 
+     *     summary="Password reset form(sending email)",
+     *     description="This endpoint allows you to send message to student email which contains a token.",
+     *     operationId="studentPasswordReset",
+     *     tags={"Student Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email"},
+     *             @OA\Property(property="email", type="email", example="tester.123@example.com"),
+     *
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Student successfully registered",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Student registered successfully."),
+     *             @OA\Property(property="student", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", example="johndoe@example.com"),
+     *                 @OA\Property(property="phone", type="string", example="+1234567890"),
+     *                 @OA\Property(property="exam_type", type="string", example="mdms")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="name", type="array", @OA\Items(type="string", example="The name field is required.")),
+     *                 @OA\Property(property="email", type="array", @OA\Items(type="string", example="The email has already been taken.")),
+     *                 @OA\Property(property="password", type="array", @OA\Items(type="string", example="The password confirmation does not match.")),
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function sendPasswordResetMail(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|exists:student_profiles,email',
+        ]);
+        if ($validator->fails()) {
+            $an_error = $validator->errors()->all();
+            return Response::apiError($an_error[0] ?? 'Validation error occurred', null, 422);
+        }
+        $already_sent = DB::table('password_reset_tokens')->where('email', $request->email)->first();
+        if ($already_sent) {
+            $token_valid_until = StudentProfile::PASSWORD_RESET_TOKEN_VALID_UNTIL; 
+            $timestamp = $already_sent->created_at;
+            $time = Carbon::parse($timestamp);
+            $hasPassed = $time->diffInMinutes(now(), false) > $token_valid_until;
+            if (!$hasPassed) {
+                return Response::apiError('Mail has already been sent/please wait for '.$token_valid_until.' minute(s)');
+            }
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+        }
+        StudentProfile::firstWhere('email', $request->email)->sendPasswordResetEmail();
+        return Response::apiSuccess('A mail has been sent to your email');
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/verify-password-reset-otp", 
+     *     summary="Send password reset token for verification",
+     *     description="This endpoint checks token received from email which was sent for password reset token.",
+     *     operationId="verifyPasswordResetOtp",
+     *     tags={"Student Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"token"},
+     *             @OA\Property(property="token", type="string", example="C1EW5"),
+     *
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Student successfully registered",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Student registered successfully."),
+     *             @OA\Property(property="student", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", example="johndoe@example.com"),
+     *                 @OA\Property(property="phone", type="string", example="+1234567890"),
+     *                 @OA\Property(property="exam_type", type="string", example="mdms")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="name", type="array", @OA\Items(type="string", example="The name field is required.")),
+     *                 @OA\Property(property="email", type="array", @OA\Items(type="string", example="The email has already been taken.")),
+     *                 @OA\Property(property="password", type="array", @OA\Items(type="string", example="The password confirmation does not match.")),
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function verifyPasswordReseToken(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required|string|exists:password_reset_tokens,token',
+        ],[
+            'token.exists' => 'Token does not match/exists'
+        ]);
+        if ($validator->fails()) {
+            $an_error = $validator->errors()->all();
+            return Response::apiError($an_error[0], null, 422);
+        }
+        $row = DB::table('password_reset_tokens')->where('token', $request->token)->first();
+        $token = $row->token;
+        $email = $row->email;
+        $data = compact('token','email');
+        return Response::apiSuccess('Token is verified',$data);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/handle-password-reset-form", 
+     *     summary="Handles password reset form",
+     *     description="This endpoint handle password reset form.",
+     *     operationId="handlePasswordResetForm",
+     *     tags={"Student Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"token","email","password","password_confirmation"},
+     *             @OA\Property(property="token", type="string", example="EC1D0"),
+     *             @OA\Property(property="email", type="string", example="tester@example.com"),
+     *             @OA\Property(property="password", type="string", example="secret"),
+     *             @OA\Property(property="password_confirmation", type="string", example="secret"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Student successfully registered",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Student registered successfully."),
+     *             @OA\Property(property="student", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", example="johndoe@example.com"),
+     *                 @OA\Property(property="phone", type="string", example="+1234567890"),
+     *                 @OA\Property(property="exam_type", type="string", example="mdms")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="name", type="array", @OA\Items(type="string", example="The name field is required.")),
+     *                 @OA\Property(property="email", type="array", @OA\Items(type="string", example="The email has already been taken.")),
+     *                 @OA\Property(property="password", type="array", @OA\Items(type="string", example="The password confirmation does not match.")),
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function passwordResetor(Request $request){
+        $validator = Validator::make($request->all(), [
+            'token' => 'required|string|exists:password_reset_tokens,token',
+            'email' => 'required|string|exists:password_reset_tokens,email',
+            'password' => 'required|string|confirmed',
+            'password_confirmation' => 'required|string',
+        ]);
+        if ($validator->fails()) {
+            $an_error = $validator->errors()->all();
+            return Response::apiError($an_error[0], null, 422);
+        }
+        $row = DB::table('password_reset_tokens')->where([
+            ['email', $request->email],
+            ['token', $request->token]
+        ]);
+        if (empty($row->first())) {
+            return Response::apiError('Requested token does not match with the email that you want the password to reset',null,400);
+        }
+        DB::transaction(function () use($row, $request){
+            $row->delete();
+            StudentProfile::where('email',$request->email)->update([
+                'password' => Hash::make($request->password)
+            ]);
+        });
+
+        return Response::apiSuccess('Password has been updated');
+    }
 }

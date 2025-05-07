@@ -41,6 +41,10 @@ Route::get('/email/verify/{id}', [AuthController::class, 'verifyEmail'])->name('
 Route::post('/student/register/', [StudentProfileController::class, 'register']);
 Route::get('student_email_confirmation/{email}', [StudentProfileController::class, 'verifyStudentEmail'])->name('student_email_confirmation')->middleware('signed');
 
+#Password Reset
+Route::post('student-password-reset', [StudentProfileController::class, 'sendPasswordResetMail']);
+Route::post('verify-password-reset-otp', [StudentProfileController::class, 'verifyPasswordReseToken']);
+Route::post('handle-password-reset-form', [StudentProfileController::class, 'passwordResetor']);
 // Student login
 Route::post('/student/login', [AuthController::class, 'loginStudent'])->name('login');
 Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('loginAdmin');
