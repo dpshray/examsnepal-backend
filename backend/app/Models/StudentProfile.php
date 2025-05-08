@@ -58,13 +58,20 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
 
     public function sendPasswordResetEmail(){
         $token = strtoupper(str()->random(5));
+        $link_expires_minute   = SELF::PASSWORD_RESET_TOKEN_VALID_UNTIL;
+        $url_expiration_minute = now()->addMinutes($link_expires_minute);
+
         try {
             DB::table('password_reset_tokens')->insert([
                 'email' => $this->email,
                 'token' => $token,
                 'created_at' => now()
             ]);
-            Mail::send('mail.student.password_reset', ['user' => $this->name, 'token' => $token], function ($message) {
+            Mail::send('mail.student.password_reset', [
+                'user' => $this->name, 
+                'token' => $token,
+                'expiration_period' => $url_expiration_minute->format('Y-m-d h:i:s a')
+            ], function ($message) {
                 $message->to($this->email);
                 $message->subject('Student Password Reset');
             });
