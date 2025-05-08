@@ -12,6 +12,8 @@ class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+    
+    protected $perPage = 12;
 
     /**
      * The attributes that are mass assignable.

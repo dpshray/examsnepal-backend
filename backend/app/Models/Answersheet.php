@@ -10,6 +10,7 @@ class Answersheet extends Model
     //
     use HasFactory;
 
+    protected $perPage = 10;
 
     protected $fillable = [
         'student_exam_id',

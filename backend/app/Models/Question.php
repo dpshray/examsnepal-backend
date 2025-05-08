@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Question extends Model
 {
+    protected $perPage = 10;
+
     public $timestamps = false;
     use HasFactory;
 

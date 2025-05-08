@@ -40,7 +40,6 @@ Route::get('/email/verify/{id}', [AuthController::class, 'verifyEmail'])->name('
 // Student registration
 Route::post('/student/register/', [StudentProfileController::class, 'register']);
 Route::get('student_email_confirmation/{email}', [StudentProfileController::class, 'verifyStudentEmail'])->name('student_email_confirmation');
-
 #Password Reset
 Route::post('student-password-reset', [StudentProfileController::class, 'sendPasswordResetMail']);
 Route::post('verify-password-reset-otp', [StudentProfileController::class, 'verifyPasswordReseToken']);
@@ -49,7 +48,6 @@ Route::post('handle-password-reset-form', [StudentProfileController::class, 'pas
 Route::post('/student/login', [AuthController::class, 'loginStudent'])->name('login');
 Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('loginAdmin');
 Route::post('/teacher/login', [AuthController::class, 'teacherLogin'])->name('loginTeacher');
-
 
 #routes accessed by both api and users guards
 Route::middleware(AuthEitherUser::class)->group(function(){
@@ -62,6 +60,8 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::post('/student/logout', [AuthController::class, 'logoutStudent']);
     Route::post('/student/refresh', [AuthController::class, 'refreshStudent']);
     Route::get('/student/me', [AuthController::class, 'me']);
+    #Student Account Removal
+    Route::delete('student-account-removal/{student}', [StudentProfileController::class, 'permanentStudentRemoveAccount']);
 
     Route::get('/student/questions', [ForumController::class, 'fetchQuestions']);
     Route::get('/student/myquestions', [ForumController::class, 'fetchMyQuestions']);
@@ -144,6 +144,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::put('update-student-profile', [StudentProfileController::class,'studentProfileUpdater']);
 
         #pool
+    Route::get('get-todays-pool-players', [PoolController::class, 'fetchTodaysPoolPlayers']);
     Route::get('request-pool-question', [PoolController::class, 'getPoolQuestions']);
     Route::post('send-pool-response', [PoolController::class, 'sendPoolQuestionResponse']);
 });

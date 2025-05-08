@@ -10,6 +10,7 @@ class Bookmark extends Model
 {
     //
     use HasFactory;
+    protected $perPage = 12;
 
     public $timestamps = false;
 

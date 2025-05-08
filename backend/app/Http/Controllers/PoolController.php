@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\QuestionResource;
 use App\Models\Question;
+use App\Models\StudentPool;
+use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +13,7 @@ use Illuminate\Support\Facades\Response;
 
 class PoolController extends Controller
 {
+    use PaginatorTrait;
     /**
      * @OA\Get(
      *     path="/request-pool-question",
@@ -242,5 +245,79 @@ class PoolController extends Controller
             }
             return Response::apiSuccess('Wrong answer',['type' => 0, 'strike' => $todays_student_pool_strikes, 'token' => $token]);
         }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/get-todays-pool-players",
+     *     summary="Fetch todays pool players",
+     *     description="Fetch list of pool players.",
+     *     operationId="getTodaysPoolPlayers",
+     *     tags={"Pool"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number",
+     *         @OA\Schema(
+     *             type="integer",
+     *             example="1"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Pool question retrieved",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Solutions retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="exam_id", type="integer"),
+     *                     @OA\Property(property="student_id", type="integer"),
+     *                     @OA\Property(property="answer", type="string"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No solutions found for this exam",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="No solutions found for this exam.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized - The user is not authenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Unauthorized")
+     *         )
+     *     ),
+     *     security={
+     *         {"bearerAuth": {}}
+     *     }
+     * )
+     */
+    public function fetchTodaysPoolPlayers() {
+        $student = Auth::guard('api')->user();
+        $today = now();
+        $pool_players = StudentPool::select("id","student_id")
+                            ->with(['student:id,name'])
+                            ->withCount(['pools as score' => fn($qry) => $qry->where('is_correct',1)])
+                            ->whereRelation('student','exam_type_id', $student->exam_type_id)
+                            ->whereDate('played_at', $today)
+                            ->orderBy('score','DESC')
+                            ->paginate();
+        $data = $this->setupPagination($pool_players)->data;
+        $today_date_str = $today->format('d-m-Y');
+        return Response::apiSuccess("List of todays pool players({$today_date_str})", $data);
     }
 }

@@ -9,7 +9,8 @@ class Organization extends Model
 {
     //
     use HasFactory;
-    
+
+    protected $perPage = 12;
     protected $fillable = [
         'name', 'email', 'phone', 'address', 'is_active'
     ];

@@ -88,7 +88,7 @@ class ForumController extends Controller
             ->withCount('answers')
             ->where('deleted', '0') // Only fetch non-deleted questions
             ->orderBy('id','DESC')
-            ->paginate(10);
+            ->paginate();
 
         $data = $this->setupPagination($questions, ForumQuestionCollection::class);
 
@@ -132,7 +132,7 @@ class ForumController extends Controller
             ->withCount('answers')
             ->where('deleted', '0') // Only fetch non-deleted questions
             ->orderBy('id','DESC')
-            ->paginate(10);
+            ->paginate();
 
         $data = $this->setupPagination($questions, ForumQuestionCollection::class);
 

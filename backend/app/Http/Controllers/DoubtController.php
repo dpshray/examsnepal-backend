@@ -63,7 +63,7 @@ class DoubtController extends Controller
                         ->doubts()
                         ->where('status',0)
                         ->with(['question','solver:id,username,fullname'])
-                        ->paginate(10);
+                        ->paginate();
         $data = $this->setupPagination($user_doubt, DoubtCollection::class)->data;
         return Response::apiSuccess('User doubt retrieved successfully!', $data);
     }    
@@ -115,7 +115,7 @@ class DoubtController extends Controller
                         ->doubts()
                         ->where('status',1)
                         ->with(['question.options','solver:id,username,fullname'])
-                        ->paginate(10);
+                        ->paginate();
         $data = $this->setupPagination($user_doubt, DoubtCollection::class)->data;
 
         return Response::apiSuccess('User doubt retrieved successfully!', $data);
@@ -153,7 +153,7 @@ class DoubtController extends Controller
         $doubts = Doubt::select('id', 'doubt', 'created_at', 'updated_at', 'status', 'exam_id', 'student_id', 'org_id', 'question_id')
                     ->where('status', '1')
                     ->with('exam:id,exam_name', 'student:id,name', 'organization:id,fullname', 'question:id,question')
-                    ->paginate(10);
+                    ->paginate();
 
         return response()->json([
             'message' => 'Fetched all doubts successfully.',
