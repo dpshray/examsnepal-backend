@@ -401,21 +401,11 @@ class StudentProfileController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/handle-password-reset-form", 
+     *     path="/student-account-removal/{student}", 
      *     summary="Handles password reset form",
      *     description="This endpoint handle password reset form.",
      *     operationId="handlePasswordResetForm",
      *     tags={"Student Authentication"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"token","email","password","password_confirmation"},
-     *             @OA\Property(property="token", type="string", example="EC1D0"),
-     *             @OA\Property(property="email", type="string", example="tester@example.com"),
-     *             @OA\Property(property="password", type="string", example="secret"),
-     *             @OA\Property(property="password_confirmation", type="string", example="secret"),
-     *         )
-     *     ),
      *     @OA\Response(
      *         response=201,
      *         description="Student successfully registered",
@@ -469,5 +459,48 @@ class StudentProfileController extends Controller
         });
 
         return Response::apiSuccess('Password has been updated');
+    }
+
+
+    /**
+     * @OA\DELETE(
+     *     path="/student-account-removal/{student}",
+     *     summary="Removes currently logged in student account permanently",
+     *     description="Removed student account.",
+     *     tags={"Student Authentication"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="student",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the student",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="New access token generated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="access_token", type="string", example="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."),
+     *             @OA\Property(property="token_type", type="string", example="bearer"),
+     *             @OA\Property(property="expires_in", type="integer", example=3600)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Could not refresh token",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Could not refresh token")
+     *         )
+     *     )
+     * )
+     */
+    public function permanentStudentRemoveAccount(StudentProfile $student)
+    {
+        $logged_in_user = Auth::guard('api')->user();
+        if ($logged_in_user->isNot($student)) {
+            return Response::apiError('Cannot delete account.(user does not match)',null,403);
+        } 
+        $logged_in_user->delete();
+        return Response::apiSuccess('Your account has been removed permanently');
     }
 }
