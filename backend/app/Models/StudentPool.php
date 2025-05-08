@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class StudentPool extends Model
 {
     public $timestamps = false;
+    protected $perPage = 10;
 
     protected $fillable = [
         'student_id',
@@ -27,5 +28,9 @@ class StudentPool extends Model
 
     public function pools(){
         return $this->hasMany(Pool::class,'student_pool_id');
+    }
+
+    public function student(){
+        return $this->belongsTo(StudentProfile::class,'student_id');
     }
 }

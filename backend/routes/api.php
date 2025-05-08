@@ -144,6 +144,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::put('update-student-profile', [StudentProfileController::class,'studentProfileUpdater']);
 
         #pool
+    Route::get('get-todays-pool-players', [PoolController::class, 'fetchTodaysPoolPlayers']);
     Route::get('request-pool-question', [PoolController::class, 'getPoolQuestions']);
     Route::post('send-pool-response', [PoolController::class, 'sendPoolQuestionResponse']);
 });
