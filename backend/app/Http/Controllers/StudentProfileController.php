@@ -401,11 +401,21 @@ class StudentProfileController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/student-account-removal/{student}", 
+     *     path="/handle-password-reset-form", 
      *     summary="Handles password reset form",
      *     description="This endpoint handle password reset form.",
      *     operationId="handlePasswordResetForm",
      *     tags={"Student Authentication"},
+     *      @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"token","email","password","password_confirmation"},
+     *             @OA\Property(property="token", type="string", example="EC1D0"),
+     *             @OA\Property(property="email", type="string", example="tester@example.com"),
+     *             @OA\Property(property="password", type="string", example="secret"),
+     *             @OA\Property(property="password_confirmation", type="string", example="secret"),
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=201,
      *         description="Student successfully registered",
