@@ -70,7 +70,7 @@ class QuizController extends Controller
      */
     public function getCompletedFreeQuiz()
     {
-        $free_quiz_query = Exam::freeType()->authUserCompleted()->paginate(10);
+        $free_quiz_query = Exam::freeType()->authUserCompleted()->paginate();
         $data = $this->setupPagination($free_quiz_query, ExamCollection::class)->data;
 
         return Response::apiSuccess('Free completed quizzes retrieved successfully.', $data);
@@ -192,7 +192,7 @@ class QuizController extends Controller
      */
     public function getCompletedSprintQuiz()
     {
-        $sprint_quiz_query = Exam::sprintType()->authUserCompleted()->paginate(10);
+        $sprint_quiz_query = Exam::sprintType()->authUserCompleted()->paginate();
         $data = $this->setupPagination($sprint_quiz_query, ExamCollection::class)->data;
 
         return Response::apiSuccess('Sprint completed quizzes retrieved successfully.', $data);
@@ -253,7 +253,7 @@ class QuizController extends Controller
      */
     public function getPendingSprintQuiz()
     {
-        $sprint_quiz_query = Exam::sprintType()->authUserPending()->paginate(10);
+        $sprint_quiz_query = Exam::sprintType()->authUserPending()->paginate();
         $data = $this->setupPagination($sprint_quiz_query, ExamCollection::class)->data;
 
         return Response::apiSuccess('Sprint pending quizzes retrieved successfully.', $data);
@@ -755,7 +755,7 @@ class QuizController extends Controller
     {
         $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
                     ->freeType()
-                    ->paginate(10);
+                    ->paginate();
         $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's free exam completed status", $data);
@@ -813,7 +813,7 @@ class QuizController extends Controller
     {
         $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
                     ->sprintType()
-                    ->paginate(10);
+                    ->paginate();
         $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's sprint exam completed status", $data);
@@ -871,7 +871,7 @@ class QuizController extends Controller
     {
         $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
                     ->mockType()
-                    ->paginate(10);
+                    ->paginate();
         $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's mock exam completed status", $data);

@@ -10,6 +10,7 @@ class ForumQuestion extends Model
 {
     use HasFactory;
 
+    protected $perPage = 12;
     protected $fillable = ['user_id', 'question', 'deleted'];
 
     public static function boot()

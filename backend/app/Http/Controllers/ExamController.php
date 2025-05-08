@@ -62,7 +62,7 @@ class ExamController extends Controller
     public function index()
     {
         //
-        $exams = Exam::with(['organization', 'examType'])->paginate(10);
+        $exams = Exam::with(['organization', 'examType'])->paginate();
         return response()->json($exams);
     }
 

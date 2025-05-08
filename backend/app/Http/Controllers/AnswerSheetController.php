@@ -268,7 +268,7 @@ class AnswerSheetController extends Controller
             return Response::apiSuccess('User exam not found', null, 403);
         }
 
-        $questions = $exam->questions()->with('options')->paginate(10);
+        $questions = $exam->questions()->with('options')->paginate();
         $data = $this->setupPagination($questions, QuestionCollection::class)->data;
 
         $user_choosed = $student_exam->answers->pluck('selected_option_id','question_id');

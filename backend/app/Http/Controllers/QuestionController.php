@@ -113,7 +113,7 @@ class QuestionController extends Controller
             ], 404);
         }
         // Get all questions that belong to these exams
-        $questions = Question::with('options')->whereIn('exam_id', $examIds)->paginate(10);
+        $questions = Question::with('options')->whereIn('exam_id', $examIds)->paginate();
         return response()->json([
             'success' => true,
             'message' => 'Questions retrieved successfully!',
@@ -275,7 +275,7 @@ class QuestionController extends Controller
         // Use LIKE for flexible partial text search within the user's exam_ids
         $questions = Question::with('options')->whereRelation('exam','exam_type_id','=', $exam_type_id)
                         ->where('question', 'LIKE', '%' . $keyword . '%')
-                        ->paginate(10);
+                        ->paginate();
         $data = $this->setupPagination($questions, QuestionCollection::class)->data;
 
         if ($questions->isEmpty()) {
@@ -969,7 +969,7 @@ class QuestionController extends Controller
         $questions = $exam->questions()
                         ->with('options')
                         ->select('id', 'exam_id', 'question', 'explanation')
-                        ->paginate(10);
+                        ->paginate();
         $append = compact('token');
         $data = $this->setupPagination($questions, QuestionCollection::class, $append)->data;
 
@@ -1084,7 +1084,7 @@ class QuestionController extends Controller
                                 ->questions()
                                 ->with('options')
                                 ->select('id', 'exam_id', 'question', 'explanation')
-                                ->paginate(10);
+                                ->paginate();
         $append = compact('token');
         $data = $this->setupPagination($questionsMockTest, QuestionCollection::class, $append)->data;
 
@@ -1198,7 +1198,7 @@ class QuestionController extends Controller
         $questionsSprintQuiz = $exam->questions()
             ->with('options')
             ->select('id', 'exam_id', 'question', 'explanation')
-            ->paginate(10);
+            ->paginate();
         $append = compact('token');
         $data = $this->setupPagination($questionsSprintQuiz, QuestionCollection::class, $append)->data;
 

@@ -73,7 +73,7 @@ class BookmarkController extends Controller
                                         $query->select('id', 'name'); // Load specific student fields
                                     }])
                                     ->whereRelation('exam','exam_type_id',$student->exam_type_id)
-                                    ->paginate(10);
+                                    ->paginate();
             $data['data'] = $questionsWithStudents->map(function ($question) {
                     // Extract students from bookmarks and add to top-level 'students'
                     $question['students'] = $question->bookmarks->pluck('student')->unique('id')->values();
@@ -264,39 +264,10 @@ class BookmarkController extends Controller
     public function getBookmarksByStudent(StudentProfile $student_id)
     {
         $student = $student_id;
-        $student_bookmarks = $student->bookmarks()->with('question.options')->paginate(10);
+        $student_bookmarks = $student->bookmarks()->with('question.options')->paginate();
         $data = $this->setupPagination($student_bookmarks, BookmarkCollection::class)->data;
         $student_name = $student->name;
         return Response::apiSuccess("User {$student_name} bookmark lists", $data);
-
-        // $pagination_data = $student_bookmarks->toArray();
-        // ['links' => $links] = $pagination_data;
-
-
-        // $data = new BookmarkCollection($student_bookmarks);
-        // $links['current_page'] = $student_bookmarks->currentPage();
-        // $links['last_page']    = $student_bookmarks->lastPage();
-        // $links['total']        = $student_bookmarks->total();
-
-        // $data = compact('data', 'links');
-
-        // return Response::apiSuccess('User bookmarks', $data);
-
-        // // Check if the student_id is valid (you can add more validation as needed)
-        // if (!is_numeric($student_id) || $student_id <= 0) {
-        //     return response()->json(['error' => 'Invalid student ID'], 400);
-        // }
-
-        // // Fetch bookmarks for the given student_id
-        // $bookmarks = Bookmark::with('questions')
-        //     ->where('student_id', $student_id)
-        //     ->paginate(10);
-
-        // // Check if any bookmarks exist for the student
-        // if ($bookmarks->isEmpty()) {
-        //     return response()->json(['error' => 'No bookmarks found for the given student ID'], 404);
-        // }
-        return response()->json($bookmarks);
     }
 
     /**
@@ -354,7 +325,7 @@ class BookmarkController extends Controller
     {
         // Get the authenticated user's ID
         $user = Auth::guard('api')->user();
-        $user_bookmarks = $user->bookmarks()->with('question.options')->paginate(10);
+        $user_bookmarks = $user->bookmarks()->with('question.options')->paginate();
         $data = $this->setupPagination($user_bookmarks, BookmarkCollection::class)->data;
 
         return Response::apiSuccess('User bookmarks', $data);

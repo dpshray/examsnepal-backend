@@ -16,6 +16,8 @@ use Illuminate\Support\Str;
 class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEmail
 {
     use HasFactory;
+
+    protected $perPage = 12;
     public $timestamps = false;
     const EMAIL_LINK_EXPIRES_AT = 2; #in minutes
     const PASSWORD_RESET_TOKEN_VALID_UNTIL = 2; #in minutes

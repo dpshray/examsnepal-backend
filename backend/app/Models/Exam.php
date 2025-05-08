@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Enums\ExamTypeEnum;
@@ -7,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class Exam extends Model
-{
+{    
+    protected $perPage = 12;
     public $timestamps = false;
     /**
      * the column name of this table/model indicates this exams another type which is described in ExamTypeEnum::class
@@ -24,7 +26,7 @@ class Exam extends Model
         'exam_time',
         'is_active',
         'price',
-        'assign_id',# ID belongs to users table
+        'assign_id', # ID belongs to users table
         'is_question_bank',
     ];
 
@@ -40,50 +42,49 @@ class Exam extends Model
 
     public function scopeMockType(Builder $query): Builder
     {
-        /**
-         * question bank = where assign = 1 , status = 1 and live = 1
-         */
-        return $query->where('status', ExamTypeEnum::MOCK_TEST->value)->when(env('LIVE',1) == 1, fn($qry) => $qry->where('assign', 1));
+        return $query->where('status', ExamTypeEnum::MOCK_TEST->value)->when(env('LIVE', 1) == 1, fn($qry) => $qry->where('assign', 1));
     }
 
     public function scopeAuthUserPending(Builder $query): Builder
     {
         return $query->allAvailableExams()
-                ->when(
-                    Auth::guard('api')->check(), 
-                    fn($qry) => $qry->whereDoesntHave('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id())));
+            ->when(
+                Auth::guard('api')->check(),
+                fn($qry) => $qry->whereDoesntHave('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))
+            );
     }
 
     public function scopeAuthUserCompleted(Builder $query): Builder
     {
         return $query->allAvailableExams()
-                ->with([
-                    'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])->with([
-                        'student:id,name',
-                        'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
-                        ])
-                        ->withCount([
-                            'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
-                            ])
-                        ->orderBy('correct_answers_count', 'DESC'),
+            ->with([
+                'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])->with([
+                    'student:id,name',
+                    'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
+                ])
+                    ->withCount([
+                        'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
                     ])
-                ->when(
-                    Auth::guard('api')->check(), 
-                    fn($qry) => $qry->whereHas('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id())));
+                    ->orderBy('correct_answers_count', 'DESC'),
+            ])
+            ->when(
+                Auth::guard('api')->check(),
+                fn($qry) => $qry->whereHas('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))
+            );
     }
 
     public function scopeAllAvailableExams(Builder $query): Builder
     {
         return $query->select(['id', 'exam_name', 'status', 'user_id'])
-                ->with('user:id,fullname')
-                ->withCount('questions')
-                ->has('questions')
-                ->where('live', 1)
-                ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id))
-                ->orderBy('id', 'DESC');
+            ->with('user:id,fullname')
+            ->withCount('questions')
+            ->has('questions')
+            ->where('live', 1)
+            ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id))
+            ->orderBy('id', 'DESC');
     }
 
-    
+
 
     public function exams()
     {

@@ -11,6 +11,7 @@ class Doubt extends Model
 {
     //
     use HasFactory;
+    protected $perPage = 12;
 
     protected $fillable = [
         'email',

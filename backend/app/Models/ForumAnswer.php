@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ForumAnswer extends Model {
     use HasFactory;
 
+    protected $perPage = 12;
     // Define the fillable attributes for mass assignment
     protected $fillable = ['user_id', 'answer','forum_question_id'];
 
