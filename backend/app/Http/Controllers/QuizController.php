@@ -925,9 +925,32 @@ class QuizController extends Controller
      */
     public function totalExamCounter(){
         $free = Exam::freeType()->allAvailableExams()->count();
-        $mock = Exam::sprintType()->allAvailableExams()->count();
-        $sprint = Exam::mockType()->allAvailableExams()->count();
-        $data = compact('free','sprint','mock');
+        $sprint = Exam::sprintType()->allAvailableExams()->count();
+        $mock = Exam::mockType()->allAvailableExams()->count();
+
+        $free_quiz_query = Exam::freeType()->authUserCompleted()->count();
+        $sprint_quiz_query = Exam::sprintType()->authUserCompleted()->count();
+        $mock_quiz_query = Exam::mockType()->authUserCompleted()->count();
+
+        $free_type_performance = ($free_quiz_query/$free)*100;
+        $sprint_type_performance = ($sprint_quiz_query/$sprint)*100;
+        $mock_type_performance = ($mock_quiz_query/$mock)*100;
+        
+        $data = [
+            'free' => [
+                'total' => $free,
+                'overall' => round($free_type_performance, 2)
+            ],
+            'sprint' => [
+                'total' => $sprint,
+                'overall' => round($sprint_type_performance, 2)
+            ],
+            'mock' => [
+                'total' => $mock,
+                'overall' => round($mock_type_performance, 2)
+            ]
+        ];
+        // $data = compact('free','sprint','mock');
         return Response::apiSuccess('Available Exams with their total', $data);
     }
 }
