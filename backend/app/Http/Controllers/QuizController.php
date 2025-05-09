@@ -932,9 +932,9 @@ class QuizController extends Controller
         $sprint_quiz_query = Exam::sprintType()->authUserCompleted()->count();
         $mock_quiz_query = Exam::mockType()->authUserCompleted()->count();
 
-        $free_type_performance = ($free_quiz_query/$free)*100;
-        $sprint_type_performance = ($sprint_quiz_query/$sprint)*100;
-        $mock_type_performance = ($mock_quiz_query/$mock)*100;
+        $free_type_performance = ($free == 0) ? 0 : ($free_quiz_query/$free)*100;
+        $sprint_type_performance = ($sprint == 0) ? 0 : ($sprint_quiz_query/$sprint)*100;
+        $mock_type_performance = ($mock == 0) ? 0 : ($mock_quiz_query/$mock)*100;
         
         $data = [
             'free' => [
