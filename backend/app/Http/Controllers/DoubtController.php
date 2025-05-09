@@ -62,7 +62,7 @@ class DoubtController extends Controller
                         ->user()
                         ->doubts()
                         ->where('status',0)
-                        ->with(['question','solver:id,username,fullname'])
+                        ->with(['question.options','solver:id,username,fullname'])
                         ->paginate();
         $data = $this->setupPagination($user_doubt, DoubtCollection::class)->data;
         return Response::apiSuccess('User doubt retrieved successfully!', $data);

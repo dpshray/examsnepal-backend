@@ -8,6 +8,7 @@ use App\Models\StudentPool;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
@@ -82,15 +83,28 @@ class PoolController extends Controller
             if ($student_pool->strike == 3 || $student_pool->token != $request->query('token')) {
                 return Response::apiError('Only one pool per day is allowed',null,400);
             } else {
-                $questions_to_ignore = $student_pool->pools->pluck('question_id')->all();
+                $questions_to_ignore = $student_pool->pools()->pluck('question_id')->all();
             }
         }
+
         $exam_type_id = $student->exam_type_id;
-        $data = Question::with('options')
-                ->whereRelation('exam','exam_type_id', $exam_type_id)
-                ->whereNotIn('id', $questions_to_ignore)
-                ->inRandomOrder()
-                ->first();
+        $cache_name = 'todays_questions_for_pool_for_exam_type_' . $exam_type_id;
+        Cache::remember($cache_name, 86400, function () use($exam_type_id) {
+            return Question::select("id", "question", "explanation")
+                    ->whereRelation('exam', 'exam_type_id', $exam_type_id)
+                    ->inRandomOrder()
+                    ->limit(500)
+                    ->pluck('id')
+                    ->all();
+        });
+        $pool_questions = Cache::get($cache_name);
+        $remaining_questions = array_diff($pool_questions, $questions_to_ignore);
+        $a_random_question = $remaining_questions[array_rand($remaining_questions)];
+
+        $data = Question::select("id","question","explanation")
+                ->with('options')
+                ->find($a_random_question);
+
         $data = new QuestionResource($data);
         return Response::apiSuccess('Pool question', $data);
     }
