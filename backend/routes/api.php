@@ -14,6 +14,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\BankQuestionController;
 use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Middleware\isStudentSubscribedMiddleware;
@@ -53,6 +54,7 @@ Route::post('/teacher/login', [AuthController::class, 'teacherLogin'])->name('lo
 Route::middleware(AuthEitherUser::class)->group(function(){
     Route::get('/subjects', [SubjectController::class, 'index']);
     Route::get('total-exam-count', [QuizController::class,'totalExamCounter']);
+    Route::apiResource('blog', BlogController::class)->scoped(['blog' => 'slug']);
 });
 
 // Protected Routes (for authenticated students)
