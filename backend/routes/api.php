@@ -50,15 +50,16 @@ Route::post('/student/login', [AuthController::class, 'loginStudent'])->name('lo
 Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('loginAdmin');
 Route::post('/teacher/login', [AuthController::class, 'teacherLogin'])->name('loginTeacher');
 
+Route::apiResource('blog', BlogController::class)->scoped(['blog' => 'slug']);
 #routes accessed by both api and users guards
 Route::middleware(AuthEitherUser::class)->group(function(){
     Route::get('/subjects', [SubjectController::class, 'index']);
     Route::get('total-exam-count', [QuizController::class,'totalExamCounter']);
-    Route::apiResource('blog', BlogController::class)->scoped(['blog' => 'slug']);
 });
 
 // Protected Routes (for authenticated students)
 Route::middleware(['auth:api','verified'])->group(function () {
+    Route::get('test', [BlogController::class,'test']);
     Route::post('/student/logout', [AuthController::class, 'logoutStudent']);
     Route::post('/student/refresh', [AuthController::class, 'refreshStudent']);
     Route::get('/student/me', [AuthController::class, 'me']);
@@ -149,6 +150,8 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::get('get-todays-pool-players', [PoolController::class, 'fetchTodaysPoolPlayers']);
     Route::get('request-pool-question', [PoolController::class, 'getPoolQuestions']);
     Route::post('send-pool-response', [PoolController::class, 'sendPoolQuestionResponse']);
+
+    Route::get('student-exams-stats', [StudentProfileController::class, 'studentProfileExamStats']);
 });
 
 // for exam type

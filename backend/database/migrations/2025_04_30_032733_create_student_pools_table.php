@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('student_id');
             $table->foreign('student_id')->references('id')->on('student_profiles')->onDelete('cascade');
-            $table->foreign('student_id')->references('id')->on('student_profiles')->onDelete('cascade');
             $table->unsignedTinyInteger('strike',1)->default(0);
             $table->string('token')->nullable();
             $table->date('played_at');

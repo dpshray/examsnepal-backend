@@ -56,8 +56,7 @@ class Exam extends Model
 
     public function scopeAuthUserCompleted(Builder $query): Builder
     {
-        return $query->allAvailableExams()
-            ->with([
+        return $query->with([
                 'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])->with([
                     'student:id,name',
                     'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
@@ -70,7 +69,8 @@ class Exam extends Model
             ->when(
                 Auth::guard('api')->check(),
                 fn($qry) => $qry->whereHas('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))
-            );
+            )
+            ->allAvailableExams();
     }
 
     public function scopeAllAvailableExams(Builder $query): Builder
