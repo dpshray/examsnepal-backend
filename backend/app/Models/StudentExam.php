@@ -12,6 +12,15 @@ class StudentExam extends Model
         'first_time_token'
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'exam_id' => 'integer',
+            'student_id' => 'integer'
+        ];
+    }
+
     public function answers(){
         return $this->hasMany(Answersheet::class,'student_exam_id');
     }

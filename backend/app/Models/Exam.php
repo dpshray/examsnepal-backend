@@ -30,6 +30,16 @@ class Exam extends Model
         'is_question_bank',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'user_id' => 'integer',
+            'exam_type_id' => 'integer',
+            'status' => 'integer'
+        ];
+    }
+
     public function scopeFreeType(Builder $query): Builder
     {
         return $query->where('status', ExamTypeEnum::FREE_QUIZ->value);

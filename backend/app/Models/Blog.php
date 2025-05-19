@@ -15,4 +15,12 @@ class Blog extends Model
     public function author() {
         return $this->belongsTo(User::class,'user_id');
     }
+
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'user_id' => 'integer'
+        ];
+    }
 }

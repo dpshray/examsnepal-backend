@@ -25,6 +25,15 @@ class Bookmark extends Model
     //     return $this->belongsTo(Exam::class);
     // }
 
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'student_id' => 'integer',
+            'question_id' => 'integer'
+        ];
+    }
+
     public function student()
     {
         return $this->belongsTo(StudentProfile::class, 'student_id');

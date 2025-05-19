@@ -14,14 +14,13 @@ class StudentPool extends Model
         'played_at',
         'token'
     ];
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+
     protected function casts(): array
     {
         return [
+            'id' => 'integer',
+            'student_id' => 'integer',
+            'strike' => 'integer',
             'played_at' => 'date'
         ];
     }

@@ -19,4 +19,13 @@ class Organization extends Model
     {
         return $this->hasMany(Exam::class); // One Organization has many Exams
     }
+
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'question_id' => 'integer',
+            'value' => 'integer',
+        ];
+    }
 }

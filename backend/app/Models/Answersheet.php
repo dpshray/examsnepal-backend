@@ -17,10 +17,18 @@ class Answersheet extends Model
         'question_id',
         'selected_option_id',
         'is_correct'
-        // 'student_id',
-        // 'correct_answer_submitted',
-        // 'choosed_option_value',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'student_exam_id' => 'integer',
+            'question_id' => 'integer',
+            'selected_option_id' => 'integer',
+            'is_correct' => 'integer'
+        ];
+    }
 
     public function exam()
     {

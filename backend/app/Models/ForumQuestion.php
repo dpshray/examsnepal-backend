@@ -13,6 +13,15 @@ class ForumQuestion extends Model
     protected $perPage = 12;
     protected $fillable = ['user_id', 'question', 'deleted'];
 
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'deleted' => 'integer',
+            'user_id' => 'integer'
+        ];
+    }
+
     public static function boot()
     {
         parent::boot();
