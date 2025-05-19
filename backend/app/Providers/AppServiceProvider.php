@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use App\Models\{Subject, Role};
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,17 +23,14 @@ class AppServiceProvider extends ServiceProvider
         // Model::preventLazyLoading(true);
         if (Schema::hasTable('subjects')) {
             Cache::remember('subjects', 3600, function () {
-                return DB::table('subjects')
-                        ->select('id','name','code','description')
+                return Subject::select('id','name','code','description')
                         ->where('status',1)
                         ->get();
             });
-        }        
+        }
         if (Schema::hasTable('roles')) {
             Cache::remember('roles', 3600, function () {
-                return DB::table('roles')
-                        ->select('id','name')
-                        ->pluck('name','id');
+                return Role::select('id','name')->pluck('name','id');
             });
         }
     }
