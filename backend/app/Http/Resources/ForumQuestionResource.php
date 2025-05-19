@@ -22,7 +22,7 @@ class ForumQuestionResource extends JsonResource
         "question" => $this->question,
         "created_at" => $this->created_at,
         "updated_at" => $this->updated_at,
-        "answers_count" => $this->answers_count,
+        "answers_count" => (int)$this->whenCounted('answers'),#str->int
         "student_profile" => $this->whenLoaded('studentProfile', fn() => new StudentResource($this->studentProfile)),
         "answers" => $this->whenLoaded('answers', fn() => new ForumAnswerCollection($this->answers))
         ];

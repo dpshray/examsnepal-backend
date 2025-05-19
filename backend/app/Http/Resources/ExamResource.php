@@ -21,7 +21,7 @@ class ExamResource extends JsonResource
             "id" => $this->id,
             "exam_name" => $this->exam_name,
             "status" => $this->status,
-            "questions_count" => $this->whenCounted('questions'),
+            "questions_count" => (int)$this->whenCounted('questions'),
             "user" => $this->whenLoaded('user'), #<---added_by
             'players' => $this->whenLoaded('student_exams', fn() => new PlayerExamScoreCollection($this->student_exams))
         ];
