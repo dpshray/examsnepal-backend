@@ -35,8 +35,7 @@ class Exam extends Model
         return [
             'id' => 'integer',
             'user_id' => 'integer',
-            'exam_type_id' => 'integer',
-            'status' => 'integer'
+            'exam_type_id' => 'integer'
         ];
     }
 
