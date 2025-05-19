@@ -26,6 +26,16 @@ class Doubt extends Model
         'solved_by',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'student_id' => 'integer',
+            'question_id' => 'integer',
+            'user_id' => 'integer'
+        ];
+    }
+
     public function getCreatedAtAttribute($value)
     {
         return Carbon::parse($value)->setTimezone('Asia/Kathmandu')->format('Y-m-d H:i:s');

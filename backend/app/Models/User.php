@@ -67,6 +67,9 @@ class User extends Authenticatable implements JWTSubject
     protected function casts(): array
     {
         return [
+            'id' => 'integer',
+            'role_id' => 'integer',
+            'added_by' => 'integer',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];

@@ -16,9 +16,9 @@ class StudentProfileResource extends JsonResource
     {
         // return parent::toArray($request);
         return [    
-            "id" => (int)$this->id,
-            "exam_type_id" => (int)$this->exam_type_id,
-            "is_subscripted" => (int)$this->is_subscripted,
+            "id" => $this->id,
+            "exam_type_id" => $this->exam_type_id,
+            "is_subscripted" => $this->is_subscripted,
             "name" => $this->name,
             "email" => $this->email,
             "email_verified_at" => $this->email_verified_at,

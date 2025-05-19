@@ -34,6 +34,18 @@ class Question extends Model
         'from_question_bank',
     ];
 
+
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'exam_id' => 'integer',
+            'exam_type_id' => 'integer',
+            'added_by' => 'integer',
+            'subject_id' => 'integer',
+        ];
+    }
+
     public function uploader()
     {
         return $this->belongsTo(User::class, 'uploader');

@@ -17,4 +17,11 @@ class Subject extends Model
         'status',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer'
+        ];
+    }
+
 }

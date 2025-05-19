@@ -34,6 +34,15 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
 
     protected $hidden = ['password'];
 
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'exam_type_id' => 'integer',
+            'is_subscripted' => 'integer',
+        ];
+    }
+
     public static function boot()
     {
         parent::boot();

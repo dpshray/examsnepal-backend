@@ -11,6 +11,14 @@ class ForumAnswer extends Model {
     // Define the fillable attributes for mass assignment
     protected $fillable = ['user_id', 'answer','forum_question_id'];
 
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'forum_question_id' => 'integer',
+            'user_id' => 'integer'
+        ];
+    }
     /**
      * Define the relationship with the StudentProfile model.
      * Assumes 'user_id' is the foreign key in this table.
