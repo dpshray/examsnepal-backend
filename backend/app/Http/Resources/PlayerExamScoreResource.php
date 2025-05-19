@@ -20,7 +20,7 @@ class PlayerExamScoreResource extends JsonResource
             'id' => $this->whenLoaded('student', fn() => $this->student->id),
             'name' => $this->whenLoaded('student', fn() => $this->student->name),
             'solutions' => $this->whenLoaded('answers', fn() => [
-                'corrected' => $this->correct_answers_count, # right answered
+                'corrected' => (int)$this->correct_answers_count, # right answered
                 // 'total' => $this->question_count # total questions
             ])
         ];
