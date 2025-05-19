@@ -19,8 +19,9 @@ class BlogResource extends JsonResource
             'slug' => $this->slug,
             'title' => $this->title,
             'excerpt' => $this->excerpt,
-            'datetime' => $this->datatime,
+            'datetime' => $this->created_at,
+			'image' => $this->image,
             'author' => $this->whenLoaded('author', fn() => $this->author)
-        ];
+         ];
     }
 }

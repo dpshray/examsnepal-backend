@@ -16,13 +16,13 @@ class ForumQuestionResource extends JsonResource
     {
         // return parent::toArray($request);
         return [
-        "id" => $this->id,
-        "deleted" => $this->deleted,
-        "user_id" => $this->user_id,
+        "id" => (int)$this->id,
+        "deleted" => (int)$this->deleted,
+        "user_id" => (int)$this->user_id,
         "question" => $this->question,
         "created_at" => $this->created_at,
         "updated_at" => $this->updated_at,
-        "answers_count" => $this->answers_count,
+        "answers_count" => (int)$this->answers_count,
         "student_profile" => $this->whenLoaded('studentProfile', fn() => new StudentResource($this->studentProfile)),
         "answers" => $this->whenLoaded('answers', fn() => new ForumAnswerCollection($this->answers))
         ];

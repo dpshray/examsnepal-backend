@@ -513,4 +513,50 @@ class StudentProfileController extends Controller
         $logged_in_user->delete();
         return Response::apiSuccess('Your account has been removed permanently');
     }
+
+    /**
+     * @OA\Get(
+     *     path="/student-exams-stats",
+     *     summary="Get an student exams stats",
+     *     description="Fetches a list of exams of a student with its statistics.",
+     *     operationId="studentExamsStats",
+     *     tags={"Student Authentication"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of exams retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
+     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
+     *                 @OA\Property(
+     *                     property="organization",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="ABC University")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="examType",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Final Exam")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
+     */
+    public function studentProfileExamStats() {
+        return Auth::guard('api')->user()->student_exams()->with('answers')->get();
+
+    }
 }

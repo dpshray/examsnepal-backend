@@ -6,12 +6,15 @@ use App\Models\Blog;
 use App\Http\Requests\StoreBlogRequest;
 use App\Http\Requests\UpdateBlogRequest;
 use App\Http\Resources\BlogCollection;
+use App\Http\Resources\ExamCollection;
+use App\Models\Exam;
 use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Response;
 
 class BlogController extends Controller
 {
     use PaginatorTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -73,7 +76,7 @@ class BlogController extends Controller
      */
     public function index()
     {
-        $rows = Blog::select("slug", 'title', 'excerpt', 'user_id')->with('author:id,username')->paginate();
+        $rows = Blog::select("slug", 'title', 'excerpt', 'user_id','image','created_at')->with('author:id,username')->paginate();
         $data = $this->setupPagination($rows, BlogCollection::class)->data;
         return Response::apiSuccess('Blog list fetched', $data);
     }

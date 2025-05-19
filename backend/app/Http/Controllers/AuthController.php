@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\StudentProfileResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -208,7 +209,7 @@ class AuthController extends Controller
         if (!$token = Auth::guard('api')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
+        
         return $this->respondWithToken($token);
         // // return $this->respondWithToken($credentials);
 
@@ -466,7 +467,7 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 1,
-            'student' => $student,
+            'student' => new StudentProfileResource($student),
         ]);
     }
 
@@ -478,7 +479,7 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
-            'student' => $student,
+            'student' => new StudentProfileResource($student),
         ]);
     }
 }
