@@ -70,10 +70,11 @@ class Exam extends Model
                     'student:id,name',
                     'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
                 ])
-                    ->withCount([
-                        'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
-                    ])
-                    ->orderBy('correct_answers_count', 'DESC'),
+                ->withCount([
+                    'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
+                ])
+                ->orderBy('correct_answers_count', 'DESC')
+                ->orderBy('id', 'DESC')
             ])
             ->when(
                 Auth::guard('api')->check(),

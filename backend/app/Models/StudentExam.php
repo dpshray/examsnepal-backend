@@ -25,6 +25,11 @@ class StudentExam extends Model
         return $this->hasMany(Answersheet::class,'student_exam_id');
     }
 
+    public function correct_answers()
+    {
+        return $this->hasMany(Answersheet::class)->where('is_correct', 1);
+    }
+
     function student() {
         return $this->belongsTo(StudentProfile::class,'student_id');
     }
