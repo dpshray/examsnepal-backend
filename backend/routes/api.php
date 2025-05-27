@@ -93,6 +93,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
 
     // for Exam
     // Route::get('/exam', [ExamController::class, 'index']);
+    Route::get('exam-scorers/{exam}', [ExamController::class, 'examPlayersScoreList']);
     Route::delete('/exam/{id}', [ExamController::class, 'destroy']);
     Route::post('/exam', [ExamController::class, 'store']);
     Route::get('/exam/{id}', [ExamController::class, 'show']);

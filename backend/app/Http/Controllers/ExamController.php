@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Exam;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response;
 
 class ExamController extends Controller
 {
@@ -425,5 +426,67 @@ class ExamController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/exam-scorers/{exam}",
+     *     summary="Get all exams scorers",
+     *     description="Fetches all exams scorers.",
+     *     operationId="GetExamScorers",
+     *     tags={"Exams"},
+     *     @OA\Parameter(
+     *         name="exam",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the exam",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of exams retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
+     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
+     *                 @OA\Property(
+     *                     property="organization",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="ABC University")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="examType",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Final Exam")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
+    */
+    public function examPlayersScoreList(Exam $exam)
+    {
+        $exam = $exam->load([
+            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])
+                ->with(['student:id,name'])
+                ->withCount('correct_answers')
+                ->orderBy('correct_answers_count', 'DESC')
+                ->orderBy('id', 'DESC')
+        ]);
+
+        $data = new \App\Http\Resources\ExamResource($exam);
+        return Response::apiSuccess('exam with its lists of players with scores', $data);
     }
 }
