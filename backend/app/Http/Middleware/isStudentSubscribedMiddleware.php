@@ -16,8 +16,8 @@ class isStudentSubscribedMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $is_user_not_subscribed = Auth::guard('api')->user()->is_subscripted != 1;
-        if ($is_user_not_subscribed) {
+        $subscribed = Auth::guard('api')->user()->subscribed;
+        if (empty($subscribed)) {
             return response()->json([
                 'status' => false,
                 'data' => null,

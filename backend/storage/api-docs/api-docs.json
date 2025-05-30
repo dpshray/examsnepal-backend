@@ -5008,6 +5008,195 @@
                 }
             }
         },
+        "/esewa/save-transaction": {
+            "post": {
+                "tags": [
+                    "Esewa"
+                ],
+                "summary": "Saves student transactions",
+                "description": "Saves student transactions.",
+                "operationId": "esewaSaveTransaction",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "student_id",
+                                    "productId",
+                                    "productName",
+                                    "totalAmount",
+                                    "environment",
+                                    "code",
+                                    "merchantName",
+                                    "message",
+                                    "date",
+                                    "status",
+                                    "refId"
+                                ],
+                                "properties": {
+                                    "studentId": {
+                                        "type": "integer",
+                                        "example": 12127
+                                    },
+                                    "productId": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "productName": {
+                                        "type": "string",
+                                        "example": "some name"
+                                    },
+                                    "totalAmount": {
+                                        "type": "string",
+                                        "example": "100.50"
+                                    },
+                                    "environment": {
+                                        "type": "string",
+                                        "example": "test"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "00"
+                                    },
+                                    "merchantName": {
+                                        "type": "string",
+                                        "example": "EPAYTEST"
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "example": "Fri May 30 12:46:57 NPT 2025"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "COMPLETED"
+                                    },
+                                    "refId": {
+                                        "type": "string",
+                                        "example": "000ASZ5"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Transaction saved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "student_profile_id": {
+                                                    "type": "integer",
+                                                    "example": 12127
+                                                },
+                                                "subscription_type_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "transaction_id": {
+                                                    "type": "string",
+                                                    "example": "000ASZ5"
+                                                },
+                                                "start_date": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-05-29T18:15:00.000000Z"
+                                                },
+                                                "end_date": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-06-29T18:15:00.000000Z"
+                                                },
+                                                "price": {
+                                                    "type": "string",
+                                                    "example": "110.00"
+                                                },
+                                                "paid": {
+                                                    "type": "string",
+                                                    "example": "100.50"
+                                                },
+                                                "subscribed_at": {
+                                                    "type": "string",
+                                                    "example": "2025-05-30 17:03:20"
+                                                },
+                                                "data": {
+                                                    "properties": {
+                                                        "studentId": {
+                                                            "type": "integer",
+                                                            "example": 12127
+                                                        },
+                                                        "productId": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "productName": {
+                                                            "type": "string",
+                                                            "example": "some name"
+                                                        },
+                                                        "totalAmount": {
+                                                            "type": "string",
+                                                            "example": "100.50"
+                                                        },
+                                                        "environment": {
+                                                            "type": "string",
+                                                            "example": "test"
+                                                        },
+                                                        "code": {
+                                                            "type": "string",
+                                                            "example": "00"
+                                                        },
+                                                        "merchantName": {
+                                                            "type": "string",
+                                                            "example": "EPAYTEST"
+                                                        },
+                                                        "message": {
+                                                            "type": "string",
+                                                            "example": "1"
+                                                        },
+                                                        "date": {
+                                                            "type": "string",
+                                                            "example": "Fri May 30 12:46:57 NPT 2025"
+                                                        },
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "COMPLETED"
+                                                        },
+                                                        "refId": {
+                                                            "type": "string",
+                                                            "example": "000ASZ5"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Transaction saved"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/request-pool-question": {
             "get": {
                 "tags": [
@@ -10238,6 +10427,59 @@
                 }
             }
         },
+        "/subscription-type": {
+            "get": {
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Fetch all subscription list",
+                "description": "Fetch all subscription list",
+                "operationId": "SubscriptionList",
+                "responses": {
+                    "200": {
+                        "description": "Active package list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "duration": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "price": {
+                                                        "type": "string",
+                                                        "example": "100.00"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Active package list"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/teachers": {
             "get": {
                 "tags": [
@@ -10377,6 +10619,10 @@
             "description": "Organizations"
         },
         {
+            "name": "Esewa",
+            "description": "Esewa"
+        },
+        {
             "name": "Pool",
             "description": "Pool"
         },
@@ -10391,6 +10637,10 @@
         {
             "name": "Subjects",
             "description": "Subjects"
+        },
+        {
+            "name": "Subscription",
+            "description": "Subscription"
         },
         {
             "name": "Teachers",

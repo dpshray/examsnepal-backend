@@ -34,7 +34,7 @@ class EsewaController extends Controller
      *             @OA\Property(property="refId", type="string", example="000ASZ5")
      *         )
      *     ),
-@OA\Response(
+     *     @OA\Response(
      *         response=200,
      *         description="Transaction saved successfully",
      *         @OA\JsonContent(
@@ -74,15 +74,18 @@ class EsewaController extends Controller
      */
     public function storeTransaction(Request $request){
         $data = $request->all();
-        Log::info($data);
-        $subscription_types = DB::table('subscription_types')->where('id', $request->productId)->first();
+        $subscription_type = DB::table('subscription_types')->where('id', $request->productId)->first();
+        $student = DB::table('student_profiles')->find($request->studentId);
+        if ($subscription_type->exam_type_id != $student->exam_type_id) {
+            return Response::apiError('This subscription type is not for this student', 403);
+        }
         $transaction = [
             'student_profile_id' => $request->studentId,
             'subscription_type_id' => $request->productId,
             'transaction_id' => $request->refId,
             'start_date' => today(),
-            'end_date' => today()->addMonths($subscription_types->duration),
-            'price' => $subscription_types->price,
+            'end_date' => today()->addMonths($subscription_type->duration),
+            'price' => $subscription_type->price,
             'paid' => $request->totalAmount,
             'subscribed_at' => now()->format('Y-m-d H:i:s')
         ];
@@ -90,7 +93,6 @@ class EsewaController extends Controller
             $transaction['data'] = json_encode($data);
             DB::transaction(fn() => DB::table('subscribers')->insert($transaction));
         } catch (\Exception $e) {
-            dd($e->getMessage());
             Log::error($e->getMessage());
             Log::info($transaction);
             return Response::apiError('Error while saving transaction',500);
