@@ -130,4 +130,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
     public function student_pools(){
         return $this->hasMany(StudentPool::class,'student_id');
     }
+
+    public function subscribed(){
+        return $this->hasOne(Subscriber::class)->whereDate('end_date','>=',today())->latestOfMany();
+    }
 }

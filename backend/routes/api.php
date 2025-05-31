@@ -17,6 +17,9 @@ use App\Http\Controllers\AnswerSheetController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
+use App\Http\Controllers\PackageController;
+use App\Http\Controllers\Payment\EsewaController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Middleware\isStudentSubscribedMiddleware;
 use App\Models\Answersheet;
 use App\Models\Question;
@@ -24,7 +27,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PoolController;
+use App\Http\Controllers\SubscriptionTypeController;
 use App\Http\Middleware\AuthEitherUser;
+use App\Models\SubscriptionType;
 
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
@@ -153,6 +158,9 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::post('send-pool-response', [PoolController::class, 'sendPoolQuestionResponse']);
 
     Route::get('student-exams-stats', [StudentProfileController::class, 'studentProfileExamStats']);
+
+    Route::apiResource('subscription-type', SubscriptionTypeController::class);
+    Route::post('esewa/save-transaction', [EsewaController::class, 'storeTransaction']);
 });
 
 // for exam type
