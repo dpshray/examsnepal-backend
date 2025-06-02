@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Models\StudentProfile;
+use App\Models\SubscriptionType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -74,17 +76,26 @@ class EsewaController extends Controller
      */
     public function storeTransaction(Request $request){
         $data = $request->all();
-        $subscription_type = DB::table('subscription_types')->where('id', $request->productId)->first();
-        $student = DB::table('student_profiles')->find($request->studentId);
+
+        $subscription_type = SubscriptionType::findOrFail($request->productId);
+        $student = StudentProfile::findOrFail($request->studentId);
+
         if ($subscription_type->exam_type_id != $student->exam_type_id) {
             return Response::apiError('This subscription type is not for this student', 403);
+        }
+        $is_subscription_still_active = $student->subscribed;
+        $start_date = today();
+        $end_date = today()->addMonths($subscription_type->duration);
+        if ($is_subscription_still_active) { #if previous subscription is active
+            $start_date = $is_subscription_still_active->start_date;
+            $end_date = $is_subscription_still_active->end_date->addMonths($subscription_type->duration);
         }
         $transaction = [
             'student_profile_id' => $request->studentId,
             'subscription_type_id' => $request->productId,
             'transaction_id' => $request->refId,
-            'start_date' => today(),
-            'end_date' => today()->addMonths($subscription_type->duration),
+            'start_date' => $start_date,
+            'end_date' => $end_date,
             'price' => $subscription_type->price,
             'paid' => $request->totalAmount,
             'subscribed_at' => now()->format('Y-m-d H:i:s')
