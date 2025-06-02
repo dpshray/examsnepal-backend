@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 Route::get('/', function () {
     return view('welcome');
@@ -17,6 +18,7 @@ Route::get('/doc', function () {
 
 Route::get('dummy-data-inserter', function(){
     $temp = [];
+    DB::select('ALTER TABLE subscription_types AUTO_INCREMENT = 1');
     DB::table('exam_types')->get()->each(function($item, $key) use(&$temp){
         foreach ([1 => 100, 3 => 300, 6 => 500, 12 => 1000] as $month => $price) {
             $temp[] = [

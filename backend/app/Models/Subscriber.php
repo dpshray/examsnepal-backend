@@ -12,4 +12,8 @@ class Subscriber extends Model
             'end_date' => 'date'
         ];
     }
+
+    public function subscriptionType(){
+        return $this->belongsTo(SubscriptionType::class);
+    }
 }

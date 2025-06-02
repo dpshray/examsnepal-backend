@@ -159,6 +159,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
 
     Route::get('student-exams-stats', [StudentProfileController::class, 'studentProfileExamStats']);
 
+    Route::get('user-subscription-status', [SubscriptionTypeController::class, 'subscribeStat']);
     Route::apiResource('subscription-type', SubscriptionTypeController::class);
     Route::post('esewa/save-transaction', [EsewaController::class, 'storeTransaction']);
 });
