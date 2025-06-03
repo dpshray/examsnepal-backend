@@ -4,11 +4,52 @@ namespace App\Http\Controllers;
 
 use App\Models\SubscriptionType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\{Auth,DB};
 use Illuminate\Support\Facades\Response;
 
 class SubscriptionTypeController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     security={{"bearerAuth": {}}},
+     *     path="/user-subscription-status",
+     *     summary="Fetch student subscription",
+     *     description="Fetch student subscription",
+     *     operationId="SubscriptionStatus",
+     *     tags={"Subscription"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Active package list",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="duration", type="integer", example=1),
+     *                     @OA\Property(property="price", type="string", example="100.00")
+     *                 )
+     *             ),
+     *             @OA\Property(property="message", type="string", example="Active package list")
+     *         )
+     *     )
+     * )
+     */
+    public function subscribeStat(){
+        $subscription = Auth::user()
+                        ->subscribed()
+                        ->select(
+                            'price',
+                            'subscribers.student_profile_id',
+                            DB::raw("DATE_FORMAT(subscribers.start_date, '%Y-%m-%d') as starts_at"),
+                            DB::raw("DATE_FORMAT(subscribers.end_date, '%Y-%m-%d') as ends_at"),
+                            'subscribed_at',
+                        )
+                        ->first();
+        return Response::apiSuccess('User subscription status', $subscription);
+    }
     /**
      * Display a listing of the resource.
      */

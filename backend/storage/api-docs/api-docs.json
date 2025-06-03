@@ -10427,6 +10427,59 @@
                 }
             }
         },
+        "/user-subscription-status": {
+            "get": {
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Fetch student subscription",
+                "description": "Fetch student subscription",
+                "operationId": "SubscriptionStatus",
+                "responses": {
+                    "200": {
+                        "description": "Active package list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "duration": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "price": {
+                                                        "type": "string",
+                                                        "example": "100.00"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Active package list"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/subscription-type": {
             "get": {
                 "tags": [

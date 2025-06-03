@@ -132,6 +132,6 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
     }
 
     public function subscribed(){
-        return $this->hasOne(Subscriber::class)->whereDate('end_date','>=',today())->latestOfMany();
+        return $this->hasOne(Subscriber::class)->where('status',1)->whereDate('end_date','>=',today())->latestOfMany();
     }
 }
