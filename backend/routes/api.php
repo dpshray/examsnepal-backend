@@ -65,6 +65,7 @@ Route::middleware(AuthEitherUser::class)->group(function(){
 // Protected Routes (for authenticated students)
 Route::middleware(['auth:api','verified'])->group(function () {
     Route::get('test', [BlogController::class,'test']);
+    Route::get('auth-student', [AuthController::class, 'studentAuthResponse']);
     Route::post('/student/logout', [AuthController::class, 'logoutStudent']);
     Route::post('/student/refresh', [AuthController::class, 'refreshStudent']);
     Route::get('/student/me', [AuthController::class, 'me']);

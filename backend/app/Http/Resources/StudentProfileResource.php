@@ -21,14 +21,6 @@ class StudentProfileResource extends JsonResource
             "is_subscripted" => $this->is_subscripted,
             "name" => $this->name,
             "email" => $this->email,
-            "email_verified_at" => $this->email_verified_at,
-            "image" => $this->image,
-            "phone" => $this->phone,
-            "address" => $this->address,
-            "description" => $this->description,
-            "target" => $this->target,
-            "college" => $this->college,
-            "date" => $this->date,
         ];
     }
 }

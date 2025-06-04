@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\StudentSubscriptionResource;
 use App\Models\SubscriptionType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth,DB};
@@ -18,37 +19,50 @@ class SubscriptionTypeController extends Controller
      *     operationId="SubscriptionStatus",
      *     tags={"Subscription"},
      *     @OA\Response(
-     *         response=200,
-     *         description="Active package list",
-     *         @OA\JsonContent(
+     *     response=200,
+     *     description="User subscription status response",
+     *     @OA\JsonContent(
+     *         @OA\Property(property="status", type="boolean", example=true),
+     *         @OA\Property(
+     *             property="data",
      *             type="object",
-     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="price", type="string", example="101.00"),
+     *             @OA\Property(property="paid", type="string", example="100.50"),
+     *             @OA\Property(property="student_profile_id", type="integer", example=12127),
+     *             @OA\Property(property="starts_at", type="string", format="date", example="2025-06-02"),
+     *             @OA\Property(property="ends_at", type="string", format="date", example="2026-02-02"),
+     *             @OA\Property(property="subscribed_at", type="string", format="date-time", example="2025-06-04 10:55:59"),
      *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="duration", type="integer", example=1),
-     *                     @OA\Property(property="price", type="string", example="100.00")
-     *                 )
-     *             ),
-     *             @OA\Property(property="message", type="string", example="Active package list")
-     *         )
+     *                 property="subscription",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="exam_type_id", type="integer", example=1),
+     *                 @OA\Property(property="duration", type="integer", example=1),
+     *                 @OA\Property(property="price", type="string", example="101.00"),
+     *                 @OA\Property(property="status", type="integer", example=1)
+     *             )
+     *         ),
+     *         @OA\Property(property="message", type="string", example="User subscription status")
      *     )
+     * )
      * )
      */
     public function subscribeStat(){
         $subscription = Auth::user()
                         ->subscribed()
+                        ->with('subscriptionType')
                         ->select(
                             'price',
+                            'paid',
                             'subscribers.student_profile_id',
                             DB::raw("DATE_FORMAT(subscribers.start_date, '%Y-%m-%d') as starts_at"),
                             DB::raw("DATE_FORMAT(subscribers.end_date, '%Y-%m-%d') as ends_at"),
                             'subscribed_at',
+                            'subscription_type_id'
                         )
                         ->first();
-        return Response::apiSuccess('User subscription status', $subscription);
+        $data = new StudentSubscriptionResource($subscription);
+        return Response::apiSuccess('User subscription status', $data);
     }
     /**
      * Display a listing of the resource.
