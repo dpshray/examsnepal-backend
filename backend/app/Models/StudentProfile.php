@@ -29,7 +29,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
         'password',
         'exam_type_id',
         'date',
-        'email_verified_at'
+        'email_verified_at',
+        'fcm_token'
     ];
 
     protected $hidden = ['password'];

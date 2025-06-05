@@ -146,9 +146,10 @@ class AuthController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"email","password"},
+     *             required={"email","password","fcm_token"},
      *             @OA\Property(property="email", type="string", format="email", example="dhurbac66@gmail.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="Nepal123#")
+     *             @OA\Property(property="password", type="string", format="password", example="Nepal123#"),
+     *             @OA\Property(property="fcm_token", type="string", example="Q8nR457CD")
      *         )
      *     ),
      *     @OA\Response(
@@ -182,6 +183,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:student_profiles,email',
             'password' => 'required|string',
+            "fcm_token" => 'required|string'
         ]);
         if ($validator->fails()) {
             $an_error = $validator->errors()->all();
@@ -210,7 +212,7 @@ class AuthController extends Controller
         if (!$token = Auth::guard('api')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        
+        $student->update(['fcm_token' => $request->fcm_token]);
         return $this->respondWithToken($token);
         // // return $this->respondWithToken($credentials);
 
