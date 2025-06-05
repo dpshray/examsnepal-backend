@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PoolController;
+use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\SubscriptionTypeController;
 use App\Http\Middleware\AuthEitherUser;
 use App\Models\SubscriptionType;
@@ -163,6 +164,8 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::get('user-subscription-status', [SubscriptionTypeController::class, 'subscribeStat']);
     Route::apiResource('subscription-type', SubscriptionTypeController::class);
     Route::post('esewa/save-transaction', [EsewaController::class, 'storeTransaction']);
+
+    Route::post('verify-promo-code', [PromoCodeController::class, 'checkPromoCodes']);
 });
 
 // for exam type
