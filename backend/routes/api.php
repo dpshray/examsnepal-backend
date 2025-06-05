@@ -17,6 +17,7 @@ use App\Http\Controllers\AnswerSheetController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\Payment\EsewaController;
 use App\Http\Controllers\PaymentController;
@@ -166,6 +167,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::post('esewa/save-transaction', [EsewaController::class, 'storeTransaction']);
 
     Route::post('verify-promo-code', [PromoCodeController::class, 'checkPromoCodes']);
+    Route::get('notification', [NotificationController::class, 'getUserNotifications']);
 });
 
 // for exam type

@@ -29,7 +29,7 @@ class ExamObserver
             ->whereNotNull('fcm_token')
             ->get();
 
-        $fcmTokens = $students->pluck('fcm_token')->filter()->all();
+        $fcmTokens = $students->pluck('fcm_token', 'id')->all();
 
         $successCount = 0;
         $failureCount = 0;
@@ -56,8 +56,24 @@ class ExamObserver
                 $successCount = $response->successes()->count();
                 $failureCount = $response->failures()->count();
 
+                $successfulTokens = [];
+                Log::info('Success count: ' . $response->successes()->count());
+                foreach ($response->successes() as $success) {
+                    Log::info('Success token target:', [
+                        'target' => $success->target(),
+                    ]);
+                    $token = trim($success->target()->value());
+                    $successfulTokens[] = $token;
+                }
+
+
+                $result = array_filter($fcmTokens, function ($fcm) use ($successfulTokens) {
+                    return in_array(trim($fcm), $successfulTokens, true);
+                });
+
+                // Log::info($result);
                 foreach ($response->failures() as $failure) {
-                    $errors[] = $failure->error()->getMessage();
+                    $errors[] = $failure;
                     Log::error("FCM error: " . $failure->error()->getMessage());
                 }
             } catch (\Exception $e) {
