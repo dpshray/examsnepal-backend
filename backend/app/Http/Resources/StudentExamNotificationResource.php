@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class StudentProfileResource extends JsonResource
+class StudentExamNotificationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,12 +15,11 @@ class StudentProfileResource extends JsonResource
     public function toArray(Request $request): array
     {
         // return parent::toArray($request);
-        return [    
-            "id" => $this->id,
-            "exam_type_id" => $this->exam_type_id,
-            "is_subscripted" => $this->is_subscripted,
-            "name" => $this->name,
-            "email" => $this->email,
+        $item = json_decode($this->data);
+        return [
+            'title' => $item->title,
+            'body' => $item->body,
+            'notified_at' => $this->notified_at
         ];
     }
 }

@@ -1,0 +1,127 @@
+<?php
+
+namespace App\Observers;
+
+use App\Models\Exam;
+use Kreait\Firebase\Factory;
+use Illuminate\Support\Facades\Log;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
+use Kreait\Firebase\Messaging\RegistrationToken;
+use Illuminate\Support\Facades\DB;
+
+class ExamObserver
+{
+    /**
+     * Handle the Exam "created" event.
+     */
+    public function created(Exam $exam): void
+    {
+        $factory = (new Factory())->withServiceAccount(
+            base_path('exams-nepal-661f4-firebase-adminsdk-fbsvc-7bb2520f4b.json')
+        );
+
+        $messaging = $factory->createMessaging();
+
+        $students = DB::table('student_profiles')
+            ->select('fcm_token', 'id')
+            ->where('exam_type_id', $exam->exam_type_id)
+            ->whereNotNull('fcm_token')
+            ->get();
+
+        $fcmTokens = $students->pluck('fcm_token', 'id')->all();
+
+        $successCount = 0;
+        $failureCount = 0;
+        $errors = [];
+
+        if (!empty($fcmTokens)) {
+            $title = 'New Exam Added';
+            $body = 'New exam ' . $exam->name . ' has been added';
+
+            $notification = Notification::create($title, $body);
+
+            $message = CloudMessage::new()
+                ->withNotification($notification)
+                ->withData([
+                    'type' => 'notification',
+                ]);
+
+            try {
+                $response = $messaging->sendMulticast($message, array_map(
+                    fn($token) => RegistrationToken::fromValue($token),
+                    $fcmTokens
+                ));
+
+                $successCount = $response->successes()->count();
+                $failureCount = $response->failures()->count();
+
+                $successfulTokens = [];
+                Log::info('Success count: ' . $response->successes()->count());
+                foreach ($response->successes() as $success) {
+                    Log::info('Success token target:', [
+                        'target' => $success->target(),
+                    ]);
+                    $token = trim($success->target()->value());
+                    $successfulTokens[] = $token;
+                }
+
+
+                $result = array_filter($fcmTokens, function ($fcm) use ($successfulTokens) {
+                    return in_array(trim($fcm), $successfulTokens, true);
+                });
+
+                // Log::info($result);
+                foreach ($response->failures() as $failure) {
+                    $errors[] = $failure;
+                    Log::error("FCM error: " . $failure->error()->getMessage());
+                }
+            } catch (\Exception $e) {
+                $failureCount = count($fcmTokens);
+                $errors[] = $e->getMessage();
+                Log::error("Failed to send FCM notifications: " . $e->getMessage());
+            }
+        } else {
+            Log::info('No valid FCM tokens found.');
+        }
+
+        Log::info('Notification summary', [
+            'successes' => $successCount,
+            'failures' => $failureCount,
+            'errors' => $errors,
+            'date' => now()->format('Y-m-d H:i:s')
+        ]);
+    }
+
+    /**
+     * Handle the Exam "updated" event.
+     */
+    public function updated(Exam $exam): void
+    {
+        //
+    }
+
+    /**
+     * Handle the Exam "deleted" event.
+     */
+    public function deleted(Exam $exam): void
+    {
+        //
+    }
+
+    /**
+     * Handle the Exam "restored" event.
+     */
+    public function restored(Exam $exam): void
+    {
+        //
+    }
+
+    /**
+     * Handle the Exam "force deleted" event.
+     */
+    public function forceDeleted(Exam $exam): void
+    {
+        //
+    }
+}

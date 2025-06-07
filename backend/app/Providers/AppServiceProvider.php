@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
-use App\Models\{Subject, Role};
+use App\Models\{Exam, Subject, Role};
+use App\Observers\ExamObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
                 return Role::select('id','name')->pluck('name','id');
             });
         }
+        Exam::observe(ExamObserver::class);
     }
 
     public function register()

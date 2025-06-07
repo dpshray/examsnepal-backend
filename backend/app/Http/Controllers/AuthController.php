@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\StudentProfileResource;
+use App\Http\Resources\StudentResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -145,9 +146,10 @@ class AuthController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"email","password"},
+     *             required={"email","password","fcm_token"},
      *             @OA\Property(property="email", type="string", format="email", example="dhurbac66@gmail.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="Nepal123#")
+     *             @OA\Property(property="password", type="string", format="password", example="Nepal123#"),
+     *             @OA\Property(property="fcm_token", type="string", example="Q8nR457CD")
      *         )
      *     ),
      *     @OA\Response(
@@ -181,6 +183,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:student_profiles,email',
             'password' => 'required|string',
+            "fcm_token" => 'required|string'
         ]);
         if ($validator->fails()) {
             $an_error = $validator->errors()->all();
@@ -209,7 +212,7 @@ class AuthController extends Controller
         if (!$token = Auth::guard('api')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        
+        $student->update(['fcm_token' => $request->fcm_token]);
         return $this->respondWithToken($token);
         // // return $this->respondWithToken($credentials);
 
@@ -457,8 +460,54 @@ class AuthController extends Controller
     }
 
 
-
-
+    /**
+     * @OA\Get(
+     *     path="/auth-student",
+     *     summary="Get auth student info",
+     *     description="Retrieve auth student info.",
+     *     operationId="authStudent",
+     *     tags={"Student Authentication"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Free quizzes retrieved successfully."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="exam_name", type="string", example="Math Quiz"),
+     *                         @OA\Property(property="status", type="string", example="free"),
+     *                         @OA\Property(property="user_id", type="integer", example=12),
+     *                         @OA\Property(
+     *                             property="user",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=12),
+     *                             @OA\Property(property="fullname", type="string", example="John Doe")
+     *                         )
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="last_page", type="integer", example=5),
+     *                 @OA\Property(property="per_page", type="integer", example=10),
+     *                 @OA\Property(property="total", type="integer", example=50)
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function studentAuthResponse(){
+        $student = Auth::guard('api')->user();
+        $data = new StudentProfileResource($student);
+        return Response::apiSuccess('Authenticated student info', $data);
+    }
+    
     protected function respondWithToken($token)
     {
         $student = Auth::guard('api')->user();

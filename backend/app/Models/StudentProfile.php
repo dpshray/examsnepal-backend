@@ -29,7 +29,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
         'password',
         'exam_type_id',
         'date',
-        'email_verified_at'
+        'email_verified_at',
+        'fcm_token'
     ];
 
     protected $hidden = ['password'];
@@ -133,5 +134,10 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
 
     public function subscribed(){
         return $this->hasOne(Subscriber::class)->where('status',1)->whereDate('end_date','>=',today())->latestOfMany();
+    }
+
+    public function getIsSubscriptedAttribute()
+    {
+        return $this->subscribed()->exists() ? 1: 0;
     }
 }

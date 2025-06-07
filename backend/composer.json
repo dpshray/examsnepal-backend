@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "darkaonline/l5-swagger": "^9.0",
+        "kreait/laravel-firebase": "^5.8",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
         "tymon/jwt-auth": "^2.1"

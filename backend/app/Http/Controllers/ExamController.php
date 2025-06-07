@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExamTypeEnum;
 use Illuminate\Http\Request;
 use App\Models\Exam;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\Rule;
 
 class ExamController extends Controller
 {
@@ -96,7 +98,8 @@ class ExamController extends Controller
      *             @OA\Property(property="exam_date", type="string", format="date", example="2025-06-15"),
      *             @OA\Property(property="exam_time", type="string", format="time", example="09:00:00"),
      *             @OA\Property(property="is_active", type="boolean", example=true),
-     *             @OA\Property(property="price", type="integer", example=500)
+     *             @OA\Property(property="price", type="integer", example=500),
+     *             @OA\Property(property="test_type", type="integer", example=1)
      *         )
      *     ),
      *     @OA\Response(
@@ -108,7 +111,7 @@ class ExamController extends Controller
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="organization_id", type="integer", example=1),
      *                 @OA\Property(property="exam_type_id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="Mathematics Final Exam"),
+     *                 @OA\Property(property="exam_name", type="string", example="Mathematics Final Exam"),
      *                 @OA\Property(property="description", type="string", example="A detailed mathematics final exam."),
      *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-15"),
      *                 @OA\Property(property="exam_time", type="string", format="time", example="09:00:00"),
@@ -140,16 +143,18 @@ class ExamController extends Controller
         // Validate the request data
         $validated = $request->validate([
             'exam_type_id' => 'required|integer|exists:exam_types,id',
-            'name' => 'required|string|max:255',
+            'exam_name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'exam_date' => 'required|string',
             'exam_time' => 'required|string',
             'is_active' => 'nullable|boolean',
             'price' => 'nullable|integer',
+            'test_type' => ['required', Rule::enum(ExamTypeEnum::class)]
         ]);
 
         try {
             // Create the exam
+            $validated['status'] = $validated['test_type'];
             $exam = Exam::create($validated);
 
             // Return a successful response with the created exam

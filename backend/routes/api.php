@@ -17,6 +17,7 @@ use App\Http\Controllers\AnswerSheetController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\Payment\EsewaController;
 use App\Http\Controllers\PaymentController;
@@ -27,6 +28,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PoolController;
+use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\SubscriptionTypeController;
 use App\Http\Middleware\AuthEitherUser;
 use App\Models\SubscriptionType;
@@ -65,6 +67,7 @@ Route::middleware(AuthEitherUser::class)->group(function(){
 // Protected Routes (for authenticated students)
 Route::middleware(['auth:api','verified'])->group(function () {
     Route::get('test', [BlogController::class,'test']);
+    Route::get('auth-student', [AuthController::class, 'studentAuthResponse']);
     Route::post('/student/logout', [AuthController::class, 'logoutStudent']);
     Route::post('/student/refresh', [AuthController::class, 'refreshStudent']);
     Route::get('/student/me', [AuthController::class, 'me']);
@@ -162,6 +165,9 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::get('user-subscription-status', [SubscriptionTypeController::class, 'subscribeStat']);
     Route::apiResource('subscription-type', SubscriptionTypeController::class);
     Route::post('esewa/save-transaction', [EsewaController::class, 'storeTransaction']);
+
+    Route::post('verify-promo-code', [PromoCodeController::class, 'checkPromoCodes']);
+    Route::get('notification', [NotificationController::class, 'getUserNotifications']);
 });
 
 // for exam type

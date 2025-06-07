@@ -1220,7 +1220,8 @@
                             "schema": {
                                 "required": [
                                     "email",
-                                    "password"
+                                    "password",
+                                    "fcm_token"
                                 ],
                                 "properties": {
                                     "email": {
@@ -1232,6 +1233,10 @@
                                         "type": "string",
                                         "format": "password",
                                         "example": "Nepal123#"
+                                    },
+                                    "fcm_token": {
+                                        "type": "string",
+                                        "example": "Q8nR457CD"
                                     }
                                 },
                                 "type": "object"
@@ -1591,6 +1596,96 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/auth-student": {
+            "get": {
+                "tags": [
+                    "Student Authentication"
+                ],
+                "summary": "Get auth student info",
+                "description": "Retrieve auth student info.",
+                "operationId": "authStudent",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Free quizzes retrieved successfully."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "exam_name": {
+                                                                "type": "string",
+                                                                "example": "Math Quiz"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "free"
+                                                            },
+                                                            "user_id": {
+                                                                "type": "integer",
+                                                                "example": 12
+                                                            },
+                                                            "user": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 12
+                                                                    },
+                                                                    "fullname": {
+                                                                        "type": "string",
+                                                                        "example": "John Doe"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/all-question-banks": {
@@ -3352,6 +3447,10 @@
                                     "price": {
                                         "type": "integer",
                                         "example": 500
+                                    },
+                                    "test_type": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -3384,7 +3483,7 @@
                                                     "type": "integer",
                                                     "example": 1
                                                 },
-                                                "name": {
+                                                "exam_name": {
                                                     "type": "string",
                                                     "example": "Mathematics Final Exam"
                                                 },
@@ -4534,6 +4633,64 @@
                 }
             }
         },
+        "/notification": {
+            "get": {
+                "tags": [
+                    "Notification"
+                ],
+                "summary": "Get all student notifications",
+                "description": "Get all student notifications",
+                "operationId": "StudentNotifications",
+                "responses": {
+                    "200": {
+                        "description": "User notifications",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "some title here"
+                                                    },
+                                                    "body": {
+                                                        "type": "string",
+                                                        "example": "some body here"
+                                                    },
+                                                    "notified_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-06-05 16:45:52"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User anonymous user notifications"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/organization": {
             "get": {
                 "tags": [
@@ -5552,6 +5709,74 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/verify-promo-code": {
+            "post": {
+                "tags": [
+                    "PromoCode"
+                ],
+                "summary": "Api for verifying promo code",
+                "description": "Api for verifying promo code.",
+                "operationId": "verifyPromoCode",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "promo_code"
+                                ],
+                                "properties": {
+                                    "promo_code": {
+                                        "type": "string",
+                                        "example": "VISITNEPAL2026"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Promo code information",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "NEPALMEDIA25"
+                                                },
+                                                "discount_percent": {
+                                                    "type": "string",
+                                                    "example": "9.00"
+                                                },
+                                                "detail": {
+                                                    "type": "string",
+                                                    "example": "Nostrum velit id ratione dolorem cumque alias. Voluptatem nulla eaque dolores laborum quae."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Promo code information"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/questions": {
@@ -10437,7 +10662,7 @@
                 "operationId": "SubscriptionStatus",
                 "responses": {
                     "200": {
-                        "description": "Active package list",
+                        "description": "User subscription status response",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -10447,24 +10672,65 @@
                                             "example": true
                                         },
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "duration": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "price": {
-                                                        "type": "string",
-                                                        "example": "100.00"
-                                                    }
+                                            "properties": {
+                                                "price": {
+                                                    "type": "string",
+                                                    "example": "101.00"
                                                 },
-                                                "type": "object"
-                                            }
+                                                "paid": {
+                                                    "type": "string",
+                                                    "example": "100.50"
+                                                },
+                                                "student_profile_id": {
+                                                    "type": "integer",
+                                                    "example": 12127
+                                                },
+                                                "starts_at": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2025-06-02"
+                                                },
+                                                "ends_at": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-02-02"
+                                                },
+                                                "subscribed_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-06-04 10:55:59"
+                                                },
+                                                "subscription": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "exam_type_id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "duration": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "price": {
+                                                            "type": "string",
+                                                            "example": "101.00"
+                                                        },
+                                                        "status": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Active package list"
+                                            "example": "User subscription status"
                                         }
                                     },
                                     "type": "object"
@@ -10668,6 +10934,10 @@
             "description": "AnswerSheet Migration"
         },
         {
+            "name": "Notification",
+            "description": "Notification"
+        },
+        {
             "name": "Organizations",
             "description": "Organizations"
         },
@@ -10678,6 +10948,10 @@
         {
             "name": "Pool",
             "description": "Pool"
+        },
+        {
+            "name": "PromoCode",
+            "description": "PromoCode"
         },
         {
             "name": "MCQs",
