@@ -183,7 +183,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:student_profiles,email',
             'password' => 'required|string',
-            "fcm_token" => 'required|string'
+            "fcm_token" => 'nullable'
         ]);
         if ($validator->fails()) {
             $an_error = $validator->errors()->all();
