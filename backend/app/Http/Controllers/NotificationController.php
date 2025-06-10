@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use App\Models\StudentProfile;
 
 class NotificationController extends Controller
 {
@@ -44,7 +45,7 @@ class NotificationController extends Controller
         $student = Auth::user();
         $notifications = DB::table('notifications')
                             ->select('data','notified_at')
-                            ->where('model_type', '\App\Models\StudentProfile')
+                            ->where('model_type', StudentProfile::class)
                             ->where('model_id', $student->id)
                             ->get();
         $notifications = new StudentExamNotificationCollection($notifications);
