@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\Exam;
+use App\Models\{Exam, StudentProfile};
 use Kreait\Firebase\Factory;
 use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Messaging\CloudMessage;
@@ -37,7 +37,7 @@ class ExamObserver
 
         if (!empty($fcmTokens)) {
             $title = 'New Exam Added';
-            $body = 'New exam ' . $exam->name . ' has been added';
+            $body = "New exam *".$exam->exam_name ."* has been added";
 
             $notification = Notification::create($title, $body);
 
@@ -57,21 +57,35 @@ class ExamObserver
                 $failureCount = $response->failures()->count();
 
                 $successfulTokens = [];
-                Log::info('Success count: ' . $response->successes()->count());
-                foreach ($response->successes() as $success) {
-                    Log::info('Success token target:', [
-                        'target' => $success->target(),
-                    ]);
+                $_successes = iterator_to_array($response->successes()->getItems());
+                
+                foreach ($_successes as $success) {
                     $token = trim($success->target()->value());
                     $successfulTokens[] = $token;
                 }
+                // DB::select('user')
 
 
-                $result = array_filter($fcmTokens, function ($fcm) use ($successfulTokens) {
-                    return in_array(trim($fcm), $successfulTokens, true);
-                });
+                $result = [];
+                foreach ($fcmTokens as $id => $token) {
+                    // Log::info([in_array(($token), $successfulTokens),$token == $successfulTokens, $token, $successfulTokens]);
+                    $temp = [];
+                    if (in_array(($token), $successfulTokens)) {
+                        $temp['model_type'] = StudentProfile::class;
+                        $temp['model_id'] = $id;
+                        $temp['data'] = json_encode(compact('title','body'));
+                        $temp['notified_at'] = now();
+                        $result[] = $temp;
+                    }
+                }
+                Log::info($result);
+                DB::table('notifications')->insert($result);
+                // $result = array_filter($fcmTokens, function ($fcm) use ($successfulTokens) {
+                //     return in_array(trim($fcm), $successfulTokens, true);
+                // });
+                // Log::info('Success token:', collect($fcmTokens)->where('fcm_token', $successfulTokens)->all());
+                // $result;
 
-                // Log::info($result);
                 foreach ($response->failures() as $failure) {
                     $errors[] = $failure;
                     Log::error("FCM error: " . $failure->error()->getMessage());
