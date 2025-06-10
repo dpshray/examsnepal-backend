@@ -11,7 +11,8 @@ use App\Models\StudentProfile;
 use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
-
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * @OA\Info(
@@ -684,5 +685,51 @@ class ForumController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/forum-question-view-increment/{id}",
+     *     tags={"Forum"},
+     *     summary="Forum question view incrementor",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="question id",
+     *         @OA\Schema(
+     *             type="integer",
+     *             example="1"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *     response=200,
+     *     description="View incremented successfully",
+     *     @OA\JsonContent(
+     *         type="object",
+     *         @OA\Property(property="status", type="boolean", example=true),
+     *         @OA\Property(property="data", type="string", nullable=true, example=null),
+     *         @OA\Property(property="message", type="string", example="view incremented")
+     *     )
+     *     )
+     * )
+    */
+    public function viewIncrementor(Request $request, $id)
+    {
+        $user_id = Auth::id();
+        try {
+            $question = ForumQuestion::findOrFail($id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return Response::apiError('Question not found', null, 404);
+        }
+        $cache_key = 'viewed_product_'.$user_id.'_'.$question->id;
+
+        if (!Cache::has($cache_key)) {
+            $question->increment('view_count');
+            Cache::add($cache_key, 1, now()->addDays(1));
+            return Response::apiSuccess('view incremented');
+        }
+        return Response::apiSuccess('already incremented');
     }
 }
