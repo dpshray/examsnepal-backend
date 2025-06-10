@@ -82,6 +82,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::get('/student/questions/their/{id}', [ForumController::class, 'getQuestionByTheirId']);
     Route::get('/student/questions/{subStream}', [ForumController::class, 'fetchQuestionsBySubstream']);
     Route::delete('/student/questions/{id}', [ForumController::class, 'deleteTheirQuestionCreated']);
+    Route::get('/forum-question-view-increment/{id}', [ForumController::class, 'incrementForumQuestionView']);
 
     Route::post('/student/answers', [ForumController::class, 'addAnswer']);
 

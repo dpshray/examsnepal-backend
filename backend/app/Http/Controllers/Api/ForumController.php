@@ -715,7 +715,7 @@ class ForumController extends Controller
      *     )
      * )
     */
-    public function viewIncrementor(Request $request, $id)
+    public function incrementForumQuestionView(Request $request, $id)
     {
         $user_id = Auth::id();
         try {
