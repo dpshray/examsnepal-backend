@@ -1096,6 +1096,59 @@
                 ]
             }
         },
+        "/forum-question-view-increment/{id}": {
+            "get": {
+                "tags": [
+                    "Forum"
+                ],
+                "summary": "Forum question view incrementor",
+                "operationId": "a36e3109932a70736a0ef76fd7a2132b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "question id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "View incremented successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "view incremented"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/register": {
             "post": {
                 "tags": [
