@@ -73,6 +73,8 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::get('/student/me', [AuthController::class, 'me']);
     #Student Account Removal
     Route::delete('student-account-removal/{student}', [StudentProfileController::class, 'permanentStudentRemoveAccount']);
+    
+    Route::get('get-student-performance-data', [StudentProfileController::class, 'studentPerformanceReport']);
 
     Route::get('/student/questions', [ForumController::class, 'fetchQuestions']);
     Route::get('/student/myquestions', [ForumController::class, 'fetchMyQuestions']);

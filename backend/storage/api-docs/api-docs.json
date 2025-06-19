@@ -10194,6 +10194,81 @@
                 }
             }
         },
+        "/get-student-performance-data": {
+            "get": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Get student performance report",
+                "description": "Retrieve student performance report.",
+                "operationId": "studentPerformanceReport",
+                "responses": {
+                    "200": {
+                        "description": "Performance data for user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "exams_given": {
+                                                                "type": "integer",
+                                                                "example": 51
+                                                            },
+                                                            "total_questions": {
+                                                                "type": "integer",
+                                                                "example": 7340
+                                                            },
+                                                            "correct_answers": {
+                                                                "type": "integer",
+                                                                "example": 3553
+                                                            },
+                                                            "exam_type": {
+                                                                "type": "string",
+                                                                "example": "MOCK_TEST"
+                                                            },
+                                                            "average_score": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 48.41
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "total_average_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 49.01
+                                                },
+                                                "total_exams": {
+                                                    "type": "integer",
+                                                    "example": 2129
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "performance data for user : Sandy"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/subjects": {
             "get": {
                 "tags": [

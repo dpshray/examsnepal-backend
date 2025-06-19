@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\ValidationException;
+use App\Enums\ExamTypeEnum;
 
 class StudentProfileController extends Controller
 {
@@ -558,5 +559,75 @@ class StudentProfileController extends Controller
     public function studentProfileExamStats() {
         return Auth::guard('api')->user()->student_exams()->with('answers')->get();
 
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/get-student-performance-data",
+     *     summary="Get student performance report",
+     *     description="Retrieve student performance report.",
+     *     operationId="studentPerformanceReport",
+     *     tags={"Students"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Performance data for user",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="exams_given", type="integer", example=51),
+     *                         @OA\Property(property="total_questions", type="integer", example=7340),
+     *                         @OA\Property(property="correct_answers", type="integer", example=3553),
+     *                         @OA\Property(property="exam_type", type="string", example="MOCK_TEST"),
+     *                         @OA\Property(property="average_score", type="number", format="float", example=48.41)
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="total_average_score", type="number", format="float", example=49.01),
+     *                 @OA\Property(property="total_exams", type="integer", example=2129)
+     *             ),
+     *             @OA\Property(property="message", type="string", example="performance data for user : Sandy")
+     *         )
+     *     )
+     * )
+    */
+    public function studentPerformanceReport(){
+
+        $student = Auth::guard('api')->user();
+
+        $total_exams = DB::table('exams')->count();
+        $data = DB::table('examsnepal_copy.student_profiles as sp')
+                ->join('examsnepal_copy.student_exams as se', 'sp.id', '=', 'se.student_id')
+                ->join('examsnepal_copy.answersheets as a', 'se.id', '=', 'a.student_exam_id')
+                ->join('examsnepal_copy.exams as e', 'e.id', '=', 'se.exam_id')
+                ->where('sp.id', $student->id)
+                ->select(
+                    // 'sp.id as sp_id',
+                    'e.status',
+                    DB::raw('COUNT(DISTINCT se.exam_id) as exams_given'),
+                    DB::raw('COUNT(a.question_id) as total_questions'),
+                    DB::raw('CAST(SUM(CASE WHEN a.is_correct = 1 THEN 1 ELSE 0 END) AS UNSIGNED) as correct_answers')
+                )
+                ->groupBy('sp.id', 'e.status')
+                ->get()
+                ->map(function ($item) {
+                    $item->exam_type = ExamTypeEnum::getKeyByValue((int) $item->status);
+                    unset($item->status);
+
+                    $item->average_score = $item->total_questions > 0
+                        ? round(($item->correct_answers / $item->total_questions) * 100, 2)
+                        : 0;
+
+                    return $item;
+                });
+        $totalCorrect = $data->sum('correct_answers');
+        $totalQuestions = $data->sum('total_questions');
+
+        $total_average_score = $totalQuestions > 0 ? round(($totalCorrect / $totalQuestions) * 100, 2) : 0;
+        return Response::apiSuccess('performance data for user : '.$student->name, compact('data','total_average_score','total_exams'));
     }
 }
