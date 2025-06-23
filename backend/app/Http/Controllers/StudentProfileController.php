@@ -600,10 +600,10 @@ class StudentProfileController extends Controller
         $student = Auth::guard('api')->user();
 
         $total_exams = DB::table('exams')->count();
-        $data = DB::table('examsnepal_copy.student_profiles as sp')
-                ->join('examsnepal_copy.student_exams as se', 'sp.id', '=', 'se.student_id')
-                ->join('examsnepal_copy.answersheets as a', 'se.id', '=', 'a.student_exam_id')
-                ->join('examsnepal_copy.exams as e', 'e.id', '=', 'se.exam_id')
+        $data = DB::table('student_profiles as sp')
+                ->join('student_exams as se', 'sp.id', '=', 'se.student_id')
+                ->join('answersheets as a', 'se.id', '=', 'a.student_exam_id')
+                ->join('exams as e', 'e.id', '=', 'se.exam_id')
                 ->where('sp.id', $student->id)
                 ->select(
                     // 'sp.id as sp_id',
