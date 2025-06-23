@@ -914,7 +914,7 @@ class QuizController extends Controller
      *             ),
      *             @OA\Property(property="message", type="string", example="Available Exams with their total")
      *         )
-     *     )
+     *     ),
      *     @OA\Response(
      *         response=500,
      *         description="Internal Server Error"
