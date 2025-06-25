@@ -17,7 +17,7 @@ class ForumQuestionResource extends JsonResource
         // return parent::toArray($request);
         return [
         "id" => $this->id,
-        "view_count" => $this->view_count,
+        "view_count" => (int)$this->view_count,
         "deleted" => $this->deleted,
         "user_id" => $this->user_id,
         "question" => $this->question,
