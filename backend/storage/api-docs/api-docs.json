@@ -9215,76 +9215,67 @@
                 "operationId": "totalExamCount",
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Available Exams with their total",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "status": {
                                             "type": "boolean",
                                             "example": true
                                         },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Free quizzes retrieved successfully."
-                                        },
                                         "data": {
                                             "properties": {
-                                                "current_page": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "exam_name": {
-                                                                "type": "string",
-                                                                "example": "Math Quiz"
-                                                            },
-                                                            "status": {
-                                                                "type": "string",
-                                                                "example": "free"
-                                                            },
-                                                            "user_id": {
-                                                                "type": "integer",
-                                                                "example": 12
-                                                            },
-                                                            "user": {
-                                                                "properties": {
-                                                                    "id": {
-                                                                        "type": "integer",
-                                                                        "example": 12
-                                                                    },
-                                                                    "fullname": {
-                                                                        "type": "string",
-                                                                        "example": "John Doe"
-                                                                    }
-                                                                },
-                                                                "type": "object"
-                                                            }
+                                                "free": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 15
                                                         },
-                                                        "type": "object"
-                                                    }
+                                                        "overall": {
+                                                            "type": "integer",
+                                                            "example": 100
+                                                        }
+                                                    },
+                                                    "type": "object"
                                                 },
-                                                "last_page": {
-                                                    "type": "integer",
-                                                    "example": 5
+                                                "sprint": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 29
+                                                        },
+                                                        "overall": {
+                                                            "type": "integer",
+                                                            "example": 100
+                                                        }
+                                                    },
+                                                    "type": "object"
                                                 },
-                                                "per_page": {
-                                                    "type": "integer",
-                                                    "example": 10
+                                                "mock": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 341
+                                                        },
+                                                        "overall": {
+                                                            "type": "integer",
+                                                            "example": 0
+                                                        }
+                                                    },
+                                                    "type": "object"
                                                 },
-                                                "total": {
-                                                    "type": "integer",
-                                                    "example": 50
+                                                "avg_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 49.01
                                                 }
                                             },
                                             "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Available Exams with their total"
                                         }
                                     },
                                     "type": "object"

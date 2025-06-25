@@ -886,35 +886,33 @@ class QuizController extends Controller
      *     tags={"Quiz"},
      *     @OA\Response(
      *         response=200,
-     *         description="Successful operation",
+     *         description="Available Exams with their total",
      *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Free quizzes retrieved successfully."),
+     *             @OA\Property(property="status", type="boolean", example=true),
      *             @OA\Property(
      *                 property="data",
      *                 type="object",
-     *                 @OA\Property(property="current_page", type="integer", example=1),
      *                 @OA\Property(
-     *                     property="data",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         type="object",
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="exam_name", type="string", example="Math Quiz"),
-     *                         @OA\Property(property="status", type="string", example="free"),
-     *                         @OA\Property(property="user_id", type="integer", example=12),
-     *                         @OA\Property(
-     *                             property="user",
-     *                             type="object",
-     *                             @OA\Property(property="id", type="integer", example=12),
-     *                             @OA\Property(property="fullname", type="string", example="John Doe")
-     *                         )
-     *                     )
+     *                     property="free",
+     *                     type="object",
+     *                     @OA\Property(property="total", type="integer", example=15),
+     *                     @OA\Property(property="overall", type="integer", example=100)
      *                 ),
-     *                 @OA\Property(property="last_page", type="integer", example=5),
-     *                 @OA\Property(property="per_page", type="integer", example=10),
-     *                 @OA\Property(property="total", type="integer", example=50)
-     *             )
+     *                 @OA\Property(
+     *                     property="sprint",
+     *                     type="object",
+     *                     @OA\Property(property="total", type="integer", example=29),
+     *                     @OA\Property(property="overall", type="integer", example=100)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="mock",
+     *                     type="object",
+     *                     @OA\Property(property="total", type="integer", example=341),
+     *                     @OA\Property(property="overall", type="integer", example=0)
+     *                 ),
+     *                 @OA\Property(property="avg_score", type="number", format="float", example=49.01)
+     *             ),
+     *             @OA\Property(property="message", type="string", example="Available Exams with their total")
      *         )
      *     ),
      *     @OA\Response(
@@ -936,6 +934,25 @@ class QuizController extends Controller
         $sprint_type_performance = ($sprint == 0) ? 0 : ($sprint_quiz_query/$sprint)*100;
         $mock_type_performance = ($mock == 0) ? 0 : ($mock_quiz_query/$mock)*100;
         
+
+
+        $stats = DB::table('student_profiles as sp')
+                    ->join('student_exams as se', 'sp.id', '=', 'se.student_id')
+                    ->join('answersheets as a', 'se.id', '=', 'a.student_exam_id')
+                    ->where('sp.id', Auth::guard('api')->id())
+                    ->selectRaw('
+                        COUNT(a.question_id) as total_questions,
+                        SUM(CASE WHEN a.is_correct = 1 THEN 1 ELSE 0 END) as correct_answers
+                    ')
+                    ->first();
+
+                $totalQuestions = $stats->total_questions ?? 0;
+                $totalCorrect   = $stats->correct_answers ?? 0;
+
+                $average_score = $totalQuestions > 0 ? round(($totalCorrect / $totalQuestions) * 100, 2) : 0;
+
+
+
         $data = [
             'free' => [
                 'total' => $free,
@@ -948,7 +965,8 @@ class QuizController extends Controller
             'mock' => [
                 'total' => $mock,
                 'overall' => round($mock_type_performance, 2)
-            ]
+            ],
+            'avg_score' => $average_score
         ];
         // $data = compact('free','sprint','mock');
         return Response::apiSuccess('Available Exams with their total', $data);
