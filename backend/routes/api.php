@@ -15,6 +15,7 @@ use App\Http\Controllers\BankQuestionController;
 use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\Corporate\CorporateExamController;
 use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\NotificationController;
@@ -32,6 +33,9 @@ use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\SubscriptionTypeController;
 use App\Http\Middleware\AuthEitherUser;
 use App\Models\SubscriptionType;
+
+
+require __DIR__.'/corporate.php';
 
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);

@@ -16,13 +16,21 @@ return new class extends Migration
             $table->smallIncrements('id');
             $table->string('name');
         });
+        $roles = \App\Enums\RoleEnum::cases();
+        $temp = [];
+        foreach($roles as $role){
+            $temp[] = ['name' => $role->value];
+        }
+        DB::table('roles')->insert($temp);
+        /* 
         DB::table('roles')->insert([
             ['name' => 'admin'],
             ['name' => 'teacher'],
             ['name' => 'upload'],
             ['name' => 'uploader'],
             ['name' => 'corporate']
-        ]);
+        ]); 
+        */
     }
 
     /**
