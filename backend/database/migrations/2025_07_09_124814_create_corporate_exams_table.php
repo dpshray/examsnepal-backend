@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('title');
             $table->date('exam_date');
             $table->time('start_time');
-            $table->time('duration');
+            $table->unsignedTinyInteger('duration');
             $table->text('about')->nullable();
             $table->text('rules')->nullable();
             $table->boolean('is_published')->default(true); 

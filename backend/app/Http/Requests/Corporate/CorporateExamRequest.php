@@ -25,7 +25,7 @@ class CorporateExamRequest extends FormRequest
             'title' => 'required|max:255',
             'exam_date' => 'required|date_format:Y-m-d',
             'start_time' => 'required|date_format:H:i',
-            'duration' => 'required|date_format:H:i',
+            'duration' => 'required|integer',
             'is_published' => 'required|in:0,1',
             'about' => 'nullable',
             'rules' => 'nullable',
