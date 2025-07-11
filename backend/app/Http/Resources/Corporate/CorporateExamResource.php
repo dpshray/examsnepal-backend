@@ -21,6 +21,9 @@ class CorporateExamResource extends JsonResource
             "exam_date" => $this->exam_date,
             "start_time" => $this->start_time,
             "end_time" => $this->end_time,
+            "participant_count" => rand(100, 1000),
+            "section_count" => rand(100,1000),
+            "question_count" => $this->whenCounted('sections'),
         ];
     }
 }

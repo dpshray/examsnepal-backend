@@ -61,11 +61,13 @@ class CorporateExamController extends Controller
      *                     type="array",
      *                     @OA\Items(
      *                         @OA\Property(property="id", type="integer", example=4),
-     *                         @OA\Property(property="corporate_id", type="integer", example=197),
      *                         @OA\Property(property="title", type="string", example="corporate exam NO 51"),
      *                         @OA\Property(property="exam_date", type="string", format="date", example="2025-07-09"),
      *                         @OA\Property(property="start_time", type="string", format="time", example="10:00:00"),
-     *                         @OA\Property(property="end_time", type="string", format="time", example="14:00:00")
+     *                         @OA\Property(property="end_time", type="string", format="time", example="14:00:00"),
+     *                         @OA\Property(property="participant_count", type="integer", example=10),
+     *                         @OA\Property(property="section_count", type="integer", example=25),
+     *                         @OA\Property(property="question_count", type="integer", example=75)
      *                     )
      *                 ),
      *                 @OA\Property(property="current_page", type="integer", example=1),
@@ -76,18 +78,19 @@ class CorporateExamController extends Controller
      *         )
      *     )
      * )
-    */
+     */
     public function index(Request $request)
     {
         $per_page = $request->query('per_page',12);
         $published = $request->query('published',1);
-        $pagination = CorporateExam::where([
+        $pagination = CorporateExam::withCount('sections')
+                        ->where([
                             ['corporate_id', Auth::guard('users')->id()],
                             ['is_published', $published]
                         ])
                         ->paginate($per_page);
         $data = $this->setupPagination($pagination, CorporateExamCollection::class)->data;
-        return Response::apiSuccess("corporate exam of user", $data);
+        return Response::apiSuccess("corporate exam list", $data);
     }
 
     /**
