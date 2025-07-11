@@ -26,4 +26,8 @@ class CorporateExam extends Model
     public function corporate(){
         return $this->belongsTo(User::class,'corporate_id');
     }
+
+    public function sections(){
+        return $this->hasMany(CorporateExamSection::class);
+    }
 }
