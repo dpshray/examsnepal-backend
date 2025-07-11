@@ -38,6 +38,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // });
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->expectsJson()) {
+                return Response::apiError('Resource Not Found');
+            }
+        });
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            if ($request->expectsJson()) {
                 return Response::apiError('Not Found');
             }
         });
