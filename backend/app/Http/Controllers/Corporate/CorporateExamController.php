@@ -106,7 +106,7 @@ class CorporateExamController extends Controller
      *             @OA\Property(property="title", type="string", example="corporate exam NO 1"),
      *             @OA\Property(property="exam_date", type="string", format="date", example="2025-07-09"),
      *             @OA\Property(property="start_time", type="string", format="time", example="10:00"),
-     *             @OA\Property(property="duration", type="integer", example="90"),
+     *             @OA\Property(property="end_time", type="string", format="time", example="14:00"),
      *             @OA\Property(property="about", type="string", example="lorem ipsum dolor"),
      *             @OA\Property(property="rules", type="string", example="lorem ipsum dolor"),
      *             @OA\Property(property="is_published", type="integer", example=1)
@@ -122,7 +122,7 @@ class CorporateExamController extends Controller
      *         )
      *     )
      * )
-    */
+     */
     public function store(CorporateExamRequest $request)
     {
         $form_data = $request->validated();
@@ -165,7 +165,7 @@ class CorporateExamController extends Controller
      *             @OA\Property(property="title", type="string", example="corporate exam NO 1"),
      *             @OA\Property(property="exam_date", type="string", format="date", example="2025-07-09"),
      *             @OA\Property(property="start_time", type="string", format="time", example="10:00"),
-     *             @OA\Property(property="duration", type="integer", example="90"),
+     *             @OA\Property(property="end_time", type="string", format="time", example="14:00"),
      *             @OA\Property(property="about", type="string", example="lorem ipsum dolor"),
      *             @OA\Property(property="rules", type="string", example="lorem ipsum dolor"),
      *             @OA\Property(property="is_published", type="integer", example=1)

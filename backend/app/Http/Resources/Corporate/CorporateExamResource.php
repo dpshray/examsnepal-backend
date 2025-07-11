@@ -20,7 +20,7 @@ class CorporateExamResource extends JsonResource
             "title" => $this->title,
             "exam_date" => $this->exam_date,
             "start_time" => $this->start_time,
-            "duration" => $this->duration,
+            "end_time" => $this->end_time,
         ];
     }
 }

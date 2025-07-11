@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CorporateExam extends Model
 {    
     use Uuid, SoftDeletes; // use the trait
-    protected $fillable = ['uuid','corporate_id','title','exam_date','start_time','duration','about','rules','is_published'];
+    protected $fillable = ['uuid','corporate_id','title','exam_date','start_time','end_time','about','rules','is_published'];
     
     protected $dates = ['deleted_at']; // mark this column as a date
 
