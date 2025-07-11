@@ -8,7 +8,7 @@ trait PaginatorTrait
 {
     public array $data = [];
 
-    public function setupPagination(LengthAwarePaginator $pagination, string $resourceClass = null, array $append = []): self
+    public function setupPagination(LengthAwarePaginator $pagination, string|callable|null $resourceClass = null, array $append = []): self
     {
         $items = $pagination->items();
 
