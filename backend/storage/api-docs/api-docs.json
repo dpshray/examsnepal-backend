@@ -2907,6 +2907,1219 @@
                 ]
             }
         },
+        "/corporate/login": {
+            "post": {
+                "tags": [
+                    "CorporateLogin"
+                ],
+                "summary": "Login form for corporate user(Note: role 5 is for corporate)",
+                "description": "Login form for corporate user",
+                "operationId": "corporateLogin",
+                "requestBody": {
+                    "description": "Corporate Exam data to be stored",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "corporate@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "Corporate@123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 197
+                                                        },
+                                                        "username": {
+                                                            "type": "string",
+                                                            "example": "corp"
+                                                        },
+                                                        "fullname": {
+                                                            "type": "string",
+                                                            "example": "CORPORATE"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "corporate@example.com"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ..."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "logged in successfull"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/corporate/exam": {
+            "get": {
+                "tags": [
+                    "CorporateExams"
+                ],
+                "summary": "Fetch all exams of a corporate",
+                "description": "Fetch all exams of a corporate",
+                "operationId": "CorporateExamsList",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Corprate exam ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 12
+                        }
+                    },
+                    {
+                        "name": "published",
+                        "in": "query",
+                        "description": "Corporate exam of status: published",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of corporate exams for a user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 4
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "corporate exam NO 51"
+                                                            },
+                                                            "exam_date": {
+                                                                "type": "string",
+                                                                "format": "date",
+                                                                "example": "2025-07-09"
+                                                            },
+                                                            "start_time": {
+                                                                "type": "string",
+                                                                "format": "time",
+                                                                "example": "10:00:00"
+                                                            },
+                                                            "end_time": {
+                                                                "type": "string",
+                                                                "format": "time",
+                                                                "example": "14:00:00"
+                                                            },
+                                                            "participant_count": {
+                                                                "type": "integer",
+                                                                "example": 10
+                                                            },
+                                                            "section_count": {
+                                                                "type": "integer",
+                                                                "example": 25
+                                                            },
+                                                            "question_count": {
+                                                                "type": "integer",
+                                                                "example": 75
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam of user"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "CorporateExams"
+                ],
+                "summary": "Create a new corporate exam",
+                "description": "Store a new corporate exam in the database.",
+                "operationId": "createCorporateExam",
+                "requestBody": {
+                    "description": "Corporate Exam data to be stored",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "exam_date",
+                                    "start_time",
+                                    "duration",
+                                    "is_published"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "corporate exam NO 1"
+                                    },
+                                    "exam_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-07-09"
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "10:00"
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "14:00"
+                                    },
+                                    "about": {
+                                        "type": "string",
+                                        "example": "lorem ipsum dolor"
+                                    },
+                                    "rules": {
+                                        "type": "string",
+                                        "example": "lorem ipsum dolor"
+                                    },
+                                    "is_published": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Corporate exam added successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam added successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/exam/{exam}": {
+            "put": {
+                "tags": [
+                    "CorporateExams"
+                ],
+                "summary": "Update an existing exam",
+                "description": "Update an exam's details in the database.",
+                "operationId": "updateCorporateExam",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "ID of the exam to be updated",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Exam data to be updated",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "exam_date",
+                                    "start_time",
+                                    "duration",
+                                    "is_published"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "corporate exam NO 1"
+                                    },
+                                    "exam_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-07-09"
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "10:00"
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "14:00"
+                                    },
+                                    "about": {
+                                        "type": "string",
+                                        "example": "lorem ipsum dolor"
+                                    },
+                                    "rules": {
+                                        "type": "string",
+                                        "example": "lorem ipsum dolor"
+                                    },
+                                    "is_published": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Corporate exam updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam updated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "CorporateExams"
+                ],
+                "summary": "Delete an corporate exam by ID",
+                "description": "Delete an corporate exam from(exam id)",
+                "operationId": "deleteCorporateExam",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "ID of the exam to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Corporate exam deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/corporate/exam/section/list/{exam}": {
+            "get": {
+                "tags": [
+                    "corporateExamSection"
+                ],
+                "summary": "Fetch all exams of a corporate",
+                "description": "Fetch all exams of a corporate",
+                "operationId": "CorporateExamsSectionList",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Corprate exam ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 12
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of corporate exams for a user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 4
+                                                            },
+                                                            "corporate_id": {
+                                                                "type": "integer",
+                                                                "example": 197
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "corporate exam NO 51"
+                                                            },
+                                                            "exam_date": {
+                                                                "type": "string",
+                                                                "format": "date",
+                                                                "example": "2025-07-09"
+                                                            },
+                                                            "start_time": {
+                                                                "type": "string",
+                                                                "format": "time",
+                                                                "example": "10:00:00"
+                                                            },
+                                                            "end_time": {
+                                                                "type": "string",
+                                                                "format": "time",
+                                                                "example": "14:00:00"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam of user"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/exam/section": {
+            "post": {
+                "tags": [
+                    "corporateExamSection"
+                ],
+                "summary": "Create a new corporate exam",
+                "description": "Store a new corporate exam section in the database.",
+                "operationId": "corporateExamSectionCreate",
+                "requestBody": {
+                    "description": "Corporate Exam data to be stored",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "corporate_exam_id",
+                                    "title",
+                                    "detail"
+                                ],
+                                "properties": {
+                                    "corporate_exam_id": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Exam section A-45"
+                                    },
+                                    "detail": {
+                                        "type": "string",
+                                        "example": "Exam section A-45 desctiption"
+                                    },
+                                    "is_published": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Corporate exam added successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam added successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/exam/section/{section}": {
+            "put": {
+                "tags": [
+                    "corporateExamSection"
+                ],
+                "summary": "Update an existing exam",
+                "description": "Update an exam's details in the database.",
+                "operationId": "corporateExamSectionUpdate",
+                "parameters": [
+                    {
+                        "name": "section",
+                        "in": "path",
+                        "description": "ID of the corporate exam section to be updated",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Exam data to be updated",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "corporate_exam_id",
+                                    "title",
+                                    "detail"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Exam section A-45"
+                                    },
+                                    "detail": {
+                                        "type": "string",
+                                        "example": "Exam section A-45 desctiption"
+                                    },
+                                    "is_published": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Corporate exam updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam updated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "corporateExamSection"
+                ],
+                "summary": "Delete an corporate exam by ID",
+                "description": "Delete an corporate exam from(exam id)",
+                "operationId": "corporateExamSectionDelete",
+                "parameters": [
+                    {
+                        "name": "section",
+                        "in": "path",
+                        "description": "ID of the exam to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Corporate exam deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/exam/participant/create-from-excel/{exam}": {
+            "post": {
+                "tags": [
+                    "CorporateParticipant"
+                ],
+                "summary": "Create a new corporate exam participants(from excel file)",
+                "description": "Store a new corporate exam participants(from excel file)",
+                "operationId": "createCorporateParticipantExcel",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Corprate exam ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "description": "Optional image file to upload",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Corporate exam added successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam added successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/exam/participant/list/{exam}": {
+            "get": {
+                "tags": [
+                    "CorporateParticipant"
+                ],
+                "summary": "Fetch all participants based on exam ID",
+                "description": "Fetch all participants based on exam ID",
+                "operationId": "listCorporateParticipant",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 12
+                        }
+                    },
+                    {
+                        "name": "published",
+                        "in": "query",
+                        "description": "Corporate exam of status: published",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of corporate exams for a user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 4
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "corporate exam NO 51"
+                                                            },
+                                                            "exam_date": {
+                                                                "type": "string",
+                                                                "format": "date",
+                                                                "example": "2025-07-09"
+                                                            },
+                                                            "start_time": {
+                                                                "type": "string",
+                                                                "format": "time",
+                                                                "example": "10:00:00"
+                                                            },
+                                                            "end_time": {
+                                                                "type": "string",
+                                                                "format": "time",
+                                                                "example": "14:00:00"
+                                                            },
+                                                            "participant_count": {
+                                                                "type": "integer",
+                                                                "example": 10
+                                                            },
+                                                            "section_count": {
+                                                                "type": "integer",
+                                                                "example": 25
+                                                            },
+                                                            "question_count": {
+                                                                "type": "integer",
+                                                                "example": 75
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam of user"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/participant": {
+            "post": {
+                "tags": [
+                    "CorporateParticipant"
+                ],
+                "summary": "Create a new corporate exam participant",
+                "description": "Store a new corporate exam participant",
+                "operationId": "createCorporateParticipant",
+                "requestBody": {
+                    "description": "Corporate Exam participant data to be stored",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "corporate_exam_id",
+                                    "username",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "corporate_exam_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "nicolson"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "jack.nicolson@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Corporate exam added successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam added successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        " /corporate/participant/{participant}": {
+            "put": {
+                "tags": [
+                    "CorporateParticipant"
+                ],
+                "summary": "Update an existing exam participant",
+                "description": "Update an existing exam participant in database.",
+                "operationId": "updateCorporateParticipant",
+                "parameters": [
+                    {
+                        "name": "participant",
+                        "in": "path",
+                        "description": "ID of the exam to be updated",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Exam data to be updated",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "corporate_exam_id",
+                                    "username",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "corporate_exam_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "nicolson"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "jack.nicolson@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "string",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Corporate exam updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam updated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/participant/{participant}": {
+            "delete": {
+                "tags": [
+                    "CorporateParticipant"
+                ],
+                "summary": "Delete an corporate participant by ID",
+                "description": "Delete an corporate participant from(participant id)",
+                "operationId": "deleteCorporateParticipant",
+                "parameters": [
+                    {
+                        "name": "participant",
+                        "in": "path",
+                        "description": "ID of the exam to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Corporate exam deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "corporate exam deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/doubt/student/solved": {
             "get": {
                 "tags": [
@@ -11035,6 +12248,22 @@
         {
             "name": "Bookmarks",
             "description": "Bookmarks"
+        },
+        {
+            "name": "CorporateLogin",
+            "description": "CorporateLogin"
+        },
+        {
+            "name": "CorporateExams",
+            "description": "CorporateExams"
+        },
+        {
+            "name": "corporateExamSection",
+            "description": "corporateExamSection"
+        },
+        {
+            "name": "CorporateParticipant",
+            "description": "CorporateParticipant"
         },
         {
             "name": "Doubts",

@@ -16,6 +16,19 @@ Route::get('/doc', function () {
     return redirect('/api/documentation');
 });
 
+
+Route::get('inserter', function(){
+    $name = \App\Enums\RoleEnum::PARTICIPANT;
+    $is_null = DB::table('roles')->where('name', $name)->first();
+    if (empty($is_null)) {
+        DB::table('roles')->insert([
+            ['name' => \App\Enums\RoleEnum::PARTICIPANT]
+        ]);
+        echo 'INSERTED';
+    } else {
+        echo 'ALREADY INSERTED';
+    }
+});
 // Route::get('dummy-data-inserter', function(){
 //     $temp = [];
 //     DB::select('ALTER TABLE subscription_types AUTO_INCREMENT = 1');

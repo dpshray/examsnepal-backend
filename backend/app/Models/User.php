@@ -12,7 +12,7 @@ class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
-    
+
     protected $perPage = 12;
 
     /**
@@ -83,6 +83,10 @@ class User extends Authenticatable implements JWTSubject
     public function answerSheets()
     {
         return $this->hasMany(AnswerSheet::class);
+    }
+
+    public function role(){
+        return $this->belongsTo(Role::class);
     }
 
 }
