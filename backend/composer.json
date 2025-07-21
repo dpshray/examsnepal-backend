@@ -11,6 +11,7 @@
         "kreait/laravel-firebase": "^5.8",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
+        "phpoffice/phpspreadsheet": "^4.4",
         "tymon/jwt-auth": "^2.1"
     },
     "require-dev": {
