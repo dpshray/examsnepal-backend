@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\RoleEnum;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -89,4 +90,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class);
     }
 
+    public function isTeacher(){
+        return $this->role->name == RoleEnum::TEACHER->value;
+    }
+
+    public function teacherExams(){
+        return $this->hasMany(Exam::class);
+    }
 }

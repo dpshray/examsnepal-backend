@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "https://api.examsnepal.dworklabs.com/api",
+            "url": "http://192.168.100.23:8000/api",
             "description": "Localhost API Server"
         }
     ],
@@ -1472,12 +1472,12 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "johndoe@example.com"
+                                        "example": "hariofhungi@gmail.com"
                                     },
                                     "password": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "password123"
+                                        "example": "password"
                                     }
                                 },
                                 "type": "object"
@@ -1492,49 +1492,35 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "access_token": {
-                                            "type": "string",
-                                            "example": "your_generated_jwt_token"
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
                                         },
-                                        "token_type": {
-                                            "type": "string",
-                                            "example": "bearer"
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "username": {
+                                                            "type": "string",
+                                                            "example": "teacher"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "info@examsnepal.com"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                                }
+                                            },
+                                            "type": "object"
                                         },
-                                        "expires_in": {
-                                            "type": "integer",
-                                            "example": 3600
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
+                                        "message": {
                                             "type": "string",
-                                            "example": "Incorrect password"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "user Not Found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "type": "string",
-                                            "example": "user not found"
+                                            "example": "welcome, teacher"
                                         }
                                     },
                                     "type": "object"
@@ -3005,16 +2991,6 @@
                 "operationId": "CorporateExamsList",
                 "parameters": [
                     {
-                        "name": "exam",
-                        "in": "path",
-                        "description": "Corprate exam ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    },
-                    {
                         "name": "page",
                         "in": "query",
                         "description": "Page number for pagination",
@@ -3701,425 +3677,6 @@
                 }
             }
         },
-        "/exam/participant/create-from-excel/{exam}": {
-            "post": {
-                "tags": [
-                    "CorporateParticipant"
-                ],
-                "summary": "Create a new corporate exam participants(from excel file)",
-                "description": "Store a new corporate exam participants(from excel file)",
-                "operationId": "createCorporateParticipantExcel",
-                "parameters": [
-                    {
-                        "name": "exam",
-                        "in": "path",
-                        "description": "Corprate exam ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "image"
-                                ],
-                                "properties": {
-                                    "image": {
-                                        "description": "Optional image file to upload",
-                                        "type": "string",
-                                        "format": "binary"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Corporate exam added successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "type": "string",
-                                            "example": null,
-                                            "nullable": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "corporate exam added successfully"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/corporate/exam/participant/list/{exam}": {
-            "get": {
-                "tags": [
-                    "CorporateParticipant"
-                ],
-                "summary": "Fetch all participants based on exam ID",
-                "description": "Fetch all participants based on exam ID",
-                "operationId": "listCorporateParticipant",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number for pagination",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "example": 12
-                        }
-                    },
-                    {
-                        "name": "published",
-                        "in": "query",
-                        "description": "Corporate exam of status: published",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of corporate exams for a user",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 4
-                                                            },
-                                                            "title": {
-                                                                "type": "string",
-                                                                "example": "corporate exam NO 51"
-                                                            },
-                                                            "exam_date": {
-                                                                "type": "string",
-                                                                "format": "date",
-                                                                "example": "2025-07-09"
-                                                            },
-                                                            "start_time": {
-                                                                "type": "string",
-                                                                "format": "time",
-                                                                "example": "10:00:00"
-                                                            },
-                                                            "end_time": {
-                                                                "type": "string",
-                                                                "format": "time",
-                                                                "example": "14:00:00"
-                                                            },
-                                                            "participant_count": {
-                                                                "type": "integer",
-                                                                "example": 10
-                                                            },
-                                                            "section_count": {
-                                                                "type": "integer",
-                                                                "example": 25
-                                                            },
-                                                            "question_count": {
-                                                                "type": "integer",
-                                                                "example": 75
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    }
-                                                },
-                                                "current_page": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "last_page": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "total": {
-                                                    "type": "integer",
-                                                    "example": 2
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "corporate exam of user"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/corporate/participant": {
-            "post": {
-                "tags": [
-                    "CorporateParticipant"
-                ],
-                "summary": "Create a new corporate exam participant",
-                "description": "Store a new corporate exam participant",
-                "operationId": "createCorporateParticipant",
-                "requestBody": {
-                    "description": "Corporate Exam participant data to be stored",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "corporate_exam_id",
-                                    "username",
-                                    "email"
-                                ],
-                                "properties": {
-                                    "corporate_exam_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "username": {
-                                        "type": "string",
-                                        "example": "nicolson"
-                                    },
-                                    "email": {
-                                        "type": "string",
-                                        "format": "time",
-                                        "example": "jack.nicolson@example.com"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Corporate exam added successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "type": "string",
-                                            "example": null,
-                                            "nullable": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "corporate exam added successfully"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        " /corporate/participant/{participant}": {
-            "put": {
-                "tags": [
-                    "CorporateParticipant"
-                ],
-                "summary": "Update an existing exam participant",
-                "description": "Update an existing exam participant in database.",
-                "operationId": "updateCorporateParticipant",
-                "parameters": [
-                    {
-                        "name": "participant",
-                        "in": "path",
-                        "description": "ID of the exam to be updated",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "description": "Exam data to be updated",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "corporate_exam_id",
-                                    "username",
-                                    "email",
-                                    "password",
-                                    "password_confirmation"
-                                ],
-                                "properties": {
-                                    "corporate_exam_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "username": {
-                                        "type": "string",
-                                        "example": "nicolson"
-                                    },
-                                    "email": {
-                                        "type": "string",
-                                        "format": "time",
-                                        "example": "jack.nicolson@example.com"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "format": "string",
-                                        "example": "password123"
-                                    },
-                                    "password_confirmation": {
-                                        "type": "string",
-                                        "example": "password123"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Corporate exam updated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "type": "string",
-                                            "example": null,
-                                            "nullable": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "corporate exam updated"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/corporate/participant/{participant}": {
-            "delete": {
-                "tags": [
-                    "CorporateParticipant"
-                ],
-                "summary": "Delete an corporate participant by ID",
-                "description": "Delete an corporate participant from(participant id)",
-                "operationId": "deleteCorporateParticipant",
-                "parameters": [
-                    {
-                        "name": "participant",
-                        "in": "path",
-                        "description": "ID of the exam to delete",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Corporate exam deleted",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "type": "string",
-                                            "example": null,
-                                            "nullable": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "corporate exam deleted"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/doubt/student/solved": {
             "get": {
                 "tags": [
@@ -4556,6 +4113,54 @@
                                         },
                                         "data": {
                                             "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/category-types": {
+            "get": {
+                "tags": [
+                    "ExamCategory"
+                ],
+                "summary": "Get all exam category types",
+                "description": "Fetches a list of exams categories.",
+                "operationId": "exam_category",
+                "responses": {
+                    "200": {
+                        "description": "Exam Category List",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "FREE_QUIZ"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "exam category list"
                                         }
                                     },
                                     "type": "object"
@@ -12210,6 +11815,166 @@
                     }
                 }
             }
+        },
+        "/teacher/exam": {
+            "get": {
+                "tags": [
+                    "TeacherExam"
+                ],
+                "summary": "Get all exam of logged in teacher",
+                "description": "Fetches all exam of logged in teacher.",
+                "operationId": "teacher_exam_list",
+                "responses": {
+                    "200": {
+                        "description": "Teacher (Loksewa) Exam List with Total Questions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 368
+                                                            },
+                                                            "publised": {
+                                                                "type": "integer",
+                                                                "example": 0
+                                                            },
+                                                            "exam_type": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 4
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Administration Loksewa all levels Exams"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "exam_name": {
+                                                                "type": "string",
+                                                                "example": "Loksewa Online Exam for Nasu & Kharidar"
+                                                            },
+                                                            "total_questions": {
+                                                                "type": "integer",
+                                                                "example": 50
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 9
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "teacher(loksewa) exam list"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "TeacherExam"
+                ],
+                "summary": "Add an exam (via teacher)",
+                "description": "Add an exam. (Note: For 'publish', value must be either 1 or 0)",
+                "operationId": "teacher_exam",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "exam_type_id",
+                                    "category_type",
+                                    "exam_name",
+                                    "description",
+                                    "publish"
+                                ],
+                                "properties": {
+                                    "exam_type_id": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "category_type": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "exam_name": {
+                                        "type": "string",
+                                        "example": "This is some exam name"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "This is some description of exam"
+                                    },
+                                    "publish": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Exam Added Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "exam added successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -12262,12 +12027,12 @@
             "description": "corporateExamSection"
         },
         {
-            "name": "CorporateParticipant",
-            "description": "CorporateParticipant"
-        },
-        {
             "name": "Doubts",
             "description": "Doubts"
+        },
+        {
+            "name": "ExamCategory",
+            "description": "ExamCategory"
         },
         {
             "name": "Exams",
@@ -12320,6 +12085,10 @@
         {
             "name": "Teachers",
             "description": "Teachers"
+        },
+        {
+            "name": "TeacherExam",
+            "description": "TeacherExam"
         }
     ],
     "components": {
