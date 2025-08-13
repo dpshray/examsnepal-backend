@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://192.168.100.23:8000/api",
+            "url": "http://127.0.0.1:8000/api",
             "description": "Localhost API Server"
         }
     ],
@@ -11975,6 +11975,123 @@
                     }
                 }
             }
+        },
+        "/teacher/exam/{exam}/question": {
+            "post": {
+                "tags": [
+                    "TeacherQuestionStore"
+                ],
+                "summary": "Store question (with options) for an exam of a teacher",
+                "description": "Stores a question along with multiple-choice options and an optional image for a teacher's exam.",
+                "operationId": "teacher_question_store",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "exam id of question",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "question",
+                                    "option_a",
+                                    "option_a_is_true",
+                                    "option_b",
+                                    "option_b_is_true",
+                                    "option_c",
+                                    "option_c_is_true",
+                                    "option_d",
+                                    "option_d_is_true",
+                                    "explanation"
+                                ],
+                                "properties": {
+                                    "question": {
+                                        "type": "string",
+                                        "example": "Who was the first person to land on the moon?"
+                                    },
+                                    "option_a": {
+                                        "type": "string",
+                                        "example": "Albert Einstein"
+                                    },
+                                    "option_a_is_true": {
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "option_b": {
+                                        "type": "string",
+                                        "example": "Edmund Hillary"
+                                    },
+                                    "option_b_is_true": {
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "option_c": {
+                                        "type": "string",
+                                        "example": "Neil Armstrong"
+                                    },
+                                    "option_c_is_true": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "option_d": {
+                                        "type": "string",
+                                        "example": "Bill Clinton"
+                                    },
+                                    "option_d_is_true": {
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "explanation": {
+                                        "type": "string",
+                                        "example": "On July 20, 1969, during NASA’s Apollo 11 mission, Neil Armstrong became the first human to step onto the Moon."
+                                    },
+                                    "image": {
+                                        "description": "Optional image file to upload",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Question Added Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question added of exam name: This is some exam name"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -12089,6 +12206,10 @@
         {
             "name": "TeacherExam",
             "description": "TeacherExam"
+        },
+        {
+            "name": "TeacherQuestionStore",
+            "description": "TeacherQuestionStore"
         }
     ],
     "components": {

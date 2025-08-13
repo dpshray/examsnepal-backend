@@ -27,6 +27,67 @@ class TeacherQuestionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    /**
+     * @OA\Post(
+     *     path="/teacher/exam/{exam}/question",
+     *     summary="Store question (with options) for an exam of a teacher",
+     *     description="Stores a question along with multiple-choice options and an optional image for a teacher's exam.",
+     *     operationId="teacher_question_store",
+     *     tags={"TeacherQuestionStore"},
+     *     @OA\Parameter(
+     *         name="exam",
+     *         in="path",
+     *         required=true,
+     *         description="exam id of question",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={
+     *                     "question",
+     *                     "option_a",
+     *                     "option_a_is_true",
+     *                     "option_b",
+     *                     "option_b_is_true",
+     *                     "option_c",
+     *                     "option_c_is_true",
+     *                     "option_d",
+     *                     "option_d_is_true",
+     *                     "explanation"
+     *                 },
+     *                 @OA\Property(property="question", type="string", example="Who was the first person to land on the moon?"),
+     *                 @OA\Property(property="option_a", type="string", example="Albert Einstein"),
+     *                 @OA\Property(property="option_a_is_true", type="integer", example=0),
+     *                 @OA\Property(property="option_b", type="string", example="Edmund Hillary"),
+     *                 @OA\Property(property="option_b_is_true", type="integer", example=0),
+     *                 @OA\Property(property="option_c", type="string", example="Neil Armstrong"),
+     *                 @OA\Property(property="option_c_is_true", type="integer", example=1),
+     *                 @OA\Property(property="option_d", type="string", example="Bill Clinton"),
+     *                 @OA\Property(property="option_d_is_true", type="integer", example=0),
+     *                 @OA\Property(property="explanation", type="string", example="On July 20, 1969, during NASA’s Apollo 11 mission, Neil Armstrong became the first human to step onto the Moon."),
+     *                 @OA\Property(
+     *                     property="image",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="Optional image file to upload"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Question Added Successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null),
+     *             @OA\Property(property="message", type="string", example="Question added of exam name: This is some exam name")
+     *         )
+     *     )
+     * )
+     */
     public function store(TeacherQuestionStoreRequest $request, Exam $exam)
     {
         $this->isOwner($exam);
