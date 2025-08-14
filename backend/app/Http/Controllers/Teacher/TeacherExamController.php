@@ -26,6 +26,20 @@ class TeacherExamController extends Controller
      *     description="Fetches all exam of logged in teacher.",
      *     operationId="teacher_exam_list",
      *     tags={"TeacherExam"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="page no of list",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         required=false,
+     *         description="items per page",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Teacher (Loksewa) Exam List with Total Questions",
@@ -61,8 +75,12 @@ class TeacherExamController extends Controller
      */
     public function index(Request $request)
     {
+        $per_page = $request->query('per_page',10);
         $teacher = Auth::guard('users')->user();
-        $pagination = $teacher->teacherExams()->with(['examType:id,name'])->withCount(['questions'])->paginate();
+        $pagination = $teacher->teacherExams()
+                        ->with(['examType:id,name'])
+                        ->withCount(['questions'])
+                        ->paginate($per_page);
         $data = $this->setupPagination($pagination, fn($item) => TeacherExamResource::collection($item))->data;
         return Response::apiSuccess("teacher({$teacher->username}) exam list", $data);
     }

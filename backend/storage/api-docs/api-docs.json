@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8000/api",
+            "url": "http://192.168.100.23:8000/api/",
             "description": "Localhost API Server"
         }
     ],
@@ -11824,6 +11824,28 @@
                 "summary": "Get all exam of logged in teacher",
                 "description": "Fetches all exam of logged in teacher.",
                 "operationId": "teacher_exam_list",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "page no of list",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Teacher (Loksewa) Exam List with Total Questions",
@@ -11977,9 +11999,199 @@
             }
         },
         "/teacher/exam/{exam}/question": {
+            "get": {
+                "tags": [
+                    "TeacherQuestion"
+                ],
+                "summary": "Get all question of an exam of logged in teacher",
+                "description": "Fetches all question of an exam of logged in teacher",
+                "operationId": "teacher_exam_question_list",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "ID of an exam",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam question list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "questions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 185959
+                                                            },
+                                                            "exam_id": {
+                                                                "type": "integer",
+                                                                "example": 2378
+                                                            },
+                                                            "exam_type_id": {
+                                                                "type": "integer",
+                                                                "example": 3,
+                                                                "nullable": true
+                                                            },
+                                                            "uploader": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "added_by": {
+                                                                "type": "integer",
+                                                                "example": 16,
+                                                                "nullable": true
+                                                            },
+                                                            "subject_id": {
+                                                                "type": "integer",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "question": {
+                                                                "type": "string",
+                                                                "example": "What is the highest mountain peak in the world?",
+                                                                "nullable": true
+                                                            },
+                                                            "explanation": {
+                                                                "type": "string",
+                                                                "example": "The correct answer, Mount Everest, is considered the highest...",
+                                                                "nullable": true
+                                                            },
+                                                            "subject": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "remark": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "serial": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "mark_type": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "options": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 3262633
+                                                                        },
+                                                                        "question_id": {
+                                                                            "type": "integer",
+                                                                            "example": 185959
+                                                                        },
+                                                                        "option": {
+                                                                            "type": "string",
+                                                                            "example": "The Mount Everest"
+                                                                        },
+                                                                        "value": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "exam": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 2378
+                                                        },
+                                                        "is_active": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "exam_name": {
+                                                            "type": "string",
+                                                            "example": "This is some exam name"
+                                                        },
+                                                        "exam_date": {
+                                                            "type": "string",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        },
+                                                        "exam_time": {
+                                                            "type": "string",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        },
+                                                        "end_time": {
+                                                            "type": "string",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        },
+                                                        "category": {
+                                                            "type": "string",
+                                                            "example": "MOCK_TEST"
+                                                        },
+                                                        "description": {
+                                                            "type": "string",
+                                                            "example": "This is some description for this exam"
+                                                        },
+                                                        "exam_type": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 3
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "MBBS Entrance Exams"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "exam name: This is some exam name, question list"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "tags": [
-                    "TeacherQuestionStore"
+                    "TeacherQuestion"
                 ],
                 "summary": "Store question (with options) for an exam of a teacher",
                 "description": "Stores a question along with multiple-choice options and an optional image for a teacher's exam.",
@@ -12208,8 +12420,8 @@
             "description": "TeacherExam"
         },
         {
-            "name": "TeacherQuestionStore",
-            "description": "TeacherQuestionStore"
+            "name": "TeacherQuestion",
+            "description": "TeacherQuestion"
         }
     ],
     "components": {
