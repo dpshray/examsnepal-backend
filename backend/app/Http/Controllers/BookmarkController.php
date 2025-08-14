@@ -78,6 +78,7 @@ class BookmarkController extends Controller
                     // Extract students from bookmarks and add to top-level 'students'
                     $question['students'] = $question->bookmarks->pluck('student')->unique('id')->values();
                     $question['options'] = $question->options;
+                    $question['bookmarks_count'] = (int)$question->bookmarks_count;
                     unset($question->bookmarks); // Optional: Remove bookmarks if not needed
                     return $question;
                 });

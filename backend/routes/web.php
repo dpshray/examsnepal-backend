@@ -1,8 +1,13 @@
 <?php
 
+use App\Services\ConnectIPSService;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+
+Route::get('cips', function(){
+    app(ConnectIPSService::class)->initiateTransaction([]);
+});
 
 Route::get('/', function () {
     return view('welcome');

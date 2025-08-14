@@ -15,6 +15,8 @@ class Question extends Model
     protected $fillable = [
         'exam_id',
         'question',
+        'added_by',
+        'exam_type_id',
         'option_1',
         'option_value_1',
         'option_2',
@@ -72,5 +74,8 @@ class Question extends Model
     public function student_answers() {
         return $this->hasMany(Answersheet::class);
     }
-   
+    
+    public function image(){
+        return $this->morphOne(Image::class,'imagable');
+    }
 }
