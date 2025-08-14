@@ -12016,11 +12016,31 @@
                             "type": "integer",
                             "example": 1
                         }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "page no of list",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Exam question list",
+                        "description": "Exam questions list with options",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -12032,94 +12052,65 @@
                                         "data": {
                                             "properties": {
                                                 "questions": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 185959
-                                                            },
-                                                            "exam_id": {
-                                                                "type": "integer",
-                                                                "example": 2378
-                                                            },
-                                                            "exam_type_id": {
-                                                                "type": "integer",
-                                                                "example": 3,
-                                                                "nullable": true
-                                                            },
-                                                            "uploader": {
-                                                                "type": "string",
-                                                                "example": null,
-                                                                "nullable": true
-                                                            },
-                                                            "added_by": {
-                                                                "type": "integer",
-                                                                "example": 16,
-                                                                "nullable": true
-                                                            },
-                                                            "subject_id": {
-                                                                "type": "integer",
-                                                                "example": null,
-                                                                "nullable": true
-                                                            },
-                                                            "question": {
-                                                                "type": "string",
-                                                                "example": "What is the highest mountain peak in the world?",
-                                                                "nullable": true
-                                                            },
-                                                            "explanation": {
-                                                                "type": "string",
-                                                                "example": "The correct answer, Mount Everest, is considered the highest...",
-                                                                "nullable": true
-                                                            },
-                                                            "subject": {
-                                                                "type": "string",
-                                                                "example": null,
-                                                                "nullable": true
-                                                            },
-                                                            "remark": {
-                                                                "type": "string",
-                                                                "example": null,
-                                                                "nullable": true
-                                                            },
-                                                            "serial": {
-                                                                "type": "string",
-                                                                "example": null,
-                                                                "nullable": true
-                                                            },
-                                                            "mark_type": {
-                                                                "type": "string",
-                                                                "example": null,
-                                                                "nullable": true
-                                                            },
-                                                            "options": {
-                                                                "type": "array",
-                                                                "items": {
-                                                                    "properties": {
-                                                                        "id": {
-                                                                            "type": "integer",
-                                                                            "example": 3262633
-                                                                        },
-                                                                        "question_id": {
-                                                                            "type": "integer",
-                                                                            "example": 185959
-                                                                        },
-                                                                        "option": {
-                                                                            "type": "string",
-                                                                            "example": "The Mount Everest"
-                                                                        },
-                                                                        "value": {
-                                                                            "type": "integer",
-                                                                            "example": 1
-                                                                        }
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 185959
                                                                     },
-                                                                    "type": "object"
-                                                                }
+                                                                    "question": {
+                                                                        "type": "string",
+                                                                        "example": "What is the highest mountain peak in the world?"
+                                                                    },
+                                                                    "explanation": {
+                                                                        "type": "string",
+                                                                        "example": "The correct answer, Mount Everest, is considered the highest mountain peak..."
+                                                                    },
+                                                                    "options": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "id": {
+                                                                                    "type": "integer",
+                                                                                    "example": 3262633
+                                                                                },
+                                                                                "question_id": {
+                                                                                    "type": "integer",
+                                                                                    "example": 185959
+                                                                                },
+                                                                                "option": {
+                                                                                    "type": "string",
+                                                                                    "example": "The Mount Everest"
+                                                                                },
+                                                                                "value": {
+                                                                                    "type": "integer",
+                                                                                    "example": 1
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "type": "object"
                                                             }
                                                         },
-                                                        "type": "object"
-                                                    }
+                                                        "current_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 10
+                                                        }
+                                                    },
+                                                    "type": "object"
                                                 },
                                                 "exam": {
                                                     "properties": {
