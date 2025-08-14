@@ -13,9 +13,9 @@ use App\Http\Resources\Teacher\TeacherExamQuestionResource;
 use App\Http\Resources\Teacher\TeacherExamResource;
 use App\Traits\PaginatorTrait;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 
@@ -39,9 +39,23 @@ class TeacherQuestionController extends Controller
      *         description="ID of an exam",
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="page no of list",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         required=false,
+     *         description="items per page",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Exam question list",
+     *         description="Exam questions list with options",
      *         @OA\JsonContent(
      *             @OA\Property(property="status", type="boolean", example=true),
      *             @OA\Property(
@@ -49,33 +63,35 @@ class TeacherQuestionController extends Controller
      *                 type="object",
      *                 @OA\Property(
      *                     property="questions",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         type="object",
-     *                         @OA\Property(property="id", type="integer", example=185959),
-     *                         @OA\Property(property="exam_id", type="integer", example=2378),
-     *                         @OA\Property(property="exam_type_id", type="integer", nullable=true, example=3),
-     *                         @OA\Property(property="uploader", type="string", nullable=true, example=null),
-     *                         @OA\Property(property="added_by", type="integer", nullable=true, example=16),
-     *                         @OA\Property(property="subject_id", type="integer", nullable=true, example=null),
-     *                         @OA\Property(property="question", type="string", nullable=true, example="What is the highest mountain peak in the world?"),
-     *                         @OA\Property(property="explanation", type="string", nullable=true, example="The correct answer, Mount Everest, is considered the highest..."),
-     *                         @OA\Property(property="subject", type="string", nullable=true, example=null),
-     *                         @OA\Property(property="remark", type="string", nullable=true, example=null),
-     *                         @OA\Property(property="serial", type="string", nullable=true, example=null),
-     *                         @OA\Property(property="mark_type", type="string", nullable=true, example=null),
-     *                         @OA\Property(
-     *                             property="options",
-     *                             type="array",
-     *                             @OA\Items(
-     *                                 type="object",
-     *                                 @OA\Property(property="id", type="integer", example=3262633),
-     *                                 @OA\Property(property="question_id", type="integer", example=185959),
-     *                                 @OA\Property(property="option", type="string", example="The Mount Everest"),
-     *                                 @OA\Property(property="value", type="integer", example=1)
+     *                     type="object",
+     *                     @OA\Property(
+     *                         property="data",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=185959),
+     *                             @OA\Property(property="question", type="string", example="What is the highest mountain peak in the world?"),
+     *                             @OA\Property(
+     *                                 property="explanation",
+     *                                 type="string",
+     *                                 example="The correct answer, Mount Everest, is considered the highest mountain peak..."
+     *                             ),
+     *                             @OA\Property(
+     *                                 property="options",
+     *                                 type="array",
+     *                                 @OA\Items(
+     *                                     type="object",
+     *                                     @OA\Property(property="id", type="integer", example=3262633),
+     *                                     @OA\Property(property="question_id", type="integer", example=185959),
+     *                                     @OA\Property(property="option", type="string", example="The Mount Everest"),
+     *                                     @OA\Property(property="value", type="integer", example=1)
+     *                                 )
      *                             )
      *                         )
-     *                     )
+     *                     ),
+     *                     @OA\Property(property="current_page", type="integer", example=1),
+     *                     @OA\Property(property="last_page", type="integer", example=1),
+     *                     @OA\Property(property="total", type="integer", example=10)
      *                 ),
      *                 @OA\Property(
      *                     property="exam",
@@ -104,10 +120,14 @@ class TeacherQuestionController extends Controller
     public function index(Request $request, Exam $exam)
     {
         $this->isOwner($exam);
+        $per_page = $request->query('per_page',10);
         $exam_title = $exam->exam_name;
-        $pagination = $exam->questions()->with(['options'])->get();
-        // $questions = $this->setupPagination($pagination, fn($item) => TeacherExamQuestionResource::collection($item))->data;
-        $questions = $pagination;
+        $pagination = $exam->questions()
+                        ->with(['options'])
+                        ->orderBy('id', 'DESC')
+                        ->paginate($per_page);
+        $questions = $this->setupPagination($pagination, fn($item) => TeacherExamQuestionResource::collection($item))->data;
+        // $questions = $pagination;
         $exam->loadMissing(['examType:id,name']);
         $exam = [
             "id" => $exam->id,
