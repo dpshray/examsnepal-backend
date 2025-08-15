@@ -355,7 +355,7 @@ class AuthController extends Controller
          ]); 
          $credentials = $request->only('email', 'password');
          $user = User::where('email', $credentials['email'])->first();
-         if (!$user->isTeacher()) {
+         if ($user && !$user->isTeacher()) {
              return response()->json(['error' => 'Unauthorized: Not an teacher'], 403);
          }
          if (!Hash::check($credentials['password'], $user->password)) {
