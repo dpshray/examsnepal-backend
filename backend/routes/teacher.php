@@ -5,6 +5,7 @@ use App\Http\Controllers\Teacher\TeacherExamController;
 use App\Http\Controllers\Teacher\TeacherQuestionController;
 use Illuminate\Support\Facades\Route;
 
+Route::post('teacher-login', [AuthController::class, 'teacherLogin']);
 Route::prefix('teacher')->group(function(){
     Route::post('login', [AuthController::class, 'teacherLogin'])->name('loginTeacher');
     Route::middleware('auth:users')
