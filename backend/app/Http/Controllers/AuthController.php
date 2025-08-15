@@ -271,6 +271,7 @@ class AuthController extends Controller
 
     public function AdminLogin(Request $request)
     {
+        dd('inside admin login method');
         // Validate the input fields
         $request->validate([
             'email'    => 'required|email',
