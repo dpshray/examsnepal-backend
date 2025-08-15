@@ -349,8 +349,6 @@ class AuthController extends Controller
 
      public function teacherLogin(Request $request)
      {
-        return ('inside admin login method');
-
         $request->validate([
              'email'    => 'required|email|exists:users,email',
              'password' => 'required|string',
