@@ -80,6 +80,7 @@ class TeacherExamController extends Controller
         $pagination = $teacher->teacherExams()
                         ->with(['examType:id,name'])
                         ->withCount(['questions'])
+                        ->orderBy('id','DESC')
                         ->paginate($per_page);
         $data = $this->setupPagination($pagination, fn($item) => TeacherExamResource::collection($item))->data;
         return Response::apiSuccess("teacher({$teacher->username}) exam list", $data);
