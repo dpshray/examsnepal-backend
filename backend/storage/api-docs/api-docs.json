@@ -11998,6 +11998,55 @@
                 }
             }
         },
+        "/teacher/exam/{exam}": {
+            "delete": {
+                "tags": [
+                    "TeacherExam"
+                ],
+                "summary": "Delete an exam",
+                "description": "Delete an exam by its ID.",
+                "operationId": "deleteTeacherExam",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "The ID of the exam to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "exam name This is some exam name 1 deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/teacher/exam/{exam}/question": {
             "get": {
                 "tags": [
@@ -12286,6 +12335,55 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Question added of exam name: This is some exam name"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/teacher/question/{question}": {
+            "delete": {
+                "tags": [
+                    "TeacherQuestion"
+                ],
+                "summary": "Delete an exam's question",
+                "description": "Delete an exam's question by its ID.",
+                "operationId": "deleteTeacherExamQuestion",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "description": "The ID of the exam's question to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "question removed"
                                         }
                                     },
                                     "type": "object"
