@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\StudentSubscriptionResource;
+use App\Http\Resources\Subscription\SubscriptionTypeResource;
 use App\Models\SubscriptionType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth,DB};
@@ -61,7 +62,8 @@ class SubscriptionTypeController extends Controller
                             'subscription_type_id'
                         )
                         ->first();
-        $data = new StudentSubscriptionResource($subscription);
+        
+        $data = $subscription ? new StudentSubscriptionResource($subscription) : null;
         return Response::apiSuccess('User subscription status', $data);
     }
     /**
@@ -77,17 +79,17 @@ class SubscriptionTypeController extends Controller
      *     tags={"Subscription"},
      *     @OA\Response(
      *         response=200,
-     *         description="Active package list",
+     *         description="Active subscription package list",
      *         @OA\JsonContent(
-     *             type="object",
      *             @OA\Property(property="status", type="boolean", example=true),
      *             @OA\Property(
      *                 property="data",
      *                 type="array",
      *                 @OA\Items(
      *                     type="object",
+     *                     @OA\Property(property="subscription_type_id", type="integer", example=1),
      *                     @OA\Property(property="duration", type="integer", example=1),
-     *                     @OA\Property(property="price", type="string", example="100.00")
+     *                     @OA\Property(property="price", type="string", example="101.00")
      *                 )
      *             ),
      *             @OA\Property(property="message", type="string", example="Active package list")
@@ -102,7 +104,8 @@ class SubscriptionTypeController extends Controller
             ->where('status', 1)
             ->where('exam_type_id',$user->exam_type_id)
             ->get();
-        return Response::apiSuccess('Active package list', $rows);
+        $data = SubscriptionTypeResource::collection($rows);
+        return Response::apiSuccess('Active package list', $data);
     }
 
     /**
