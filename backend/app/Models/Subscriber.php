@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subscriber extends Model
 {
+    protected $fillable = ['status'];
+    
     protected function casts(){
         return [
             'start_date' => 'date',
-            'end_date' => 'date'
+            'end_date' => 'date',
+            'data' => 'array'
         ];
     }
 

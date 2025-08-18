@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'connectips' => [
+        'merchant_id' => env('CONNECTIPS_MERCHANTID'),
+        'app_id' => env('CONNECTIPS_APPID'),
+        'app_name' => env('CONNECTIPS_APPNAME'),
+        'url' => env('CONNECTIPS_URL'),
+    ]
+
 ];

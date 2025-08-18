@@ -36,6 +36,7 @@ use App\Models\SubscriptionType;
 
 
 require __DIR__.'/corporate.php';
+require __DIR__.'/payment.php';
 
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
