@@ -213,7 +213,14 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $student->update(['fcm_token' => $request->fcm_token]);
-        return $this->respondWithToken($token);
+        $data = [
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 1,
+            'student' => new StudentProfileResource($student),
+        ];
+        return response()->json($data, 200);
+        // return $this->respondWithToken($token);
         // // return $this->respondWithToken($credentials);
 
         // Validate the incoming request
@@ -295,11 +302,11 @@ class AuthController extends Controller
         // }
         $token = JWTAuth::fromUser($admin);
 
-        return $this->respondWithToken($token);
+        // return $this->respondWithToken($token);
         // return response()->json(['data' => $admin]);
     }
 
-     /**
+    /**
      * @OA\Post(
      *     path="/teacher/login",
      *     summary="Login Teachers",
@@ -310,31 +317,31 @@ class AuthController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"email","password"},
-     *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *             @OA\Property(property="email", type="string", format="email", example="hariofhungi@gmail.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password")
      *         )
      *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful Login",
      *         @OA\JsonContent(
-     *             @OA\Property(property="access_token", type="string", example="your_generated_jwt_token"),
-     *             @OA\Property(property="token_type", type="string", example="bearer"),
-     *             @OA\Property(property="expires_in", type="integer", example=3600)
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="error", type="string", example="Incorrect password")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="user Not Found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="error", type="string", example="user not found")
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="user",
+     *                     type="object",
+     *                     @OA\Property(property="username", type="string", example="teacher"),
+     *                     @OA\Property(property="email", type="string", example="info@examsnepal.com")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="token",
+     *                     type="string",
+     *                     example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+     *                 )
+     *             ),
+     *             @OA\Property(property="message", type="string", example="welcome, teacher")
      *         )
      *     )
      * )
@@ -342,45 +349,34 @@ class AuthController extends Controller
 
      public function teacherLogin(Request $request)
      {
-         // Validate the input fields
-         $request->validate([
-             'email'    => 'required|email',
+        $request->validate([
+             'email'    => 'required|email|exists:users,email',
              'password' => 'required|string',
-         ]);
- 
+         ]); 
          $credentials = $request->only('email', 'password');
- 
-         // Retrieve the user by email
-         $teacher = User::where('email', $credentials['email'])->first();
- 
-         if (!$teacher) {
-             return response()->json(['error' => 'User not found'], 404);
+         $user = User::where('email', $credentials['email'])->first();
+         if ($user && !$user->isTeacher()) {
+             return response()->json(['error' => 'Unauthorized: Not an teacher'], 403);
          }
- 
-         // Ensure the user is an admin
-         if ($teacher->role !== 'teacher') {
-             return response()->json(['error' => 'Unauthorized: Not an admin user'], 403);
-         }
- 
-         // // Verify that the password is correct
-         if (!Hash::check($credentials['password'], $teacher->password)) {
+         if (!Hash::check($credentials['password'], $user->password)) {
              return response()->json(['error' => 'Incorrect password'], 401);
          }
- 
-         // Attempt token generation using the admin guard
-        //  if (!$token = Auth::guard('users')->attempt($credentials)) {
-        //      return response()->json(['error' => 'Unauthorized'], 401);
-        //  }
-        $token = JWTAuth::fromUser($teacher);
+        $token = JWTAuth::fromUser($user);
+        $data = [
+            'user' => [
+                'username' => $user->username,
+                'email' => $user->email
+            ],
+            'token' => $token
+        ];
+        return Response::apiSuccess("welcome, {$user->username}", $data);
 
- 
-         return $this->respondWithToken($token);
-        //  return response()->json(['data' => $admin]);
+        return $this->respondWithToken($token, 'users');
      }
 
 
 
-    public function me()
+    public function me()#me = student
     {
         return response()->json(Auth::guard('api')->user());
     }
@@ -508,15 +504,13 @@ class AuthController extends Controller
         return Response::apiSuccess('Authenticated student info', $data);
     }
     
-    protected function respondWithToken($token)
+    protected function respondWithToken($token, $user)
     {
-        $student = Auth::guard('api')->user();
-
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 1,
-            'student' => new StudentProfileResource($student),
+            'student' => new StudentProfileResource($user),
         ]);
     }
 

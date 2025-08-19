@@ -35,23 +35,23 @@ return [
     |
     */
 
- 'guards' => [
-    'web' => [
-        'driver' => 'session',
-        'provider' => 'users',
-    ],
+    'guards' => [
+        'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
 
-    // Add this guard for JWT authentication
-    'api' => [
-        'driver' => 'jwt',
-        'provider' => 'students',
-    ],
+        // Add this guard for JWT authentication
+        'api' => [
+            'driver' => 'jwt',
+            'provider' => 'students',
+        ],
 
-    'users' => [
+        'users' => [
             'driver'   => 'jwt',
             'provider' => 'users',
         ],
-],
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -70,17 +70,17 @@ return [
     |
     */
 
-'providers' => [
-    'users' => [
-        'driver' => 'eloquent',
-        'model' => App\Models\User::class,
-    ],
+    'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
+        ],
 
-    'students' => [
-        'driver' => 'eloquent',
-        'model' => App\Models\StudentProfile::class,
+        'students' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\StudentProfile::class,
+        ],
     ],
-],
 
     /*
     |--------------------------------------------------------------------------

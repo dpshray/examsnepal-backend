@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ExamTypeEnum;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\Api\ForumController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Corporate\CorporateExamController;
+use App\Http\Controllers\ExamCategoryController;
 use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\NotificationController;
@@ -37,6 +39,7 @@ use App\Models\SubscriptionType;
 
 require __DIR__.'/corporate.php';
 require __DIR__.'/payment.php';
+require __DIR__.'/teacher.php';
 
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
@@ -60,7 +63,6 @@ Route::post('handle-password-reset-form', [StudentProfileController::class, 'pas
 // Student login
 Route::post('/student/login', [AuthController::class, 'loginStudent'])->name('login');
 Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('loginAdmin');
-Route::post('/teacher/login', [AuthController::class, 'teacherLogin'])->name('loginTeacher');
 
 Route::apiResource('blog', BlogController::class)->scoped(['blog' => 'slug']);
 #routes accessed by both api and users guards
@@ -180,6 +182,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
 
 // for exam type
 Route::get('/exam-types', [ExamTypeController::class, 'index']);
+Route::get('/category-types', ExamCategoryController::class);
 
 // Route::get('/documentation', function () {
 //     return view('vendor.l5-swagger.index');

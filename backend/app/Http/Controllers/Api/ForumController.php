@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Cache;
  * )
  * 
  * @OA\Server( 
- *     url="https://api.examsnepal.dworklabs.com/api",
+ *     url="https://api.examsnepal.dworklabs.com/api/",
  *     description="Localhost API Server"
  * )
  * 
