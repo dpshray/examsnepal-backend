@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\PaymentStatusEnum;
 use App\Models\Subscriber;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -58,18 +59,28 @@ class ConnectIPSService
             'currency' => $currency,
             'token' => $token,
         ];
+        // Subscriber::
+        $student = Auth::user();
+        $subscribe = $student->subscribed;
 
+        $start_date = $transactionDateCarbon; #DEFAULT
+        $end_date = $transactionDateCarbon->copy()->addMonths($data['month']); #DEFAULT
+        if ($subscribe) {
+            $start_date = $subscribe->start_date; 
+            $end_date = $subscribe->end_date->copy()->addMonths($data['month']);
+        }
         DB::table('subscribers')->insert(
             [
                 'subscription_type_id' => $data['subscription_type_id'],
                 'transaction_id' => $transactionID,
-                'start_date' => $transactionDateCarbon,
-                'end_date' => $transactionDateCarbon->addMonths($data['month']),
+                'start_date' => $start_date,
+                'end_date' => $end_date,
                 'price' => $data['price'],
                 'paid' => $data['price'],
                 'subscribed_at' => now()->format('Y-m-d H:i:s'),
-                'data' => json_encode($response),
+                'data' => json_encode($response), #XTRA
                 'status' => 0,
+                'payment_status' => PaymentStatusEnum::PAYMENT_INIT->value,
                 'student_profile_id' => Auth::id()
             ]
         );
@@ -167,22 +178,26 @@ class ConnectIPSService
         curl_close($ch);
 
         // === Handle Response ===
+        $transaction->update(['payment_status' => PaymentStatusEnum::PAYMENT_PENDING->value]);
         Log::info($response);
         $result = json_decode($response, true);
         if ($httpCode == 200) {
             if (isset($result['status']) && $result['status'] === 'SUCCESS') {
                 // Log::info($transaction);
-                Log::channel('payment')->debug("transaction info", $transaction);
-                $transaction->update(['status' => 1]);
+                Log::channel('payment')->debug("transaction info", [$transaction]);
+
+                $transaction->update(['status' => 1, 'payment_status' => PaymentStatusEnum::PAYMENT_SUCCESS->value]);
                 return json_decode($response);
             } else {
-                Log::channel('payment')->debug("transaction error", $result);
+                Log::channel('payment')->debug("transaction error", [$result]);
+                $transaction->update(['payment_status' => PaymentStatusEnum::PAYMENT_ERROR->value]);
                 return json_decode($response);
-                echo "Payment failed: " . ($result['statusDesc'] ?? 'Unknown error') . "\n";
+                // echo "Payment failed: " . ($result['statusDesc'] ?? 'Unknown error') . "\n";
             }
         } else {
-            Log::channel('payment')->debug("Validation API error: {$httpCode}", $result);
-            echo "Validation API error: {$httpCode}\n";
+            $transaction->update(['payment_status' => PaymentStatusEnum::PAYMENT_ERROR->value]);
+            Log::channel('payment')->debug("Validation API error: {$httpCode}", [$result]);
+            return "Validation API error: {$httpCode}\n";
         }
     }
 }

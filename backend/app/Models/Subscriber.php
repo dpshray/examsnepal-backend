@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subscriber extends Model
 {
-    protected $fillable = ['status'];
+    public $timestamps = false;
+    protected $fillable = ['status', 'payment_status'];
     
     protected function casts(){
         return [
