@@ -62,12 +62,16 @@ class ConnectIPSService
         // Subscriber::
         $student = Auth::user();
         $subscribe = $student->subscribed;
+        $price = $data['price'];
+        $paid = $data['price'];
 
         $start_date = $transactionDateCarbon; #DEFAULT
         $end_date = $transactionDateCarbon->copy()->addMonths($data['month']); #DEFAULT
-        if ($subscribe) {
+        if ($subscribe) { #if has previous active subscribe
             $start_date = $subscribe->start_date; 
             $end_date = $subscribe->end_date->copy()->addMonths($data['month']);
+            $price = $price + $subscribe->price;
+            $paid = $paid + $subscribe->paid;
         }
         DB::table('subscribers')->insert(
             [
@@ -75,8 +79,8 @@ class ConnectIPSService
                 'transaction_id' => $transactionID,
                 'start_date' => $start_date,
                 'end_date' => $end_date,
-                'price' => $data['price'],
-                'paid' => $data['price'],
+                'price' => $price,
+                'paid' => $paid,
                 'subscribed_at' => now()->format('Y-m-d H:i:s'),
                 'data' => json_encode($response), #XTRA
                 'status' => 0,
