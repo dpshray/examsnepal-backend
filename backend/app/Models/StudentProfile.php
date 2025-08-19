@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatusEnum;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -133,7 +134,7 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
     }
 
     public function subscribed(){
-        return $this->hasOne(Subscriber::class)->where('status',1)->whereDate('end_date','>=',today())->latestOfMany();
+        return $this->hasOne(Subscriber::class)->where('status',1)->where('payment_status', PaymentStatusEnum::PAYMENT_SUCCESS->value)->whereDate('end_date','>=',today())->latestOfMany();
     }
 
     public function getIsSubscriptedAttribute()
