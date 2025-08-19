@@ -616,9 +616,12 @@ class StudentProfileController extends Controller
                 ->get()
                 ->map(function ($item) {
                     $item->exam_type = ExamTypeEnum::getKeyByValue((int) $item->status);
+                    $item->exams_given = (int) $item->exams_given;
+                    $item->total_questions = (int) $item->total_questions;
+                    $item->correct_answers = (int) $item->correct_answers;
                     unset($item->status);
 
-                    $item->average_score = $item->total_questions > 0
+                    $item->average_score = (float) $item->total_questions > 0
                         ? round(($item->correct_answers / $item->total_questions) * 100, 2)
                         : 0;
 
