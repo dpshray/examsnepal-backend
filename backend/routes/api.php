@@ -38,6 +38,7 @@ use App\Models\SubscriptionType;
 
 
 require __DIR__.'/corporate.php';
+require __DIR__.'/payment.php';
 require __DIR__.'/teacher.php';
 
 // Registration route
