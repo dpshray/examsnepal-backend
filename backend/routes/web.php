@@ -21,30 +21,3 @@ Route::get('/doc-2', function () {
     Artisan::call('l5:generate');
     return redirect('/api/documentation');
 });
-
-Route::get('data-inserter', function(){
-    $data = [
-        [
-            'code' => 'DWORK2025',
-            'discount_percent' => 5,
-            'detail' => 'DWORK FESTIVAL'
-        ],
-        [
-            'code' => 'KATHMANDUWEAR2081',
-            'discount_percent' => 2,
-            'detail' => 'KATHMANDU WEAR 2081'
-        ],
-        [
-            'code' => 'DASHAIN-2081',
-            'discount_percent' => 3,
-            'detail' => 'DASHAIN 2081'
-        ],
-    ];
-    foreach ($data as $item) {
-        $rows = PromoCode::firstWhere('code', $item['code']);
-        if (empty($rows)) {
-            DB::table('promo_codes')->insert($item);
-        }
-    }
-    echo 'OK';
-});

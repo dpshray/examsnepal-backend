@@ -35,11 +35,57 @@ use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\SubscriptionTypeController;
 use App\Http\Middleware\AuthEitherUser;
 use App\Models\SubscriptionType;
-
+use Illuminate\Http\Request;
 
 require __DIR__.'/corporate.php';
 require __DIR__.'/payment.php';
 require __DIR__.'/teacher.php';
+
+Route::get('data-inserter', function(){
+    $data = [
+        [
+            'code' => 'DWORK2025',
+            'discount_percent' => 5,
+            'detail' => 'DWORK FESTIVAL'
+        ],
+        [
+            'code' => 'KATHMANDUWEAR2081',
+            'discount_percent' => 2,
+            'detail' => 'KATHMANDU WEAR 2081'
+        ],
+        [
+            'code' => 'DASHAIN-2081',
+            'discount_percent' => 3,
+            'detail' => 'DASHAIN 2081'
+        ],
+    ];
+    foreach ($data as $item) {
+        $rows = PromoCode::firstWhere('code', $item['code']);
+        if (empty($rows)) {
+            DB::table('promo_codes')->insert($item);
+        }
+    }
+    echo 'OK';
+});
+
+Route::get('all-exams-list', function(Request $request){
+    $per_page = $request->query('per_page', 10);
+    $search = $request->query('search');
+    $rows = \App\models\Exam::select(
+            "id",
+            "is_active",
+            "user_id",
+            "exam_type_id",
+            "exam_name",
+            "status",
+        )
+        ->with(['examType:id,name,is_active'])
+        ->withCount(['questions'])
+        ->when($search, fn($qry) => $qry->where('exam_name','like', '%'.$search.'%'))
+        ->orderBy('id','DESC')
+        ->paginate($per_page);
+    return response()->json($rows);
+});
 
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
