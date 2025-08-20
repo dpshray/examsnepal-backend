@@ -1149,25 +1149,36 @@
                 ]
             }
         },
-        "/connectips/init-transaction/{subscription_type}": {
-            "get": {
+        "/connectips/init-transaction": {
+            "post": {
                 "tags": [
                     "ConnectIPS"
                 ],
                 "summary": "Get logged in student question solved doubts",
                 "operationId": "init_transaction",
-                "parameters": [
-                    {
-                        "name": "subscription_type",
-                        "in": "path",
-                        "description": "Subscription type ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "subscription_type_id"
+                                ],
+                                "properties": {
+                                    "subscription_type_id": {
+                                        "type": "integer",
+                                        "example": "127181"
+                                    },
+                                    "promo_code": {
+                                        "type": "string",
+                                        "example": "DWORK2025"
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "Transaction generated successfully",
