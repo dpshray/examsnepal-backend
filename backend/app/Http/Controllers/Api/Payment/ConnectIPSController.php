@@ -73,10 +73,19 @@ class ConnectIPSController extends Controller
         $promo_code = $request->promo_code;
         if ($promo_code) {
             Log::info($promo_code);
-            $promo_code_data = PromoCode::firstWhere('code', $promo_code);
-            $promo_code_id = $promo_code_data->id;
-            $discount_percent = $promo_code_data->discount_percent;
-            $paid = $price - (($price * $discount_percent) / 100);
+            
+            $promo_code_row = PromoCode::select('code', 'discount_percent', 'detail')
+                ->where('status', 1)
+                ->firstWhere('code', $promo_code);
+
+            // $promo_code_data = PromoCode::firstWhere('code', $promo_code);
+            if (empty($promo_code_row) || $promo_code !== $promo_code_row->code) {
+                return Response::apiError('This promo code does not match/exists', null, 404);
+            } else {                
+                $promo_code_id = $promo_code_row->id;
+                $discount_percent = $promo_code_row->discount_percent;
+                $paid = $price - (($price * $discount_percent) / 100);
+            }
         }
         Log::info(['PC' => $promo_code, 'PR' => $price, 'PD' => $paid]);
 
