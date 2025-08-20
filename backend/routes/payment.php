@@ -8,7 +8,7 @@ Route::middleware(['auth:api'])
     ->controller(ConnectIPSController::class)
     ->prefix('connectips')
     ->group(function(){
-        Route::get('init-transaction/{subscription_type}', 'beginTransaction');
+        Route::post('init-transaction', 'beginTransaction');
         Route::get('transaction-successfull/{transaction_id}', 'successPayment');
         // Route::post('store-transaction', 'transactionStore');
 })->middleware('verified');

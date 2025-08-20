@@ -38,16 +38,48 @@ class ConnectIPSService
         $transactionDateCarbon = now(); 
         $transactionDate = $transactionDateCarbon->format('d-m-Y');
         $REF_ID = uniqid('REF-');
-        $price = $data['price'] * 100;
+        $price = $data['price'];
+        $paid = $data['paid'];
+        $paid_in_paisa = $paid * 100;
         $REMARKS = uniqid('RMKS-');
         $PARTICULAR = uniqid('PART-');
         $currency = 'NPR';
 
-        $dataString = "MERCHANTID={$this->merchant_id},APPID={$this->app_id},APPNAME={$this->app_name},TXNID={$transactionID},TXNDATE={$transactionDate},TXNCRNCY={$currency},TXNAMT={$price},REFERENCEID={$REF_ID},REMARKS={$REMARKS},PARTICULARS={$PARTICULAR},TOKEN=TOKEN";
+        $dataString = "MERCHANTID={$this->merchant_id},APPID={$this->app_id},APPNAME={$this->app_name},TXNID={$transactionID},TXNDATE={$transactionDate},TXNCRNCY={$currency},TXNAMT={$paid_in_paisa},REFERENCEID={$REF_ID},REMARKS={$REMARKS},PARTICULARS={$PARTICULAR},TOKEN=TOKEN";
         $signature = '';
         openssl_sign($dataString, $signature, $privateKey, OPENSSL_ALGO_SHA256);
 
         $token = base64_encode($signature);
+
+        // Subscriber::
+        $student = Auth::user();
+        $subscribe = $student->subscribed;
+        // $price = $data['price'];
+        // $paid = $data['paid'];
+
+        $start_date = $transactionDateCarbon; #DEFAULT
+        $end_date = $transactionDateCarbon->copy()->addMonths($data['month']); #DEFAULT
+        if ($subscribe) { #if has previous active subscribe
+            $start_date = $subscribe->start_date; 
+            $end_date = $subscribe->end_date->copy()->addMonths($data['month']);
+            // $price = $data['price'] + $subscribe->price;
+            // $paid = $data['paid'] + $subscribe->paid;
+            // dd([$data['paid'] , $subscribe->paid]);
+        }
+        // dd([
+        //     'subscription_type_id' => $data['subscription_type_id'],
+        //     'transaction_id' => $transactionID,
+        //     'promo_code_id' => $data['promo_code_id'],
+        //     'start_date' => $start_date,
+        //     'end_date' => $end_date,
+        //     'price' => $price,
+        //     'paid' => $paid,
+        //     'subscribed_at' => now()->format('Y-m-d H:i:s'),
+        //     'data' => json_encode($response), #XTRA
+        //     'status' => 0,
+        //     'payment_status' => PaymentStatusEnum::PAYMENT_INIT->value,
+        //     'student_profile_id' => Auth::id()
+        // ]);
 
         $response = [
             'transaction_id' => $transactionID,
@@ -55,32 +87,21 @@ class ConnectIPSService
             'ref_id' => $REF_ID,
             'remarks' => $REMARKS,
             'particular' => $PARTICULAR,
-            'price' => $price,
+            'price' => $paid_in_paisa,
             'currency' => $currency,
             'token' => $token,
         ];
-        // Subscriber::
-        $student = Auth::user();
-        $subscribe = $student->subscribed;
-        $price = $data['price'];
-        $paid = $data['price'];
 
-        $start_date = $transactionDateCarbon; #DEFAULT
-        $end_date = $transactionDateCarbon->copy()->addMonths($data['month']); #DEFAULT
-        if ($subscribe) { #if has previous active subscribe
-            $start_date = $subscribe->start_date; 
-            $end_date = $subscribe->end_date->copy()->addMonths($data['month']);
-            $price = $price + $subscribe->price;
-            $paid = $paid + $subscribe->paid;
-        }
         DB::table('subscribers')->insert(
             [
                 'subscription_type_id' => $data['subscription_type_id'],
                 'transaction_id' => $transactionID,
+                'promo_code_id' => $data['promo_code_id'],
                 'start_date' => $start_date,
                 'end_date' => $end_date,
                 'price' => $price,
                 'paid' => $paid,
+                'paid_in_paisa' => $paid_in_paisa,
                 'subscribed_at' => now()->format('Y-m-d H:i:s'),
                 'data' => json_encode($response), #XTRA
                 'status' => 0,
@@ -102,7 +123,7 @@ class ConnectIPSService
             'TXNID' => $transactionID,
             'TXNDATE' => $transactionDate,
             'TXNCRNCY' => $currency,
-            'TXNAMT' => $price,
+            'TXNAMT' => $paid_in_paisa,
             'REFERENCEID' => $REF_ID,
             'REMARKS' => $REMARKS,
             'PARTICULARS' => $PARTICULAR,
@@ -142,7 +163,7 @@ class ConnectIPSService
 
         $merchantId = $this->merchant_id;
         $appId      = $this->app_id;
-        $txnAmt     = $transaction->paid * 100; // in paisa
+        $txnAmt     = $transaction->paid_in_paisa;
         $REF_ID = $transaction_id;
         $username   = $appId;  // Basic Auth username
         $password   = "Abcd@123"; // Basic Auth password

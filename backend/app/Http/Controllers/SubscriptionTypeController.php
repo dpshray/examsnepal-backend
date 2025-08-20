@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\StudentSubscriptionResource;
 use App\Http\Resources\Subscription\SubscriptionTypeResource;
+use App\Models\Subscriber;
 use App\Models\SubscriptionType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth,DB};
@@ -49,21 +50,34 @@ class SubscriptionTypeController extends Controller
      * )
      */
     public function subscribeStat(){
-        $subscription = Auth::user()
-                        ->subscribed()
-                        ->with('subscriptionType')
-                        ->select(
-                            'price',
-                            'paid',
-                            'subscribers.student_profile_id',
-                            DB::raw("DATE_FORMAT(subscribers.start_date, '%Y-%m-%d') as starts_at"),
-                            DB::raw("DATE_FORMAT(subscribers.end_date, '%Y-%m-%d') as ends_at"),
-                            'subscribed_at',
-                            'subscription_type_id'
-                        )
-                        ->first();
-        
-        $data = $subscription ? new StudentSubscriptionResource($subscription) : null;
+        // return Auth::id();
+        $student = Auth::user();
+        $student_id = $student->id;
+        $subscription = Subscriber::with(['subscriptionType'])
+                            ->where('student_profile_id', $student_id)
+                            ->where('status', 1)
+                            ->whereDate('end_date','>=',now())
+                            ->orderBy('id','DESC')
+                            ->get();
+        $data = null;
+        if ($subscription->count()) {
+            $latest_subscription = $subscription->first();
+            $data = [
+                "price" => (string) $subscription->sum('price'),
+                "paid" => (string) $subscription->sum('paid'),
+                "student_profile_id" => $student_id,
+                "starts_at" => $latest_subscription->start_date->format('Y-m-d'),
+                "ends_at" => $latest_subscription->end_date->format('Y-m-d'),
+                "subscribed_at" => $latest_subscription->subscribed_at,
+                "subscription" => [
+                    "id" => $latest_subscription->subscriptionType->id,
+                    "exam_type_id" => $latest_subscription->subscriptionType->exam_type_id,
+                    "duration" => $latest_subscription->subscriptionType->duration,
+                    "price" => $latest_subscription->subscriptionType->price,
+                    "status" => $latest_subscription->subscriptionType->status,
+                ]
+            ];
+        }
         return Response::apiSuccess('User subscription status', $data);
     }
     /**

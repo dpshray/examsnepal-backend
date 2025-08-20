@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Models\PromoCode;
 use App\Models\SubscriptionType;
 use App\Services\ConnectIPSService;
 use Illuminate\Http\Request;
@@ -12,17 +13,18 @@ use Illuminate\Support\Facades\Response;
 class ConnectIPSController extends Controller
 {
     /**
-     * @OA\Get(
-     *     path="/connectips/init-transaction/{subscription_type}",
+     * @OA\Post(
+     *     path="/connectips/init-transaction",
      *     summary="Get logged in student question solved doubts",
      *     tags={"ConnectIPS"},
      *     operationId="init_transaction",
-     *     @OA\Parameter(
-     *         name="subscription_type",
-     *         in="path",
+     *     @OA\RequestBody(
      *         required=true,
-     *         description="Subscription type ID",
-     *         @OA\Schema(type="integer", example=1)
+     *         @OA\JsonContent(
+     *             required={"subscription_type_id"},
+     *             @OA\Property(property="subscription_type_id", type="integer", example="127181"),
+     *             @OA\Property(property="promo_code", type="string", example="DWORK2025"),
+     *         )
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -53,12 +55,38 @@ class ConnectIPSController extends Controller
      *     )
      *  )
      */
-    public function beginTransaction(Request $request, SubscriptionType $subscription_type){
-        $price = $subscription_type->price;
+    public function beginTransaction(Request $request){
+        // return $request->all();
+        $request->validate([
+            'subscription_type_id' => 'required|exists:subscription_types,id'
+        ]);
+        Log::info('request all',$request->all());
+        $subscription_type_id = $request->subscription_type_id; 
+        // return $subscription_type_id;
+        $subscription_type = SubscriptionType::find($subscription_type_id);
+        if (empty($subscription_type)) {
+            return Response::apiError('Invalid subscription type', 404);
+        }
+        $paid = $price = $subscription_type->price;
+        $promo_code_id = null;
+        
+        $promo_code = $request->promo_code;
+        if ($promo_code) {
+            Log::info($promo_code);
+            $promo_code_data = PromoCode::firstWhere('code', $promo_code);
+            $promo_code_id = $promo_code_data->id;
+            $discount_percent = $promo_code_data->discount_percent;
+            $paid = $price - (($price * $discount_percent) / 100);
+        }
+        Log::info(['PC' => $promo_code, 'PR' => $price, 'PD' => $paid]);
+
+        // return ['PC' => $promo_code, 'PR' => $price, 'PD' => $paid];
         $data = app(ConnectIPSService::class)->initiateTransaction([
             'price' => $price,
+            'paid' => $paid,
             'subscription_type_id' => $subscription_type->id,
-            'month' => $subscription_type->duration
+            'month' => $subscription_type->duration,
+            'promo_code_id' => $promo_code_id
         ]);
         return Response::apiSuccess('transaction generated', $data);
     }
