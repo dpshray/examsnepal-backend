@@ -71,10 +71,10 @@ class SubscriptionTypeController extends Controller
                 "subscribed_at" => $latest_subscription->subscribed_at,
                 "subscription" => [
                     "id" => $latest_subscription->subscriptionType->id,
-                    "exam_type_id" => $latest_subscription->subscriptionType->exam_type_id,
+                    "exam_type_id" => (int) $latest_subscription->subscriptionType->exam_type_id,
                     "duration" => $latest_subscription->subscriptionType->duration,
                     "price" => $latest_subscription->subscriptionType->price,
-                    "status" => $latest_subscription->subscriptionType->status,
+                    "status" => (int) $latest_subscription->subscriptionType->status,
                 ]
             ];
         }
