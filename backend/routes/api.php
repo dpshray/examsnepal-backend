@@ -36,6 +36,7 @@ use App\Http\Controllers\SubscriptionTypeController;
 use App\Http\Middleware\AuthEitherUser;
 use App\Models\SubscriptionType;
 use Illuminate\Http\Request;
+use App\Models\PromoCode;
 
 require __DIR__.'/corporate.php';
 require __DIR__.'/payment.php';
@@ -85,6 +86,12 @@ Route::get('all-exams-list', function(Request $request){
         ->orderBy('id','DESC')
         ->paginate($per_page);
     return response()->json($rows);
+});
+
+#testing purpose
+Route::get('change-exam-assign-status/{exam}/{column}/{value}', function(\App\Models\Exam $exam, $column, $value){
+    $exam->update([$column => $value]);
+    echo "exam of id {$exam->id} {$column} column changed to : {$value}";
 });
 
 // Registration route
