@@ -36,6 +36,7 @@ use App\Http\Controllers\SubscriptionTypeController;
 use App\Http\Middleware\AuthEitherUser;
 use App\Models\SubscriptionType;
 use Illuminate\Http\Request;
+use App\Models\PromoCode;
 
 require __DIR__.'/corporate.php';
 require __DIR__.'/payment.php';
