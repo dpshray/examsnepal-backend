@@ -12146,6 +12146,14 @@
                                     "publish": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "assign": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "live": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"

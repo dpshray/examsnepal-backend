@@ -104,7 +104,9 @@ class TeacherExamController extends Controller
      *             @OA\Property(property="category_type", type="integer", example=1),
      *             @OA\Property(property="exam_name", type="string", example="This is some exam name"),
      *             @OA\Property(property="description", type="string", example="This is some description of exam"),
-     *             @OA\Property(property="publish", type="integer", example=1)
+     *             @OA\Property(property="publish", type="integer", example=1),
+     *             @OA\Property(property="assign", type="integer", example=1),
+     *             @OA\Property(property="live", type="integer", example=1)
      *         )
      *     ),
      *     @OA\Response(
@@ -122,7 +124,8 @@ class TeacherExamController extends Controller
     public function store(TeacherExamStoreRequest $request)
     {
         // dd($request->all());
-        $data = $request->all();
+        $data = $request->validated();
+        $data['is_active'] = 1;
         Auth::user()
             ->teacherExams()
             ->createQuietly($data);
