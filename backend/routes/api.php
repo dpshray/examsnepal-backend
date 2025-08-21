@@ -88,6 +88,12 @@ Route::get('all-exams-list', function(Request $request){
     return response()->json($rows);
 });
 
+#testing purpose
+Route::get('change-exam-assign-status/{exam}/{column}/{value}', function(\App\Models\Exam $exam, $column, $value){
+    $exam->update([$column => $value]);
+    echo "exam of id {$exam->id} {$column} column changed to : {$value}";
+});
+
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/migrate', [MigrationController::class, 'migrateNext']);
