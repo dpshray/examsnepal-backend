@@ -74,7 +74,7 @@ class ConnectIPSController extends Controller
         if ($promo_code) {
             Log::info($promo_code);
             
-            $promo_code_row = PromoCode::select('code', 'discount_percent', 'detail')
+            $promo_code_row = PromoCode::select('id','code', 'discount_percent', 'detail')
                 ->where('status', 1)
                 ->firstWhere('code', $promo_code);
 
