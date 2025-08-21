@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\StudentSubscriptionResource;
+use App\Http\Resources\Subscription\SubscriptionTypeResource;
+use App\Models\Subscriber;
 use App\Models\SubscriptionType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth,DB};
@@ -48,20 +50,34 @@ class SubscriptionTypeController extends Controller
      * )
      */
     public function subscribeStat(){
-        $subscription = Auth::user()
-                        ->subscribed()
-                        ->with('subscriptionType')
-                        ->select(
-                            'price',
-                            'paid',
-                            'subscribers.student_profile_id',
-                            DB::raw("DATE_FORMAT(subscribers.start_date, '%Y-%m-%d') as starts_at"),
-                            DB::raw("DATE_FORMAT(subscribers.end_date, '%Y-%m-%d') as ends_at"),
-                            'subscribed_at',
-                            'subscription_type_id'
-                        )
-                        ->first();
-        $data = new StudentSubscriptionResource($subscription);
+        // return Auth::id();
+        $student = Auth::user();
+        $student_id = $student->id;
+        $subscription = Subscriber::with(['subscriptionType'])
+                            ->where('student_profile_id', $student_id)
+                            ->where('status', 1)
+                            ->whereDate('end_date','>=',now())
+                            ->orderBy('id','DESC')
+                            ->get();
+        $data = null;
+        if ($subscription->count()) {
+            $latest_subscription = $subscription->first();
+            $data = [
+                "price" => (string) $subscription->sum('price'),
+                "paid" => (string) $subscription->sum('paid'),
+                "student_profile_id" => $student_id,
+                "starts_at" => $latest_subscription->start_date->format('Y-m-d'),
+                "ends_at" => $latest_subscription->end_date->format('Y-m-d'),
+                "subscribed_at" => $latest_subscription->subscribed_at,
+                "subscription" => [
+                    "id" => $latest_subscription->subscriptionType->id,
+                    "exam_type_id" => (int) $latest_subscription->subscriptionType->exam_type_id,
+                    "duration" => $latest_subscription->subscriptionType->duration,
+                    "price" => $latest_subscription->subscriptionType->price,
+                    "status" => (int) $latest_subscription->subscriptionType->status,
+                ]
+            ];
+        }
         return Response::apiSuccess('User subscription status', $data);
     }
     /**
@@ -77,17 +93,17 @@ class SubscriptionTypeController extends Controller
      *     tags={"Subscription"},
      *     @OA\Response(
      *         response=200,
-     *         description="Active package list",
+     *         description="Active subscription package list",
      *         @OA\JsonContent(
-     *             type="object",
      *             @OA\Property(property="status", type="boolean", example=true),
      *             @OA\Property(
      *                 property="data",
      *                 type="array",
      *                 @OA\Items(
      *                     type="object",
+     *                     @OA\Property(property="subscription_type_id", type="integer", example=1),
      *                     @OA\Property(property="duration", type="integer", example=1),
-     *                     @OA\Property(property="price", type="string", example="100.00")
+     *                     @OA\Property(property="price", type="string", example="101.00")
      *                 )
      *             ),
      *             @OA\Property(property="message", type="string", example="Active package list")
@@ -102,7 +118,8 @@ class SubscriptionTypeController extends Controller
             ->where('status', 1)
             ->where('exam_type_id',$user->exam_type_id)
             ->get();
-        return Response::apiSuccess('Active package list', $rows);
+        $data = SubscriptionTypeResource::collection($rows);
+        return Response::apiSuccess('Active package list', $data);
     }
 
     /**

@@ -6,10 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subscriber extends Model
 {
+    public $timestamps = false;
+    protected $fillable = ['status','paid_in_paisa','promo_code_id','payment_status'];
+    
     protected function casts(){
         return [
             'start_date' => 'date',
-            'end_date' => 'date'
+            'end_date' => 'date',
+            'data' => 'array'
         ];
     }
 

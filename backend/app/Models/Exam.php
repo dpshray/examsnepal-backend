@@ -27,6 +27,8 @@ class Exam extends Model
         'is_active',
         'price',
         'assign_id', # ID belongs to users table
+        'assign',
+        'live',
         'is_question_bank',
     ];
 
