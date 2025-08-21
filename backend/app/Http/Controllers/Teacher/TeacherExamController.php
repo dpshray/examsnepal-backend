@@ -12,6 +12,7 @@ use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class TeacherExamController extends Controller
 {
@@ -151,8 +152,42 @@ class TeacherExamController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    /**
+     * @OA\Delete(
+     *     path="/teacher/exam/{exam}",
+     *     summary="Delete an exam",
+     *     description="Delete an exam by its ID.",
+     *     operationId="deleteTeacherExam",
+     *     tags={"TeacherExam"},
+     *     @OA\Parameter(
+     *         name="exam",
+     *         in="path",
+     *         description="The ID of the exam to delete",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null),
+     *             @OA\Property(property="message", type="string", example="exam name This is some exam name 1 deleted")
+     *         )
+     *     )
+     * )
+     */
+
     public function destroy(Exam $exam)
     {
-        //
+        $this->isOwner($exam);
+        $exam_name = $exam->exam_name;
+        $exam->delete();
+        return Response::apiSuccess("exam name {$exam_name} deleted");
+    }
+
+    private function isOwner(Exam $exam)
+    {
+        throw_if($exam->user->isNot(Auth::guard('users')->user()), AuthorizationException::class, 'You are not the owner');
     }
 }
