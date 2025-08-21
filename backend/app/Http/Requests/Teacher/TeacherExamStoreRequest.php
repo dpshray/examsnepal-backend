@@ -28,7 +28,9 @@ class TeacherExamStoreRequest extends FormRequest
             'category_type' => ['required', Rule::enum(ExamTypeEnum::class)],
             'exam_name' => 'required',
             'description' => 'required',
-            'publish' => 'required|between:0,1'
+            'publish' => 'required|between:0,1',
+            'assign' => 'required|between:0,1',
+            'live' => 'required|between:0,1',
         ];
     }
 
@@ -40,6 +42,8 @@ class TeacherExamStoreRequest extends FormRequest
             'description' => $this->description,
             'status' => $this->category_type,
             'is_active' => $this->publish,
+            'assign' => $this->assign,
+            'live' => $this->live,
         ]);
     }
 }
