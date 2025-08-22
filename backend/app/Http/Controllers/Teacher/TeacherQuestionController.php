@@ -120,7 +120,7 @@ class TeacherQuestionController extends Controller
      */
     public function index(Request $request, Exam $exam)
     {
-        $this->isOwner($exam);
+        $this->isExamOwner($exam);
         $per_page = $request->query('per_page',10);
         $exam_title = $exam->exam_name;
         $pagination = $exam->questions()

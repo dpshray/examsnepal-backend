@@ -56,12 +56,13 @@ class SubscriptionTypeController extends Controller
         $subscription = Subscriber::with(['subscriptionType'])
                             ->where('student_profile_id', $student_id)
                             ->where('status', 1)
-                            ->whereDate('end_date','>=',now())
+                            // ->whereDate('end_date','>=',now())
                             ->orderBy('id','DESC')
                             ->get();
         $data = null;
         if ($subscription->count()) {
             $latest_subscription = $subscription->first();
+            $duration = $latest_subscription->start_date->diffInMonths($latest_subscription->end_date);
             $data = [
                 "price" => (string) $subscription->sum('price'),
                 "paid" => (string) $subscription->sum('paid'),
@@ -72,7 +73,7 @@ class SubscriptionTypeController extends Controller
                 "subscription" => [
                     "id" => $latest_subscription->subscriptionType->id,
                     "exam_type_id" => (int) $latest_subscription->subscriptionType->exam_type_id,
-                    "duration" => $latest_subscription->subscriptionType->duration,
+                    "duration" => $duration,
                     "price" => $latest_subscription->subscriptionType->price,
                     "status" => (int) $latest_subscription->subscriptionType->status,
                 ]
