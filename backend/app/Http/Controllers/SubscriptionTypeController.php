@@ -56,7 +56,7 @@ class SubscriptionTypeController extends Controller
         $subscription = Subscriber::with(['subscriptionType'])
                             ->where('student_profile_id', $student_id)
                             ->where('status', 1)
-                            ->whereDate('end_date','>=',now())
+                            // ->whereDate('end_date','>=',now())
                             ->orderBy('id','DESC')
                             ->get();
         $data = null;
