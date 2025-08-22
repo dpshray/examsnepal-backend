@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateExamRequest;
 use App\Http\Resources\QuestionResource;
 use App\Http\Resources\Teacher\TeacherExamQuestionResource;
 use App\Http\Resources\Teacher\TeacherExamResource;
+use App\Models\Question;
 use App\Traits\PaginatorTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
@@ -209,7 +210,7 @@ class TeacherQuestionController extends Controller
      */
     public function store(TeacherQuestionStoreRequest $request, Exam $exam)
     {
-        $this->isOwner($exam);
+        $this->isExamOwner($exam);
         $request->merge([
             'exam_type_id' => $exam->exam_type_id,
             'added_by' => Auth::guard('users')->id()
@@ -255,12 +256,43 @@ class TeacherQuestionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Exam $exam)
+    /**
+     * @OA\Delete(
+     *     path="/teacher/question/{question}",
+     *     summary="Delete an exam's question",
+     *     description="Delete an exam's question by its ID.",
+     *     operationId="deleteTeacherExamQuestion",
+     *     tags={"TeacherQuestion"},
+     *     @OA\Parameter(
+     *         name="question",
+     *         in="path",
+     *         description="The ID of the exam's question to delete",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null),
+     *             @OA\Property(property="message", type="string", example="question removed")
+     *         )
+     *     )
+     * )
+     */
+
+    public function destroy(Question $question)
     {
-        //
+        $this->isQuestionOwner($question);
+        $question->delete();
+        return Response::apiSuccess('question removed');
     }
 
-    private function isOwner(Exam $exam){
+    private function isExamOwner(Exam $exam){
         throw_if($exam->user->isNot(Auth::guard('users')->user()), AuthorizationException::class, 'You are not the owner');
+    }
+    private function isQuestionOwner(Question $question){
+        throw_if($question->exam->user->isNot(Auth::guard('users')->user()), AuthorizationException::class, 'You are not the owner');
     }
 }
