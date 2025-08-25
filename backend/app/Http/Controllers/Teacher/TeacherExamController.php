@@ -127,8 +127,6 @@ class TeacherExamController extends Controller
     {
         // dd($request->all());
         $data = $request->validated();
-        $data['status'] = $request
-        return $data;
         $data['is_active'] = 1;
         Auth::user()
             ->teacherExams()
