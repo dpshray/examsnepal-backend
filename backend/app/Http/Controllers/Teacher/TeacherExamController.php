@@ -128,6 +128,7 @@ class TeacherExamController extends Controller
         // dd($request->all());
         $data = $request->validated();
         $data['is_active'] = 1;
+        $data['status'] = $request->category_type;
         Auth::user()
             ->teacherExams()
             ->createQuietly($data);
@@ -202,7 +203,7 @@ class TeacherExamController extends Controller
      * )
      */
 
-    public function update(UpdateTeacherExamRequest $request, Exam $exam)
+    public function update(TeacherExamStoreRequest $request, Exam $exam)
     {
         //
         $this->isOwner($exam);
