@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Storage;
 
 class TeacherQuestionController extends Controller
 {
-    use PaginatorTrait; 
+    use PaginatorTrait;
     /**
      * Display a listing of the resource.
      */
@@ -225,13 +225,13 @@ class TeacherQuestionController extends Controller
             $question = $request->only(['question', 'explanation','exam_type_id','added_by']);
             $question = $exam->questions()->create($question);
             clone($question)->options()->createMany($options);
-            
+
             if ($request->hasFile('image')) {
                 $image_dir_name = $question->id;
                 $image_ext = $request->image->getClientOriginalExtension();
                 $image_name = 'question-image-' . $image_dir_name . '.'. $image_ext;
                 $question->image()->create(['image' => $image_name]);
-                Storage::disk('exam')->putFileAs($image_dir_name, $request->image, $image_name);                
+                Storage::disk('exam')->putFileAs($image_dir_name, $request->image, $image_name);
             }
         });
         return Response::apiSuccess("Question added of exam name: {$exam->exam_name}");
@@ -248,9 +248,93 @@ class TeacherQuestionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Exam $exam)
+     /**
+     * @OA\POST(
+     *     path="/teacher/question/{question}",
+     *     summary="Update a question of an exam",
+     *     description="Update an existing question (with options and image). Only the exam owner (teacher) can update.",
+     *     operationId="teacher_exam_question_update",
+     *     tags={"TeacherQuestion"},
+     *     @OA\Parameter(
+     *         name="question",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the question",
+     *         @OA\Schema(type="integer", example=101)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"question","option_a","option_b","option_c","option_d"},
+     *                 @OA\Property(property="question", type="string", example="What is the capital of Nepal?"),
+     *                 @OA\Property(property="_method", type="string", example="patch"),
+     *                 @OA\Property(property="explanation", type="string", example="Kathmandu is the capital city."),
+     *                 @OA\Property(property="option_a", type="string", example="Kathmandu"),
+     *                 @OA\Property(property="option_a_is_true", type="boolean", example=true),
+     *                 @OA\Property(property="option_b", type="string", example="Pokhara"),
+     *                 @OA\Property(property="option_b_is_true", type="boolean", example=false),
+     *                 @OA\Property(property="option_c", type="string", example="Lalitpur"),
+     *                 @OA\Property(property="option_c_is_true", type="boolean", example=false),
+     *                 @OA\Property(property="option_d", type="string", example="Bhaktapur"),
+     *                 @OA\Property(property="option_d_is_true", type="boolean", example=false),
+     *                 @OA\Property(property="image", type="string", format="binary", description="Optional image for the question")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Question Updated Successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null),
+     *             @OA\Property(property="message", type="string", example="Question updated for exam: Example Exam Name")
+     *         )
+     *     )
+     * )
+    */
+
+    public function update(Request $request ,Question $question)
     {
         //
+        // $this->isExamOwner($exam);
+        $this->isQuestionOwner($question);
+        DB::transaction(function () use ($request, $question) {
+            //update question
+            $question->update([
+                'question'    => $request->question ?? $question->question,
+                'explanation' => $request->explanation ?? $question->explanation,
+            ]);
+            //update option
+            if ($request->has(['option_a', 'option_b', 'option_c', 'option_d'])) {
+                // Remove old options
+                $question->options()->delete();
+                // Recreate new options
+                $options = [
+                    ['option' => $request->option_a, 'value' => $request->option_a_is_true],
+                    ['option' => $request->option_b, 'value' => $request->option_b_is_true],
+                    ['option' => $request->option_c, 'value' => $request->option_c_is_true],
+                    ['option' => $request->option_d, 'value' => $request->option_d_is_true],
+                ];
+                $question->options()->createMany($options);
+            }
+            //update image if exists
+            if ($request->hasFile('image')) {
+                $image_dir_name = $question->id;
+                $image_ext = $request->image->getClientOriginalExtension();
+                $image_name = 'question-image-' . $image_dir_name . '.' . $image_ext;
+                // Delete old image if exists
+                if ($question->image) {
+                    Storage::disk('exam')->delete($image_dir_name . '/' . $question->image->image);
+                    $question->image()->delete();
+                }
+                // Save new image
+                $question->image()->create(['image' => $image_name]);
+                Storage::disk('exam')->putFileAs($image_dir_name, $request->image, $image_name);
+            }
+        });
+        return Response::apiSuccess("Question updated for exam:");
     }
 
     /**
