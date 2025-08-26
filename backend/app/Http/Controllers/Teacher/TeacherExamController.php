@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Teacher\TeacherExamStoreRequest;
+use App\Http\Requests\Teacher\UpdateTeacherExamRequest;
 use App\Http\Resources\ExamCollection;
 use App\Http\Resources\ExamResource;
 use App\Http\Resources\Teacher\TeacherExamResource;
@@ -76,13 +77,13 @@ class TeacherExamController extends Controller
      */
     public function index(Request $request)
     {
-        $per_page = $request->query('per_page',10);
+        $per_page = $request->query('per_page', 10);
         $teacher = Auth::guard('users')->user();
         $pagination = $teacher->teacherExams()
-                        ->with(['examType:id,name'])
-                        ->withCount(['questions'])
-                        ->orderBy('id','DESC')
-                        ->paginate($per_page);
+            ->with(['examType:id,name'])
+            ->withCount(['questions'])
+            ->orderBy('id', 'DESC')
+            ->paginate($per_page);
         $data = $this->setupPagination($pagination, fn($item) => TeacherExamResource::collection($item))->data;
         return Response::apiSuccess("teacher({$teacher->username}) exam list", $data);
     }
@@ -127,6 +128,7 @@ class TeacherExamController extends Controller
         // dd($request->all());
         $data = $request->validated();
         $data['is_active'] = 1;
+        $data['status'] = $request->category_type;
         Auth::user()
             ->teacherExams()
             ->createQuietly($data);
@@ -144,9 +146,71 @@ class TeacherExamController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Exam $exam)
+    /**
+     * @OA\Put(
+     *     path="/teacher/exam/{exam}",
+     *     summary="Update an exam (via teacher)",
+     *     description="Update an existing exam. (Note: For 'publish', value must be either 1 or 0)",
+     *     operationId="teacher_exam_update",
+     *     tags={"TeacherExam"},
+     *     @OA\Parameter(
+     *         name="exam",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the exam to update",
+     *         @OA\Schema(type="integer", example=10)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"exam_type_id","category_type","exam_name","description","publish"},
+     *             @OA\Property(property="exam_type_id", type="integer", example=5),
+     *             @OA\Property(property="category_type", type="integer", example=1),
+     *             @OA\Property(property="exam_name", type="string", example="Updated Exam Name"),
+     *             @OA\Property(property="description", type="string", example="Updated exam description"),
+     *             @OA\Property(property="publish", type="integer", example=0),
+     *             @OA\Property(property="assign", type="integer", example=0),
+     *             @OA\Property(property="live", type="integer", example=1)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Exam Updated Successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null),
+     *             @OA\Property(property="message", type="string", example="exam updated successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized action",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null),
+     *             @OA\Property(property="message", type="string", example="Unauthorized action")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Exam not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null),
+     *             @OA\Property(property="message", type="string", example="Exam not found")
+     *         )
+     *     )
+     * )
+     */
+
+    public function update(TeacherExamStoreRequest $request, Exam $exam)
     {
         //
+        $this->isOwner($exam);
+        $data = $request->validated();
+        $exam->updateQuietly($data);
+
+        return Response::apiSuccess('exam updated successfully');
     }
 
     /**
@@ -185,6 +249,7 @@ class TeacherExamController extends Controller
         $exam->delete();
         return Response::apiSuccess("exam name {$exam_name} deleted");
     }
+
 
     private function isOwner(Exam $exam)
     {
