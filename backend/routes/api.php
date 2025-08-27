@@ -22,6 +22,7 @@ use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\Participant\ParticipantController;
 use App\Http\Controllers\Payment\EsewaController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Middleware\isStudentSubscribedMiddleware;
@@ -133,7 +134,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::get('/student/me', [AuthController::class, 'me']);
     #Student Account Removal
     Route::delete('student-account-removal/{student}', [StudentProfileController::class, 'permanentStudentRemoveAccount']);
-    
+
     Route::get('get-student-performance-data', [StudentProfileController::class, 'studentPerformanceReport']);
 
     Route::get('/student/questions', [ForumController::class, 'fetchQuestions']);
@@ -193,7 +194,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
     #sprint quiz
     Route::get('/sprint-quiz/pending', [QuizController::class, 'getPendingSprintQuiz']);
     Route::get('/sprint-quiz/completed', [QuizController::class, 'getCompletedSprintQuiz']);
-    
+
     #mock quiz
     Route::get('/mock-test/pending', [QuizController::class, 'getPendingMockTest']);
     Route::get('/mock-test/completed', [QuizController::class, 'getCompletedMockTest']);
@@ -203,10 +204,10 @@ Route::middleware(['auth:api','verified'])->group(function () {
         Route::get('/sprint-quiz/questions/{exam_id}', [QuestionController::class, 'sprintQuizQuestions']);
         Route::get('/mock-test/questions/{exam_id}', [QuestionController::class, 'mockTestQuestions']);
     });
-    
-    
+
+
     Route::post('/submit-answer', [AnswerSheetController::class, 'store']);
-    
+
     # solutions
     Route::get('/view-solutions/{exam_id}', [AnswerSheetController::class, 'getResultsWithExam']);
 
@@ -283,4 +284,11 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
 
 Route::middleware(['auth:users', 'role:teacher'])->group(function () {
     // Route::get('/subjects', [SubjectController::class, 'index']);
+});
+
+Route::controller(ParticipantController::class)->group(function (){
+    Route::post('/store-participant','store');
+    Route::post('/excel-participant','store_from_excel');
+    Route::post('/update-participant/{participant}','update');
+    Route::delete('/delete-participant/{participant}','destroy');
 });
