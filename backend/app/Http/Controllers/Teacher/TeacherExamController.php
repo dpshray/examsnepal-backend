@@ -129,6 +129,8 @@ class TeacherExamController extends Controller
         $data = $request->validated();
         $data['is_active'] = 1;
         $data['status'] = $request->category_type;
+        // $data = array_merge($data, ['status' => $request->category_type]);
+        return $data;
         Auth::user()
             ->teacherExams()
             ->createQuietly($data);
