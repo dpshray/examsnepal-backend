@@ -20,7 +20,10 @@ class TeacherExamResource extends JsonResource
             "id" => $this->id,
             "published" => $this->is_active,
             "exam_type" => $this->whenLoaded('examType'),
-            "category_type"=> ExamTypeEnum::getKeyByValue($this->status),
+            "category_type"=> [
+                'id'=>$this->status,
+                'name'=>ExamTypeEnum::getKeyByValue($this->status),
+            ],
             "exam_name" => $this->exam_name,
             "live"=>$this->live,
             "description"=>$this->description,

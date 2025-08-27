@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class Exam extends Model
-{    
+{
     protected $perPage = 12;
     public $timestamps = false;
     /**
@@ -37,7 +37,8 @@ class Exam extends Model
         return [
             'id' => 'integer',
             'user_id' => 'integer',
-            'exam_type_id' => 'integer'
+            'exam_type_id' => 'integer',
+            'status'=>'integer'
         ];
     }
 
