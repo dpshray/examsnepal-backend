@@ -34,16 +34,16 @@ class TeacherExamStoreRequest extends FormRequest
         ];
     }
 
-    protected function passedValidation(): void
-    {
-        $this->replace([
-            'exam_type_id' => $this->exam_type_id,
-            'exam_name' => $this->exam_name,
-            'description' => $this->description,
-            'status' => $this->category_type,
-            'is_active' => $this->publish,
-            'assign' => $this->assign,
-            'live' => $this->live,
-        ]);
-    }
+    // protected function passedValidation(): void
+    // {
+    //     $this->replace([
+    //         'exam_type_id' => $this->exam_type_id,
+    //         'exam_name' => $this->exam_name,
+    //         'description' => $this->description,
+    //         'status' => $this->category_type,
+    //         'is_active' => $this->publish,
+    //         'assign' => $this->assign,
+    //         'live' => $this->live,
+    //     ]);
+    // }
 }
