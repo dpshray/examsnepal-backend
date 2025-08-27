@@ -35,6 +35,7 @@ use App\Http\Controllers\PoolController;
 use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\SubscriptionTypeController;
 use App\Http\Middleware\AuthEitherUser;
+use App\Models\Exam;
 use App\Models\SubscriptionType;
 use Illuminate\Http\Request;
 use App\Models\PromoCode;
@@ -43,32 +44,32 @@ require __DIR__.'/corporate.php';
 require __DIR__.'/payment.php';
 require __DIR__.'/teacher.php';
 
-Route::get('data-inserter', function(){
-    $data = [
-        [
-            'code' => 'DWORK2025',
-            'discount_percent' => 5,
-            'detail' => 'DWORK FESTIVAL'
-        ],
-        [
-            'code' => 'KATHMANDUWEAR2081',
-            'discount_percent' => 2,
-            'detail' => 'KATHMANDU WEAR 2081'
-        ],
-        [
-            'code' => 'DASHAIN-2081',
-            'discount_percent' => 3,
-            'detail' => 'DASHAIN 2081'
-        ],
-    ];
-    foreach ($data as $item) {
-        $rows = PromoCode::firstWhere('code', $item['code']);
-        if (empty($rows)) {
-            DB::table('promo_codes')->insert($item);
-        }
-    }
-    echo 'OK';
-});
+// Route::get('data-inserter', function(){
+//     $data = [
+//         [
+//             'code' => 'DWORK2025',
+//             'discount_percent' => 5,
+//             'detail' => 'DWORK FESTIVAL'
+//         ],
+//         [
+//             'code' => 'KATHMANDUWEAR2081',
+//             'discount_percent' => 2,
+//             'detail' => 'KATHMANDU WEAR 2081'
+//         ],
+//         [
+//             'code' => 'DASHAIN-2081',
+//             'discount_percent' => 3,
+//             'detail' => 'DASHAIN 2081'
+//         ],
+//     ];
+//     foreach ($data as $item) {
+//         $rows = PromoCode::firstWhere('code', $item['code']);
+//         if (empty($rows)) {
+//             DB::table('promo_codes')->insert($item);
+//         }
+//     }
+//     echo 'OK';
+// });
 
 Route::get('all-exams-list', function(Request $request){
     $per_page = $request->query('per_page', 10);
@@ -87,6 +88,14 @@ Route::get('all-exams-list', function(Request $request){
         ->orderBy('id','DESC')
         ->paginate($per_page);
     return response()->json($rows);
+});
+
+Route::post('web-exam-update/{exam}', function(Request $request, Exam $exam){
+    $request->validate([
+        'status' => 'required'
+    ]);
+    $exam->update(['status' => request()->status]);
+    return $exam;
 });
 
 #testing purpose
