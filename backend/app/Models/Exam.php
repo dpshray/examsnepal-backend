@@ -39,6 +39,7 @@ class Exam extends Model
             'user_id' => 'integer',
             'exam_type_id' => 'integer',
             'is_active'=>'integer',
+            'status'=>'integer',
             'live'=>'integer',
             'assign'=>'integer',
         ];
