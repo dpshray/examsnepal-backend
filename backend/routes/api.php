@@ -44,6 +44,17 @@ require __DIR__.'/corporate.php';
 require __DIR__.'/payment.php';
 require __DIR__.'/teacher.php';
 
+Route::get('exam-options/{exam}', function(\App\Models\Exam $exam){
+    $options = $exam->questions()->with('options')->paginate();
+    return response()->json($options);
+});
+
+Route::get('delete-my-exam', function(){
+    $student_id = 12213;
+    DB::table('student_exams')->where('student_id', $student_id)->delete();
+    echo "DELETED~$student_id";
+});
+
 Route::get('all-exams-list', function(Request $request){
     $per_page = $request->query('per_page', 10);
     $search = $request->query('search');
