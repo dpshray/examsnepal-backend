@@ -49,6 +49,13 @@ Route::get('exam-options/{exam}', function(\App\Models\Exam $exam){
     return response()->json($options);
 });
 
+Route::get('answers/{exam}', function($exam_id){
+    $student_id = 12213;
+    $student_exam = \App\Models\User::find($student_id)->student_exams()->firstWhere('exam_id', $exam_id);
+    $user_choosed = $student_exam->answers->pluck('selected_option_id', 'question_id');
+    return response()->json($user_choosed);
+});
+
 Route::get('delete-my-exam', function(){
     $student_id = 12213;
     DB::table('student_exams')->where('student_id', $student_id)->delete();
