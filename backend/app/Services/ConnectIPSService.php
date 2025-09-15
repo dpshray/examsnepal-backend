@@ -26,7 +26,8 @@ class ConnectIPSService
 
     public function initiateTransaction(array $data){
         // dd($data);
-        $pfxPath = storage_path('certs/CREDITOR.key');
+        // $pfxPath = storage_path('certs/CREDITOR.key'); #TEST
+        $pfxPath = storage_path('certs/live/DWORKIT_LIVE.key'); #LIVE
         if (!file_exists($pfxPath)) {
             throw new \Exception("PFX file not found at: $pfxPath");
         }
