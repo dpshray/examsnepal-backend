@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Response;
 
 class ConnectIPSService
 {
-    private $merchant_id, $app_id, $app_name, $url = null;
+    private $merchant_id, $app_id, $basic_auth_password, $app_name, $url, $key_file_password, $validation_url = null;
 
     public function __construct()
     {
@@ -19,7 +19,9 @@ class ConnectIPSService
         $this->app_id = config('services.connectips.app_id');
         $this->app_name = config('services.connectips.app_name');
         $this->url = config('services.connectips.url');
-        
+        $this->validation_url = config('services.connectips.validation_url');
+        $this->basic_auth_password = config('services.connectips.basic_auth_password');
+        $this->key_file_password = config('services.connectips.keyfile_password');
     }
 
     public function initiateTransaction(array $data){
@@ -29,7 +31,7 @@ class ConnectIPSService
             throw new \Exception("PFX file not found at: $pfxPath");
         }
 
-        $pfxPassword = 123;
+        $pfxPassword = $this->key_file_password;
         $privateKey = openssl_pkey_get_private(file_get_contents($pfxPath), $pfxPassword);
         // $pfxPath = storage_path('certs/CREDITOR.pfx');
 
@@ -131,7 +133,7 @@ class ConnectIPSService
         ];
         // dd($postData);
 
-        $ch = curl_init('https://uat.connectips.com/connectipswebgw/loginpage');
+        $ch = curl_init($this->validation_url);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -166,7 +168,7 @@ class ConnectIPSService
         $txnAmt     = $transaction->paid_in_paisa;
         $REF_ID = $transaction_id;
         $username   = $appId;  // Basic Auth username
-        $password   = "Abcd@123"; // Basic Auth password
+        $password   = $this->basic_auth_password; // Basic Auth password
 
         // === Build message string ===
         $message = "MERCHANTID={$merchantId},APPID={$appId},REFERENCEID={$REF_ID},TXNAMT={$txnAmt}";
@@ -189,7 +191,8 @@ class ConnectIPSService
         $authHeader = "Authorization: Basic " . base64_encode("{$username}:{$password}");
 
         // === Send POST request ===
-        $ch = curl_init("https://uat.connectips.com/connectipswebws/api/creditor/validatetxn");
+        $validation_url = $this->validation_url;
+        $ch = curl_init($validation_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             "Content-Type: application/json",

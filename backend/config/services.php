@@ -40,6 +40,9 @@ return [
         'app_id' => env('CONNECTIPS_APPID'),
         'app_name' => env('CONNECTIPS_APPNAME'),
         'url' => env('CONNECTIPS_URL'),
+        'validation_url' => env('VALIDATION_URL'),
+        'basic_auth_password' => env('BASIC_AUTH_PASSWORD'),
+        'keyfile_password' => env('KEYFILE_PASSWORD')
     ]
 
 ];
