@@ -19,7 +19,7 @@ class StudentProfileController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/student/register", 
+     *     path="/student/register",
      *     summary="Register a new student",
      *     description="This endpoint allows you to register a new student by providing necessary details.",
      *     operationId="registerStudent",
@@ -84,13 +84,13 @@ class StudentProfileController extends Controller
             'email' => 'required|string|email|unique:student_profiles,email',
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:8|confirmed',
-            'exam_type_id' => 'exists:exam_types,id',
-        ]); 
+            'exam_type_id' => 'required|exists:exam_types,id',
+        ]);
         if ($validator->fails()) {
             $an_error = $validator->errors()->all();
             return Response::apiError($an_error[0] ?? 'Validation error occurred',null,422);
         }
-        
+
         // Create student profile
         $student = StudentProfile::create([
             'name' => $request->name,
@@ -190,7 +190,7 @@ class StudentProfileController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/update-student-profile", 
+     *     path="/update-student-profile",
      *     summary="Update Student Profile",
      *     description="This endpoint allows you to update student profile.",
      *     operationId="updateStudentProfile",
@@ -247,7 +247,7 @@ class StudentProfileController extends Controller
         ]);
         $student_id = Auth::guard('api')->id();
         $student = DB::table('student_profiles')->find($student_id);
-        
+
         $data = [
             "name" => $validatedData["name"],
             // "email" => $validatedData["email"],
@@ -278,7 +278,7 @@ class StudentProfileController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/student-password-reset", 
+     *     path="/student-password-reset",
      *     summary="Password reset form(sending email)",
      *     description="This endpoint allows you to send message to student email which contains a token.",
      *     operationId="studentPasswordReset",
@@ -328,7 +328,7 @@ class StudentProfileController extends Controller
         }
         $already_sent = DB::table('password_reset_tokens')->where('email', $request->email)->first();
         if ($already_sent) {
-            $token_valid_until = StudentProfile::PASSWORD_RESET_TOKEN_VALID_UNTIL; 
+            $token_valid_until = StudentProfile::PASSWORD_RESET_TOKEN_VALID_UNTIL;
             $timestamp = $already_sent->created_at;
             $time = Carbon::parse($timestamp);
             $hasPassed = $time->diffInMinutes(now(), false) > $token_valid_until;
@@ -343,7 +343,7 @@ class StudentProfileController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/verify-password-reset-otp", 
+     *     path="/verify-password-reset-otp",
      *     summary="Send password reset token for verification",
      *     description="This endpoint checks token received from email which was sent for password reset token.",
      *     operationId="verifyPasswordResetOtp",
@@ -402,7 +402,7 @@ class StudentProfileController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/handle-password-reset-form", 
+     *     path="/handle-password-reset-form",
      *     summary="Handles password reset form",
      *     description="This endpoint handle password reset form.",
      *     operationId="handlePasswordResetForm",
@@ -510,7 +510,7 @@ class StudentProfileController extends Controller
         $logged_in_user = Auth::guard('api')->user();
         if ($logged_in_user->isNot($student)) {
             return Response::apiError('Cannot delete account.(user does not match)',null,403);
-        } 
+        }
         $logged_in_user->delete();
         return Response::apiSuccess('Your account has been removed permanently');
     }
