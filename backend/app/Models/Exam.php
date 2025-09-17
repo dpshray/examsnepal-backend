@@ -38,10 +38,10 @@ class Exam extends Model
             'id' => 'integer',
             'user_id' => 'integer',
             'exam_type_id' => 'integer',
-            'is_active'=>'integer',
-            'status'=>'integer',
-            'live'=>'integer',
-            'assign'=>'integer',
+            'is_active' => 'integer',
+            'status' => 'integer',
+            'live' => 'integer',
+            'assign' => 'integer',
         ];
     }
 
@@ -62,7 +62,18 @@ class Exam extends Model
 
     public function scopeAuthUserPending(Builder $query): Builder
     {
-        return $query->allAvailableExams()
+        return $query->with([
+            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])->with([
+                'student:id,name',
+                'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
+            ])
+                ->withCount([
+                    'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
+                ])
+                ->orderBy('correct_answers_count', 'DESC')
+                ->orderBy('id', 'DESC')
+        ])
+            ->allAvailableExams()
             ->when(
                 Auth::guard('api')->check(),
                 fn($qry) => $qry->whereDoesntHave('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))
@@ -72,16 +83,16 @@ class Exam extends Model
     public function scopeAuthUserCompleted(Builder $query): Builder
     {
         return $query->with([
-                'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])->with([
-                    'student:id,name',
-                    'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
-                ])
+            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])->with([
+                'student:id,name',
+                'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
+            ])
                 ->withCount([
                     'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
                 ])
                 ->orderBy('correct_answers_count', 'DESC')
                 ->orderBy('id', 'DESC')
-            ])
+        ])
             ->when(
                 Auth::guard('api')->check(),
                 fn($qry) => $qry->whereHas('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))

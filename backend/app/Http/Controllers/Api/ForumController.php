@@ -20,12 +20,12 @@ use Illuminate\Support\Facades\Cache;
  *     version="1.0.0",
  *     description="API Endpoints for Forum Questions"
  * )
- * 
- * @OA\Server( 
+ *
+ * @OA\Server(
  *     url="https://api.examsnepal.dworklabs.com/api/",
  *     description="Localhost API Server"
  * )
- * 
+ *
  * @OA\Tag(
  *     name="Forum",
  *     description="API Endpoints for Managing Forum Questions"
@@ -176,7 +176,7 @@ class ForumController extends Controller
      *                 description="The question to be added.",
      *                 example="What is the best way to improve my coding skills?"
      *             ),
-     *      
+     *
      *         )
      *     ),
      *     @OA\Response(
@@ -229,11 +229,11 @@ class ForumController extends Controller
     public function addQuestion(Request $request)
     {
         $user = Auth::guard('api')->user();
-        
+
         $validatedData = $request->validate([
             'question' => 'required|string|max:1000',
         ]);
-        $question = $validatedData['question']; 
+        $question = $validatedData['question'];
         $user->forum_questions()->create([
             'question' => $question
         ]);
@@ -275,7 +275,7 @@ class ForumController extends Controller
      *         description="Question updated successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="Question updated successfully"),
-     *             @OA\Property(property="question", type="object", 
+     *             @OA\Property(property="question", type="object",
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="user_id", type="integer", example=1),
      *                 @OA\Property(property="question", type="string", example="What is the capital of Nepal?"),
@@ -302,8 +302,8 @@ class ForumController extends Controller
      *         response=422,
      *         description="Validation errors in the request",
      *         @OA\JsonContent(
-     *             @OA\Property(property="errors", type="object", 
-     *                 @OA\Property(property="question", type="array", 
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="question", type="array",
      *                     @OA\Items(type="string", example="The question field is required.")
      *                 )
      *             )
@@ -400,7 +400,7 @@ class ForumController extends Controller
      *         description="Question details fetched successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="Question details"),
-     *             @OA\Property(property="question", type="object", 
+     *             @OA\Property(property="question", type="object",
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="user_id", type="integer", example=1),
      *                 @OA\Property(property="question", type="string", example="What is the capital of Nepal?"),
@@ -484,7 +484,7 @@ class ForumController extends Controller
      *         description="Question details fetched successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="Question details"),
-     *             @OA\Property(property="question", type="object", 
+     *             @OA\Property(property="question", type="object",
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="user_id", type="integer", example=1),
      *                 @OA\Property(property="question", type="string", example="What is the capital of Nepal?"),
