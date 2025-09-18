@@ -43,6 +43,11 @@ return [
         'validation_url' => env('VALIDATION_URL'),
         'basic_auth_password' => env('BASIC_AUTH_PASSWORD'),
         'keyfile_password' => env('KEYFILE_PASSWORD')
-    ]
+    ],
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
 
 ];

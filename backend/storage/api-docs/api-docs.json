@@ -11258,6 +11258,88 @@
                 }
             }
         },
+        "/student-google-login": {
+            "post": {
+                "tags": [
+                    "Google"
+                ],
+                "summary": "Google Login for student",
+                "description": "Google Login for student",
+                "operationId": "GoogleLogin",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "google_token": {
+                                        "type": "string",
+                                        "example": "41ht56d4h5td"
+                                    },
+                                    "fcm_token": {
+                                        "type": "string",
+                                        "example": "m8skbtfgb7"
+                                    },
+                                    "exam_type_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Lilly Lee"
+                                                },
+                                                "dob": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2082-01-25"
+                                                },
+                                                "gender": {
+                                                    "type": "boolean",
+                                                    "example": "FEMALE"
+                                                },
+                                                "media": {
+                                                    "type": "string",
+                                                    "example": "http://127.0.0.1:8000/storage/36/conversions/flowers-7382926_1920-thumbnail.jpg"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Infant information has been updated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/subjects": {
             "get": {
                 "tags": [
@@ -12191,6 +12273,150 @@
             }
         },
         "/teacher/exam/{exam}": {
+            "put": {
+                "tags": [
+                    "TeacherExam"
+                ],
+                "summary": "Update an exam (via teacher)",
+                "description": "Update an existing exam. (Note: For 'publish', value must be either 1 or 0)",
+                "operationId": "teacher_exam_update",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "ID of the exam to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "exam_type_id",
+                                    "category_type",
+                                    "exam_name",
+                                    "description",
+                                    "publish"
+                                ],
+                                "properties": {
+                                    "exam_type_id": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "category_type": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "exam_name": {
+                                        "type": "string",
+                                        "example": "Updated Exam Name"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated exam description"
+                                    },
+                                    "publish": {
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "assign": {
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "live": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Exam Updated Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "exam updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized action",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized action"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Exam not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Exam not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "delete": {
                 "tags": [
                     "TeacherExam"
@@ -12538,6 +12764,121 @@
             }
         },
         "/teacher/question/{question}": {
+            "post": {
+                "tags": [
+                    "TeacherQuestion"
+                ],
+                "summary": "Update a question of an exam",
+                "description": "Update an existing question (with options and image). Only the exam owner (teacher) can update.",
+                "operationId": "teacher_exam_question_update",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "description": "ID of the question",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 101
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "question",
+                                    "option_a",
+                                    "option_b",
+                                    "option_c",
+                                    "option_d"
+                                ],
+                                "properties": {
+                                    "question": {
+                                        "type": "string",
+                                        "example": "What is the capital of Nepal?"
+                                    },
+                                    "_method": {
+                                        "type": "string",
+                                        "example": "patch"
+                                    },
+                                    "explanation": {
+                                        "type": "string",
+                                        "example": "Kathmandu is the capital city."
+                                    },
+                                    "option_a": {
+                                        "type": "string",
+                                        "example": "Kathmandu"
+                                    },
+                                    "option_a_is_true": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "option_b": {
+                                        "type": "string",
+                                        "example": "Pokhara"
+                                    },
+                                    "option_b_is_true": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "option_c": {
+                                        "type": "string",
+                                        "example": "Lalitpur"
+                                    },
+                                    "option_c_is_true": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "option_d": {
+                                        "type": "string",
+                                        "example": "Bhaktapur"
+                                    },
+                                    "option_d_is_true": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "image": {
+                                        "description": "Optional image for the question",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Question Updated Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question updated for exam: Example Exam Name"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "delete": {
                 "tags": [
                     "TeacherQuestion"
@@ -12687,6 +13028,10 @@
         {
             "name": "Students",
             "description": "Students"
+        },
+        {
+            "name": "Google",
+            "description": "Google"
         },
         {
             "name": "Subjects",
