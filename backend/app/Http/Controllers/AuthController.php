@@ -196,6 +196,8 @@ class AuthController extends Controller
         $email_is_not_verified = !$student->hasVerifiedEmail();
         if ($email_is_not_verified) {
             return Response::apiError('Email is not verified.',null,403);
+        }elseif (empty($student->exam_type_id)) {
+            return Response::apiError('Exam type not found.',null,403);
         }
         // if (!$student) {
         //     return response()->json(['error' => 'Student not found'], 404);
