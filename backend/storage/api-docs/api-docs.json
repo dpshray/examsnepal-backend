@@ -11262,6 +11262,88 @@
                 }
             }
         },
+        "/student-google-login": {
+            "post": {
+                "tags": [
+                    "Google"
+                ],
+                "summary": "Google Login for student",
+                "description": "Google Login for student",
+                "operationId": "GoogleLogin",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "google_token": {
+                                        "type": "string",
+                                        "example": "41ht56d4h5td"
+                                    },
+                                    "fcm_token": {
+                                        "type": "string",
+                                        "example": "m8skbtfgb7"
+                                    },
+                                    "exam_type_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Lilly Lee"
+                                                },
+                                                "dob": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2082-01-25"
+                                                },
+                                                "gender": {
+                                                    "type": "boolean",
+                                                    "example": "FEMALE"
+                                                },
+                                                "media": {
+                                                    "type": "string",
+                                                    "example": "http://127.0.0.1:8000/storage/36/conversions/flowers-7382926_1920-thumbnail.jpg"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Infant information has been updated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/subjects": {
             "get": {
                 "tags": [
@@ -12950,6 +13032,10 @@
         {
             "name": "Students",
             "description": "Students"
+        },
+        {
+            "name": "Google",
+            "description": "Google"
         },
         {
             "name": "Subjects",

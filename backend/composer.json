@@ -10,6 +10,7 @@
         "darkaonline/l5-swagger": "^9.0",
         "kreait/laravel-firebase": "^5.8",
         "laravel/framework": "^11.31",
+        "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.9",
         "phpoffice/phpspreadsheet": "^4.4",
         "tymon/jwt-auth": "^2.1"
