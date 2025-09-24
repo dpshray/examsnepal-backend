@@ -127,7 +127,7 @@ class TeacherExamController extends Controller
     {
         // dd($request->all());
         $data = $request->validated();
-        $data['is_active'] = 1;
+        $data['is_active'] = $request->publish;
         $data['status'] = $request->category_type;
         Auth::user()
             ->teacherExams()

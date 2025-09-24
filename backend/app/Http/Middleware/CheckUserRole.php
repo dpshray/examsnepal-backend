@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 class CheckUserRole
 {
     /**
@@ -18,6 +20,7 @@ class CheckUserRole
         $user = Auth::user();
 
         // Check if the authenticated user exists and has one of the allowed roles.
+        Log::info($user->role);
         if (!$user || !in_array($user->role, $roles)) {
             return response()->json([
                 'success' => false,

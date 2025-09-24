@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ForumQuestion\ReplyResource;
 use App\Http\Resources\ForumQuestionCollection;
+use App\Http\Resources\ForumQuestionResource;
 use Illuminate\Http\Request;
 use App\Models\ForumQuestion;
 use App\Models\ForumAnswer;
@@ -731,5 +733,14 @@ class ForumController extends Controller
             return Response::apiSuccess('view incremented');
         }
         return Response::apiSuccess('already incremented');
+    }
+    public function question_answer($id)
+    {
+        $question = ForumQuestion::with(['studentProfile', 'answers.studentProfile'])
+        ->findOrFail($id);
+        return response()->json([
+        'message' => 'Question fetched successfully',
+        'question' => new ReplyResource($question)
+        ]);
     }
 }
