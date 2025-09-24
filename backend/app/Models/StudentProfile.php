@@ -69,7 +69,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
         });
     }
 
-    public function sendPasswordResetEmail(){
+    public function sendPasswordResetEmail()
+    {
         $token = strtoupper(str()->random(5));
         $link_expires_minute   = SELF::PASSWORD_RESET_TOKEN_VALID_UNTIL;
         $url_expiration_minute = now()->addMinutes($link_expires_minute);
@@ -114,35 +115,47 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
 
     public function doubts()
     {
-        return $this->hasMany(Doubt::class,'student_id');
+        return $this->hasMany(Doubt::class, 'student_id');
     }
 
-    public function student_exams(){
-        return $this->hasMany(StudentExam::class,'student_id');
+    public function student_exams()
+    {
+        return $this->hasMany(StudentExam::class, 'student_id');
     }
 
-    public function exams(){ # exams completed
-        return $this->belongsToMany(Exam::class,'student_exams','student_id','exam_id');
+    public function exams()
+    { # exams completed
+        return $this->belongsToMany(Exam::class, 'student_exams', 'student_id', 'exam_id');
     }
 
-    public function forum_questions() {
-        return $this->hasMany(ForumQuestion::class,'user_id');
+    public function forum_questions()
+    {
+        return $this->hasMany(ForumQuestion::class, 'user_id');
     }
 
-    public function student_pools(){
-        return $this->hasMany(StudentPool::class,'student_id');
+    public function student_pools()
+    {
+        return $this->hasMany(StudentPool::class, 'student_id');
     }
 
-    public function subscribed(){
+    public function subscribed()
+    {
         return $this->hasOne(Subscriber::class)
-        ->where('status',1)
-        ->where('payment_status', PaymentStatusEnum::PAYMENT_SUCCESS->value)
-        ->whereDate('end_date','>=',today())
-        ->latestOfMany();
+            ->where('status', 1)
+            ->where('payment_status', PaymentStatusEnum::PAYMENT_SUCCESS->value)
+            ->whereDate('end_date', '>=', today())
+            ->latestOfMany();
     }
 
     public function getIsSubscriptedAttribute()
     {
-        return $this->subscribed()->exists() ? 1: 0;
+        return $this->subscribed()->exists() ? 1 : 0;
+    }
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscriber::class)
+            ->where('status', 1)
+            ->where('payment_status', PaymentStatusEnum::PAYMENT_SUCCESS->value)
+            ->whereDate('end_date', '>=', today());
     }
 }

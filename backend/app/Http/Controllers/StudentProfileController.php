@@ -145,11 +145,12 @@ class StudentProfileController extends Controller
      *     )
      * )
      */
-    public function allStudents()
+    public function allStudents(Request $request)
     {
-       $students = StudentProfile::with('subscribed')->paginate(10);
-        // now use your trait
-        $data = $this->setupPagination($students, AllStudentResource::class);
+        $limit = $request->input('limit', 10);
+       $students = StudentProfile::with('subscriptions')->orderBy('id', 'DESC')->paginate($limit);
+
+        $data = $this->setupPagination($students, fn($item) => AllStudentResource::collection($item));
 
         return response()->json([
             'message' => 'Students List fetched successfully.',
