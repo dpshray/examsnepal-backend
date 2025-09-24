@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\ValidationException;
 use App\Enums\ExamTypeEnum;
+use App\Http\Resources\StudentProfileResource;
+use Illuminate\Support\Facades\Log;
+use Laravel\Socialite\Facades\Socialite;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class StudentProfileController extends Controller
 {
@@ -632,5 +636,93 @@ class StudentProfileController extends Controller
 
         $total_average_score = $totalQuestions > 0 ? round(($totalCorrect / $totalQuestions) * 100, 2) : 0;
         return Response::apiSuccess('performance data for user : '.$student->name, compact('data','total_average_score','total_exams'));
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/student-google-login",
+     *     summary="Google Login for student",
+     *     description="Google Login for student",
+     *     operationId="GoogleLogin",
+     *     tags={"Google"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="google_token", type="string", example="41ht56d4h5td"),
+     *             @OA\Property(property="fcm_token", type="string", example="m8skbtfgb7"),
+     *             @OA\Property(property="exam_type_id", type="integer", example=1)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Success response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=10),
+     *                 @OA\Property(property="name", type="string", example="Lilly Lee"),
+     *                 @OA\Property(property="dob", type="string", format="date", example="2082-01-25"),
+     *                 @OA\Property(property="gender", type="boolean", example="FEMALE"),
+     *                 @OA\Property(property="media", type="string", example="http://127.0.0.1:8000/storage/36/conversions/flowers-7382926_1920-thumbnail.jpg")
+     *             ),
+     *             @OA\Property(property="message", type="string", example="Infant information has been updated")
+     *         )
+     *     )
+     * )
+     */
+    function googleLogin(Request $request){
+
+        $request->validate([
+            'google_token' => 'required',
+            'fcm_token' => 'required',
+            'exam_type_id' => 'required|exists:exam_types,id'
+        ], [
+            'google_token.required' => 'google token id is required',
+            'fcm_token.required' => 'fcm token is required'
+        ]);
+        try {
+            $googleUser = Socialite::driver('google')
+                ->stateless()
+                ->userFromToken($request->input('google_token'));
+            $email = $googleUser->getEmail();
+            $student = StudentProfile::firstWhere('email', $email);
+            if (empty($student)) {
+                $student = StudentProfile::create([
+                    'email' => $googleUser->getEmail(),
+                    'name' => $googleUser->getName(),
+                    'google_id' => $googleUser->getId(),
+                    'email_verified_at' => now(),
+                    'fcm_token' => $request->fcm_token,
+                    'date' => now(),
+                    'exam_type_id' => $request->exam_type_id
+                ]);
+            } else {
+                $student = tap($student, function ($student) use ($googleUser, $request) {
+                    $student->update([
+                        'name' => $googleUser->getName(),
+                        'google_id' => $googleUser->getId(),
+                        'email_verified_at' => now(),
+                        'fcm_token' => $request->fcm_token,
+                        'date' => now(),
+                        'exam_type_id' => $request->exam_type_id
+                    ]);
+                });
+            }
+            $token = JWTAuth::fromUser($student);
+            $data = [
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => JWTAuth::factory()->getTTL() * 1,
+                'student' => new StudentProfileResource($student),
+            ];
+            Log::info($data);
+            return response()->json($data, 200);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return Response::apiError('An error occured.', 401);
+        }
     }
 }

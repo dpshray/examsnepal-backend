@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Response;
 
 class ConnectIPSService
 {
-    private $merchant_id, $app_id, $basic_auth_password, $app_name, $url, $key_file_password, $validation_url = null;
+    private $merchant_id, $app_id, $pfxPath, $basic_auth_password, $app_name, $url, $key_file_password, $validation_url = null;
 
     public function __construct()
     {
@@ -22,11 +22,14 @@ class ConnectIPSService
         $this->validation_url = config('services.connectips.validation_url');
         $this->basic_auth_password = config('services.connectips.basic_auth_password');
         $this->key_file_password = config('services.connectips.keyfile_password');
+        // $pfxPath = storage_path('certs/CREDITOR.key'); #TEST
+        $this->pfxPath = storage_path('certs/live/DWORKIT_LIVE.key'); #LIVE
+
     }
 
     public function initiateTransaction(array $data){
         // dd($data);
-        $pfxPath = storage_path('certs/CREDITOR.key');
+        $pfxPath = $this->pfxPath;
         if (!file_exists($pfxPath)) {
             throw new \Exception("PFX file not found at: $pfxPath");
         }
@@ -155,12 +158,13 @@ class ConnectIPSService
         }
         $metadata = $transaction->data;
         
-        $pfxPath = storage_path('certs/CREDITOR.key');
+        $pfxPath = $this->pfxPath; #LIVE
+
         if (!file_exists($pfxPath)) {
             throw new \Exception("PFX file not found at: $pfxPath");
         }
 
-        $pfxPassword = 123;
+        $pfxPassword = $this->key_file_password;
         $privateKey = openssl_pkey_get_private(file_get_contents($pfxPath), $pfxPassword);
 
         $merchantId = $this->merchant_id;

@@ -103,6 +103,7 @@ Route::post('handle-password-reset-form', [StudentProfileController::class, 'pas
 // Student login
 Route::post('/student/login', [AuthController::class, 'loginStudent'])->name('login');
 Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('loginAdmin');
+Route::post('student-google-login', [StudentProfileController::class, 'googleLogin']);
 
 Route::apiResource('blog', BlogController::class)->scoped(['blog' => 'slug']);
 #routes accessed by both api and users guards
