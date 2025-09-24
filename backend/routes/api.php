@@ -125,6 +125,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::get('get-student-performance-data', [StudentProfileController::class, 'studentPerformanceReport']);
 
     Route::get('/student/questions', [ForumController::class, 'fetchQuestions']);
+    Route::get('/student/questions/answer/{id}', [ForumController::class, 'question_answer']);
     Route::get('/student/myquestions', [ForumController::class, 'fetchMyQuestions']);
     Route::post('/student/addquestion', [ForumController::class, 'addQuestion']);
     Route::get('/student/questions/{id}', [ForumController::class, 'getQuestionById']);

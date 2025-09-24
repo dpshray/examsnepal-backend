@@ -13,14 +13,16 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\ValidationException;
 use App\Enums\ExamTypeEnum;
+use App\Http\Resources\Student\AllStudentResource;
 use App\Http\Resources\StudentProfileResource;
+use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class StudentProfileController extends Controller
 {
-
+    use PaginatorTrait;
     /**
      * @OA\Post(
      *     path="/student/register",
@@ -145,10 +147,13 @@ class StudentProfileController extends Controller
      */
     public function allStudents()
     {
-        $students = StudentProfile::select(['id', 'name', 'email', 'phone', 'created_at', 'updated_at'])->get();
+       $students = StudentProfile::with('subscribed')->paginate(10);
+        // now use your trait
+        $data = $this->setupPagination($students, AllStudentResource::class);
+
         return response()->json([
             'message' => 'Students List fetched successfully.',
-            'students' => $students
+            'students' => $data->data
         ], 200);
     }
 

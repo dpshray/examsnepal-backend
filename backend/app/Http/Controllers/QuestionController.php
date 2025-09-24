@@ -261,7 +261,7 @@ class QuestionController extends Controller
     {
         $user = Auth::guard('api')->user();
         $exam_type_id = $user->exam_type_id;
-        
+
         $keyword = $request->query('keyword'); // Get the keyword from the query parameter
         if (! $keyword) {
             return response()->json(['message' => 'Keyword is required'], 400);
@@ -713,7 +713,6 @@ class QuestionController extends Controller
             ], 500); // HTTP 500 Internal Server Error
         }
     }
-
     /**
      * Show the form for editing the specified resource.
      */

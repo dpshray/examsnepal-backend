@@ -11,6 +11,7 @@ use Illuminate\Auth\Events\Registered;
 use App\Models\User;
 use App\Models\StudentProfile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -289,9 +290,10 @@ class AuthController extends Controller
         }
 
         // Ensure the user is an admin
-        if ($admin->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized: Not an admin user'], 403);
-        }
+        Log::info($admin);
+        // if ($admin->role !== 'admin') {
+        //     return response()->json(['error' => 'Unauthorized: Not an admin user'], 403);
+        // }
 
         // // Verify that the password is correct
         if (!Hash::check($credentials['password'], $admin->password)) {
@@ -354,7 +356,7 @@ class AuthController extends Controller
         $request->validate([
              'email'    => 'required|email|exists:users,email',
              'password' => 'required|string',
-         ]); 
+         ]);
          $credentials = $request->only('email', 'password');
          $user = User::where('email', $credentials['email'])->first();
          if ($user && !$user->isTeacher()) {
@@ -505,7 +507,7 @@ class AuthController extends Controller
         $data = new StudentProfileResource($student);
         return Response::apiSuccess('Authenticated student info', $data);
     }
-    
+
     protected function respondWithToken($token, $user)
     {
         return response()->json([

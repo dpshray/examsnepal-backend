@@ -52,11 +52,11 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
             $link_expires_minute   = SELF::EMAIL_LINK_EXPIRES_AT;
             $url_expiration_minute = now()->addMinutes($link_expires_minute);
             $url                   = URL::temporarySignedRoute('student_email_confirmation', $url_expiration_minute, ['email' => $student->email]);
-            
+
             try {
                 Mail::send('mail.student.register', [
-                    'name' => $student->name, 
-                    'url' => $url, 
+                    'name' => $student->name,
+                    'url' => $url,
                     'expiration_period' => $url_expiration_minute->format('Y-m-d h:i:s a')
                 ], function ($message) use ($student) {
                     $message->to($student->email);
@@ -81,7 +81,7 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
                 'created_at' => now()
             ]);
             Mail::send('mail.student.password_reset', [
-                'user' => $this->name, 
+                'user' => $this->name,
                 'token' => $token,
                 'expiration_period' => $url_expiration_minute->format('Y-m-d h:i:s a')
             ], function ($message) {
@@ -90,7 +90,7 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
             });
         } catch (\Exception $e) {
             DB::table('password_reset_tokens')->where('token', $token)->delete();
-            $err_message = $e->getMessage(); 
+            $err_message = $e->getMessage();
             Log::error($err_message);
             throw new \Exception($err_message);
         }
@@ -134,7 +134,11 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
     }
 
     public function subscribed(){
-        return $this->hasOne(Subscriber::class)->where('status',1)->where('payment_status', PaymentStatusEnum::PAYMENT_SUCCESS->value)->whereDate('end_date','>=',today())->latestOfMany();
+        return $this->hasOne(Subscriber::class)
+        ->where('status',1)
+        ->where('payment_status', PaymentStatusEnum::PAYMENT_SUCCESS->value)
+        ->whereDate('end_date','>=',today())
+        ->latestOfMany();
     }
 
     public function getIsSubscriptedAttribute()
