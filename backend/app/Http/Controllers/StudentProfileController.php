@@ -147,9 +147,13 @@ class StudentProfileController extends Controller
      */
     public function allStudents(Request $request)
     {
+        $student_name= $request->query('search');
         $limit = $request->input('limit', 10);
-       $students = StudentProfile::with(['subscriptions','examType'])->orderBy('id', 'DESC')->paginate($limit);
-
+        $query = StudentProfile::with(['subscriptions','examType']);
+        if ($student_name) {
+            $query->where('name', 'like', '%' . $student_name . '%');
+        }
+        $students=$query->orderBy('id', 'DESC')->paginate($limit);
         $data = $this->setupPagination($students, fn($item) => AllStudentResource::collection($item));
 
         return response()->json([

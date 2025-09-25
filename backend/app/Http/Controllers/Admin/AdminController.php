@@ -10,7 +10,9 @@ use App\Models\Subscriber;
 use App\Models\SubscriptionType;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AdminController extends Controller
 {
@@ -61,5 +63,17 @@ class AdminController extends Controller
             ->get();
         $data = SubscriptionTypeResource::collection($rows);
         return Response::apiSuccess('Active package list', $data);
+    }
+    public function logoutadmin()
+    {
+        try {
+            // Invalidate the current JWT token
+            JWTAuth::invalidate(JWTAuth::getToken());
+
+            return response()->json(['message' => 'Successfully logged out']);
+        } catch (\Exception $e) {
+            Log::error('JWT Logout Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Could not log out'], 500);
+        }
     }
 }

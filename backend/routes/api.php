@@ -251,6 +251,7 @@ Route::middleware(['auth:users', 'role:teacher'])->group(function () {
     //added subscriber to user by admin
     Route::post('/add-subscriber/{studentId}',[AdminController::class,'addorupdate']);
     Route::get('/subtype/{student}', [AdminController::class, 'subtype']);
+    Route::post('/logout', [AdminController::class, 'logoutadmin']);
 
     Route::post('/create-quiz',[QuizController::class,'examAsQuizStore']);
     Route::get('/quiz/{id}',[QuizController::class,'show']);
