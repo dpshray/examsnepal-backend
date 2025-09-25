@@ -27,6 +27,7 @@ class AllStudentResource extends JsonResource
             // Subscription details from subscribed() relation
             'subscription_start_date'=> optional($this->subscribed)->start_date,
             'subscription_end_date'=> optional($this->subscribed)->end_date,
+            'remark'=>optional($this->subscribed)->remark,
         ];
     }
 }
