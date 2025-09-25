@@ -280,3 +280,4 @@ Route::controller(ParticipantController::class)->group(function (){
     Route::post('/update-participant/{participant}','update');
     Route::delete('/delete-participant/{participant}','destroy');
 });
+// Route::get('/all-students', [StudentProfileController::class, 'allStudents']);

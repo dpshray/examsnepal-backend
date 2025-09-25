@@ -16,16 +16,17 @@ class AllStudentResource extends JsonResource
     {
         // return parent::toArray($request);
          return [
-            'name'                => $this->name,
-            'email'               => $this->email,
-            'phone'               => $this->phone,
-            'exam_type'           => optional($this->examType)->name, // if you have examType relationship
-            'registered_date'     => $this->created_at->format('Y-m-d'),
-            'is_subscripted'      => $this->is_subscripted, // uses accessor
+            'id'=>$this->id,
+            'name'=> $this->name,
+            'email'=> $this->email,
+            'phone'=> $this->phone,
+            'exam_type'=> $this->exam_type_id,
+            'registered_date'=> $this->date,
+            'is_subscripted'=> $this->subscribed ? 1 : 0,
 
             // Subscription details from subscribed() relation
-            'subscription_start_date' => optional($this->subscribed)->start_date,
-            'subscription_end_date'   => optional($this->subscribed)->end_date,
+            'subscription_start_date'=> optional($this->subscribed)->start_date,
+            'subscription_end_date'=> optional($this->subscribed)->end_date,
         ];
     }
 }

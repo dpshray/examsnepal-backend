@@ -20,8 +20,7 @@ class CheckUserRole
         $user = Auth::user();
 
         // Check if the authenticated user exists and has one of the allowed roles.
-        Log::info($user->role);
-        if (!$user || !in_array($user->role, $roles)) {
+        if (!$user || !in_array($user->role->name, $roles)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized: insufficient permissions. Allowed role(s): ' . implode(', ', $roles),
