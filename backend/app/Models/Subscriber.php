@@ -7,8 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 class Subscriber extends Model
 {
     public $timestamps = false;
-    protected $fillable = ['status','paid_in_paisa','promo_code_id','payment_status'];
-    
+    protected $fillable =
+    [
+        'student_profile_id',
+        'subscription_type_id',
+        'status',
+        'paid',
+        'price',
+        'start_date',
+        'end_date' ,
+        'transaction_id',
+        'subscribed_at',
+        'data',
+        'paid_in_paisa',
+        'promo_code_id',
+        'payment_status'
+    ];
+
     protected function casts(){
         return [
             'start_date' => 'date',

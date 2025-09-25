@@ -158,4 +158,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
             ->where('payment_status', PaymentStatusEnum::PAYMENT_SUCCESS->value)
             ->whereDate('end_date', '>=', today());
     }
+    public function examType()
+    {
+        return $this->belongsTo(ExamType::class, 'exam_type_id');
+    }
 }

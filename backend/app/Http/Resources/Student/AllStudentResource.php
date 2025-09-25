@@ -20,9 +20,9 @@ class AllStudentResource extends JsonResource
             'name'=> $this->name,
             'email'=> $this->email,
             'phone'=> $this->phone,
-            'exam_type'=> $this->exam_type_id,
+            'exam_type'=> optional($this->examType)->name,
             'registered_date'=> $this->date,
-            'is_subscripted'=> $this->subscribed ? 1 : 0,
+            'is_subscripted'=> $this->subscribed ? 'Subscribed' : 'Not Subscribed',
 
             // Subscription details from subscribed() relation
             'subscription_start_date'=> optional($this->subscribed)->start_date,

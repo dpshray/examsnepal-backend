@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\ExamTypeEnum;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\Api\ForumController;
@@ -230,7 +231,7 @@ Route::get('/category-types', ExamCategoryController::class);
 //     return view('vendor.l5-swagger.index');
 // })->withoutMiddleware('auth:api');
 
-Route::middleware(['auth:users', 'role:admin'])->group(function () {
+Route::middleware(['auth:users', 'role:teacher'])->group(function () {
 
     // for subjects
     Route::post('/subject', [SubjectController::class, 'store']);
@@ -247,6 +248,9 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::put('/question-bank/{id}',[BankQuestionController::class,'update']);
     Route::delete('/question-bank/{id}',[BankQuestionController::class,'destroy']);
 
+    //added subscriber to user by admin
+    Route::post('/add-subscriber/{studentId}',[AdminController::class,'addorupdate']);
+    Route::get('/subtype/{student}', [AdminController::class, 'subtype']);
 
     Route::post('/create-quiz',[QuizController::class,'examAsQuizStore']);
     Route::get('/quiz/{id}',[QuizController::class,'show']);
