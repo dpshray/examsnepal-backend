@@ -8,29 +8,41 @@ use App\Http\Resources\Subscription\SubscriptionTypeResource;
 use App\Models\StudentProfile;
 use App\Models\Subscriber;
 use App\Models\SubscriptionType;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 
 class AdminController extends Controller
 {
     //
-    function addorupdate(AdminUpdateSubRequest $request ,$studentId)
+    function addorupdate(AdminUpdateSubRequest $request, $studentId)
     {
-        $validated=$request->validated();
-         $subscriber = Subscriber::updateOrCreate(
+        $validated = $request->validated();
+        // Fetch subscription type
+        $type = SubscriptionType::findOrFail($validated['subscription_type_id']);
+
+        // Calculate end date based on duration_days
+        $startDate = now();
+        $endDate = $startDate->copy()->addMonth($type->duration);
+
+        $price =$type->price;
+        $paid = $type->price;
+
+        $subscriber = Subscriber::updateOrCreate(
             [
                 'student_profile_id' => $studentId,
             ],
             [
-                'subscription_type_id' =>$validated['subscription_type_id'],
-                'price' => $validated['price']??0.00,
-                'paid' => $validated['paid']??0.00,
-                'paid_in_paisa' => $validated['paid'] * 100??0.00,
-                'start_date' => $validated['start_date'],
-                'end_date' => $validated['end_date'],
+                'subscription_type_id' => $validated['subscription_type_id'],
+                'price' => $price,
+                'paid' => $paid,
+                'paid_in_paisa' => $paid* 100 ?? 0.00,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
                 'transaction_id' => 'TXN' . rand(10000, 99999),
                 'payment_status' => 'PAYMENT_SUCCESS', // manual add by admin
                 'status' => 1,
+                'remark'=>$request->remark,
                 'data' => json_encode(['remark' => $request->remark]),
                 'subscribed_at' => now(),
             ]
@@ -43,9 +55,9 @@ class AdminController extends Controller
     }
     public function subtype(StudentProfile $student)
     {
-        $rows = SubscriptionType::select('id as subscription_type_id','duration', 'price')
+        $rows = SubscriptionType::select('id as subscription_type_id', 'duration', 'price')
             ->where('status', 1)
-            ->where('exam_type_id',$student->exam_type_id)
+            ->where('exam_type_id', $student->exam_type_id)
             ->get();
         $data = SubscriptionTypeResource::collection($rows);
         return Response::apiSuccess('Active package list', $data);

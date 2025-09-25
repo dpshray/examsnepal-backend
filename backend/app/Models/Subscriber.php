@@ -19,6 +19,7 @@ class Subscriber extends Model
         'transaction_id',
         'subscribed_at',
         'data',
+        'remark',
         'paid_in_paisa',
         'promo_code_id',
         'payment_status'
