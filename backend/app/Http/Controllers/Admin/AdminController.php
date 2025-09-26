@@ -25,30 +25,49 @@ class AdminController extends Controller
 
         // Calculate end date based on duration_days
         $startDate = now();
-        $endDate = $startDate->copy()->addMonth($type->duration);
+        $newEndDate = $startDate->copy()->addMonths($type->duration);
 
-        $price =$type->price;
+        $price = $type->price;
         $paid = $type->price;
-
-        $subscriber = Subscriber::updateOrCreate(
-            [
+        $existing = Subscriber::where('student_profile_id', $studentId)->orderBy('id', 'desc')->first();
+        if (!$existing) {
+            $subscriber = Subscriber::Create(
+                [
+                    'student_profile_id' => $studentId,
+                    'subscription_type_id' => $validated['subscription_type_id'],
+                    'price' => $price,
+                    'paid' => $paid,
+                    'paid_in_paisa' => $paid * 100 ?? 0.00,
+                    'start_date' => $startDate,
+                    'end_date' => $newEndDate,
+                    'transaction_id' => 'TXN' . rand(10000, 99999),
+                    'payment_status' => 'PAYMENT_SUCCESS', // manual add by admin
+                    'status' => 1,
+                    'remark' => $request->remark,
+                    'data' => json_encode(['remark' => $request->remark]),
+                    'subscribed_at' => now(),
+                ]
+            );
+        } else {
+            $currentEndDate = Carbon::parse($existing->end_date);
+            $extendedEndDate = $currentEndDate->copy()->addMonths($type->duration);
+            $existing->create([
                 'student_profile_id' => $studentId,
-            ],
-            [
                 'subscription_type_id' => $validated['subscription_type_id'],
                 'price' => $price,
                 'paid' => $paid,
-                'paid_in_paisa' => $paid* 100 ?? 0.00,
+                'paid_in_paisa' => $paid * 100 ?? 0.00,
                 'start_date' => $startDate,
-                'end_date' => $endDate,
+                'end_date' => $extendedEndDate,
                 'transaction_id' => 'TXN' . rand(10000, 99999),
                 'payment_status' => 'PAYMENT_SUCCESS', // manual add by admin
                 'status' => 1,
-                'remark'=>$request->remark,
+                'remark' => $request->remark,
                 'data' => json_encode(['remark' => $request->remark]),
                 'subscribed_at' => now(),
-            ]
-        );
+            ]);
+            $subscriber = $existing->fresh(); // reload updated record
+        }
 
         return response()->json([
             'message' => 'Subscription added updated successfully.',
