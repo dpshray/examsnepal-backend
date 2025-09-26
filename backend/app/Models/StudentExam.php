@@ -21,8 +21,9 @@ class StudentExam extends Model
         ];
     }
 
-    public function answers(){
-        return $this->hasMany(Answersheet::class,'student_exam_id');
+    public function answers()
+    {
+        return $this->hasMany(Answersheet::class, 'student_exam_id');
     }
 
     public function correct_answers()
@@ -30,11 +31,17 @@ class StudentExam extends Model
         return $this->hasMany(Answersheet::class)->where('is_correct', 1);
     }
 
-    function student() {
-        return $this->belongsTo(StudentProfile::class,'student_id');
+    function student()
+    {
+        return $this->belongsTo(StudentProfile::class, 'student_id');
     }
 
-    function exams() {
+    function exams()
+    {
         return $this->hasMany(Exam::class);
+    }
+    public function exam()
+    {
+        return $this->belongsTo(Exam::class, 'exam_id');
     }
 }

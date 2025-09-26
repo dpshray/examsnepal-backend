@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminUpdateSubRequest;
+use App\Http\Resources\Submission\SubmissionResource;
 use App\Http\Resources\Subscription\SubscriptionTypeResource;
+use App\Models\Answersheet;
+use App\Models\StudentExam;
 use App\Models\StudentProfile;
 use App\Models\Subscriber;
 use App\Models\SubscriptionType;
+use App\Traits\PaginatorTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -17,6 +21,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class AdminController extends Controller
 {
     //
+    use PaginatorTrait;
     function addorupdate(AdminUpdateSubRequest $request, $studentId)
     {
         $validated = $request->validated();
@@ -94,5 +99,41 @@ class AdminController extends Controller
             Log::error('JWT Logout Error: ' . $e->getMessage());
             return response()->json(['error' => 'Could not log out'], 500);
         }
+    }
+    public function submissionsList(Request $request)
+    {
+        $email        = $request->query('email');
+        $examTypeId   = $request->query('exam_type');
+        $examCategory = $request->query('exam_category');
+        $limit        = $request->input('limit', 10);
+
+        $query = StudentExam::with(['student', 'exam.examType', 'answers']);
+
+        if ($email) {
+            $query->whereHas('student', function ($q) use ($email) {
+                $q->where('email', 'like', '%' . $email . '%');
+            });
+        }
+
+        if ($examTypeId) {
+            $query->whereHas('exam', function ($q) use ($examTypeId) {
+                $q->where('exam_type_id', $examTypeId);
+            });
+        }
+
+        if ($examCategory) {
+            $query->whereHas('exam', function ($q) use ($examCategory) {
+                $q->where('category', $examCategory);
+            });
+        }
+
+        $submissions = $query->orderBy('id', 'DESC')->paginate($limit);
+
+        $data = $this->setupPagination($submissions, fn($item) => SubmissionResource::collection($item));
+
+        return response()->json([
+            'message' => 'Submissions list fetched successfully.',
+            'submissions' => $data->data
+        ], 200);
     }
 }
