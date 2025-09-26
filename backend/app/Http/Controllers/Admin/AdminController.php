@@ -49,9 +49,10 @@ class AdminController extends Controller
                 ]
             );
         } else {
-            $currentEndDate =Carbon::parse($existing->end_date);
+            $currentEndDate = Carbon::parse($existing->end_date);
             $extendedEndDate = $currentEndDate->copy()->addMonths($type->duration);
-            $existing->update([
+            $existing->create([
+                'student_profile_id' => $studentId,
                 'subscription_type_id' => $validated['subscription_type_id'],
                 'price' => $price,
                 'paid' => $paid,
