@@ -102,7 +102,7 @@ class AdminController extends Controller
     }
     public function submissionsList(Request $request)
     {
-        $email        = $request->query('email');
+        $email        = $request->query('search');
         $examTypeId   = $request->query('exam_type');
         $examCategory = $request->query('exam_category');
         $limit        = $request->input('limit', 10);
@@ -123,7 +123,7 @@ class AdminController extends Controller
 
         if ($examCategory) {
             $query->whereHas('exam', function ($q) use ($examCategory) {
-                $q->where('category', $examCategory);
+                $q->where('status', $examCategory);
             });
         }
 
