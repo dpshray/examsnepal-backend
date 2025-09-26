@@ -22,8 +22,8 @@ class AdminUpdateSubRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'subscription_type_id' => 'nullable|exists:subscription_types,id',
-            'remark'               => 'nullable|string',
+            'subscription_type_id' => 'required|exists:subscription_types,id',
+            'remark'               => 'required|string',
         ];
     }
 }

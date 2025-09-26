@@ -20,6 +20,7 @@ class AllStudentResource extends JsonResource
             'name'=> $this->name,
             'email'=> $this->email,
             'phone'=> $this->phone,
+            'email_verified_at'=>$this->email_verified_at ? 'Verified':'Not Verified',
             'exam_type'=> optional($this->examType)->name,
             'registered_date'=> $this->date,
             'is_subscripted'=> $this->subscribed ? 'Subscribed' : 'Not Subscribed',
