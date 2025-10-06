@@ -62,7 +62,7 @@ class SubscriptionTypeController extends Controller
         $data = null;
         if ($subscription->count()) {
             $latest_subscription = $subscription->first();
-            $duration = $latest_subscription->start_date->diffInMonths($latest_subscription->end_date);
+            $duration = ceil($latest_subscription->start_date->floatDiffInMonths($latest_subscription->end_date));
             $data = [
                 "price" => (string) $subscription->sum('price'),
                 "paid" => (string) $subscription->sum('paid'),
