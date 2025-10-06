@@ -19,11 +19,12 @@ class SubmissionResource extends JsonResource
         $score = $this->answers ? $this->answers->where('is_correct', 1)->count() : 0;
 
         return [
+            'id'=>$this->student->id,
             'student_name'  => $this->student->name ?? null,
             'student_email' => $this->student->email ?? null,
             'exam_name'     => $this->exam->exam_name ?? null,
             'exam_type'     => $this->exam->examType->name ?? null,
-            'exam_category' =>ExamTypeEnum::getKeyByValue($this->exam->exam_type_id) ,
+            'exam_category' =>ExamTypeEnum::getKeyByValue($this->exam->status) ,
             'score'         => $score,
         ];
     }
