@@ -155,6 +155,18 @@ class AdminController extends Controller
         $data = $this->setupPagination($doubts, fn($item) => AdminDoubtResource::collection($item));
 
         return Response::apiSuccess('doubt list', $data);
+    }
+    public function resolve(Doubt $doubt, Request $request)
+    {
+        $request->validate([
+            'remark' => 'nullable|string|max:250'
+        ]);
 
+        $doubt->update([
+            'status' => 1,
+            'remark' => $request->remark ?? null,
+        ]);
+
+        return Response::apiSuccess('Update successful');
     }
 }

@@ -17,7 +17,7 @@ class AdminDoubtResource extends JsonResource
         // return parent::toArray($request);
         return [
             'id' => $this->id,
-            'status' => $this->status,
+            'status' => $this->status ? 'Resolved':'Not Resolved',
             'doubt' => $this->doubt,
             'date' => $this->date,
             'remark' => $this->remark,

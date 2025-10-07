@@ -258,6 +258,7 @@ Route::middleware(['auth:users', 'role:teacher'])->group(function () {
 
     //added doubt list
     Route::get('/doubtslist', [AdminController::class, 'doubtslist']);
+    Route::post('/doubtsresolve/{doubt}', [AdminController::class, 'resolve']);
 
     Route::post('/create-quiz',[QuizController::class,'examAsQuizStore']);
     Route::get('/quiz/{id}',[QuizController::class,'show']);
