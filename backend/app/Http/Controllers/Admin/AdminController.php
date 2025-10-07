@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminUpdateSubRequest;
+use App\Http\Resources\Doubt\AdminDoubtResource;
 use App\Http\Resources\Submission\SubmissionResource;
 use App\Http\Resources\Subscription\SubscriptionTypeResource;
 use App\Models\Answersheet;
+use App\Models\Doubt;
 use App\Models\StudentExam;
 use App\Models\StudentProfile;
 use App\Models\Subscriber;
@@ -135,5 +137,24 @@ class AdminController extends Controller
             'message' => 'Submissions list fetched successfully.',
             'submissions' => $data->data
         ], 200);
+    }
+    public function doubtslist(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $doubts = Doubt::with([
+            'question' => function ($query) {
+                $query->select('id', 'question', 'explanation')
+                    ->with('options');
+            },
+            'student:id,name'
+        ])
+            ->orderBy('id', 'DESC')
+            ->paginate($limit);
+
+
+        $data = $this->setupPagination($doubts, fn($item) => AdminDoubtResource::collection($item));
+
+        return Response::apiSuccess('doubt list', $data);
+
     }
 }

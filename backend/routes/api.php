@@ -255,6 +255,10 @@ Route::middleware(['auth:users', 'role:teacher'])->group(function () {
     Route::get('/submissionslist', [AdminController::class, 'submissionsList']);
     Route::post('/logout', [AdminController::class, 'logoutadmin']);
 
+
+    //added doubt list
+    Route::get('/doubtslist', [AdminController::class, 'doubtslist']);
+
     Route::post('/create-quiz',[QuizController::class,'examAsQuizStore']);
     Route::get('/quiz/{id}',[QuizController::class,'show']);
     Route::put('/update-quiz/{exam}',[QuizController::class,'updateExamAsQuiz']);
