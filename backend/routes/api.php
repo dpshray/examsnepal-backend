@@ -17,6 +17,7 @@ use App\Http\Controllers\BankQuestionController;
 use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\Contact\ContactController;
 use App\Http\Controllers\Corporate\CorporateExamController;
 use App\Http\Controllers\ExamCategoryController;
 use App\Http\Controllers\TableMigrateController;
@@ -287,3 +288,4 @@ Route::controller(ParticipantController::class)->group(function (){
     Route::delete('/delete-participant/{participant}','destroy');
 });
 // Route::get('/all-students', [StudentProfileController::class, 'allStudents']);
+Route::post('/contact',[ContactController::class,'store']);
