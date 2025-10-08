@@ -17,6 +17,7 @@ use App\Http\Controllers\BankQuestionController;
 use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\Contact\ContactController;
 use App\Http\Controllers\Corporate\CorporateExamController;
 use App\Http\Controllers\ExamCategoryController;
 use App\Http\Controllers\TableMigrateController;
@@ -254,6 +255,11 @@ Route::middleware(['auth:users', 'role:teacher'])->group(function () {
     Route::get('/submissionslist', [AdminController::class, 'submissionsList']);
     Route::post('/logout', [AdminController::class, 'logoutadmin']);
 
+
+    //added doubt list
+    Route::get('/doubtslist', [AdminController::class, 'doubtslist']);
+    Route::post('/doubtsresolve/{doubt}', [AdminController::class, 'resolve']);
+
     Route::post('/create-quiz',[QuizController::class,'examAsQuizStore']);
     Route::get('/quiz/{id}',[QuizController::class,'show']);
     Route::put('/update-quiz/{exam}',[QuizController::class,'updateExamAsQuiz']);
@@ -287,3 +293,4 @@ Route::controller(ParticipantController::class)->group(function (){
     Route::delete('/delete-participant/{participant}','destroy');
 });
 // Route::get('/all-students', [StudentProfileController::class, 'allStudents']);
+Route::post('/contact',[ContactController::class,'store']);

@@ -21,7 +21,7 @@ class Doubt extends Model
         'org_id',
         'doubt',
         'date',
-        'remarks',
+        'remark',
         'status',
         'solved_by',
     ];
@@ -45,7 +45,7 @@ class Doubt extends Model
     {
         return Carbon::parse($value)->setTimezone('Asia/Kathmandu')->format('Y-m-d H:i:s');
     }
-    
+
     public function solver() {
         return $this->belongsTo(User::class,'user_id');
     }
