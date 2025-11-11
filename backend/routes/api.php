@@ -280,6 +280,8 @@ Route::middleware(['auth:users', 'role:teacher'])->group(function () {
     // for doubts
     Route::get('/doubts', [DoubtController::class, 'index']);
     Route::get('/doubt/{id}', [DoubtController::class, 'show']);
+
+    Route::post('/students/notifications', [NotificationController::class ,'sendBulkPushNotification']);
 });
 
 Route::middleware(['auth:users', 'role:teacher'])->group(function () {

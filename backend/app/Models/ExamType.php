@@ -24,4 +24,8 @@ class ExamType extends Model
         return $this->hasMany(Exam::class); // One Exam Type has many Exams
     }
 
+    function scopeActive($qry) {
+        return $qry->where('is_active',true);
+    }
+
 }
