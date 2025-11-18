@@ -42,6 +42,13 @@ class TeacherExamController extends Controller
      *         description="items per page",
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *     @OA\Parameter(
+     *         name="exam_type",
+     *         in="query",
+     *         required=false,
+     *         description="exam_type",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Teacher (Loksewa) Exam List with Total Questions",
@@ -78,8 +85,12 @@ class TeacherExamController extends Controller
     public function index(Request $request)
     {
         $per_page = $request->query('per_page', 10);
+        $examTypeId   = $request->query('exam_type');
         $teacher = Auth::guard('users')->user();
         $pagination = $teacher->teacherExams()
+            ->when($examTypeId, function ($q) use ($examTypeId) {
+                $q->where('exam_type_id', $examTypeId);
+            })
             ->with(['examType:id,name'])
             ->withCount(['questions'])
             ->orderBy('id', 'DESC')

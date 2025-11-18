@@ -9,13 +9,178 @@
         {
             "url": "https://api.examsnepal.dworklabs.com/api/",
             "description": "Localhost API Server"
-        },
-        {
-            "url": "http://192.168.100.18:8000/api/",
-            "description": "API Server"
         }
     ],
     "paths": {
+        "/add-subscriber/{studentId}": {
+            "post": {
+                "tags": [
+                    "Admin Subscription"
+                ],
+                "summary": "Add or update a student's subscription",
+                "description": "Admin can manually add or extend a student's subscription based on the selected subscription type.",
+                "operationId": "AdminAddOrUpdateSubscription",
+                "parameters": [
+                    {
+                        "name": "studentId",
+                        "in": "path",
+                        "description": "The ID of the student to whom the subscription belongs",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 12
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Validated subscription details",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "subscription_type_id"
+                                ],
+                                "properties": {
+                                    "subscription_type_id": {
+                                        "description": "The ID of the subscription type to assign",
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "remark": {
+                                        "description": "Remarks or notes for this subscription update",
+                                        "type": "string",
+                                        "example": "Added manually by admin"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Subscription added or updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Subscription added updated successfully."
+                                        },
+                                        "subscriber": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 45
+                                                },
+                                                "student_profile_id": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "subscription_type_id": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 499
+                                                },
+                                                "paid": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 499
+                                                },
+                                                "paid_in_paisa": {
+                                                    "type": "integer",
+                                                    "example": 49900
+                                                },
+                                                "start_date": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-11-11T09:45:00Z"
+                                                },
+                                                "end_date": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-11T09:45:00Z"
+                                                },
+                                                "transaction_id": {
+                                                    "type": "string",
+                                                    "example": "TXN12345"
+                                                },
+                                                "payment_status": {
+                                                    "type": "string",
+                                                    "example": "PAYMENT_SUCCESS"
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "remark": {
+                                                    "type": "string",
+                                                    "example": "Added manually by admin"
+                                                },
+                                                "data": {
+                                                    "type": "object",
+                                                    "example": {
+                                                        "remark": "Added manually by admin"
+                                                    }
+                                                },
+                                                "subscribed_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-11-11T09:45:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Subscription type or student not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No query results for model [App\\\\Models\\\\SubscriptionType]"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The subscription_type_id field is required."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/submit-answer": {
             "post": {
                 "tags": [
@@ -12114,6 +12279,16 @@
                             "type": "integer",
                             "example": 1
                         }
+                    },
+                    {
+                        "name": "exam_type",
+                        "in": "query",
+                        "description": "exam_type",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
                     }
                 ],
                 "responses": {
@@ -12936,6 +13111,10 @@
         {
             "name": "Forum",
             "description": "API Endpoints for Managing Forum Questions"
+        },
+        {
+            "name": "Admin Subscription",
+            "description": "Admin Subscription"
         },
         {
             "name": "Quiz",
