@@ -24,6 +24,87 @@ class AdminController extends Controller
 {
     //
     use PaginatorTrait;
+    /**
+     * @OA\Post(
+     *     path="/add-subscriber/{studentId}",
+     *     summary="Add or update a student's subscription",
+     *     description="Admin can manually add or extend a student's subscription based on the selected subscription type.",
+     *     operationId="AdminAddOrUpdateSubscription",
+     *     tags={"Admin Subscription"},
+     *     @OA\Parameter(
+     *         name="studentId",
+     *         in="path",
+     *         required=true,
+     *         description="The ID of the student to whom the subscription belongs",
+     *         @OA\Schema(type="integer", example=12)
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Validated subscription details",
+     *         @OA\JsonContent(
+     *             required={"subscription_type_id"},
+     *             @OA\Property(
+     *                 property="subscription_type_id",
+     *                 type="integer",
+     *                 example=3,
+     *                 description="The ID of the subscription type to assign"
+     *             ),
+     *             @OA\Property(
+     *                 property="remark",
+     *                 type="string",
+     *                 example="Added manually by admin",
+     *                 description="Remarks or notes for this subscription update"
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Subscription added or updated successfully.",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Subscription added updated successfully."),
+     *             @OA\Property(
+     *                 property="subscriber",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=45),
+     *                 @OA\Property(property="student_profile_id", type="integer", example=12),
+     *                 @OA\Property(property="subscription_type_id", type="integer", example=3),
+     *                 @OA\Property(property="price", type="number", format="float", example=499.00),
+     *                 @OA\Property(property="paid", type="number", format="float", example=499.00),
+     *                 @OA\Property(property="paid_in_paisa", type="integer", example=49900),
+     *                 @OA\Property(property="start_date", type="string", format="date-time", example="2025-11-11T09:45:00Z"),
+     *                 @OA\Property(property="end_date", type="string", format="date-time", example="2026-02-11T09:45:00Z"),
+     *                 @OA\Property(property="transaction_id", type="string", example="TXN12345"),
+     *                 @OA\Property(property="payment_status", type="string", example="PAYMENT_SUCCESS"),
+     *                 @OA\Property(property="status", type="integer", example=1),
+     *                 @OA\Property(property="remark", type="string", example="Added manually by admin"),
+     *                 @OA\Property(property="data", type="object", example={"remark": "Added manually by admin"}),
+     *                 @OA\Property(property="subscribed_at", type="string", format="date-time", example="2025-11-11T09:45:00Z")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Subscription type or student not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="No query results for model [App\\Models\\SubscriptionType]")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation failed",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The subscription_type_id field is required."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *
+     * )
+     */
+
     function addorupdate(AdminUpdateSubRequest $request, $studentId)
     {
         $validated = $request->validated();
