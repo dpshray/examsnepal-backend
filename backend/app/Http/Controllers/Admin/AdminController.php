@@ -9,6 +9,7 @@ use App\Http\Resources\Submission\SubmissionResource;
 use App\Http\Resources\Subscription\SubscriptionTypeResource;
 use App\Models\Answersheet;
 use App\Models\Doubt;
+use App\Models\Question;
 use App\Models\StudentExam;
 use App\Models\StudentProfile;
 use App\Models\Subscriber;
@@ -242,7 +243,23 @@ class AdminController extends Controller
         $request->validate([
             'remark' => 'nullable|string|max:250'
         ]);
-
+        $question = Question::find($doubt->question_id);
+        $question->update([
+            'question' => $request->question,
+            'explanation' => $request->explanation,
+        ]);
+        if ($request->has(['option_a', 'option_b', 'option_c', 'option_d'])) {
+            // Remove old options
+            $question->options()->delete();
+            // Recreate new options
+            $options = [
+                ['option' => $request->option_a, 'value' => $request->option_a_is_true],
+                ['option' => $request->option_b, 'value' => $request->option_b_is_true],
+                ['option' => $request->option_c, 'value' => $request->option_c_is_true],
+                ['option' => $request->option_d, 'value' => $request->option_d_is_true],
+            ];
+            $question->options()->createMany($options);
+        }
         $doubt->update([
             'status' => 1,
             'remark' => $request->remark ?? null,
