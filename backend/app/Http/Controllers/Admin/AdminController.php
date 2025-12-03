@@ -261,7 +261,7 @@ class AdminController extends Controller
             $question->options()->createMany($options);
         }
         $doubt->update([
-            'status' => 1,
+            'status' => 0,
             'remark' => $request->remark ?? null,
         ]);
 

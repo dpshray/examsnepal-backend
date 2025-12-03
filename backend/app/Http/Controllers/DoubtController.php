@@ -66,8 +66,8 @@ class DoubtController extends Controller
                         ->paginate();
         $data = $this->setupPagination($user_doubt, DoubtCollection::class)->data;
         return Response::apiSuccess('User doubt retrieved successfully!', $data);
-    }    
-    
+    }
+
     /**
      * @OA\Get(
      *     path="/doubt/student/unsolved",
@@ -113,14 +113,14 @@ class DoubtController extends Controller
        $user_doubt = Auth::guard('api')
                         ->user()
                         ->doubts()
-                        ->where('status',1)
+                        ->where('status',0)
                         ->with(['question.options','solver:id,username,fullname'])
                         ->paginate();
         $data = $this->setupPagination($user_doubt, DoubtCollection::class)->data;
 
         return Response::apiSuccess('User doubt retrieved successfully!', $data);
     }
-    
+
     /**
      * Display a listing of user own .
      */
@@ -234,7 +234,7 @@ class DoubtController extends Controller
         }
 
         $organization_id = Question::findOrFail($validatedData['question_id'])->exam->user_id;
-        $validatedData['organization_id'] = $organization_id; 
+        $validatedData['organization_id'] = $organization_id;
         $data = $doubt->create($validatedData);
         return Response::apiSuccess('Doubt posted',$data);
     }
