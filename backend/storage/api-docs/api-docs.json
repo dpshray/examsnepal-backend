@@ -11,8 +11,12 @@
             "description": "Localhost API Server 1"
         },
         {
-            "url": "http://192.168.100.18:8001/api/",
+            "url": "http://192.168.100.18:8000/api/",
             "description": "Localhost API Server 2"
+        },
+        {
+            "url": "http://192.168.100.23:8000/api/",
+            "description": "Localhost API Server"
         }
     ],
     "paths": {
@@ -5913,6 +5917,70 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/students/notifications": {
+            "post": {
+                "tags": [
+                    "Notification"
+                ],
+                "summary": "Send notification to student(verified) based on ther exam type.",
+                "description": "Send notification to student(verified) based on ther exam type.",
+                "operationId": "BulkNotification",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "body"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "This is a title."
+                                    },
+                                    "body": {
+                                        "type": "string",
+                                        "example": "This is a description."
+                                    },
+                                    "exam_type_id": {
+                                        "type": "integer",
+                                        "example": 0
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Notification response data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Notification send with 1 success and 0 failure"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/organization": {

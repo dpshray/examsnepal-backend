@@ -113,7 +113,7 @@ class DoubtController extends Controller
        $user_doubt = Auth::guard('api')
                         ->user()
                         ->doubts()
-                        ->where('status',0)
+                        ->where('status',1)
                         ->with(['question.options','solver:id,username,fullname'])
                         ->paginate();
         $data = $this->setupPagination($user_doubt, DoubtCollection::class)->data;

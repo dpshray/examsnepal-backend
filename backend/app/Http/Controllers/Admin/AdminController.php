@@ -14,11 +14,13 @@ use App\Models\StudentExam;
 use App\Models\StudentProfile;
 use App\Models\Subscriber;
 use App\Models\SubscriptionType;
+use App\Services\FCMService;
 use App\Traits\PaginatorTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
+use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AdminController extends Controller
@@ -118,7 +120,7 @@ class AdminController extends Controller
 
         $price = $type->price;
         $paid = $type->price;
-        $existing = Subscriber::where('student_profile_id', $studentId)->orderBy('id', 'desc')->first();
+        $existing = Subscriber::where('student_profile_id', $studentId)->where('status', 1)->orderBy('id', 'desc')->first();
         if (!$existing) {
             $subscriber = Subscriber::Create(
                 [
@@ -264,7 +266,11 @@ class AdminController extends Controller
             'status' => 0,
             'remark' => $request->remark ?? null,
         ]);
-
+        new FCMService(
+            'Doubt Resolved',
+            'Your doubt for question ID ' . $doubt->question_id . ' has been resolved.'
+        )->notify([$doubt->student->fcm_token]);
+        // return $doubt->student->fcm_token;
         return Response::apiSuccess('Update successful');
     }
 }
