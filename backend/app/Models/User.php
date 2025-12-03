@@ -86,15 +86,22 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(AnswerSheet::class);
     }
 
-    public function role(){
+    public function role()
+    {
         return $this->belongsTo(Role::class);
     }
 
-    public function isTeacher(){
+    public function isTeacher()
+    {
         return $this->role->name == RoleEnum::TEACHER->value;
     }
 
-    public function teacherExams(){
+    public function teacherExams()
+    {
         return $this->hasMany(Exam::class);
+    }
+    public function isAdmin()
+    {
+        return $this->role->name == RoleEnum::ADMIN->value;
     }
 }

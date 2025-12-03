@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Teacher\Register\TeacherRegisterRequest;
 use App\Http\Resources\StudentProfileResource;
 use App\Http\Resources\StudentResource;
 use Illuminate\Http\Request;
@@ -196,9 +197,9 @@ class AuthController extends Controller
         $student = StudentProfile::where('email', $credentials['email'])->first();
         $email_is_not_verified = !$student->hasVerifiedEmail();
         if ($email_is_not_verified) {
-            return Response::apiError('Email is not verified.',null,403);
-        }elseif (empty($student->exam_type_id)) {
-            return Response::apiError('Exam type not found.',null,403);
+            return Response::apiError('Email is not verified.', null, 403);
+        } elseif (empty($student->exam_type_id)) {
+            return Response::apiError('Exam type not found.', null, 403);
         }
         // if (!$student) {
         //     return response()->json(['error' => 'Student not found'], 404);
@@ -296,15 +297,28 @@ class AuthController extends Controller
         // }
 
         // // Verify that the password is correct
+        if ($admin && !$admin->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized: Not an teacher'], 403);
+        }
         if (!Hash::check($credentials['password'], $admin->password)) {
             return response()->json(['error' => 'Incorrect password'], 401);
         }
+        $token = JWTAuth::fromUser($admin);
+        $data = [
+            'user' => [
+                'username' => $admin->username,
+                'email' => $admin->email
+            ],
+            'token' => $token
+        ];
+        return Response::apiSuccess("welcome, {$admin->username}", $data);
 
+        return $this->respondWithToken($token, 'users');
         // Attempt token generation using the admin guard
         // if (!$token = Auth::guard('users')->attempt($credentials)) {
         //     return response()->json(['error' => 'Unauthorized'], 401);
         // }
-        $token = JWTAuth::fromUser($admin);
+        // $token = JWTAuth::fromUser($admin);
 
         // return $this->respondWithToken($token);
         // return response()->json(['data' => $admin]);
@@ -351,20 +365,20 @@ class AuthController extends Controller
      * )
      */
 
-     public function teacherLogin(Request $request)
-     {
+    public function teacherLogin(Request $request)
+    {
         $request->validate([
-             'email'    => 'required|email|exists:users,email',
-             'password' => 'required|string',
-         ]);
-         $credentials = $request->only('email', 'password');
-         $user = User::where('email', $credentials['email'])->first();
-         if ($user && !$user->isTeacher()) {
-             return response()->json(['error' => 'Unauthorized: Not an teacher'], 403);
-         }
-         if (!Hash::check($credentials['password'], $user->password)) {
-             return response()->json(['error' => 'Incorrect password'], 401);
-         }
+            'email'    => 'required|email|exists:users,email',
+            'password' => 'required|string',
+        ]);
+        $credentials = $request->only('email', 'password');
+        $user = User::where('email', $credentials['email'])->first();
+        if ($user && !$user->isTeacher()) {
+            return response()->json(['error' => 'Unauthorized: Not an teacher'], 403);
+        }
+        if (!Hash::check($credentials['password'], $user->password)) {
+            return response()->json(['error' => 'Incorrect password'], 401);
+        }
         $token = JWTAuth::fromUser($user);
         $data = [
             'user' => [
@@ -376,11 +390,11 @@ class AuthController extends Controller
         return Response::apiSuccess("welcome, {$user->username}", $data);
 
         return $this->respondWithToken($token, 'users');
-     }
+    }
 
 
 
-    public function me()#me = student
+    public function me() #me = student
     {
         return response()->json(Auth::guard('api')->user());
     }
@@ -502,7 +516,8 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function studentAuthResponse(){
+    public function studentAuthResponse()
+    {
         $student = Auth::guard('api')->user();
         $data = new StudentProfileResource($student);
         return Response::apiSuccess('Authenticated student info', $data);
@@ -528,5 +543,22 @@ class AuthController extends Controller
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
             'student' => new StudentProfileResource($student),
         ]);
+    }
+    function teacher_register(TeacherRegisterRequest $request)
+    {
+        $validated = $request->validated();
+
+        $teacher = User::create([
+            'username' => $validated['username'],
+            'password' => Hash::make($validated['password']),
+            'fullname' => $validated['fullname'],
+            'role' => 'teacher',
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+        ]);
+
+        event(new Registered($teacher));
+
+        return Response::apiSuccess('Teacher registered successfully. Please verify your email.', null, 201);
     }
 }

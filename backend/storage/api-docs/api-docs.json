@@ -7,6 +7,14 @@
     },
     "servers": [
         {
+            "url": "https://api.examsnepal.dworklabs.com/api/",
+            "description": "Localhost API Server 1"
+        },
+        {
+            "url": "http://192.168.100.18:8000/api/",
+            "description": "Localhost API Server 2"
+        },
+        {
             "url": "http://192.168.100.23:8000/api/",
             "description": "Localhost API Server"
         }
