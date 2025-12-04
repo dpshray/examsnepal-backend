@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Corporate;
 use App\Enums\RoleEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Corporate\CorporateLoginRequest;
+use App\Http\Requests\Corporate\Register\CorporateResisterRequest;
 use App\Http\Resources\UserResource;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -64,7 +67,7 @@ class CorporateAuthController extends Controller
         $user = DB::table('users')
                                 ->join('roles','users.role_id','=','roles.id')
                                 ->where([
-                                    ['email', $validated['email']], 
+                                    ['email', $validated['email']],
                                     ['email_verified_at', '!=', null],
                                     ['roles.name', RoleEnum::CORPORATE->value]
                                 ])
@@ -82,5 +85,18 @@ class CorporateAuthController extends Controller
         $user->loadMissing('role');
         $user = new UserResource($user);
         return Response::apiSuccess('logged in successfull', compact('user','token'));
+    }
+    public function logout(){
+        JWTAuth::invalidate(JWTAuth::getToken());
+        return Response::apiSuccess('logged out successfully');
+    }
+    public function register(CorporateResisterRequest $request)
+    {
+        $data = $request->validated();
+        $data['role_id'] = RoleEnum::CORPORATE->value;
+        $user = User::create($data);
+        $user->loadMissing('role');
+        event(new Registered($user));
+        return Response::apiSuccess('email verification link sent to your email address');
     }
 }
