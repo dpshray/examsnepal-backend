@@ -14,6 +14,7 @@ use App\Models\StudentExam;
 use App\Models\StudentProfile;
 use App\Models\Subscriber;
 use App\Models\SubscriptionType;
+use App\Services\FCMService;
 use App\Traits\PaginatorTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -118,7 +119,7 @@ class AdminController extends Controller
 
         $price = $type->price;
         $paid = $type->price;
-        $existing = Subscriber::where('student_profile_id', $studentId)->orderBy('id', 'desc')->first();
+        $existing = Subscriber::where('student_profile_id', $studentId)->where('status', 1)->orderBy('id', 'desc')->first();
         if (!$existing) {
             $subscriber = Subscriber::Create(
                 [
@@ -261,10 +262,15 @@ class AdminController extends Controller
             $question->options()->createMany($options);
         }
         $doubt->update([
-            'status' => 1,
+            'status' => 0,
             'remark' => $request->remark ?? null,
         ]);
-
+        // Send FCM notification to student
+        $fcmService = new FCMService(
+            'Doubt Resolved',
+            'Your doubt for question ID ' . $doubt->question_id . ' has been resolved.'
+        );
+        $fcmService->notify([$doubt->student->fcm_token]);
         return Response::apiSuccess('Update successful');
     }
 }
