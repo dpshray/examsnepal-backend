@@ -17,6 +17,13 @@ class User extends Authenticatable implements JWTSubject
     protected $perPage = 12;
 
     /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -26,6 +33,7 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'fullname',
         'role',
+        'role_id',
         'created_by',
         'created_date',
         'user',

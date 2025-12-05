@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\StudentNotification;
 use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
@@ -11,7 +12,7 @@ use Kreait\Firebase\Messaging\RegistrationToken;
 class FCMService
 {
     private $factory;
-    public function __construct(public string $title, public string $body)
+    public function __construct(public string $title, public string $body, public ?string $type = null, public ?array $students = null)
     {
         $this->factory = (new Factory())->withServiceAccount(
             base_path('exams-nepal-661f4-firebase-adminsdk-fbsvc-7bb2520f4b.json')
@@ -27,59 +28,80 @@ class FCMService
         $errors = [];
         $successfulTokens = [];
 
-        if (!empty($fcm_token)) {
-            $title = $this->title;
-            $body = $this->body;
-            // ['title' => $title, 'body' => $body] = $form_data;
-            // dd([$title, $body]);
-            // Create Firebase Notification object
-            $notification = Notification::create($title, $body);
+        // Filter invalid tokens (fixes your error)
+        $fcm_token = array_filter($fcm_token, function ($token) {
+            return !empty($token) && is_string($token);
+        });
 
-            // Create message base
-            $message = CloudMessage::new()
-                ->withNotification($notification)
-                ->withData(['type' => 'notification']);
+        $fcm_token = array_values($fcm_token); // reset keys
 
-            // Split tokens into chunks of 100
-            $chunks = array_chunk($fcm_token, 100, true);
-
-            foreach ($chunks as $chunk) {
-                try {
-                    $tokens = array_map(
-                        fn($token) => RegistrationToken::fromValue($token),
-                        $chunk
-                    );
-
-                    $response = $messaging->sendMulticast($message, $tokens);
-
-                    // Count successes & failures
-                    $successCount += $response->successes()->count();
-                    $failureCount += $response->failures()->count();
-
-                    // Handle successful sends
-                    foreach ($response->successes()->getItems() as $success) {
-                        $token = trim($success->target()->value());
-                        $successfulTokens[] = $token;
-                    }
-
-                    // Handle failed sends
-                    foreach ($response->failures()->getItems() as $failure) {
-                        $errorMsg = $failure->error()->getMessage();
-                        $errors[] = $errorMsg;
-                        Log::error("FCM error: {$errorMsg}");
-                    }
-
-                    // Free memory after each batch
-                    unset($tokens, $response);
-                    gc_collect_cycles();
-                } catch (\Exception $e) {
-                    $failureCount += count($chunk);
-                    $errors[] = $e->getMessage();
-                    Log::error("Failed to send FCM batch: " . $e->getMessage());
-                }
-            }
-        } else {
+        if (empty($fcm_token)) {
             Log::info('No valid FCM tokens found.');
+            return [
+                'successes' => 0,
+                'failures' => 0,
+                'errors' => ['No valid FCM tokens found'],
+                'date' => now()->format('Y-m-d H:i:s')
+            ];
+        }
+
+        $title = $this->title;
+        $body  = $this->body;
+        $type  = $this->type ?? 'notification';
+        $students = $this->students ?? [];
+
+        // Save notification records
+        foreach ($students as $studentId) {
+            StudentNotification::create([
+                'student_profile_id' => $studentId,
+                'title' => $title,
+                'body' => $body,
+                'type' => $type,
+            ]);
+        }
+
+        $notification = Notification::create($title, $body);
+
+        $message = CloudMessage::new()
+            ->withNotification($notification)
+            ->withData(['type' => $type]);
+
+        //Split into chunks of 100 tokens
+        $chunks = array_chunk($fcm_token, 100);
+
+        foreach ($chunks as $chunk) {
+            try {
+                // Convert each token to RegistrationToken object
+                $tokens = array_map(
+                    fn($token) => RegistrationToken::fromValue($token),
+                    $chunk
+                );
+
+                // Send multicast
+                $response = $messaging->sendMulticast($message, $tokens);
+
+                // Count success & failure
+                $successCount += $response->successes()->count();
+                $failureCount += $response->failures()->count();
+
+                // Store successful tokens
+                foreach ($response->successes()->getItems() as $success) {
+                    $successfulTokens[] = $success->target()->value();
+                }
+
+                // Store error messages
+                foreach ($response->failures()->getItems() as $failure) {
+                    $errors[] = $failure->error()->getMessage();
+                    Log::error("FCM error: " . $failure->error()->getMessage());
+                }
+
+                unset($tokens, $response);
+                gc_collect_cycles();
+            } catch (\Exception $e) {
+                $failureCount += count($chunk);
+                $errors[] = $e->getMessage();
+                Log::error("Failed to send FCM batch: " . $e->getMessage());
+            }
         }
         $result = [
             'successes' => $successCount,
@@ -87,12 +109,9 @@ class FCMService
             'errors' => $errors,
             'date' => now()->format('Y-m-d H:i:s')
         ];
+
         Log::info('Notification summary', $result);
-        return [
-            'successes' => $successCount,
-            'failures' => $failureCount,
-            'errors' => $errors,
-            'date' => now()->format('Y-m-d H:i:s')
-        ];
+
+        return $result;
     }
 }
