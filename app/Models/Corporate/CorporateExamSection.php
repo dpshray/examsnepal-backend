@@ -15,4 +15,9 @@ class CorporateExamSection extends Model
     public function scopePublished($query){
         return $query->wheren('is_published',1);
     }
+
+    public function questions()
+    {
+        return $this->hasMany(CorporateQuestion::class);
+    }
 }

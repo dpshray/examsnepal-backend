@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Corporate\CorporateAuthController;
 use App\Http\Controllers\Corporate\CorporateExamController;
+use App\Http\Controllers\Corporate\CorporateExamSectionController;
+use App\Http\Controllers\Corporate\CorporateQuestionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('corporate')->group(function(){
@@ -14,5 +16,7 @@ Route::prefix('corporate')->group(function(){
     });
     Route::middleware('auth:users')->group(function(){
         Route::apiResource('exam', CorporateExamController::class);
+        Route::apiResource('exam/section', CorporateExamSectionController::class);
+        Route::apiResource('exam/section/question', CorporateQuestionController::class);
     });
 });

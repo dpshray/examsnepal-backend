@@ -110,6 +110,7 @@ class CorporateExamSectionController extends Controller
      *             @OA\Property(property="title", type="string", example="Exam section A-45"),
      *             @OA\Property(property="detail", type="string", example="Exam section A-45 desctiption"),
      *             @OA\Property(property="is_published", type="integer", example=1),
+     *
      *         )
      *     ),
      *     @OA\Response(
@@ -137,7 +138,7 @@ class CorporateExamSectionController extends Controller
      */
     public function show(CorporateExamSection $section)
     {
-        
+
     }
 
     /**

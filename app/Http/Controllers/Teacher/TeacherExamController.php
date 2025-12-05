@@ -146,7 +146,7 @@ class TeacherExamController extends Controller
         $exam = Auth::user()
         ->teacherExams()
         ->createQuietly($data);
-        $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->exam_type_id)));
+        $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
         if ($data['is_active'] == 1) {
 
             // get students who match exam type
@@ -244,7 +244,7 @@ class TeacherExamController extends Controller
         $data['status'] = $request->category_type;
         $data['is_active'] = $request->publish;
         $exam->updateQuietly($data);
-        $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->exam_type_id)));
+        $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
         if ($data['is_active'] == 1) {
 
             // get students who match exam type
