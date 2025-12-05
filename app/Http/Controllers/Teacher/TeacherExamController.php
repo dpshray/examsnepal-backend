@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Teacher;
 
+use App\Enums\ExamTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Teacher\TeacherExamStoreRequest;
 use App\Http\Requests\Teacher\UpdateTeacherExamRequest;
@@ -9,6 +10,8 @@ use App\Http\Resources\ExamCollection;
 use App\Http\Resources\ExamResource;
 use App\Http\Resources\Teacher\TeacherExamResource;
 use App\Models\Exam;
+use App\Models\StudentProfile;
+use App\Services\FCMService;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -140,9 +143,28 @@ class TeacherExamController extends Controller
         $data = $request->validated();
         $data['is_active'] = $request->publish;
         $data['status'] = $request->category_type;
-        Auth::user()
-            ->teacherExams()
-            ->createQuietly($data);
+        $exam = Auth::user()
+        ->teacherExams()
+        ->createQuietly($data);
+        $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->exam_type_id)));
+        if ($data['is_active'] == 1) {
+
+            // get students who match exam type
+            $students = StudentProfile::where('exam_type_id', $exam->exam_type_id)
+                ->get();
+            // return $students;
+            if (!empty($students)) {
+                $fcmService = new FCMService(
+                    'New Exam',
+                    'A new '.$type.' exam has been added by your teacher. Please check and start preparing for it.',
+                    $type,
+                    $students->pluck('id')->toArray()
+                );
+                // send notification to all tokens
+                $fcmService->notify($students->pluck('fcm_token')->toArray());
+            }
+        }
+
         return Response::apiSuccess('exam added successfully');
     }
 
@@ -222,7 +244,24 @@ class TeacherExamController extends Controller
         $data['status'] = $request->category_type;
         $data['is_active'] = $request->publish;
         $exam->updateQuietly($data);
+        $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->exam_type_id)));
+        if ($data['is_active'] == 1) {
 
+            // get students who match exam type
+            $students = StudentProfile::where('exam_type_id', $exam->exam_type_id)
+                ->get();
+
+            if (!empty($students)) {
+                $fcmService = new FCMService(
+                    'New Exam',
+                    'A new '.$type.' exam has been added by your teacher. Please check and start preparing for it.',
+                    $type,
+                    $students->pluck('id')->toArray()
+                );
+                // send notification to all tokens
+                $fcmService->notify($students->pluck('fcm_token')->toArray());
+            }
+        }
         return Response::apiSuccess('exam updated successfully');
     }
 

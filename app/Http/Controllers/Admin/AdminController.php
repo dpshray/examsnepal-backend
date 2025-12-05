@@ -269,7 +269,9 @@ class AdminController extends Controller
         // Send FCM notification to student
         $fcmService = new FCMService(
             'Doubt Resolved',
-            'Your doubt for question ID ' . $doubt->question_id . ' has been resolved.'
+            'Your doubt for question ID ' . $doubt->question_id . ' has been resolved.',
+            'Notification',
+            [$doubt->student->id]
         );
         $fcmService->notify([$doubt->student->fcm_token]);
         // return $doubt->student->fcm_token;
