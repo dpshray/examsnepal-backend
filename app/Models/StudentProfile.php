@@ -20,8 +20,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
 
     protected $perPage = 12;
     public $timestamps = false;
-    const EMAIL_LINK_EXPIRES_AT = 2; #in minutes
-    const PASSWORD_RESET_TOKEN_VALID_UNTIL = 2; #in minutes
+    const EMAIL_LINK_EXPIRES_AT = 10; #in minutes
+    const PASSWORD_RESET_TOKEN_VALID_UNTIL = 10; #in minutes
 
     protected $fillable = [
         'name',
@@ -161,5 +161,26 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
     public function examType()
     {
         return $this->belongsTo(ExamType::class, 'exam_type_id');
+    }
+
+    function resendEmailVerificationLink() {
+
+        $student = $this;
+        $link_expires_minute   = SELF::EMAIL_LINK_EXPIRES_AT;
+        $url_expiration_minute = now()->addMinutes($link_expires_minute);
+        $url                   = URL::temporarySignedRoute('student_email_confirmation', $url_expiration_minute, ['email' => $student->email]);
+        try {
+            Mail::send('mail.student.register', [
+                'name' => $student->name,
+                'url' => $url,
+                'expiration_period' => $url_expiration_minute->format('Y-m-d h:i:s a')
+            ], function ($message) use ($student) {
+                $message->to($student->email);
+                $message->subject('Student email verification link');
+            });
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            throw new \Exception('Something went wrong while sending mail');
+        }
     }
 }

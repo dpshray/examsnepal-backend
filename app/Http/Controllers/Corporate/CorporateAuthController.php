@@ -131,6 +131,7 @@ class CorporateAuthController extends Controller
      *     summary="Register a new corporate user",
      *     description="Register a new corporate user with username, fullname, email, and password.",
      *     tags={"Corporate Authentication"},
+     *
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -143,15 +144,16 @@ class CorporateAuthController extends Controller
      *             @OA\Property(property="password_confirmation", type="string", format="password", example="password123")
      *         )
      *     ),
-     *    @OA\Response(
-     *        response=200,
-     *        description="Registration successful",
-     *       @OA\JsonContent(
-     *            @OA\Property(property="status", type="boolean", example=true
-     *           ),
-     *           @OA\Property(property="message", type="string", example="you have registered successfully")
-     *      )
-     *   ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Registration successful",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="you have registered successfully")
+     *         )
+     *     )
+     * )
      */
     public function register(CorporateResisterRequest $request)
     {

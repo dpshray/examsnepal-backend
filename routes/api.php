@@ -106,6 +106,7 @@ Route::post('handle-password-reset-form', [StudentProfileController::class, 'pas
 Route::post('/student/login', [AuthController::class, 'loginStudent'])->name('login');
 Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('loginAdmin');
 Route::post('student-google-login', [StudentProfileController::class, 'googleLogin']);
+Route::post('/student/resend-email-verification', [AuthController::class, 'resendStudentEmailVerification']);
 
 Route::apiResource('blog', BlogController::class)->scoped(['blog' => 'slug']);
 #routes accessed by both api and users guards
@@ -286,6 +287,7 @@ Route::middleware(['auth:users', 'role:teacher'])->group(function () {
 
 Route::middleware(['auth:users', 'role:teacher'])->group(function () {
     // Route::get('/subjects', [SubjectController::class, 'index']);
+    Route::get('/admin/manual-student-email-verify/{student_profile_id}', [AuthController::class, 'manualStudentEmailVerifier']);
 });
 
 Route::controller(ParticipantController::class)->group(function (){

@@ -561,4 +561,77 @@ class AuthController extends Controller
 
         return Response::apiSuccess('Teacher registered successfully. Please verify your email.', null, 201);
     }
+
+    /**
+     * @OA\get(
+     *     path="/admin/manual-student-email-verify/{id}",
+     *     summary="Manually verify email of a particular student using student profile id/",
+     *     description="Manually verify email of a particular student using student profile id/",
+     *     operationId="ManualStudentEmailVerifier",
+     *     tags={"Admin Authentication"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of a student",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Student email verification response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null),
+     *             @OA\Property(property="message", type="string", example="Student email has been verified.")
+     *         )
+     *     )
+     * )
+     */
+    function manualStudentEmailVerifier($student_profile_id) {
+        $student_profile = StudentProfile::firstWhere('id', $student_profile_id);
+        if (empty($student_profile)) {
+            return Response::apiError('Student does not exists.');
+        }
+        $student_profile->update(['email_verified_at' => now()]);
+        return Response::apiSuccess('Student email has been verified.');
+
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/student/resend-email-verification",
+     *     summary="Resend student email verification.",
+     *     description="Resend student email verification.",
+     *     operationId="ResendStudentEmailVerification",
+     *     tags={"Student Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email"},
+     *             @OA\Property(property="email", type="string", format="email", example="hariofhungi@gmail.com")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Verification email sent response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null),
+     *             @OA\Property(property="message", type="string", example="A verification link has been sent to your email address.")
+     *         )
+     *     )
+     * )
+     */
+    function resendStudentEmailVerification(Request $request) {
+        $form_data = $request->validate([
+            'email' => 'required|exists:student_profiles,email'
+        ]);
+        try {
+            StudentProfile::firstWhere('email', $form_data['email'])->resendEmailVerificationLink();
+        } catch (\Exception $e) {
+            Log::info($e->getMessage());
+            return Response::apiError('Something went wrong while sending verification email.');
+        }
+        return Response::apiSuccess("A verification link has been sent to your email address.");
+    }
 }
