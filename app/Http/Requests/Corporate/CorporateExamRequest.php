@@ -23,12 +23,16 @@ class CorporateExamRequest extends FormRequest
     {
         return [
             'title' => 'required|max:255',
-            'exam_date' => 'required|date_format:Y-m-d',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i',
+            'exam_date' => 'nullable|date_format:Y-m-d',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i',
             'is_published' => 'required|in:0,1',
-            'about' => 'nullable',
-            'rules' => 'nullable',
+            'description' => 'nullable|sometimes|string',
+            'instructions' => 'nullable|sometimes|string',
+            'duration' => 'nullable|sometimes|integer',
+            'is_shuffled_question' => 'nullable|sometimes|boolean',
+            'is_shuffled_option' => 'nullable|sometimes|boolean',
+            'limit_attempts' => 'nullable|sometimes|integer',
         ];
     }
 }

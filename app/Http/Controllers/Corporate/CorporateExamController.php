@@ -110,9 +110,13 @@ class CorporateExamController extends Controller
      *             @OA\Property(property="exam_date", type="string", format="date", example="2025-07-09"),
      *             @OA\Property(property="start_time", type="string", format="time", example="10:00"),
      *             @OA\Property(property="end_time", type="string", format="time", example="14:00"),
-     *             @OA\Property(property="about", type="string", example="lorem ipsum dolor"),
-     *             @OA\Property(property="rules", type="string", example="lorem ipsum dolor"),
-     *             @OA\Property(property="is_published", type="integer", example=1)
+     *             @OA\Property(property="description", type="string", example="lorem ipsum dolor"),
+     *             @OA\Property(property="instructions", type="string", example="lorem ipsum dolor"),
+     *             @OA\Property(property="is_published", type="integer", example=1),
+     *             @OA\Property(property="duration", type="integer", example=120),
+     *             @OA\Property(property="is_shuffled_question", type="boolean", example=false),
+     *             @OA\Property(property="is_shuffled_option", type="boolean", example=false),
+     *             @OA\Property(property="limit_attempts", type="integer", example=3)
      *         )
      *     ),
      *     @OA\Response(
@@ -139,7 +143,7 @@ class CorporateExamController extends Controller
     */
     public function show(CorporateExam $corporateExam)
     {
-        
+
     }
 
     /**
@@ -169,9 +173,13 @@ class CorporateExamController extends Controller
      *             @OA\Property(property="exam_date", type="string", format="date", example="2025-07-09"),
      *             @OA\Property(property="start_time", type="string", format="time", example="10:00"),
      *             @OA\Property(property="end_time", type="string", format="time", example="14:00"),
-     *             @OA\Property(property="about", type="string", example="lorem ipsum dolor"),
-     *             @OA\Property(property="rules", type="string", example="lorem ipsum dolor"),
-     *             @OA\Property(property="is_published", type="integer", example=1)
+     *             @OA\Property(property="description", type="string", example="lorem ipsum dolor"),
+     *             @OA\Property(property="instructions", type="string", example="lorem ipsum dolor"),
+     *             @OA\Property(property="is_published", type="integer", example=1),
+     *            @OA\Property(property="duration", type="integer", example=120),
+     *            @OA\Property(property="is_shuffled_question", type="boolean", example=false),
+     *            @OA\Property(property="is_shuffled_option", type="boolean", example=false),
+     *            @OA\Property(property="limit_attempts", type="integer", example=3),
      *         )
      *     ),
      *     @OA\Response(
@@ -226,7 +234,7 @@ class CorporateExamController extends Controller
         $this->itemBelongsToUser($exam);
         $exam->delete();
         return Response::apiSuccess('corporate exam deleted');
-    }   
+    }
 
     private function itemBelongsToUser(CorporateExam $corporate_exam){
         if ($corporate_exam->corporate->isNot(Auth::guard('users')->user())) {

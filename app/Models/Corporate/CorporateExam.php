@@ -8,10 +8,24 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CorporateExam extends Model
-{    
-    use Uuid, SoftDeletes; // use the trait
-    protected $fillable = ['uuid','corporate_id','title','exam_date','start_time','end_time','about','rules','is_published'];
-    
+{
+    use  SoftDeletes; // use the trait
+    protected $fillable =
+    [
+        'corporate_id',
+        'title',
+        'exam_date',
+        'start_time',
+        'end_time',
+        'description',
+        'instructions',
+        'is_published',
+        'duration',
+        'is_shuffled_question',
+        'is_shuffled_option',
+        'limit_attempts'
+    ];
+
     protected $dates = ['deleted_at']; // mark this column as a date
 
     public static function boot()
@@ -23,11 +37,18 @@ class CorporateExam extends Model
         }); */
     }
 
-    public function corporate(){
-        return $this->belongsTo(User::class,'corporate_id');
+    public function corporate()
+    {
+        return $this->belongsTo(User::class, 'corporate_id');
     }
 
-    public function sections(){
+    public function sections()
+    {
         return $this->hasMany(CorporateExamSection::class);
+    }
+
+    public function questions()
+    {
+        return $this->hasMany(CorporateQuestion::class);
     }
 }

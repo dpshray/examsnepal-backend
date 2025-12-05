@@ -13,10 +13,6 @@
         {
             "url": "http://192.168.100.18:8000/api/",
             "description": "Localhost API Server 2"
-        },
-        {
-            "url": "http://192.168.100.23:8000/api/",
-            "description": "Localhost API Server"
         }
     ],
     "paths": {
@@ -3253,13 +3249,13 @@
         "/corporate/login": {
             "post": {
                 "tags": [
-                    "CorporateLogin"
+                    "Corporate Authentication"
                 ],
-                "summary": "Login form for corporate user(Note: role 5 is for corporate)",
-                "description": "Login form for corporate user",
+                "summary": "Corporate Login",
+                "description": "Login form for corporate user (Note: role_id = 5 is corporate).",
                 "operationId": "corporateLogin",
                 "requestBody": {
-                    "description": "Corporate Exam data to be stored",
+                    "description": "Login credentials",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -3320,7 +3316,7 @@
                                                 },
                                                 "token": {
                                                     "type": "string",
-                                                    "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ..."
+                                                    "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
                                                 }
                                             },
                                             "type": "object"
@@ -3328,6 +3324,211 @@
                                         "message": {
                                             "type": "string",
                                             "example": "logged in successfull"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "User not found or invalid role"
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/corporate/logout": {
+            "post": {
+                "tags": [
+                    "Corporate Authentication"
+                ],
+                "summary": "Logout Corporate",
+                "description": "Invalidates the JWT token to log out the corporate user.",
+                "operationId": "25fd2202c058c4b53aeef94c150c7d6c",
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfully logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Could not log out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Could not log out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/register": {
+            "post": {
+                "tags": [
+                    "Corporate Authentication"
+                ],
+                "summary": "Register a new corporate user",
+                "description": "Register a new corporate user with username, fullname, email, and password.",
+                "operationId": "abbcc87fde619036c32fe53ebb72bff8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "username",
+                                    "fullname",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "username": {
+                                        "type": "string",
+                                        "example": "corpuser"
+                                    },
+                                    "fullname": {
+                                        "type": "string",
+                                        "example": "Corporate User"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "corpuser@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+1234567890"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Registration successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "you have registered successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/corporate/forgot-password": {
+            "post": {
+                "tags": [
+                    "Corporate Authentication"
+                ],
+                "summary": "Initiate password reset",
+                "description": "Sends a password reset link to the corporate user's email.",
+                "operationId": "344c13bb815b0f1110061f34c46b4d7a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "corpuser@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password reset link sent",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "forgot password link sent to your email"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Unable to send reset link",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "unable to send reset link"
                                         }
                                     },
                                     "type": "object"
@@ -3506,17 +3707,33 @@
                                         "format": "time",
                                         "example": "14:00"
                                     },
-                                    "about": {
+                                    "description": {
                                         "type": "string",
                                         "example": "lorem ipsum dolor"
                                     },
-                                    "rules": {
+                                    "instructions": {
                                         "type": "string",
                                         "example": "lorem ipsum dolor"
                                     },
                                     "is_published": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "duration": {
+                                        "type": "integer",
+                                        "example": 120
+                                    },
+                                    "is_shuffled_question": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "is_shuffled_option": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "limit_attempts": {
+                                        "type": "integer",
+                                        "example": 3
                                     }
                                 },
                                 "type": "object"
@@ -3610,17 +3827,33 @@
                                         "format": "time",
                                         "example": "14:00"
                                     },
-                                    "about": {
+                                    "description": {
                                         "type": "string",
                                         "example": "lorem ipsum dolor"
                                     },
-                                    "rules": {
+                                    "instructions": {
                                         "type": "string",
                                         "example": "lorem ipsum dolor"
                                     },
                                     "is_published": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "duration": {
+                                        "type": "integer",
+                                        "example": 120
+                                    },
+                                    "is_shuffled_question": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "is_shuffled_option": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "limit_attempts": {
+                                        "type": "integer",
+                                        "example": 3
                                     }
                                 },
                                 "type": "object"
@@ -13225,8 +13458,8 @@
             "description": "Bookmarks"
         },
         {
-            "name": "CorporateLogin",
-            "description": "CorporateLogin"
+            "name": "Corporate Authentication",
+            "description": "Corporate Authentication"
         },
         {
             "name": "CorporateExams",
