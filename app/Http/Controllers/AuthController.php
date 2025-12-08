@@ -630,6 +630,7 @@ class AuthController extends Controller
             'email' => 'required|exists:student_profiles,email'
         ]);
         // return $requested_from;
+        Log::info('resend verificationn link : '.Browser::platformFamily());
         try {
             DB::transaction(function () use($form_data){
                 $requested_from = RequestedFromEnum::WEB->value;
