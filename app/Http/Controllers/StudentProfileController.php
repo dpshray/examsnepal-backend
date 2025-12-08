@@ -107,15 +107,21 @@ class StudentProfileController extends Controller
         } else if (Browser::platformFamily() === 'iOS') {
             $requested_from = RequestedFromEnum::IOS->value;
         }
-        $student = StudentProfile::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'exam_type_id' => $request->exam_type_id,
-            'date' => Carbon::now()->format('m/d/Y h:i:s a'),
-            'requested_from' => $requested_from
-        ]);
+        try {
+            DB::transaction(function () use($request, $requested_from){            
+                $student = StudentProfile::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'password' => Hash::make($request->password),
+                    'exam_type_id' => $request->exam_type_id,
+                    'date' => Carbon::now()->format('m/d/Y h:i:s a'),
+                    'requested_from' => $requested_from
+                ]);
+            });
+        } catch (\Exception $e) {
+            return Response::apiError('Unable to send the email right now. Please retry in a moment.');
+        }
         return Response::apiSuccess('An verification link has been sent to your email.');
 
     }
