@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\PaymentStatusEnum;
+use App\Enums\RequestedFromEnum;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -20,8 +21,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
 
     protected $perPage = 12;
     public $timestamps = false;
-    const EMAIL_LINK_EXPIRES_AT = 10; #in minutes
-    const PASSWORD_RESET_TOKEN_VALID_UNTIL = 10; #in minutes
+    const EMAIL_LINK_EXPIRES_AT = 600; #in minutes
+    const PASSWORD_RESET_TOKEN_VALID_UNTIL = 600; #in minutes
 
     protected $fillable = [
         'name',
@@ -31,17 +32,19 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
         'exam_type_id',
         'date',
         'email_verified_at',
-        'fcm_token'
+        'fcm_token',
+        'requested_from'
     ];
 
     protected $hidden = ['password'];
-
+    
     protected function casts(): array
     {
         return [
             'id' => 'integer',
             'exam_type_id' => 'integer',
             'is_subscripted' => 'integer',
+            'requested_from' => RequestedFromEnum::class
         ];
     }
 

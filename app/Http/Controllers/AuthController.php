@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RequestedFromEnum;
 use App\Http\Requests\Teacher\Register\TeacherRegisterRequest;
 use App\Http\Resources\StudentProfileResource;
 use App\Http\Resources\StudentResource;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use hisorange\BrowserDetect\Facade as Browser;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -587,7 +590,7 @@ class AuthController extends Controller
      *     )
      * )
      */
-    function manualStudentEmailVerifier($student_profile_id) {
+    function manualStudentEmailVerifier(Request $request, $student_profile_id) {
         $student_profile = StudentProfile::firstWhere('id', $student_profile_id);
         if (empty($student_profile)) {
             return Response::apiError('Student does not exists.');
@@ -626,8 +629,19 @@ class AuthController extends Controller
         $form_data = $request->validate([
             'email' => 'required|exists:student_profiles,email'
         ]);
+        // return $requested_from;
         try {
-            StudentProfile::firstWhere('email', $form_data['email'])->resendEmailVerificationLink();
+            DB::transaction(function () use($form_data){
+                $requested_from = RequestedFromEnum::WEB->value;
+                if (Browser::isAndroid() || Browser::isTablet()) {
+                    $requested_from = RequestedFromEnum::ANDROID->value;
+                }else if (Browser::platformFamily() === 'iOS') {
+                    $requested_from = RequestedFromEnum::IOS->value;
+                }
+                $student_profile = StudentProfile::firstWhere('email', $form_data['email']);
+                $student_profile->update(['requested_from' => $requested_from]);
+                $student_profile->resendEmailVerificationLink();
+            });
         } catch (\Exception $e) {
             Log::info($e->getMessage());
             return Response::apiError('Something went wrong while sending verification email.');
