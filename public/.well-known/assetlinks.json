@@ -1,0 +1,12 @@
+[
+    {
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.dwork.examsnepal",
+            "sha256_cert_fingerprints": [
+                "2F:95:0B:F7:27:26:6B:AE:43:37:85:CF:7A:E1:2B:D8:C8:5A:53:5D:34:A8:F4:D6:20:E3:5E:74:1F:44:9B:AC"
+            ]
+        }
+    }
+]
