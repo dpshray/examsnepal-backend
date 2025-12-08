@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\StudentExamNotificationCollection;
 use App\Models\ExamType;
+use App\Models\StudentNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -45,11 +46,9 @@ class NotificationController extends Controller
      */
     public function getUserNotifications(){
         $student = Auth::user();
-        $notifications = DB::table('notifications')
-                            ->select('data','notified_at')
-                            ->where('model_type', StudentProfile::class)
-                            ->where('model_id', $student->id)
-                            ->get();
+        $notifications = StudentNotification::where('student_profile_id', $student->id)
+            ->orderBy('id', 'desc')
+            ->get();
         $notifications = new StudentExamNotificationCollection($notifications);
         return Response::apiSuccess('User '. $student->name.' notifications', $notifications);
     }
@@ -101,9 +100,13 @@ class NotificationController extends Controller
             ->whereNotNull('email_verified_at')
             ->whereNotNull('fcm_token')
             ->distinct()
-            ->pluck('fcm_token')
-            ->all();
-        ['successes' => $successCount, 'failures' => $failureCount] = (new FCMService($form_data['title'], $form_data['body']))->notify($students);
+            // ->pluck('fcm_token')
+            ->get();
+        ['successes' => $successCount, 'failures' => $failureCount] = (new FCMService(
+            $form_data['title'],
+            $form_data['body'],'Notification',
+            $students->pluck('id')->toArray()
+        ))->notify($students->pluck('fcm_token')->toArray());
         return Response::apiSuccess('Notification send with '. $successCount.' success and '. $failureCount.' failure');
     }
 
