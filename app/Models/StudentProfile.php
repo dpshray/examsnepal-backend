@@ -21,8 +21,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
 
     protected $perPage = 12;
     public $timestamps = false;
-    const EMAIL_LINK_EXPIRES_AT = 600; #in minutes
-    const PASSWORD_RESET_TOKEN_VALID_UNTIL = 600; #in minutes
+    const EMAIL_LINK_EXPIRES_AT = 10; #in minutes
+    const PASSWORD_RESET_TOKEN_VALID_UNTIL = 10; #in minutes
 
     protected $fillable = [
         'name',
