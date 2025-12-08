@@ -181,7 +181,7 @@ class CorporateExamController extends Controller
     */
     public function show(CorporateExam $corporateExam)
     {
-        $this->itemBelongsToUser($corporateExam);
+        // $this->itemBelongsToUser($corporateExam);
         $data = new CorporateExamResource($corporateExam);
         return Response::apiSuccess('corporate exam details', $data);
     }

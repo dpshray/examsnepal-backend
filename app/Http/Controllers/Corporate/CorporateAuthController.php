@@ -137,6 +137,7 @@ class CorporateAuthController extends Controller
      *     summary="Register a new corporate user",
      *     description="Register a new corporate user with username, fullname, email, and password.",
      *     tags={"Corporate Authentication"},
+     *
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(

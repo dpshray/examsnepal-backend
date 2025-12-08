@@ -13,12 +13,15 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\ValidationException;
 use App\Enums\ExamTypeEnum;
+use App\Enums\RequestedFromEnum;
 use App\Http\Resources\Student\AllStudentResource;
 use App\Http\Resources\StudentProfileResource;
 use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use hisorange\BrowserDetect\Facade as Browser;
+
 
 class StudentProfileController extends Controller
 {
@@ -98,14 +101,28 @@ class StudentProfileController extends Controller
         }
 
         // Create student profile
-        $student = StudentProfile::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'exam_type_id' => $request->exam_type_id,
-            'date' => Carbon::now()->format('m/d/Y h:i:s a')
-        ]);
+        $requested_from = RequestedFromEnum::WEB->value;
+        if (Browser::isAndroid() || Browser::isTablet()) {
+            $requested_from = RequestedFromEnum::ANDROID->value;
+        } else if (Browser::platformFamily() === 'iOS') {
+            $requested_from = RequestedFromEnum::IOS->value;
+        }
+        Log::info('normal register : '.Browser::platformFamily().'|'. $requested_from);
+        try {
+            DB::transaction(function () use($request, $requested_from){            
+                $student = StudentProfile::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'password' => Hash::make($request->password),
+                    'exam_type_id' => $request->exam_type_id,
+                    'date' => Carbon::now()->format('m/d/Y h:i:s a'),
+                    'requested_from' => $requested_from
+                ]);
+            });
+        } catch (\Exception $e) {
+            return Response::apiError('Unable to send the email right now. Please retry in a moment.');
+        }
         return Response::apiSuccess('An verification link has been sent to your email.');
 
     }
@@ -286,12 +303,29 @@ class StudentProfileController extends Controller
 
     public function verifyStudentEmail(Request $request, $email) {
         if (!$request->hasValidSignature()) {
-            return Response::apiError('Invalid signature', null, 410);
+            return Response::apiError('The link you used is invalid or has already expired.', null, 410);
         }
-        DB::transaction(function () use($email){
-            StudentProfile::firstWhere('email', $email)->markEmailAsVerified();
-        });
-        echo "Email has been verified.Please goto to login page to continue.";
+        $student_profile = null;
+        try {
+            DB::transaction(function () use($email, &$student_profile){
+                $student_profile = StudentProfile::firstWhere('email', $email);
+                if (!$student_profile) {
+                    throw new \Exception('Student not found');
+                }
+                $student_profile->markEmailAsVerified();
+            });
+        } catch (\Exception $e) {
+            Log::info('Error while verifying student email', ['error' => $e->getMessage()]);
+            echo 'Error while verifying email';
+        }
+        // dd([$student_profile->requested_from, RequestedFromEnum::ANDROID, $student_profile->requested_from == RequestedFromEnum::ANDROID->value]);
+        if ($student_profile->requested_from->value == RequestedFromEnum::ANDROID->value) {
+            return redirect()->away("https://play.google.com/store/apps/details?id=com.dwork.examsnepal");
+        }else if($student_profile->requested_from->value == RequestedFromEnum::IOS->value){
+            return redirect()->away("https://play.google.com/store/apps/details?id=com.dwork.examsnepal");
+        }else{
+            return redirect()->away(env('EXAMSNEPAL_STUDENT_LOGIN_PAGE_URL'));
+        }
     }
 
     /**
