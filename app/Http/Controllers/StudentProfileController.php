@@ -101,13 +101,13 @@ class StudentProfileController extends Controller
         }
 
         // Create student profile
-        Log::info('normal register : '.Browser::platformFamily());
         $requested_from = RequestedFromEnum::WEB->value;
         if (Browser::isAndroid() || Browser::isTablet()) {
             $requested_from = RequestedFromEnum::ANDROID->value;
         } else if (Browser::platformFamily() === 'iOS') {
             $requested_from = RequestedFromEnum::IOS->value;
         }
+        Log::info('normal register : '.Browser::platformFamily().'|'. $requested_from);
         try {
             DB::transaction(function () use($request, $requested_from){            
                 $student = StudentProfile::create([

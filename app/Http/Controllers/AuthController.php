@@ -630,7 +630,6 @@ class AuthController extends Controller
             'email' => 'required|exists:student_profiles,email'
         ]);
         // return $requested_from;
-        Log::info('resend verificationn link : '.Browser::platformFamily());
         try {
             DB::transaction(function () use($form_data){
                 $requested_from = RequestedFromEnum::WEB->value;
@@ -639,6 +638,7 @@ class AuthController extends Controller
                 }else if (Browser::platformFamily() === 'iOS') {
                     $requested_from = RequestedFromEnum::IOS->value;
                 }
+                Log::info('resend verificationn link : '.Browser::platformFamily().'|'. $requested_from);
                 $student_profile = StudentProfile::firstWhere('email', $form_data['email']);
                 $student_profile->update(['requested_from' => $requested_from]);
                 $student_profile->resendEmailVerificationLink();

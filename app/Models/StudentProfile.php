@@ -21,8 +21,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
 
     protected $perPage = 12;
     public $timestamps = false;
-    const EMAIL_LINK_EXPIRES_AT = 10; #in minutes
-    const PASSWORD_RESET_TOKEN_VALID_UNTIL = 10; #in minutes
+    const EMAIL_LINK_EXPIRES_AT = 30; #in minutes
+    const PASSWORD_RESET_TOKEN_VALID_UNTIL = 30; #in minutes
 
     protected $fillable = [
         'name',
@@ -66,7 +66,7 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
                     $message->subject('New Student Registration');
                 });
             } catch (\Exception $e) {
-                Log::error($e->getMessage());
+                Log::error($e);
                 throw new \Exception('Something went wrong while sending mail');
             }
         });
