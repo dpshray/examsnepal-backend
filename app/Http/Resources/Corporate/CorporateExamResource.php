@@ -31,6 +31,7 @@ class CorporateExamResource extends JsonResource
             "participant_count" => rand(100, 1000),
             "section_count" => rand(100,1000),
             "question_count" => $this->whenCounted('sections'),
+            "exam_type" => $this->exam_type,
         ];
     }
 }

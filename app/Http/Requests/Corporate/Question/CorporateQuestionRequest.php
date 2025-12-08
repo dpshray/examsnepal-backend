@@ -29,6 +29,10 @@ class CorporateQuestionRequest extends FormRequest
             'negative_mark' => 'required_if:is_negative_marking,1|numeric',
             'full_marks' => 'required|numeric',
             'question_type' => 'required|in:MCQ,Subjective',
+            'options' => 'required_if:question_type,MCQ|array|min:2|max:5',
+            'options.*.option' => 'required_with:options|string',
+            'options.*.value' => 'required_with:options|boolean',
+            'image' => 'nullable|image', // max 2MB
         ];
     }
 }
