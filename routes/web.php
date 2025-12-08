@@ -6,25 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-
-Route::get('cips', function(){});
-
-Route::get('/download-logs', function(){
-    $logPath = storage_path('logs');
-    if (!File::exists($logPath)) {
-        return abort(404, "Log directory not found.");
-    }
-    $zipFile = storage_path('logs.zip');
-    $zip = new ZipArchive;
-    if ($zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
-        $files = File::files($logPath);
-        foreach ($files as $file) {
-            $zip->addFile($file->getRealPath(), $file->getFilename());
-        }
-        $zip->close();
-    }
-    return response()->download($zipFile)->deleteFileAfterSend(true);
-});
+use Illuminate\Support\Facades\Log;
 
 Route::get('/', function () {
     return view('welcome');
