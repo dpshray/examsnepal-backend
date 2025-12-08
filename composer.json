@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "darkaonline/l5-swagger": "^9.0",
+        "hisorange/browser-detect": "^5.0",
         "kreait/laravel-firebase": "^5.8",
         "laravel/framework": "^11.31",
         "laravel/socialite": "^5.23",
