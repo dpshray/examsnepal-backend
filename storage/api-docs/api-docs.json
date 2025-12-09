@@ -4149,7 +4149,7 @@
                 }
             }
         },
-        "/corporate/exam/section/list/{exam}": {
+        "/corporate/exam/{exam}/section": {
             "get": {
                 "tags": [
                     "corporateExamSection"
@@ -4268,9 +4268,7 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/corporate/exam/section": {
+            },
             "post": {
                 "tags": [
                     "corporateExamSection"
@@ -4278,6 +4276,17 @@
                 "summary": "Create a new corporate exam",
                 "description": "Store a new corporate exam section in the database.",
                 "operationId": "corporateExamSectionCreate",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "ID of the corporate exam to which the section belongs",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "requestBody": {
                     "description": "Corporate Exam data to be stored",
                     "required": true,

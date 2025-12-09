@@ -23,7 +23,7 @@ class CorporateExamSectionController extends Controller
      */
     /**
      * @OA\Get(
-     *     path="/corporate/exam/section/list/{exam}",
+     *     path="/corporate/exam/{exam}/section",
      *     summary="Fetch all exams of a corporate",
      *     description="Fetch all exams of a corporate",
      *     operationId="CorporateExamsSectionList",
@@ -84,8 +84,8 @@ class CorporateExamSectionController extends Controller
         $this->itemBelongsToUser($exam);
 
         $per_page = $request->query('per_page', 12);
-        $published = $request->query('published', 1);
-        $pagination = $exam->sections()->where('is_published', $published)->paginate($per_page);
+        // $published = $request->query('published', 1);
+        $pagination = $exam->sections()->paginate($per_page);
         $data = $this->setupPagination($pagination, CorporateExamSectionCollection::class)->data;
         return Response::apiSuccess("corporate section of exam: {$exam->title}", $data);
     }
@@ -95,12 +95,19 @@ class CorporateExamSectionController extends Controller
      */
     /**
      * @OA\Post(
-     *     path="/corporate/exam/section",
+     *     path="/corporate/exam/{exam}/section",
      *     summary="Create a new corporate exam",
      *     description="Store a new corporate exam section in the database.",
      *     operationId="corporateExamSectionCreate",
      *     tags={"corporateExamSection"},
      *     security={{"bearerAuth":{}}},
+     *    @OA\Parameter(
+     *        name="exam",
+     *        in="path",
+     *        required=true,
+     *        description="ID of the corporate exam to which the section belongs",
+     *        @OA\Schema(type="integer")
+     *    ),
      *     @OA\RequestBody(
      *         required=true,
      *         description="Corporate Exam data to be stored",
@@ -124,12 +131,11 @@ class CorporateExamSectionController extends Controller
      *     )
      * )
      */
-    public function store(CorporateExamSectionRequest $request)
+    public function store(CorporateExamSectionRequest $request, CorporateExam $exam)
     {
         $form_data = $request->validated();
-        $exam = CorporateExam::findOrFail($form_data['corporate_exam_id']);
         $this->itemBelongsToUser($exam);
-        CorporateExamSection::create($form_data);
+        $exam->sections()->create($form_data);
         return Response::apiSuccess('exam section created successfully');
     }
 

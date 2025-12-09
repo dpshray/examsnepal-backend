@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Corporate;
 
+use App\Models\Corporate\CorporateQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -23,6 +24,8 @@ class CorporateQuestionResource extends JsonResource
             'description' => $this->description,
             'full_marks' => $this->full_marks,
             'negative_marks' => $this->negative_mark,
+            'is_negative_marking' => (bool)$this->is_negative_marking,
+            'image_url' => $this->getFirstMediaUrl(CorporateQuestion::QUESTION_IMAGE) ?: null,
             'options' => $this->when($this->question_type === 'MCQ', function () {
                 return $this->options->map(function ($option) {
                     return [
