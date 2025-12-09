@@ -82,11 +82,11 @@ class CorporateExamController extends Controller
     public function index(Request $request)
     {
         $per_page = $request->query('per_page',12);
-        $published = $request->query('published',1);
+        // $published = $request->query('published',1);
         $pagination = CorporateExam::withCount('sections')
                         ->where([
                             ['corporate_id', Auth::guard('users')->id()],
-                            ['is_published', $published]
+                            // ['is_published', $published]
                         ])
                         ->paginate($per_page);
         $data = $this->setupPagination($pagination, CorporateExamCollection::class)->data;
@@ -140,10 +140,51 @@ class CorporateExamController extends Controller
 
     /**
      * Display the specified resource.
+     * @OA\Get(
+     *     path="/corporate/exam/{exam}",
+     *     summary="Get an corporate exam by ID",
+     *     description="Fetch an corporate exam from(exam id)",
+     *     operationId="getCorporateExamById",
+     *     tags={"CorporateExams"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="exam",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the exam to fetch",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Corporate exam details",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=4),
+     *                 @OA\Property(property="title", type="string", example="corporate exam NO 51"),
+     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-07-09"),
+     *                 @OA\Property(property="start_time", type="string", format="time", example="10:00:00"),
+     *                 @OA\Property(property="end_time", type="string", format="time", example="14:00:00"),
+     *                 @OA\Property(property="description", type="string", example="lorem ipsum dolor"),
+     *                 @OA\Property(property="instructions", type="string", example="lorem ipsum dolor"),
+     *                 @OA\Property(property="is_published", type="integer", example=1),
+     *                 @OA\Property(property="duration", type="integer", example=120),
+     *                 @OA\Property(property="is_shuffled_question", type="boolean", example=false),
+     *                 @OA\Property(property="is_shuffled_option", type="boolean", example=false),
+     *                 @OA\Property(property="limit_attempts", type="integer", example=3)
+     *             ),
+     *             @OA\Property(property="message", type="string", example="corporate exam details")
+     *         )
+     *    )
+     * )
     */
-    public function show(CorporateExam $corporateExam)
+    public function show(CorporateExam $exam)
     {
-
+        // $this->itemBelongsToUser($corporateExam);
+        $data = new CorporateExamResource($exam);
+        return Response::apiSuccess('corporate exam details', $data);
     }
 
     /**

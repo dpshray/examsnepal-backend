@@ -15,8 +15,6 @@ return new class extends Migration
     {
         Schema::create('corporate_questions', function (Blueprint $table) {
             $table->id();
-            $table->integer('corporate_exam_id');
-            $table->foreign('corporate_exam_id')->references('id')->on('corporate_exams')->cascadeOnDelete()->cascadeOnUpdate();
             $table->integer('corporate_exam_section_id');
             $table->foreign('corporate_exam_section_id')->references('id')->on('corporate_exam_sections')->cascadeOnDelete()->cascadeOnUpdate();
             $table->text('question');

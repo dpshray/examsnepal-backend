@@ -19,6 +19,10 @@ class CorporateExamSectionResource extends JsonResource
             "id" => $this->id,
             "title" => $this->title,
             "detail" => $this->detail,
+            "total_questions" => 100,
+            "is_published" => (bool)$this->is_published,
+            "created_at" => $this->created_at,
+            "updated_at" => $this->updated_at,
         ];
     }
 }

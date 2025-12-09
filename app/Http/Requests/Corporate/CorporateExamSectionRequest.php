@@ -26,9 +26,6 @@ class CorporateExamSectionRequest extends FormRequest
             'detail' => 'required',
             'is_published' => 'nullable'
         ];
-        if (request()->isMethod('POST')) {
-            $rules['corporate_exam_id'] = 'required|exists:corporate_exams,id'; 
-        }
         return $rules;
     }
 }
