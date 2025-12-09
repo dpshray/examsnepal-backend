@@ -25,7 +25,7 @@ class CorporateQuestionRequest extends FormRequest
             //
             'question' => 'required|string',
             'description' => 'nullable|string',
-            'is_negative_marking' => 'required|boolean',
+            'is_negative_marking' => 'required',
             'negative_mark' => 'required_if:is_negative_marking,1|numeric',
             'full_marks' => 'required|numeric',
             'question_type' => 'required|in:MCQ,Subjective',
@@ -34,5 +34,13 @@ class CorporateQuestionRequest extends FormRequest
             'options.*.value' => 'required_with:options|boolean',
             'image' => 'nullable|image', // max 2MB
         ];
+    }
+    protected function prepareForValidation()
+    {
+        if ($this->has('is_negative_marking')) {
+            $this->merge([
+                'is_negative_marking' => filter_var($this->is_negative_marking, FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
+            ]);
+        }
     }
 }

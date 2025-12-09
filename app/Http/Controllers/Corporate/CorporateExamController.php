@@ -178,11 +178,12 @@ class CorporateExamController extends Controller
      *             @OA\Property(property="message", type="string", example="corporate exam details")
      *         )
      *    )
+     * )
     */
-    public function show(CorporateExam $corporateExam)
+    public function show(CorporateExam $exam)
     {
         // $this->itemBelongsToUser($corporateExam);
-        $data = new CorporateExamResource($corporateExam);
+        $data = new CorporateExamResource($exam);
         return Response::apiSuccess('corporate exam details', $data);
     }
 

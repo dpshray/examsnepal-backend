@@ -22,6 +22,10 @@ class CorporateQuestion extends Model implements HasMedia
         'full_marks',
         'question_type',
     ];
+    protected $casts = [
+    'is_negative_marking' => 'boolean',
+    'options' => 'array',
+];
 
     public function exam()
     {

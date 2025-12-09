@@ -17,7 +17,7 @@ class CorporateQuestionResource extends JsonResource
         // return parent::toArray($request);
         return [
             'id' => $this->id,
-            'section_id' => $this->section_id,
+            'section_id' => $this->corporate_exam_section_id,
             'question_type' => $this->question_type,
             'question' => $this->question,
             'description' => $this->description,

@@ -17,6 +17,6 @@ Route::prefix('corporate')->group(function(){
     Route::middleware('auth:users')->group(function(){
         Route::apiResource('exam', CorporateExamController::class);
         Route::apiResource('exam/section', CorporateExamSectionController::class);
-        Route::apiResource('exam/section/question', CorporateQuestionController::class);
+        Route::apiResource('exam/section.questions', CorporateQuestionController::class);
     });
 });
