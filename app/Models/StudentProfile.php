@@ -147,7 +147,7 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
             ->where('status', 1)
             ->where('payment_status', PaymentStatusEnum::PAYMENT_SUCCESS->value)
             ->whereDate('end_date', '>=', today())
-            ->latestOfMany();
+            ->orderBy('end_date', 'desc');
     }
 
     public function getIsSubscriptedAttribute()
