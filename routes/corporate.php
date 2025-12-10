@@ -4,6 +4,7 @@ use App\Http\Controllers\Corporate\CorporateAuthController;
 use App\Http\Controllers\Corporate\CorporateExamController;
 use App\Http\Controllers\Corporate\CorporateExamSectionController;
 use App\Http\Controllers\Corporate\CorporateQuestionController;
+use App\Http\Controllers\Corporate\Participant\CorporateParticipantController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('corporate')->group(function(){
@@ -18,5 +19,7 @@ Route::prefix('corporate')->group(function(){
         Route::apiResource('exam', CorporateExamController::class);
         Route::apiResource('exam.section', CorporateExamSectionController::class);
         Route::apiResource('exam/section.questions', CorporateQuestionController::class);
+        Route::apiResource('participants', CorporateParticipantController::class);
+        Route::post('participants/import', [CorporateParticipantController::class,'store_from_excel']);
     });
 });

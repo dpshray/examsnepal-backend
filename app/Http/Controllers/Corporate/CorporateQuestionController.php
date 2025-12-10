@@ -96,7 +96,7 @@ class CorporateQuestionController extends Controller
     {
         $per_page = $request->query('per_page', 12);
         $this->checkOwnership($section);
-        $questions = $section->questions()->paginate($per_page);
+        $questions = $section->questions()->with('options')->paginate($per_page);
         $data = $this->setupPagination($questions, CorporateQuestionCollection::class)->data;
         return  Response::apiSuccess('list of questions', $data);
     }
@@ -262,7 +262,7 @@ class CorporateQuestionController extends Controller
             if ($request->hasFile('image')) {
                 $question->addMediaFromRequest('image')->toMediaCollection(CorporateQuestion::QUESTION_IMAGE);
             }
-            if ($question->question_type === 'MCQ') {
+            if ($question->question_type === 'mcq' || $question->question_type === 'MCQ') {
                 $options = $data['options'] ?? [];
                 foreach ($options as $optionData) {
                     $question->options()->create($optionData);
@@ -277,8 +277,8 @@ class CorporateQuestionController extends Controller
         }
     }
     /**
-     * @OA\Put(
-     *     path="/corporate/exam/{section_id}/questions/{id}",
+     * @OA\Post(
+     *     path="/corporate/exam/section/{section_id}/questions/{id}",
      *     summary="Update an existing question",
      *     tags={"Corporate Exam Questions"},
      *
@@ -308,7 +308,7 @@ class CorporateQuestionController extends Controller
      *                 @OA\Property(property="negative_mark", type="number", example=1),
      *                 @OA\Property(property="full_marks", type="number", example=10),
      *                 @OA\Property(property="question_type", type="string", enum={"MCQ","Subjective"}, example="MCQ"),
-     *
+     *                 @OA\Property(property="_method", type="string", example="PATCH"),
      *                 @OA\Property(
      *                     property="options",
      *                     type="array",
@@ -345,7 +345,6 @@ class CorporateQuestionController extends Controller
      *                 @OA\Property(property="full_marks", type="number", example=10),
      *                 @OA\Property(property="is_negative_marking", type="boolean", example=true),
      *                 @OA\Property(property="negative_mark", type="number", example=1),
-     *
      *                 @OA\Property(
      *                     property="options",
      *                     type="array",
@@ -364,7 +363,7 @@ class CorporateQuestionController extends Controller
      * )
      */
 
-    function update(CorporateQuestionRequest $request, CorporateQuestion $question)
+    function update(CorporateQuestionRequest $request,CorporateExamSection $section, CorporateQuestion $question)
     {
         $data = $request->validated();
         $this->checkOwnership($question->section);
@@ -391,7 +390,7 @@ class CorporateQuestionController extends Controller
     }
     /**
      * @OA\Delete(
-     *     path="/corporate/exam/{section_id}/questions/{id}",
+     *     path="/corporate/exam/section/{section_id}/questions/{id}",
      *     summary="Delete a question",
      *     tags={"Corporate Exam Questions"},
      *
@@ -426,7 +425,7 @@ class CorporateQuestionController extends Controller
      * )
      */
 
-    function destroy(CorporateQuestion $question)
+    function destroy(CorporateExamSection $section, CorporateQuestion $question)
     {
         $this->checkOwnership($question->section);
         $question->delete();

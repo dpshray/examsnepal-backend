@@ -4152,7 +4152,7 @@
         "/corporate/exam/{exam}/section": {
             "get": {
                 "tags": [
-                    "corporateExamSection"
+                    "CorporateExamSection"
                 ],
                 "summary": "Fetch all exams of a corporate",
                 "description": "Fetch all exams of a corporate",
@@ -4271,7 +4271,7 @@
             },
             "post": {
                 "tags": [
-                    "corporateExamSection"
+                    "CorporateExamSection"
                 ],
                 "summary": "Create a new corporate exam",
                 "description": "Store a new corporate exam section in the database.",
@@ -4355,15 +4355,114 @@
                 ]
             }
         },
-        "/corporate/exam/section/{section}": {
+        "/corporate/exam/{exam}/section/{section}": {
+            "get": {
+                "tags": [
+                    "CorporateExamSection"
+                ],
+                "summary": "Get exam section details by ID",
+                "description": "Retrieve detailed information about a specific exam section.",
+                "operationId": "corporateExamSectionDetails",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "ID of the exam this section belongs to",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "section",
+                        "in": "path",
+                        "description": "ID of the exam section",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam section details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "corporate_exam_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Exam Section A-45"
+                                                },
+                                                "detail": {
+                                                    "type": "string",
+                                                    "example": "Detailed description of Exam Section A-45"
+                                                },
+                                                "is_published": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-01-01T12:00:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-01-02T12:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "exam section details"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "put": {
                 "tags": [
-                    "corporateExamSection"
+                    "CorporateExamSection"
                 ],
                 "summary": "Update an existing exam",
                 "description": "Update an exam's details in the database.",
                 "operationId": "corporateExamSectionUpdate",
                 "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "ID of the corporate exam to which the section belongs",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
                     {
                         "name": "section",
                         "in": "path",
@@ -4439,12 +4538,21 @@
             },
             "delete": {
                 "tags": [
-                    "corporateExamSection"
+                    "CorporateExamSection"
                 ],
                 "summary": "Delete an corporate exam by ID",
                 "description": "Delete an corporate exam from(exam id)",
                 "operationId": "corporateExamSectionDelete",
                 "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "ID of the exam to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
                     {
                         "name": "section",
                         "in": "path",
@@ -4481,7 +4589,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/corporate/exam/section/{section_id}/questions": {
@@ -4934,13 +5047,13 @@
                 }
             }
         },
-        "/corporate/exam/{section_id}/questions/{id}": {
-            "put": {
+        "/corporate/exam/section/{section_id}/questions/{id}": {
+            "post": {
                 "tags": [
                     "Corporate Exam Questions"
                 ],
                 "summary": "Update an existing question",
-                "operationId": "ccfaff8010dd28897ee4808c5839d42f",
+                "operationId": "e91c015c01ffe061339b04d661159ac8",
                 "parameters": [
                     {
                         "name": "section_id",
@@ -4995,6 +5108,10 @@
                                             "Subjective"
                                         ],
                                         "example": "MCQ"
+                                    },
+                                    "_method": {
+                                        "type": "string",
+                                        "example": "PATCH"
                                     },
                                     "options": {
                                         "type": "array",
@@ -5116,7 +5233,7 @@
                     "Corporate Exam Questions"
                 ],
                 "summary": "Delete a question",
-                "operationId": "3475f59c37d66d0b78c62c94d86214f6",
+                "operationId": "07e5ef33d5fc3cee9a3c3fa59a73da73",
                 "parameters": [
                     {
                         "name": "section_id",
@@ -5162,6 +5279,449 @@
                         "description": "Question not found"
                     }
                 }
+            }
+        },
+        "/corporate/participants/import": {
+            "post": {
+                "tags": [
+                    "Corporate Participants"
+                ],
+                "summary": "Import Participants from Excel",
+                "description": "Store participants from an Excel file.",
+                "operationId": "3bc338bc87824aa536352292f6050af3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "Excel file to upload (xlsx, xls)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Participants imported successfully from Excel",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Participants imported successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/participants": {
+            "get": {
+                "tags": [
+                    "Corporate Participants"
+                ],
+                "summary": "Get Participants",
+                "description": "Display a listing of the participants.",
+                "operationId": "79335ee3003775b837b5f0ce994da16e",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search term (name, phone, email)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Participants retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Participants retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "John Doe"
+                                                            },
+                                                            "phone": {
+                                                                "type": "string",
+                                                                "example": "9876543210"
+                                                            },
+                                                            "email": {
+                                                                "type": "string",
+                                                                "example": "john@example.com"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2025-01-01T10:00:00Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2025-01-02T10:00:00Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "pagination": {
+                                                    "properties": {
+                                                        "current_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "per_page": {
+                                                            "type": "integer",
+                                                            "example": 10
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 55
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 6
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Corporate Participants"
+                ],
+                "summary": "Create Participant",
+                "description": "Store a newly created participant in storage.",
+                "operationId": "226508a6d42553889f9ed8a0a80140a9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Participant created successfully from form",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/participants/{id}": {
+            "get": {
+                "tags": [
+                    "Corporate Participants"
+                ],
+                "summary": "Get Participant by ID",
+                "description": "Display the specified participant.",
+                "operationId": "20644becb2ad07cf6f4c7512464d38f6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Participant ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Participant retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Participant retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "9876543210"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "john.doe@example.com"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-01-01T10:00:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-01-02T10:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Corporate Participants"
+                ],
+                "summary": "Update Participant",
+                "description": "Update the specified participant in storage.",
+                "operationId": "41be968bf8c01a7ccb9bd42770595753",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Participant ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john.doe@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Participant updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Participant updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Corporate Participants"
+                ],
+                "summary": "Delete Participant",
+                "description": "Remove the specified participant from storage.",
+                "operationId": "412d6b3956ffff77fe1c9dc671002df4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Participant ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Participant deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Participant deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/doubt/student/solved": {
@@ -14363,12 +14923,16 @@
             "description": "CorporateExams"
         },
         {
-            "name": "corporateExamSection",
-            "description": "corporateExamSection"
+            "name": "CorporateExamSection",
+            "description": "CorporateExamSection"
         },
         {
             "name": "Corporate Exam Questions",
             "description": "Corporate Exam Questions"
+        },
+        {
+            "name": "Corporate Participants",
+            "description": "Corporate Participants"
         },
         {
             "name": "Doubts",

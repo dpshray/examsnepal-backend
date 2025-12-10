@@ -28,7 +28,7 @@ class CorporateQuestionRequest extends FormRequest
             'is_negative_marking' => 'required',
             'negative_mark' => 'required_if:is_negative_marking,1|numeric',
             'full_marks' => 'required|numeric',
-            'question_type' => 'required|in:MCQ,Subjective',
+            'question_type' => 'required|in:MCQ,Subjective,mcq,subjective',
             'options' => 'required_if:question_type,MCQ|array|min:2|max:5',
             'options.*.option' => 'required_with:options|string',
             'options.*.value' => 'required_with:options|boolean',
