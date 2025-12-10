@@ -23,6 +23,7 @@ return new class extends Migration
             $table->boolean('is_shuffled_option')->default(false)->after('instructions');
             $table->integer('limit_attempts')->nullable()->after('is_published');
             $table->dropColumn('uuid');
+            $table->string('exam_type')->nullable()->after('is_published');
             $table->boolean('is_published')->default(false)->change();
         });
     }
@@ -44,6 +45,7 @@ return new class extends Migration
             $table->dropColumn('is_shuffled_option');
             $table->dropColumn('limit_attempts');
             $table->uuid();
+            $table->string('exam_type')->after('is_published');
             $table->boolean('is_published')->default(true)->change();
         });
     }

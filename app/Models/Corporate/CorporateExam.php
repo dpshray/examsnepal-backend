@@ -23,7 +23,8 @@ class CorporateExam extends Model
         'duration',
         'is_shuffled_question',
         'is_shuffled_option',
-        'limit_attempts'
+        'limit_attempts',
+        'exam_type',
     ];
 
     protected $dates = ['deleted_at']; // mark this column as a date

@@ -26,13 +26,14 @@ class CorporateExamRequest extends FormRequest
             'exam_date' => 'nullable|date_format:Y-m-d',
             'start_time' => 'nullable|date_format:H:i',
             'end_time' => 'nullable|date_format:H:i',
-            'is_published' => 'required|in:0,1',
+            'is_published' => 'sometimes|nullable|in:0,1',
             'description' => 'nullable|sometimes|string',
             'instructions' => 'nullable|sometimes|string',
             'duration' => 'nullable|sometimes|integer',
             'is_shuffled_question' => 'nullable|sometimes|boolean',
             'is_shuffled_option' => 'nullable|sometimes|boolean',
             'limit_attempts' => 'nullable|sometimes|integer',
+            'exam_type' => 'required|sometimes|string',
         ];
     }
 }
