@@ -11,6 +11,8 @@ class Participant extends Model
         'name',
         'username',
         'email',
+        'phone',
         'password',
+        'corporate_id',
     ];
 }

@@ -24,7 +24,7 @@ class CorporateQuestion extends Model implements HasMedia
     ];
     protected $casts = [
     'is_negative_marking' => 'boolean',
-    'options' => 'array',
+    // 'options' => 'array',
 ];
 
     public function exam()
@@ -37,7 +37,7 @@ class CorporateQuestion extends Model implements HasMedia
         return $this->belongsTo(CorporateExamSection::class, 'corporate_exam_section_id');
     }
     public function options(){
-        return $this->hasMany(CorporateQuestionOption::class);
+        return $this->hasMany(CorporateQuestionOption::class,'corporate_question_id');
     }
     public function registerMediaCollections(): void
     {

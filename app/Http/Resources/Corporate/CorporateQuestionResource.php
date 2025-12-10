@@ -26,15 +26,18 @@ class CorporateQuestionResource extends JsonResource
             'negative_marks' => $this->negative_mark,
             'is_negative_marking' => (bool)$this->is_negative_marking,
             'image_url' => $this->getFirstMediaUrl(CorporateQuestion::QUESTION_IMAGE) ?: null,
-            'options' => $this->when($this->question_type === 'MCQ', function () {
-                return $this->options->map(function ($option) {
-                    return [
-                        'id' => $option->id,
-                        'option' => $option->option,
-                        'value' => $option->value,
-                    ];
-                });
-            }),
+            'options' => $this->when(
+                strtolower($this->question_type) === 'mcq',
+                function () {
+                    return $this->options?->map(function ($option) {
+                        return [
+                            'id' => $option->id,
+                            'option' => $option->option,
+                            'value' => $option->value,
+                        ];
+                    }) ?? [];
+                }
+            ),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

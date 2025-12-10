@@ -27,7 +27,7 @@ class CorporateExamSectionController extends Controller
      *     summary="Fetch all exams of a corporate",
      *     description="Fetch all exams of a corporate",
      *     operationId="CorporateExamsSectionList",
-     *     tags={"corporateExamSection"},
+     *     tags={"CorporateExamSection"},
      *     security={{"bearerAuth": {}}},
      *     @OA\Parameter(
      *         name="exam",
@@ -99,7 +99,7 @@ class CorporateExamSectionController extends Controller
      *     summary="Create a new corporate exam",
      *     description="Store a new corporate exam section in the database.",
      *     operationId="corporateExamSectionCreate",
-     *     tags={"corporateExamSection"},
+     *     tags={"CorporateExamSection"},
      *     security={{"bearerAuth":{}}},
      *    @OA\Parameter(
      *        name="exam",
@@ -141,10 +141,56 @@ class CorporateExamSectionController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @OA\Get(
+     *     path="/corporate/exam/{exam}/section/{section}",
+     *     summary="Get exam section details by ID",
+     *     description="Retrieve detailed information about a specific exam section.",
+     *     operationId="corporateExamSectionDetails",
+     *     tags={"CorporateExamSection"},
+     *     security={{"bearerAuth": {}}},
+     *
+     *     @OA\Parameter(
+     *         name="exam",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the exam this section belongs to",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="section",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the exam section",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Exam section details retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=10),
+     *                 @OA\Property(property="corporate_exam_id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Exam Section A-45"),
+     *                 @OA\Property(property="detail", type="string", example="Detailed description of Exam Section A-45"),
+     *                 @OA\Property(property="is_published", type="integer", example=1),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T12:00:00Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-02T12:00:00Z")
+     *             ),
+     *             @OA\Property(property="message", type="string", example="exam section details")
+     *         )
+     *     )
+     * )
      */
-    public function show(CorporateExamSection $section)
+    public function show(CorporateExam $exam, CorporateExamSection $section)
     {
-
+        $this->itemBelongsToUser($section->exam);
+        $data = new CorporateExamSectionResource($section);
+        return Response::apiSuccess("exam section details", $data);
     }
 
     /**
@@ -152,12 +198,19 @@ class CorporateExamSectionController extends Controller
      */
     /**
      * @OA\Put(
-     *     path="/corporate/exam/section/{section}",
+     *     path="/corporate/exam/{exam}/section/{section}",
      *     summary="Update an existing exam",
      *     description="Update an exam's details in the database.",
      *     operationId="corporateExamSectionUpdate",
-     *     tags={"corporateExamSection"},
+     *     tags={"CorporateExamSection"},
      *     security={{"bearerAuth": {}}},
+     *    @OA\Parameter(
+     *        name="exam",
+     *       in="path",
+     *   required=true,
+     *   description="ID of the corporate exam to which the section belongs",
+     *   @OA\Schema(type="integer")
+     *   ),
      *     @OA\Parameter(
      *         name="section",
      *         in="path",
@@ -186,10 +239,9 @@ class CorporateExamSectionController extends Controller
      *     )
      * )
      */
-    public function update(CorporateExamSectionRequest $request, CorporateExamSection $section)
+    public function update(CorporateExamSectionRequest $request, CorporateExam $exam, CorporateExamSection $section)
     {
         $this->itemBelongsToUser($section->exam);
-
         $form_data = $request->validated();
         $section->update($form_data);
         return Response::apiSuccess('exam section updated');
@@ -200,11 +252,19 @@ class CorporateExamSectionController extends Controller
      */
     /**
      * @OA\Delete(
-     *     path="/corporate/exam/section/{section}",
+     *     path="/corporate/exam/{exam}/section/{section}",
      *     summary="Delete an corporate exam by ID",
      *     description="Delete an corporate exam from(exam id)",
      *     operationId="corporateExamSectionDelete",
-     *     tags={"corporateExamSection"},
+     *     tags={"CorporateExamSection"},
+     *    security={{"bearerAuth": {}}},
+     *    @OA\Parameter(
+     *        name="exam",
+     *       in="path",
+     *   required=true,
+     *    description="ID of the exam to delete",
+     *    @OA\Schema(type="integer")
+     *    ),
      *     @OA\Parameter(
      *         name="section",
      *         in="path",
@@ -223,14 +283,15 @@ class CorporateExamSectionController extends Controller
      *     )
      * )
      */
-    public function destroy(CorporateExamSection $section)
+    public function destroy(CorporateExam $exam, CorporateExamSection $section)
     {
         $this->itemBelongsToUser($section->exam);
         $section->delete();
         return Response::apiSuccess('exam section deleted');
     }
 
-    private function itemBelongsToUser(CorporateExam $exam){
+    private function itemBelongsToUser(CorporateExam $exam)
+    {
         if ($exam->corporate->isNot(Auth::guard('users')->user())) {
             throw new AuthorizationException('You do not have permission to do this.');
         }
