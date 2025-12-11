@@ -10,6 +10,7 @@ use App\Models\Corporate\CorporateExamSection;
 use App\Models\Corporate\CorporateQuestion;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
@@ -433,7 +434,10 @@ class CorporateQuestionController extends Controller
     }
     private function checkOwnership(CorporateExamSection $section)
     {
-        if (auth()->id() !== $section->exam->corporate_id) {
+        $user=Auth::user();
+        Log::info('Authenticated user ID: ' . $user->id);
+        Log::info('Exam corporate ID: ' . $section->exam->corporate_id);
+        if ($user->id !== $section->exam->corporate_id) {
             abort(403, 'Unauthorized: You do not own this exam.');
         }
     }

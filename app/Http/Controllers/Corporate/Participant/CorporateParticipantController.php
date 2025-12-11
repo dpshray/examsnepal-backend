@@ -72,14 +72,13 @@ class CorporateParticipantController extends Controller
         foreach ($rows as $index => $row) {
             if ($index === 0) continue; // skip header
 
-           $p = Participant::create([
+            $p = Participant::create([
                 'corporate_id' => $user->id,
                 'name'     => $row[0] ?? null,
                 'phone' => $row[1] ?? null,
                 'email'    => $row[2] ?? null,
                 'password' => isset($row[3]) ? Hash::make($row[3]) : null,
             ]);
-
         }
 
         return Response::apiSuccess('Participants imported successfully from Excel');
@@ -323,5 +322,52 @@ class CorporateParticipantController extends Controller
             'password' => isset($data['password']) ? Hash::make($data['password']) : $participant->password,
         ]);
         return Response::apiSuccess('Participant updated successfully');
+    }
+    /**
+     * Bulk delete participants.
+     *
+     * @OA\Delete(
+     *   path="/corporate/participants/bulk-delete",
+     *   summary="Bulk Delete Participants",
+     *   tags={"Corporate Participants"},
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"ids"},
+     *       @OA\Property(
+     *         property="ids",
+     *         type="array",
+     *         @OA\Items(
+     *           type="integer",
+     *           example=1
+     *         )
+     *       )
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Participants deleted successfully"
+     *   ),
+     *   @OA\Response(
+     *     response=422,
+     *     description="Validation error"
+     *   )
+     * )
+     */
+    function bulk_delete(Request $request)
+    {
+        $user = Auth::user();
+        $data = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:participants,id',
+        ]);
+        foreach ($data['ids'] as $id) {
+            $participant = Participant::find($id);
+            if ($participant && $participant->corporate_id == $user->id) {
+                $participant->delete();
+            }
+        }
+        return Response::apiSuccess('Participants deleted successfully');
     }
 }

@@ -26,7 +26,7 @@ class ParticipantRequest extends FormRequest
             'name'     => 'required|string|max:255',
             'phone'=> 'nullable|string|max:20',
             'email'    => 'required|email',
-            'password' => 'required|string|min:6',
+            'password' => 'nullable|sometimes|string|min:6',
         ];
     }
 }

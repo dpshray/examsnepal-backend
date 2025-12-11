@@ -2,12 +2,17 @@
 
 namespace App\Models\Corporate;
 
+use App\Traits\SlugTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class CorporateExamSection extends Model
 {
-    protected $fillable = ['corporate_exam_id', 'title', 'detail','is_published'];
-
+    use SlugTrait;
+    protected $fillable = ['corporate_exam_id', 'title', 'slug','detail','is_published'];
+    public function slugSource()
+    {
+        return 'title';
+    }
     public function exam(){
         return $this->belongsTo(CorporateExam::class, 'corporate_exam_id');
     }
