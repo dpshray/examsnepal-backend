@@ -2,18 +2,22 @@
 
 namespace App\Models\Corporate;
 
+use App\Models\Participant;
+use App\Models\ParticipantExam;
 use App\Models\Traits\Uuid;
 use App\Models\User;
+use App\Traits\SlugTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CorporateExam extends Model
 {
-    use  SoftDeletes; // use the trait
+    use  SoftDeletes,SlugTrait; // use the trait
     protected $fillable =
     [
         'corporate_id',
         'title',
+        'slug',
         'exam_date',
         'start_time',
         'end_time',
@@ -26,6 +30,11 @@ class CorporateExam extends Model
         'limit_attempts',
         'exam_type',
     ];
+
+    public function slugSource()
+    {
+        return 'title';
+    }
 
     protected $dates = ['deleted_at']; // mark this column as a date
 
@@ -51,5 +60,15 @@ class CorporateExam extends Model
     public function questions()
     {
         return $this->hasMany(CorporateQuestion::class);
+    }
+    public function participants()
+    {
+        return $this->belongsToMany(
+            Participant::class,
+            'participant_exams',
+            'corporate_exam_id',
+            'participant_id'
+        )
+        ->withPivot('id');
     }
 }

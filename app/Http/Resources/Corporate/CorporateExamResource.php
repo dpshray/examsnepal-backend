@@ -18,6 +18,7 @@ class CorporateExamResource extends JsonResource
         return [
             "id" => $this->id,
             "title" => $this->title,
+            "slug"=>$this->slug,
             "exam_date" => $this->exam_date,
             "start_time" => $this->start_time,
             "end_time" => $this->end_time,
