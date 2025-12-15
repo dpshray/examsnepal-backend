@@ -18,8 +18,9 @@ class CorporateExamSectionResource extends JsonResource
         return [
             "id" => $this->id,
             "title" => $this->title,
+            "slug"=>$this->slug,
             "detail" => $this->detail,
-            "total_questions" => 100,
+            "total_questions" => $this->whenCounted('questions'),
             "is_published" => (bool)$this->is_published,
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,

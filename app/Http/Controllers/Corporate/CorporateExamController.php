@@ -81,14 +81,25 @@ class CorporateExamController extends Controller
      */
     public function index(Request $request)
     {
-        $per_page = $request->query('per_page',12);
+        $per_page = $request->query('per_page', 12);
         // $published = $request->query('published',1);
-        $pagination = CorporateExam::withCount('sections')
-                        ->where([
-                            ['corporate_id', Auth::guard('users')->id()],
-                            // ['is_published', $published]
-                        ])
-                        ->paginate($per_page);
+        $pagination = CorporateExam::withCount([
+            'sections',
+            'participants',
+            'sections as questions_count' => function ($q) {
+                $q->join(
+                    'corporate_questions',
+                    'corporate_exam_sections.id',
+                    '=',
+                    'corporate_questions.corporate_exam_section_id'
+                );
+            }
+        ])
+            ->where([
+                ['corporate_id', Auth::guard('users')->id()],
+                // ['is_published', $published]
+            ])
+            ->paginate($per_page);
         $data = $this->setupPagination($pagination, CorporateExamCollection::class)->data;
         return Response::apiSuccess("corporate exam list", $data);
     }
@@ -179,7 +190,7 @@ class CorporateExamController extends Controller
      *         )
      *    )
      * )
-    */
+     */
     public function show(CorporateExam $exam)
     {
         // $this->itemBelongsToUser($corporateExam);
@@ -189,7 +200,7 @@ class CorporateExamController extends Controller
 
     /**
      * Update the specified resource in storage.
-    */
+     */
     /**
      * @OA\Put(
      *     path="/corporate/exam/{exam}",
@@ -277,7 +288,8 @@ class CorporateExamController extends Controller
         return Response::apiSuccess('corporate exam deleted');
     }
 
-    private function itemBelongsToUser(CorporateExam $corporate_exam){
+    private function itemBelongsToUser(CorporateExam $corporate_exam)
+    {
         if ($corporate_exam->corporate->isNot(Auth::guard('users')->user())) {
             throw new AuthorizationException('You do not have permission to do this.');
         }

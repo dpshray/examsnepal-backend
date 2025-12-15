@@ -85,7 +85,7 @@ class CorporateExamSectionController extends Controller
 
         $per_page = $request->query('per_page', 12);
         // $published = $request->query('published', 1);
-        $pagination = $exam->sections()->paginate($per_page);
+        $pagination = $exam->sections()->withCount('questions')->paginate($per_page);
         $data = $this->setupPagination($pagination, CorporateExamSectionCollection::class)->data;
         return Response::apiSuccess("corporate section of exam: {$exam->title}", $data);
     }

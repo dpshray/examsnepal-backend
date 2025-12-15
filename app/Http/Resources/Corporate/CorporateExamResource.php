@@ -30,9 +30,9 @@ class CorporateExamResource extends JsonResource
             "is_shuffled_option" => $this->is_shuffled_option,
             "attempts" => $this->limit_attempts ? true : false,
             "limit_attempts" => $this->limit_attempts,
-            "participant_count" => rand(100, 1000),
-            "section_count" => rand(100,1000),
-            "question_count" => $this->whenCounted('sections'),
+            "participant_count" => $this->whenCounted('participants'),
+            "section_count" => $this->whenCounted('sections'),
+            "question_count" => $this->whenCounted('questions'),
             "exam_type" => $this->exam_type,
         ];
     }
