@@ -22,7 +22,7 @@ class StudentExamRegisterController extends Controller
      * Register a student for a public exam (no login required).
      *
      * @OA\Post(
-     *     path="/exams/{exam}/register-public",
+     *     path="/exam/{exam}/register-public",
      *     summary="Register student for public exam",
      *     tags={"Corporate Exams Auth"},
      *

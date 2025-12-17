@@ -25,4 +25,8 @@ class CorporateExamSection extends Model
     {
         return $this->hasMany(CorporateQuestion::class);
     }
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }

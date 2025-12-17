@@ -13,10 +13,6 @@
         {
             "url": "http://192.168.100.18:8000/api/",
             "description": "Localhost API Server 2"
-        },
-        {
-            "url": "http://192.168.100.23:8008/api/",
-            "description": "Localhost API Server 2"
         }
     ],
     "paths": {
@@ -13628,14 +13624,70 @@
                 }
             }
         },
-        "/exams/{exam}/register-public": {
+        "/students/me/exams/scores": {
+            "get": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Get student overall exam score results.",
+                "description": "Get student overall exam score results.",
+                "operationId": "StudentOverscoreReport",
+                "responses": {
+                    "200": {
+                        "description": "Student overall exam score results.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "exam_name": {
+                                                        "type": "string",
+                                                        "example": "MDMS CEE Revision all Subject"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "FREE_QUIZ"
+                                                    },
+                                                    "total_question_count": {
+                                                        "type": "integer",
+                                                        "example": 30
+                                                    },
+                                                    "correct_answer_count": {
+                                                        "type": "integer",
+                                                        "example": 22
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Student overall exam score results."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/exam/{exam}/register-public": {
             "post": {
                 "tags": [
                     "Corporate Exams Auth"
                 ],
                 "summary": "Register student for public exam",
                 "description": "Register a student for a public exam (no login required).",
-                "operationId": "2cd8bcb5f449d568e33aba829b61cf68",
+                "operationId": "27517a6d85bf3d9e6064338bcf3837d3",
                 "parameters": [
                     {
                         "name": "exam",
@@ -13709,10 +13761,6 @@
                                                 },
                                                 "type": "object"
                                             }
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Student overall exam score results."
                                         }
                                     },
                                     "type": "object"
@@ -13872,23 +13920,23 @@
                 ]
             }
         },
-        "/student/exams/{slug}/intro": {
+        "/exams/{exams}/examsdetail": {
             "get": {
                 "tags": [
-                    " Corporate Student Exam"
+                    "Corporate Student Exam"
                 ],
                 "summary": "Get exam intro and sections",
                 "description": "Get exam introduction and sections.",
-                "operationId": "e75dc78ce1ac40fece25f4387e03d7c9",
+                "operationId": "b1e0634fcebcb41459f3cb6e0f381315",
                 "parameters": [
                     {
-                        "name": "slug",
+                        "name": "exams",
                         "in": "path",
                         "description": "Exam slug",
                         "required": true,
                         "schema": {
                             "type": "string",
-                            "example": "php-basic-test"
+                            "example": ""
                         }
                     }
                 ],
@@ -13961,14 +14009,14 @@
                 ]
             }
         },
-        "/student/exams/{exam}/sections/{section}/start": {
+        "/exam/{exam}/section/{section}/startexam": {
             "post": {
                 "tags": [
                     "Corporate Student Exam"
                 ],
                 "summary": "Start a section exam attempt",
                 "description": "Start exam section attempt.",
-                "operationId": "3fe5d4b1510066f77291941b02a2ed9d",
+                "operationId": "9e97cd5b0640b1cf1cadf11327fef2d1",
                 "parameters": [
                     {
                         "name": "exam",
@@ -14055,14 +14103,14 @@
                 ]
             }
         },
-        "/student/exams/attempts/{attempt_id}/questions": {
+        "/get-question/{attempt_id}": {
             "get": {
                 "tags": [
-                    "CorporateStudent Exam"
+                    "Corporate Student Exam"
                 ],
                 "summary": "Get questions for an active exam attempt",
                 "description": "Get questions for an exam attempt.",
-                "operationId": "1c04eca02a270a2897e5d4c6154488ce",
+                "operationId": "e0550a194150fff4376d7ee9c5027322",
                 "parameters": [
                     {
                         "name": "attempt_id",
@@ -15898,16 +15946,8 @@
             "description": "Corporate Exams Auth"
         },
         {
-            "name": " Corporate Student Exam",
-            "description": " Corporate Student Exam"
-        },
-        {
             "name": "Corporate Student Exam",
             "description": "Corporate Student Exam"
-        },
-        {
-            "name": "CorporateStudent Exam",
-            "description": "CorporateStudent Exam"
         },
         {
             "name": "Subjects",

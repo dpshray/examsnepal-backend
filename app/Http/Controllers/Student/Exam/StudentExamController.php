@@ -36,17 +36,17 @@ class StudentExamController extends Controller
      * Get exam introduction and sections.
      *
      * @OA\Get(
-     *     path="/student/exams/{slug}/intro",
+     *     path="/exams/{exams}/examsdetail",
      *     summary="Get exam intro and sections",
-     *     tags={" Corporate Student Exam"},
+     *     tags={"Corporate Student Exam"},
      *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
-     *         name="slug",
+     *         name="exams",
      *         in="path",
      *         required=true,
      *         description="Exam slug",
-     *         @OA\Schema(type="string", example="php-basic-test")
+     *         @OA\Schema(type="string", example="")
      *     ),
      *
      *     @OA\Response(
@@ -134,7 +134,7 @@ class StudentExamController extends Controller
      * Start exam section attempt.
      *
      * @OA\Post(
-     *     path="/student/exams/{exam}/sections/{section}/start",
+     *     path="/exam/{exam}/section/{section}/startexam",
      *     summary="Start a section exam attempt",
      *     tags={"Corporate Student Exam"},
      *     security={{"bearerAuth":{}}},
@@ -253,9 +253,9 @@ class StudentExamController extends Controller
      * Get questions for an exam attempt.
      *
      * @OA\Get(
-     *     path="/student/exams/attempts/{attempt_id}/questions",
+     *     path="/get-question/{attempt_id}",
      *     summary="Get questions for an active exam attempt",
-     *     tags={"CorporateStudent Exam"},
+     *     tags={"Corporate Student Exam"},
      *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
@@ -347,27 +347,33 @@ class StudentExamController extends Controller
             ->with(['options', 'studentAnswers' => function ($query) use ($attempt_id) {
                 $query->where('exam_attempts_id', $attempt_id);
             }]);
-        //if exam question suffled is on
+
+        // If exam question shuffled is on
         if ($exam->is_shuffled_question) {
             $questionsQuery->inRandomOrder($attempt->id);
         }
         $questions = $questionsQuery->paginate($per_page);
-        //if question option suffled is no
-        if ($questions->question_type === 'mcq' && $exam->is_shuffled_option) {
+
+        // If question option shuffled is on
+        if ($exam->is_shuffled_option) {
             $questions->getCollection()->transform(function ($question) use ($attempt) {
-                // Create a unique seed for each question using attempt_id + question_id
-                // This ensures the same shuffle order every time for consistency
-                $seed = crc32($attempt->id . '_' . $question->id);
+                // Only shuffle for MCQ/objective type questions
+                if ($question->question_type === 'mcq' || $question->question_type === 'objective') {
+                    // Create a unique seed for each question using attempt_id + question_id
+                    // This ensures the same shuffle order every time for consistency
+                    $seed = crc32($attempt->id . '_' . $question->id);
 
-                // Shuffle options with seed
-                $options = $question->options->shuffle($seed);
+                    // Shuffle options with seed
+                    $options = $question->options->shuffle($seed);
 
-                // Replace the options collection with shuffled one
-                $question->setRelation('options', $options);
+                    // Replace the options collection with shuffled one
+                    $question->setRelation('options', $options);
+                }
 
                 return $question;
             });
         }
+
         $data = $this->setupPagination($questions, StudentExamQuestionCollection::class)->data;
         return Response::apiSuccess("section question list", $data);
     }
