@@ -47,7 +47,7 @@ require __DIR__.'/corporate.php';
 require __DIR__.'/payment.php';
 require __DIR__.'/teacher.php';
 
-Route::get('exam-options/{exam}', function(\App\Models\Exam $exam){
+/* Route::get('exam-options/{exam}', function(\App\Models\Exam $exam){
     $options = $exam->questions()->with('options')->paginate();
     return response()->json($options);
 });
@@ -82,7 +82,7 @@ Route::get('all-exams-list', function(Request $request){
         ->orderBy('id','DESC')
         ->paginate($per_page);
     return response()->json($rows);
-});
+}); */
 
 // Registration route
 Route::post('/register', [AuthController::class, 'register']);
