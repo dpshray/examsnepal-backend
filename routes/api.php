@@ -127,6 +127,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
     Route::delete('student-account-removal/{student}', [StudentProfileController::class, 'permanentStudentRemoveAccount']);
 
     Route::get('get-student-performance-data', [StudentProfileController::class, 'studentPerformanceReport']);
+    Route::get('/students/me/exams/scores', [StudentProfileController::class, 'myExamScores']);
 
     Route::get('/student/questions', [ForumController::class, 'fetchQuestions']);
     Route::get('/student/questions/answer/{id}', [ForumController::class, 'question_answer']);

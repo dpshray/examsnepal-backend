@@ -13,6 +13,10 @@
         {
             "url": "http://192.168.100.18:8000/api/",
             "description": "Localhost API Server 2"
+        },
+        {
+            "url": "http://192.168.100.23:8008/api/",
+            "description": "Localhost API Server 2"
         }
     ],
     "paths": {
@@ -13525,6 +13529,81 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Infant information has been updated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/students/me/exams/scores": {
+            "get": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Get student overall exam score results.",
+                "description": "Get student overall exam score results.",
+                "operationId": "StudentOverscoreReport",
+                "responses": {
+                    "200": {
+                        "description": "Performance data for user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "exams_given": {
+                                                                "type": "integer",
+                                                                "example": 51
+                                                            },
+                                                            "total_questions": {
+                                                                "type": "integer",
+                                                                "example": 7340
+                                                            },
+                                                            "correct_answers": {
+                                                                "type": "integer",
+                                                                "example": 3553
+                                                            },
+                                                            "exam_type": {
+                                                                "type": "string",
+                                                                "example": "MOCK_TEST"
+                                                            },
+                                                            "average_score": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 48.41
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "total_average_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 49.01
+                                                },
+                                                "total_exams": {
+                                                    "type": "integer",
+                                                    "example": 2129
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "performance data for user : Sandy"
                                         }
                                     },
                                     "type": "object"

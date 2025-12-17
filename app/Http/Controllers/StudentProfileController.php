@@ -15,6 +15,7 @@ use Illuminate\Validation\ValidationException;
 use App\Enums\ExamTypeEnum;
 use App\Enums\RequestedFromEnum;
 use App\Http\Resources\Student\AllStudentResource;
+use App\Http\Resources\Student\Exam\StudentAllExamScoreDetailResource;
 use App\Http\Resources\StudentProfileResource;
 use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Log;
@@ -772,5 +773,57 @@ class StudentProfileController extends Controller
             Log::error($e);
             return Response::apiError('An error occured.', 401);
         }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/students/me/exams/scores",
+     *     summary="Get student overall exam score results.",
+     *     description="Get student overall exam score results.",
+     *     operationId="StudentOverscoreReport",
+     *     tags={"Students"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Performance data for user",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="exams_given", type="integer", example=51),
+     *                         @OA\Property(property="total_questions", type="integer", example=7340),
+     *                         @OA\Property(property="correct_answers", type="integer", example=3553),
+     *                         @OA\Property(property="exam_type", type="string", example="MOCK_TEST"),
+     *                         @OA\Property(property="average_score", type="number", format="float", example=48.41)
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="total_average_score", type="number", format="float", example=49.01),
+     *                 @OA\Property(property="total_exams", type="integer", example=2129)
+     *             ),
+     *             @OA\Property(property="message", type="string", example="performance data for user : Sandy")
+     *         )
+     *     )
+     * )
+     */
+    function myExamScores() {
+        $exams_score = StudentProfile::where('id', Auth::id())
+            ->has('student_exams')
+            ->with(['student_exams' => function ($q) {
+                $q->with([
+                    'exam',
+                    // 'answers' => fn($qr) => $qr->where('is_correct',1)
+                ])
+                ->withCount([
+                    'answers as total_question_count',
+                    'answers as correct_answer_count' => fn($q) => $q->where('is_correct', 1)
+                ]);
+            }])
+            ->firstOrFail();
+        $scores = new StudentAllExamScoreDetailResource($exams_score);
+        return Response::apiSuccess('Student overall exam score results.', $scores);
     }
 }
