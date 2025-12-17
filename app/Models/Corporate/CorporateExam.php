@@ -71,4 +71,8 @@ class CorporateExam extends Model
         )
         ->withPivot('id');
     }
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models\Corporate;
 
+use App\Models\StudentAnswer;
 use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
@@ -38,6 +39,10 @@ class CorporateQuestion extends Model implements HasMedia
     }
     public function options(){
         return $this->hasMany(CorporateQuestionOption::class,'corporate_question_id');
+    }
+    public function studentAnswers()
+    {
+        return $this->hasMany(StudentAnswer::class, 'question_id');
     }
     public function registerMediaCollections(): void
     {

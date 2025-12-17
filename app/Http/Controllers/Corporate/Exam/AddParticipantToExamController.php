@@ -9,8 +9,12 @@ use App\Models\Participant;
 use App\Models\ParticipantExam;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\Rules\Exists;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AddParticipantToExamController extends Controller
 {
@@ -29,7 +33,7 @@ class AddParticipantToExamController extends Controller
      *         in="path",
      *         required=true,
      *         description="ID of the corporate exam",
-     *         @OA\Schema(type="integer", example=1)
+     *         @OA\Schema(type="string", example="")
      *     ),
      *     @OA\Parameter(
      *         name="per_page",
@@ -84,7 +88,7 @@ class AddParticipantToExamController extends Controller
      *         in="path",
      *         required=true,
      *         description="ID of the corporate exam",
-     *         @OA\Schema(type="integer", example=1)
+     *         @OA\Schema(type="string", example="")
      *     ),
      *     @OA\RequestBody(
      *         required=true,
@@ -132,36 +136,174 @@ class AddParticipantToExamController extends Controller
         return Response::apiSuccess('Participants add successfully to exam');
     }
     /**
-     * Remove a participant from a corporate exam.
+     * Remove participants from a corporate exam (bulk delete).
      *
      * @OA\Delete(
-     *     path="/corporate/exams/participants/{pexam}",
-     *     summary="Delete a participant from a corporate exam",
+     *     path="/corporate/exams/participants",
+     *     summary="Remove participants from a corporate exam",
      *     tags={"Corporate Exams Participants"},
      *     security={{"bearerAuth":{}}},
-     *     @OA\Parameter(
-     *         name="pexam",
-     *         in="path",
+     *
+     *     @OA\RequestBody(
      *         required=true,
-     *         description="ID of the participant_exam pivot record",
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Participant removed successfully",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Participants has been deleted from exam")
+     *             required={"ids"},
+     *             @OA\Property(
+     *                 property="ids",
+     *                 type="array",
+     *                 description="Array of participant_exam pivot IDs",
+     *                 @OA\Items(type="string", example="")
+     *             )
      *         )
      *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Participants removed successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Participants has been deleted from exam"
+     *             )
+     *         )
+     *     ),
+     *
      *     @OA\Response(
      *         response=404,
-     *         description="ParticipantExam record not found"
+     *         description="One or more ParticipantExam records not found"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
      *     )
      * )
      */
-    function destroy(ParticipantExam $pexam)
+    function destroy(Request $request)
     {
-        $pexam->delete();
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:participant_exams,id',
+        ]);
+
+        ParticipantExam::whereIn('id', $request->ids)->delete();
+
         return Response::apiSuccess('Participants has been deleted from exam');
+    }
+
+    /**
+     * Bulk upload participants and add them to a corporate exam.
+     *
+     * @OA\Post(
+     *     path="/corporate/exams/{exam}/bulk-upload-participants",
+     *     summary="Bulk upload participants and add them to an exam",
+     *     tags={"Corporate Exams Participants"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="exam",
+     *         in="path",
+     *         required=true,
+     *         description="Corporate Exam slug",
+     *         @OA\Schema(type="string", example="")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"file"},
+     *                 @OA\Property(
+     *                     property="file",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="Excel or CSV file (name, phone, email, password)"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Participants uploaded and added to exam successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Participants uploaded and added to exam successfully"
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
+
+    public function bulk_upload_in_exam(Request $request, CorporateExam $exam)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        $file = $request->file('file')->getRealPath();
+        $spreadsheet = IOFactory::load($file);
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray();
+
+        DB::transaction(function () use ($rows, $exam, $user) {
+
+            foreach ($rows as $index => $row) {
+
+                if ($index === 0) continue; // skip header
+
+                $email = $row[2] ?? null;
+                if (!$email) continue;
+
+
+                //Find or Create Participant
+                $participant = Participant::firstOrCreate(
+                    [
+                        'corporate_id' => $user->id,
+                        'email'        => $email,
+                    ],
+                    [
+                        'name'     => $row[0] ?? null,
+                        'phone'    => $row[1] ?? null,
+                        'password' => isset($row[3]) ? Hash::make($row[3]) : null,
+                    ]
+                );
+
+
+                //Check if participant already added to exam
+
+                $alreadyAdded = ParticipantExam::where('corporate_exam_id', $exam->id)
+                    ->where('participant_id', $participant->id)
+                    ->exists();
+
+                if ($alreadyAdded) {
+                    continue; // skip if already in exam
+                }
+
+                //Add participant to exam
+                ParticipantExam::create([
+                    'corporate_exam_id' => $exam->id,
+                    'participant_id'    => $participant->id,
+                ]);
+            }
+        });
+
+        return Response::apiSuccess('Participants uploaded and added to exam successfully');
     }
 }

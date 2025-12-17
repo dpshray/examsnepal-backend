@@ -72,13 +72,22 @@ class CorporateParticipantController extends Controller
         foreach ($rows as $index => $row) {
             if ($index === 0) continue; // skip header
 
-            $p = Participant::create([
-                'corporate_id' => $user->id,
-                'name'     => $row[0] ?? null,
-                'phone' => $row[1] ?? null,
-                'email'    => $row[2] ?? null,
-                'password' => isset($row[3]) ? Hash::make($row[3]) : null,
-            ]);
+            $email = $row[2] ?? null;
+            if (!$email) continue;
+
+
+            //Find or Create Participant
+            $participant = Participant::firstOrCreate(
+                [
+                    'corporate_id' => $user->id,
+                    'email'        => $email,
+                ],
+                [
+                    'name'     => $row[0] ?? null,
+                    'phone'    => $row[1] ?? null,
+                    'password' => isset($row[3]) ? Hash::make($row[3]) : null,
+                ]
+            );
         }
 
         return Response::apiSuccess('Participants imported successfully from Excel');
@@ -115,6 +124,13 @@ class CorporateParticipantController extends Controller
         $data = $request->validated();
         $user = Auth::user();
         $data['corporate_id'] = $user->id;
+        $exists = Participant::where('corporate_id', $user->id)
+            ->where('email', $data['email'])
+            ->exists();
+
+        if ($exists) {
+            return Response::apiError('This email already exists');
+        }
         Participant::create([
             'corporate_id' => $data['corporate_id'],
             'name'     => $data['name'],

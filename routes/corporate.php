@@ -26,7 +26,8 @@ Route::prefix('corporate')->group(function () {
         Route::controller(AddParticipantToExamController::class)->group(function () {
             Route::get('exams/{exam}/participants','index');
             Route::Post('exams/{exam}/participants','store');
-            Route::delete('exams/participants/{pexam}','destroy');
+            Route::delete('exams/participants','destroy');
+            Route::post('exams/{exam}/bulk-upload-participants','bulk_upload_in_exam');
         });
     });
 });
