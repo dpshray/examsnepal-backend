@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Participant extends Model
+class Participant extends Authenticatable implements JWTSubject
 {
     //
     protected $fillable = [
@@ -15,4 +17,15 @@ class Participant extends Model
         'password',
         'corporate_id',
     ];
+    // Required for JWT
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    // Required for JWT
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 }

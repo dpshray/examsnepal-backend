@@ -194,6 +194,18 @@ class CorporateExamController extends Controller
     public function show(CorporateExam $exam)
     {
         // $this->itemBelongsToUser($corporateExam);
+        $exam->loadCount([
+            'sections',
+            'participants',
+            'sections as questions_count' => function ($q) {
+                $q->join(
+                    'corporate_questions',
+                    'corporate_exam_sections.id',
+                    '=',
+                    'corporate_questions.corporate_exam_section_id'
+                );
+            }
+        ]);
         $data = new CorporateExamResource($exam);
         return Response::apiSuccess('corporate exam details', $data);
     }

@@ -35,6 +35,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PoolController;
 use App\Http\Controllers\PromoCodeController;
+use App\Http\Controllers\Student\Exam\StudentExamController;
+use App\Http\Controllers\Student\ExamRegister\StudentExamRegisterController;
 use App\Http\Controllers\SubscriptionTypeController;
 use App\Http\Middleware\AuthEitherUser;
 use App\Models\Exam;
@@ -323,4 +325,17 @@ Route::middleware(['auth:users'])->get('/download-logs', function () {
         return response()->json(['error' => 'Cannot create zip file.'], 500);
     }
     return response()->download($zipFile)->deleteFileAfterSend(true);
+});
+
+//corparate student
+Route::controller(StudentExamController::class)->group(function (){
+    Route::get('exams/{exams}/examsdetail','examIntro');
+    Route::get('exam-type/{exams}','examtype');
+    Route::post('/exam/{exam}/section/{section}/startexam','startsectionexam');
+    Route::get('/get-question/{attempt_id}','getquestion');
+});
+Route::controller(StudentExamRegisterController::class)->group(function (){
+    Route::post('/exam/{exam}/private-login','login');
+    Route::post('/exam/{exam}/register-public','registerStudent_public_exam');
+    Route::post('/auth/logout','logout')->middleware('auth:sanctum');
 });

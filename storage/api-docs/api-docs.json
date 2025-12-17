@@ -5296,8 +5296,8 @@
                         "description": "ID of the corporate exam",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "string",
+                            "example": ""
                         }
                     },
                     {
@@ -5393,8 +5393,8 @@
                         "description": "ID of the corporate exam",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "string",
+                            "example": ""
                         }
                     }
                 ],
@@ -5452,29 +5452,40 @@
                 ]
             }
         },
-        "/corporate/exams/participants/{pexam}": {
+        "/corporate/exams/participants": {
             "delete": {
                 "tags": [
                     "Corporate Exams Participants"
                 ],
-                "summary": "Delete a participant from a corporate exam",
-                "description": "Remove a participant from a corporate exam.",
-                "operationId": "32c4dc4af9565ed8694923c13f713873",
-                "parameters": [
-                    {
-                        "name": "pexam",
-                        "in": "path",
-                        "description": "ID of the participant_exam pivot record",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
+                "summary": "Remove participants from a corporate exam",
+                "description": "Remove participants from a corporate exam (bulk delete).",
+                "operationId": "bac2d58639973b0101ec38062400f0c8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "description": "Array of participant_exam pivot IDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": ""
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
-                        "description": "Participant removed successfully",
+                        "description": "Participants removed successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5490,7 +5501,81 @@
                         }
                     },
                     "404": {
-                        "description": "ParticipantExam record not found"
+                        "description": "One or more ParticipantExam records not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/exams/{exam}/bulk-upload-participants": {
+            "post": {
+                "tags": [
+                    "Corporate Exams Participants"
+                ],
+                "summary": "Bulk upload participants and add them to an exam",
+                "description": "Bulk upload participants and add them to a corporate exam.",
+                "operationId": "011ebb97620bc27abb0c31ead69cebd3",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Corporate Exam slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": ""
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "Excel or CSV file (name, phone, email, password)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Participants uploaded and added to exam successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Participants uploaded and added to exam successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 },
                 "security": [
@@ -13535,6 +13620,548 @@
                 }
             }
         },
+        "/exams/{exam}/register-public": {
+            "post": {
+                "tags": [
+                    "Corporate Exams Auth"
+                ],
+                "summary": "Register student for public exam",
+                "description": "Register a student for a public exam (no login required).",
+                "operationId": "2cd8bcb5f449d568e33aba829b61cf68",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Corporate Exam ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": ""
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "phone"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "9800000000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Student registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "student register successfull"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "phone": {
+                                                        "type": "string"
+                                                    },
+                                                    "token": {
+                                                        "type": "string",
+                                                        "example": "eyJ0eXAiOiJKV1QiLCJhbGci..."
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Exam requires login"
+                    },
+                    "429": {
+                        "description": "Attempt limit exceeded"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/exams/{exam}/private-login": {
+            "post": {
+                "tags": [
+                    "Corporate Exams Auth"
+                ],
+                "summary": "Participant login for exam",
+                "description": "Login participant for a specific exam.",
+                "operationId": "cfccb4e7271f3685efe6d98c0175f05a",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Corporate Exam ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": ""
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "participant@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Participant logged in successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Participant logged in successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Participant Name"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "participant@example.com"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "eyJ0eXAiOiJKV1QiLCJhbGci..."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    },
+                    "403": {
+                        "description": "Participant not assigned to this exam"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Corporate Exams Auth"
+                ],
+                "summary": "Logout user",
+                "description": "Logout authenticated user (invalidate JWT token).",
+                "operationId": "ee0ef42a376afec2e23a1f316dd43b37",
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfully logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Logout failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/student/exams/{slug}/intro": {
+            "get": {
+                "tags": [
+                    " Corporate Student Exam"
+                ],
+                "summary": "Get exam intro and sections",
+                "description": "Get exam introduction and sections.",
+                "operationId": "e75dc78ce1ac40fece25f4387e03d7c9",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Exam slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "php-basic-test"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam intro data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "list of section in exam"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "corporate_exam_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Exam Section A-45"
+                                                },
+                                                "detail": {
+                                                    "type": "string",
+                                                    "example": "Detailed description of Exam Section A-45"
+                                                },
+                                                "is_published": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-01-01T12:00:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-01-02T12:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication required"
+                    },
+                    "403": {
+                        "description": "You do not have access to this exam"
+                    },
+                    "404": {
+                        "description": "Exam not found or not published"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/student/exams/{exam}/sections/{section}/start": {
+            "post": {
+                "tags": [
+                    "Corporate Student Exam"
+                ],
+                "summary": "Start a section exam attempt",
+                "description": "Start exam section attempt.",
+                "operationId": "3fe5d4b1510066f77291941b02a2ed9d",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Corporate Exam Slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": ""
+                        }
+                    },
+                    {
+                        "name": "section",
+                        "in": "path",
+                        "description": "Exam SectionSlug",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": ""
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam attempt started",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Attempt detail"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "attempt_id": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                },
+                                                "exam_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "section_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "student_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Ram"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "example@gmail.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "980000000"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Attempt limit exceeded"
+                    },
+                    "401": {
+                        "description": "Authentication required"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/student/exams/attempts/{attempt_id}/questions": {
+            "get": {
+                "tags": [
+                    "CorporateStudent Exam"
+                ],
+                "summary": "Get questions for an active exam attempt",
+                "description": "Get questions for an exam attempt.",
+                "operationId": "1c04eca02a270a2897e5d4c6154488ce",
+                "parameters": [
+                    {
+                        "name": "attempt_id",
+                        "in": "path",
+                        "description": "Exam attempt ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Questions per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Section question list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "section question list"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                },
+                                                "section_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_type": {
+                                                    "type": "string",
+                                                    "example": "MCQ"
+                                                },
+                                                "question": {
+                                                    "type": "string",
+                                                    "example": "What is 2 + 2?"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Basic math question"
+                                                },
+                                                "full_marks": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "negative_marks": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "options": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 10
+                                                            },
+                                                            "option": {
+                                                                "type": "string",
+                                                                "example": "4"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "example": "2025-01-10 10:00:00"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "example": "2025-01-10 10:00:00"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access to this attempt"
+                    },
+                    "404": {
+                        "description": "Exam attempt not found or already submitted"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/subjects": {
             "get": {
                 "tags": [
@@ -15253,6 +15880,22 @@
         {
             "name": "Google",
             "description": "Google"
+        },
+        {
+            "name": "Corporate Exams Auth",
+            "description": "Corporate Exams Auth"
+        },
+        {
+            "name": " Corporate Student Exam",
+            "description": " Corporate Student Exam"
+        },
+        {
+            "name": "Corporate Student Exam",
+            "description": "Corporate Student Exam"
+        },
+        {
+            "name": "CorporateStudent Exam",
+            "description": "CorporateStudent Exam"
         },
         {
             "name": "Subjects",

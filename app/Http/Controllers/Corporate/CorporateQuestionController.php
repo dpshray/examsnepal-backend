@@ -375,7 +375,7 @@ class CorporateQuestionController extends Controller
                 $question->clearMediaCollection(CorporateQuestion::QUESTION_IMAGE);
                 $question->addMediaFromRequest('image')->toMediaCollection(CorporateQuestion::QUESTION_IMAGE);
             }
-            if ($question->type === 'MCQ') {
+            if ($question->question_type === 'mcq') {
                 $question->options()->delete();
                 $options = $data['options'] ?? [];
                 foreach ($options as $optionData) {
