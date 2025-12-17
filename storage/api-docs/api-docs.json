@@ -13,6 +13,10 @@
         {
             "url": "http://192.168.100.18:8000/api/",
             "description": "Localhost API Server 2"
+        },
+        {
+            "url": "http://192.168.100.23:8008/api/",
+            "description": "Localhost API Server 2"
         }
     ],
     "paths": {
@@ -7987,6 +7991,10 @@
                                     "exam_type_id": {
                                         "type": "integer",
                                         "example": 0
+                                    },
+                                    "send_and_store": {
+                                        "type": "boolean",
+                                        "example": false
                                     }
                                 },
                                 "type": "object"
@@ -13701,6 +13709,10 @@
                                                 },
                                                 "type": "object"
                                             }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Student overall exam score results."
                                         }
                                     },
                                     "type": "object"

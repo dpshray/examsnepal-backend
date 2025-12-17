@@ -2,6 +2,7 @@
 
 namespace App\Enums;
 
+#this is linked to 'status' column of 'exams' table
 enum ExamTypeEnum: Int
 {
     case FREE_QUIZ = 3;
