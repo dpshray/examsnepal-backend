@@ -784,27 +784,46 @@ class StudentProfileController extends Controller
      *     tags={"Students"},
      *     @OA\Response(
      *         response=200,
-     *         description="Performance data for user",
+     *         description="Student overall exam score results.",
      *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=true),
+     *             type="object",
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="boolean",
+     *                 example=true
+     *             ),
      *             @OA\Property(
      *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(
-     *                     property="data",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="exams_given", type="integer", example=51),
-     *                         @OA\Property(property="total_questions", type="integer", example=7340),
-     *                         @OA\Property(property="correct_answers", type="integer", example=3553),
-     *                         @OA\Property(property="exam_type", type="string", example="MOCK_TEST"),
-     *                         @OA\Property(property="average_score", type="number", format="float", example=48.41)
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(
+     *                         property="exam_name",
+     *                         type="string",
+     *                         example="MDMS CEE Revision all Subject"
+     *                     ),
+     *                     @OA\Property(
+     *                         property="type",
+     *                         type="string",
+     *                         example="FREE_QUIZ"
+     *                     ),
+     *                     @OA\Property(
+     *                         property="total_question_count",
+     *                         type="integer",
+     *                         example=30
+     *                     ),
+     *                     @OA\Property(
+     *                         property="correct_answer_count",
+     *                         type="integer",
+     *                         example=22
      *                     )
-     *                 ),
-     *                 @OA\Property(property="total_average_score", type="number", format="float", example=49.01),
-     *                 @OA\Property(property="total_exams", type="integer", example=2129)
+     *                 )
      *             ),
-     *             @OA\Property(property="message", type="string", example="performance data for user : Sandy")
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Student overall exam score results."
+     *             )
      *         )
      *     )
      * )
@@ -814,11 +833,9 @@ class StudentProfileController extends Controller
             ->has('student_exams')
             ->with(['student_exams' => function ($q) {
                 $q->with([
-                    'exam',
-                    // 'answers' => fn($qr) => $qr->where('is_correct',1)
+                    'exam' => fn($q) => $q->withCount('questions')
                 ])
                 ->withCount([
-                    'answers as total_question_count',
                     'answers as correct_answer_count' => fn($q) => $q->where('is_correct', 1)
                 ]);
             }])

@@ -13549,7 +13549,7 @@
                 "operationId": "StudentOverscoreReport",
                 "responses": {
                     "200": {
-                        "description": "Performance data for user",
+                        "description": "Student overall exam score results.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -13559,51 +13559,32 @@
                                             "example": true
                                         },
                                         "data": {
-                                            "properties": {
-                                                "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "exams_given": {
-                                                                "type": "integer",
-                                                                "example": 51
-                                                            },
-                                                            "total_questions": {
-                                                                "type": "integer",
-                                                                "example": 7340
-                                                            },
-                                                            "correct_answers": {
-                                                                "type": "integer",
-                                                                "example": 3553
-                                                            },
-                                                            "exam_type": {
-                                                                "type": "string",
-                                                                "example": "MOCK_TEST"
-                                                            },
-                                                            "average_score": {
-                                                                "type": "number",
-                                                                "format": "float",
-                                                                "example": 48.41
-                                                            }
-                                                        },
-                                                        "type": "object"
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "exam_name": {
+                                                        "type": "string",
+                                                        "example": "MDMS CEE Revision all Subject"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "FREE_QUIZ"
+                                                    },
+                                                    "total_question_count": {
+                                                        "type": "integer",
+                                                        "example": 30
+                                                    },
+                                                    "correct_answer_count": {
+                                                        "type": "integer",
+                                                        "example": 22
                                                     }
                                                 },
-                                                "total_average_score": {
-                                                    "type": "number",
-                                                    "format": "float",
-                                                    "example": 49.01
-                                                },
-                                                "total_exams": {
-                                                    "type": "integer",
-                                                    "example": 2129
-                                                }
-                                            },
-                                            "type": "object"
+                                                "type": "object"
+                                            }
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "performance data for user : Sandy"
+                                            "example": "Student overall exam score results."
                                         }
                                     },
                                     "type": "object"
