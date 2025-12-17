@@ -19,7 +19,7 @@ class FCMService
         );
     }
 
-    public function notify(array $fcm_token)
+    public function notify(array $fcm_token, bool $send_and_save = true)
     {
         $messaging = $this->factory->createMessaging();
 
@@ -51,13 +51,15 @@ class FCMService
         $students = $this->students ?? [];
 
         // Save notification records
-        foreach ($students as $studentId) {
-            StudentNotification::create([
-                'student_profile_id' => $studentId,
-                'title' => $title,
-                'body' => $body,
-                'type' => $type,
-            ]);
+        if ($send_and_save) {            
+            foreach ($students as $studentId) {
+                StudentNotification::create([
+                    'student_profile_id' => $studentId,
+                    'title' => $title,
+                    'body' => $body,
+                    'type' => $type,
+                ]);
+            }
         }
 
         $notification = Notification::create($title, $body);

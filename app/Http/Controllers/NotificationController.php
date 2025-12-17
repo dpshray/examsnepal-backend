@@ -66,7 +66,8 @@ class NotificationController extends Controller
      *             required={"title", "body"},
      *             @OA\Property(property="title", type="string", example="This is a title."),
      *             @OA\Property(property="body", type="string", example="This is a description."),
-     *             @OA\Property(property="exam_type_id", type="integer", example=0)
+     *             @OA\Property(property="exam_type_id", type="integer", example=0),
+     *             @OA\Property(property="send_and_store", type="boolean", example=false)
      *         )
      *     ),
      *     @OA\Response(
@@ -86,15 +87,18 @@ class NotificationController extends Controller
         $form_data = $request->validate([
             'title' => 'required|max:255',
             'body' => 'required',
-            'exam_type_id' => 'required|exists:exam_types,id'
+            'exam_type_id' => 'required|exists:exam_types,id',
+            'send_and_store' => 'sometimes|nullable|boolean'
         ]);
-
+        // return $form_data;
         $is_exam_not_active = ExamType::active()->where('id', $form_data['exam_type_id'])->doesntExist();
         if ($is_exam_not_active) {
             return Response::apiSuccess("This exam type is not active at the moment.");
         }
+        $send_and_store = (array_key_exists('send_and_store', $form_data) && filter_var($form_data['send_and_store'], FILTER_VALIDATE_BOOLEAN) == true) ? true : false;
 
         // Get valid FCM tokens
+        // $students = DB::table('student_profiles')->where('email','like', 'rabin@fivermail.com')->get();
         $students = DB::table('student_profiles')
             ->where('exam_type_id', $form_data['exam_type_id'])
             ->whereNotNull('email_verified_at')
@@ -102,11 +106,12 @@ class NotificationController extends Controller
             ->distinct()
             // ->pluck('fcm_token')
             ->get();
+        
         ['successes' => $successCount, 'failures' => $failureCount] = (new FCMService(
             $form_data['title'],
             $form_data['body'],'Notification',
             $students->pluck('id')->toArray()
-        ))->notify($students->pluck('fcm_token')->toArray());
+        ))->notify($students->pluck('fcm_token')->toArray(), $send_and_store);
         return Response::apiSuccess('Notification send with '. $successCount.' success and '. $failureCount.' failure');
     }
 

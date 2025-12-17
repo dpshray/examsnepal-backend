@@ -7906,6 +7906,10 @@
                                     "exam_type_id": {
                                         "type": "integer",
                                         "example": 0
+                                    },
+                                    "send_and_store": {
+                                        "type": "boolean",
+                                        "example": false
                                     }
                                 },
                                 "type": "object"
