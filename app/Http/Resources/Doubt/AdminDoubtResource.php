@@ -26,6 +26,7 @@ class AdminDoubtResource extends JsonResource
                 'options' => $this->question->options ?? null,
                 'explanation' => $this->question->explanation ?? null,
             ],
+            'exam_name' => $this->question->exam->exam_name,
             'student' => [
                 'name' => $this->student->name ?? null,
             ],

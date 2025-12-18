@@ -13,6 +13,10 @@
         {
             "url": "http://192.168.100.18:8000/api/",
             "description": "Localhost API Server 2"
+        },
+        {
+            "url": "http://192.168.100.23:8008/api/",
+            "description": "Localhost API Server 2"
         }
     ],
     "paths": {
@@ -175,6 +179,160 @@
                                         },
                                         "errors": {
                                             "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doubtslist": {
+            "get": {
+                "tags": [
+                    "Doubts"
+                ],
+                "summary": "Get logged in student question solved doubts",
+                "operationId": "63ee1b98ce322c2b303deba5cb2c5810",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Doubt list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 679
+                                                                    },
+                                                                    "status": {
+                                                                        "type": "string",
+                                                                        "example": "Resolved"
+                                                                    },
+                                                                    "doubt": {
+                                                                        "type": "string",
+                                                                        "example": "2 answers"
+                                                                    },
+                                                                    "date": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "remark": {
+                                                                        "type": "string",
+                                                                        "example": "C is correct"
+                                                                    },
+                                                                    "question": {
+                                                                        "properties": {
+                                                                            "question": {
+                                                                                "type": "string",
+                                                                                "example": "Becks triad is seen in"
+                                                                            },
+                                                                            "options": {
+                                                                                "type": "array",
+                                                                                "items": {
+                                                                                    "properties": {
+                                                                                        "id": {
+                                                                                            "type": "integer",
+                                                                                            "example": 3291693
+                                                                                        },
+                                                                                        "question_id": {
+                                                                                            "type": "integer",
+                                                                                            "example": 180938
+                                                                                        },
+                                                                                        "option": {
+                                                                                            "type": "string",
+                                                                                            "example": "Constrictive pericarditis"
+                                                                                        },
+                                                                                        "value": {
+                                                                                            "type": "integer",
+                                                                                            "example": 0
+                                                                                        }
+                                                                                    },
+                                                                                    "type": "object"
+                                                                                }
+                                                                            },
+                                                                            "explanation": {
+                                                                                "type": "string",
+                                                                                "example": "Answer- C. Cardiac tamponade..."
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    },
+                                                                    "exam_name": {
+                                                                        "type": "string",
+                                                                        "example": "Sprint Quiz Medicine CBQs"
+                                                                    },
+                                                                    "student": {
+                                                                        "properties": {
+                                                                            "name": {
+                                                                                "type": "string",
+                                                                                "example": "Amit Subedi"
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "current_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 48
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 478
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "doubt list"
                                         }
                                     },
                                     "type": "object"
@@ -15830,6 +15988,10 @@
             "description": "Admin Subscription"
         },
         {
+            "name": "Doubts",
+            "description": "Doubts"
+        },
+        {
             "name": "Quiz",
             "description": "Quiz"
         },
@@ -15888,10 +16050,6 @@
         {
             "name": "Corporate Participants",
             "description": "Corporate Participants"
-        },
-        {
-            "name": "Doubts",
-            "description": "Doubts"
         },
         {
             "name": "ExamCategory",

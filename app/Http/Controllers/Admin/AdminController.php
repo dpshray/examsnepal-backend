@@ -222,19 +222,117 @@ class AdminController extends Controller
             'submissions' => $data->data
         ], 200);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/doubtslist",
+     *     summary="Get logged in student question solved doubts",
+     *     tags={"Doubts"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number for pagination",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         required=false,
+     *         description="number of items per page",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Doubt list",
+     *         @OA\JsonContent(
+     *             type="object",
+     *
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="boolean",
+     *                 example=true
+     *             ),
+     *
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="object",
+     *
+     *                     @OA\Property(
+     *                         property="data",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *
+     *                             @OA\Property(property="id", type="integer", example=679),
+     *                             @OA\Property(property="status", type="string", example="Resolved"),
+     *                             @OA\Property(property="doubt", type="string", example="2 answers"),
+     *                             @OA\Property(property="date", type="string", format="date-time", nullable=true),
+     *                             @OA\Property(property="remark", type="string", example="C is correct"),
+     *
+     *                             @OA\Property(
+     *                                 property="question",
+     *                                 type="object",
+     *
+     *                                 @OA\Property(property="question", type="string", example="Becks triad is seen in"),
+     *
+     *                                 @OA\Property(
+     *                                     property="options",
+     *                                     type="array",
+     *                                     @OA\Items(
+     *                                         type="object",
+     *                                         @OA\Property(property="id", type="integer", example=3291693),
+     *                                         @OA\Property(property="question_id", type="integer", example=180938),
+     *                                         @OA\Property(property="option", type="string", example="Constrictive pericarditis"),
+     *                                         @OA\Property(property="value", type="integer", example=0)
+     *                                     )
+     *                                 ),
+     *
+     *                                 @OA\Property(property="explanation", type="string", example="Answer- C. Cardiac tamponade...")
+     *                             ),
+     *
+     *                             @OA\Property(property="exam_name", type="string", example="Sprint Quiz Medicine CBQs"),
+     *
+     *                             @OA\Property(
+     *                                 property="student",
+     *                                 type="object",
+     *                                 @OA\Property(property="name", type="string", example="Amit Subedi")
+     *                             )
+     *                         )
+     *                     ),
+     *
+     *                     @OA\Property(property="current_page", type="integer", example=1),
+     *                     @OA\Property(property="last_page", type="integer", example=48),
+     *                     @OA\Property(property="total", type="integer", example=478)
+     *                 )
+     *             ),
+     *
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="doubt list"
+     *             )
+     *         )
+     *     )
+     * )
+     */
     public function doubtslist(Request $request)
     {
         $limit = $request->input('limit', 10);
-        $doubts = Doubt::with([
-            'question' => function ($query) {
-                $query->select('id', 'question', 'explanation')
-                    ->with('options');
-            },
-            'student:id,name'
-        ])
+        $doubts = Doubt::whereHas('question', fn($q) => $q->has('exam'))
+            ->has('student')
+            ->with([
+                'question:id,exam_id,question,explanation', // remove closure
+                'question.options',                  // load options
+                'student:id,name',
+                'question.exam'
+            ])
             ->orderBy('id', 'DESC')
             ->paginate($limit);
-
 
         $data = $this->setupPagination($doubts, fn($item) => AdminDoubtResource::collection($item));
 
