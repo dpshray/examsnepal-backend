@@ -21,8 +21,8 @@ class StudentAllExamScoreDetailResource extends JsonResource
                 // 'exam_id' => $student_exam->exam->id,
                 'exam_name' => $student_exam->exam->exam_name,
                 'type' => ExamTypeEnum::getKeyByValue($student_exam->exam->status),
-                'total_question_count' => $student_exam->exam->questions_count,
-                'correct_answer_count' => $student_exam->correct_answer_count,
+                'total_question_count' => (int)$student_exam->exam->questions_count,
+                'correct_answer_count' => (int)$student_exam->correct_answer_count,
             ];
         })->all();
     }
