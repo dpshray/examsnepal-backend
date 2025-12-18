@@ -347,7 +347,7 @@ class StudentExamController extends Controller
             ->with(['options', 'studentAnswers' => function ($query) use ($attempt_id) {
                 $query->where('exam_attempts_id', $attempt_id);
             }]);
-
+        $section = CorporateExamSection::find($attempt->corporate_exam_section_id);
         // If exam question shuffled is on
         if ($exam->is_shuffled_question) {
             $questionsQuery->inRandomOrder($attempt->id);
@@ -373,8 +373,17 @@ class StudentExamController extends Controller
                 return $question;
             });
         }
-
         $data = $this->setupPagination($questions, StudentExamQuestionCollection::class)->data;
-        return Response::apiSuccess("section question list", $data);
+        $response = array_merge(
+            [
+                'section_id' => $section->id,
+                'title'      => $section->title,
+                'slug'       => $section->slug,
+                'detail'     => $section->detail,
+                'duration'=>$exam->duration,
+            ],
+            $data
+        );
+        return Response::apiSuccess("section question list", $response);
     }
 }

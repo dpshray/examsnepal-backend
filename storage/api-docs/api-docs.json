@@ -14222,6 +14222,138 @@
                 ]
             }
         },
+        "/submit-answer/{attempt_id}": {
+            "post": {
+                "tags": [
+                    "Corporate Student Exam Answer"
+                ],
+                "summary": "Submit answers for an exam attempt",
+                "description": "Submit or update answers for an exam attempt.",
+                "operationId": "506cf5e1909ff7b8c7cd6f925f52b2d7",
+                "parameters": [
+                    {
+                        "name": "attempt_id",
+                        "in": "path",
+                        "description": "Exam attempt ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 101
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Answers payload",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "question_id": {
+                                            "type": "integer",
+                                            "example": 55
+                                        },
+                                        "option_id": {
+                                            "type": "integer",
+                                            "example": 3,
+                                            "nullable": true
+                                        },
+                                        "subjective_answer": {
+                                            "type": "string",
+                                            "example": "Polymorphism allows multiple forms",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Answer saved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "your Answer have been save"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access to this attempt"
+                    },
+                    "404": {
+                        "description": "Exam attempt not found or already submitted"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/submit-exam/{attempt_id}": {
+            "post": {
+                "tags": [
+                    "Corporate Student Exam Answer"
+                ],
+                "summary": "Submit exam attempt",
+                "description": "Submit an exam attempt for evaluation.",
+                "operationId": "d3077e5eccfc78954b859a35108f9383",
+                "parameters": [
+                    {
+                        "name": "attempt_id",
+                        "in": "path",
+                        "description": "Exam attempt ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 101
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam submitted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Thank you for Submission"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access to this attempt"
+                    },
+                    "404": {
+                        "description": "Exam attempt not found or already submitted"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/subjects": {
             "get": {
                 "tags": [
@@ -15948,6 +16080,10 @@
         {
             "name": "Corporate Student Exam",
             "description": "Corporate Student Exam"
+        },
+        {
+            "name": "Corporate Student Exam Answer",
+            "description": "Corporate Student Exam Answer"
         },
         {
             "name": "Subjects",
