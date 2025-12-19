@@ -237,7 +237,7 @@ Route::get('/category-types', ExamCategoryController::class);
 //     return view('vendor.l5-swagger.index');
 // })->withoutMiddleware('auth:api');
 
-Route::middleware(['auth:users', 'role:teacher'])->group(function () {
+Route::middleware(['auth:users', 'role:admin'])->group(function () {
 
     // for subjects
     Route::post('/subject', [SubjectController::class, 'store']);
