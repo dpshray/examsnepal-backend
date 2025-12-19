@@ -306,4 +306,12 @@ class CorporateExamController extends Controller
             throw new AuthorizationException('You do not have permission to do this.');
         }
     }
+    function public_exam(CorporateExam $exam)
+    {
+        $total_section=$exam->sections()->count();
+        if($total_section>1)
+        {
+            return Response::apiError('');
+        }
+    }
 }
