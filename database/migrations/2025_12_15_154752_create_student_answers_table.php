@@ -12,21 +12,29 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('student_answers', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // This creates bigint unsigned auto_increment
 
-            $table->foreignId('exam_attempts_id')
-                ->constrained('exam_attempts')
+            // exam_attempts_id - check if exam_attempts.id is int or bigint
+            $table->unsignedBigInteger('exam_attempts_id');
+            $table->foreign('exam_attempts_id')
+                ->references('id')
+                ->on('exam_attempts')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
 
-            $table->foreignId('question_id')
-                ->constrained('corporate_questions')
+            // question_id - bigint unsigned to match corporate_questions
+            $table->unsignedBigInteger('question_id');
+            $table->foreign('question_id')
+                ->references('id')
+                ->on('corporate_questions')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
 
-            $table->foreignId('options_id')
-                ->nullable()
-                ->constrained('corporate_question_options')
+            // options_id - bigint unsigned to match corporate_question_options
+            $table->unsignedBigInteger('options_id')->nullable();
+            $table->foreign('options_id')
+                ->references('id')
+                ->on('corporate_question_options')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
 
