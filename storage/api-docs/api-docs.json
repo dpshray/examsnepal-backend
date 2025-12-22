@@ -15,8 +15,12 @@
             "description": "Localhost API Server 2"
         },
         {
-            "url": "http://192.168.100.23:8008/api/",
-            "description": "Localhost API Server 2"
+            "url": "http://192.168.100.23:8000/api/",
+            "description": "Localhost API Server 3"
+        },
+        {
+            "url": "http://127.0.0.1:8000/api/",
+            "description": "Localhost API Server 4"
         }
     ],
     "paths": {
@@ -13792,7 +13796,7 @@
                 "operationId": "StudentOverscoreReport",
                 "responses": {
                     "200": {
-                        "description": "Student overall exam score results.",
+                        "description": "Student overall exam score results",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -13805,6 +13809,10 @@
                                             "type": "array",
                                             "items": {
                                                 "properties": {
+                                                    "exam_id": {
+                                                        "type": "integer",
+                                                        "example": 2460
+                                                    },
                                                     "exam_name": {
                                                         "type": "string",
                                                         "example": "MDMS CEE Revision all Subject"
@@ -13813,13 +13821,38 @@
                                                         "type": "string",
                                                         "example": "FREE_QUIZ"
                                                     },
+                                                    "is_negative_marking": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "negative_marking_point": {
+                                                        "type": "number",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
                                                     "total_question_count": {
                                                         "type": "integer",
                                                         "example": 30
                                                     },
                                                     "correct_answer_count": {
                                                         "type": "integer",
-                                                        "example": 22
+                                                        "example": 21
+                                                    },
+                                                    "incorrect_answer_count": {
+                                                        "type": "integer",
+                                                        "example": 8
+                                                    },
+                                                    "missed_answer_count": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "total_point_reduction_based_on_negative_marking_point": {
+                                                        "type": "number",
+                                                        "example": 0
+                                                    },
+                                                    "final_exam_marks_after_reduction_of_negative_marking_point": {
+                                                        "type": "number",
+                                                        "example": 21
                                                     }
                                                 },
                                                 "type": "object"
@@ -13828,6 +13861,100 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Student overall exam score results."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/students/get-my-exams-score/{exam_id}": {
+            "get": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Get student exam end score results.",
+                "description": "Get student end score results.",
+                "operationId": "StudentScoreReport",
+                "parameters": [
+                    {
+                        "name": "exam_id",
+                        "in": "path",
+                        "description": "ID of an exam",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Student exam score results",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "exam_id": {
+                                                    "type": "integer",
+                                                    "example": 2460
+                                                },
+                                                "exam_name": {
+                                                    "type": "string",
+                                                    "example": "MDMS CEE Revision all Subject"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "FREE_QUIZ"
+                                                },
+                                                "is_negative_marking": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "negative_marking_point": {
+                                                    "type": "number",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "total_question_count": {
+                                                    "type": "integer",
+                                                    "example": 30
+                                                },
+                                                "correct_answer_count": {
+                                                    "type": "integer",
+                                                    "example": 21
+                                                },
+                                                "incorrect_answer_count": {
+                                                    "type": "integer",
+                                                    "example": 8
+                                                },
+                                                "missed_answer_count": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "total_point_reduction_based_on_negative_marking_point": {
+                                                    "type": "number",
+                                                    "example": 0
+                                                },
+                                                "final_exam_marks_after_reduction_of_negative_marking_point": {
+                                                    "type": "number",
+                                                    "example": 21
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Student exam score results."
                                         }
                                     },
                                     "type": "object"
@@ -15418,6 +15545,14 @@
                                     "live": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "is_negative_marking": {
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "negative_marking_point": {
+                                        "type": "integer",
+                                        "example": 0
                                     }
                                 },
                                 "type": "object"
@@ -15514,6 +15649,14 @@
                                     "live": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "is_negative_marking": {
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "negative_marking_point": {
+                                        "type": "integer",
+                                        "example": 0
                                     }
                                 },
                                 "type": "object"

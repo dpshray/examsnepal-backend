@@ -131,6 +131,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
 
     Route::get('get-student-performance-data', [StudentProfileController::class, 'studentPerformanceReport']);
     Route::get('/students/me/exams/scores', [StudentProfileController::class, 'myExamScores']);
+    Route::get('/students/get-my-exams-score/{exam}', [StudentProfileController::class, 'myAnExamScore']);
 
     Route::get('/student/questions', [ForumController::class, 'fetchQuestions']);
     Route::get('/student/questions/answer/{id}', [ForumController::class, 'question_answer']);

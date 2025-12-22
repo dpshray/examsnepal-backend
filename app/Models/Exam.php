@@ -30,6 +30,8 @@ class Exam extends Model
         'assign',
         'live',
         'is_question_bank',
+        'is_negative_marking',
+        'negative_marking_point'
     ];
 
     protected function casts(): array
