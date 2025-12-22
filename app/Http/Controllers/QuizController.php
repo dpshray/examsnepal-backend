@@ -3,6 +3,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\ExamTypeEnum;
 use App\Http\Resources\ExamCollection;
+use App\Http\Resources\Student\Exam\StudentExamListCollection;
+use App\Http\Resources\Student\Exam\StudentExamListResource;
 use App\Models\Exam;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
@@ -91,48 +93,73 @@ class QuizController extends Controller
      *         @OA\Schema(type="integer", example=1)
      *     ),
      *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Free quizzes retrieved successfully."),
-     *             @OA\Property(
-     *                 property="data",
+     *       response=200,
+     *       description="Free pending quizzes retrieved successfully.",
+     *       @OA\JsonContent(
+     *         type="object",
+     *         @OA\Property(property="status", type="boolean", example=true),
+     *         @OA\Property(
+     *           property="data",
+     *           type="object",
+     *           @OA\Property(
+     *             property="data",
+     *             type="array",
+     *             @OA\Items(
+     *               type="object",
+     *               @OA\Property(property="id", type="integer", example=2127),
+     *               @OA\Property(
+     *                 property="exam_name",
+     *                 type="string",
+     *                 example="Physiology Quiz on Blood Pressure and Regulation"
+     *               ),
+     *               @OA\Property(property="is_negative_marking", type="boolean", example=false),
+     *               @OA\Property(property="negative_marking_point", type="integer", example=0),
+     *               @OA\Property(property="status", type="string", example="free"),
+     *               @OA\Property(property="questions_count", type="integer", example=30),
+     *     
+     *               @OA\Property(
+     *                 property="user",
      *                 type="object",
-     *                 @OA\Property(property="current_page", type="integer", example=1),
-     *                 @OA\Property(
-     *                     property="data",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         type="object",
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="exam_name", type="string", example="Math Quiz"),
-     *                         @OA\Property(property="status", type="string", example="free"),
-     *                         @OA\Property(property="user_id", type="integer", example=12),
-     *                         @OA\Property(
-     *                             property="user",
-     *                             type="object",
-     *                             @OA\Property(property="id", type="integer", example=12),
-     *                             @OA\Property(property="fullname", type="string", example="John Doe")
-     *                         )
-     *                     )
-     *                 ),
-     *                 @OA\Property(property="last_page", type="integer", example=5),
-     *                 @OA\Property(property="per_page", type="integer", example=10),
-     *                 @OA\Property(property="total", type="integer", example=50)
+     *                 @OA\Property(property="id", type="integer", example=175),
+     *                 @OA\Property(property="fullname", type="string", example="Paradise Study Center")
+     *               ),
+     *     
+     *               @OA\Property(
+     *                 property="players",
+     *                 type="array",
+     *                 @OA\Items(
+     *                   type="object",
+     *                   @OA\Property(property="id", type="integer", example=12056),
+     *                   @OA\Property(property="name", type="string", example="Lokaratna Gyawali"),
+     *                   @OA\Property(
+     *                     property="solutions",
+     *                     type="object",
+     *                     @OA\Property(property="corrected", type="integer", example=23)
+     *                   ),
+     *                   @OA\Property(property="corrected", type="integer", example=23)
+     *                 )
+     *               )
      *             )
+     *           ),
+     *     
+     *           @OA\Property(property="current_page", type="integer", example=1),
+     *           @OA\Property(property="last_page", type="integer", example=14),
+     *           @OA\Property(property="total", type="integer", example=14)
+     *         ),
+     *     
+     *         @OA\Property(
+     *           property="message",
+     *           type="string",
+     *           example="Free pending quizzes retrieved successfully."
      *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal Server Error"
+     *       )
      *     )
      * )
      */
     public function getPendingFreeQuiz()
     {
-        $free_quiz_query = Exam::freeType()->authUserPending()->paginate();
-        $data = $this->setupPagination($free_quiz_query, ExamCollection::class)->data;
+        $free_quiz_query = Exam::freeType()->authUserPending()->paginate(1);
+        $data = $this->setupPagination($free_quiz_query, StudentExamListCollection::class)->data;
 
         return Response::apiSuccess('Free pending quizzes retrieved successfully.', $data);
     }
@@ -205,56 +232,80 @@ class QuizController extends Controller
      *     description="Retrieve a list of pending sprint quizzes. Requires an active subscription.",
      *     operationId="getPendingSprintQuiz",
      *     tags={"Quiz"},
-     * @OA\Parameter(
-     *         name="page",
-     *         in="query",
-     *         required=false,
-     *         description="Page number for pagination",
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     security={{ "bearerAuth":{} }},
      *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Sprint quizzes retrieved successfully."),
-     *             @OA\Property(
-     *                 property="data",
+     *       response=200,
+     *       description="Sprint pending quizzes retrieved successfully.",
+     *       @OA\JsonContent(
+     *         type="object",
+     *     
+     *         @OA\Property(property="status", type="boolean", example=true),
+     *     
+     *         @OA\Property(
+     *           property="data",
+     *           type="object",
+     *     
+     *           @OA\Property(
+     *             property="data",
+     *             type="array",
+     *             @OA\Items(
+     *               type="object",
+     *     
+     *               @OA\Property(property="id", type="integer", example=2517),
+     *               @OA\Property(
+     *                 property="exam_name",
+     *                 type="string",
+     *                 example="MDMS Microbiology Based Sprint Quiz"
+     *               ),
+     *               @OA\Property(property="is_negative_marking", type="boolean", example=false),
+     *               @OA\Property(property="negative_marking_point", type="integer", example=0),
+     *               @OA\Property(property="status", type="string", example="sprint"),
+     *               @OA\Property(property="questions_count", type="integer", example=30),
+     *     
+     *               @OA\Property(
+     *                 property="user",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=16),
+     *                 @OA\Property(property="fullname", type="string", example="Loksewa preparation")
+     *               ),
+     *     
+     *               @OA\Property(
+     *                 property="players",
      *                 type="array",
      *                 @OA\Items(
+     *                   type="object",
+     *                   @OA\Property(property="id", type="integer", example=12639),
+     *                   @OA\Property(property="name", type="string", example="Amit Kumar chaudhary"),
+     *     
+     *                   @OA\Property(
+     *                     property="solutions",
      *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="exam_name", type="string", example="Sprint Test 1"),
-     *                     @OA\Property(property="status", type="string", example="3"),
-     *                     @OA\Property(property="user", type="object", nullable=true,
-     *                         @OA\Property(property="id", type="integer", example=5),
-     *                         @OA\Property(property="fullname", type="string", example="John Doe")
-     *                     )
+     *                     @OA\Property(property="corrected", type="integer", example=29)
+     *                   ),
+     *     
+     *                   @OA\Property(property="corrected", type="integer", example=29)
      *                 )
+     *               )
      *             )
+     *           ),
+     *     
+     *           @OA\Property(property="current_page", type="integer", example=1),
+     *           @OA\Property(property="last_page", type="integer", example=7),
+     *           @OA\Property(property="total", type="integer", example=73)
+     *         ),
+     *     
+     *         @OA\Property(
+     *           property="message",
+     *           type="string",
+     *           example="Sprint pending quizzes retrieved successfully."
      *         )
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Subscription Inactive",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Your subscription is inactive. Please subscribe to access sprint quizzes.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal Server Error"
+     *       )
      *     )
      * )
      */
     public function getPendingSprintQuiz()
     {
         $sprint_quiz_query = Exam::sprintType()->authUserPending()->paginate();
-        $data = $this->setupPagination($sprint_quiz_query, ExamCollection::class)->data;
+        $data = $this->setupPagination($sprint_quiz_query, StudentExamListCollection::class)->data;
 
         return Response::apiSuccess('Sprint pending quizzes retrieved successfully.', $data);
     }
@@ -322,61 +373,89 @@ class QuizController extends Controller
 
     /**
      * @OA\Get(
+     *     security={{ "bearerAuth":{} }},
      *     path="/mock-test/pending",
      *     summary="Get Pending Mock Tests (for users)",
      *     description="Retrieve a list of Pending Mock Tests.",
      *     operationId="getPendingMockTests",
      *     tags={"Quiz"},
-     * @OA\Parameter(
+     *     @OA\Parameter(
      *         name="page",
      *         in="query",
      *         required=false,
      *         description="Page number for pagination",
      *         @OA\Schema(type="integer", example=1)
      *     ),
-     *     security={{ "bearerAuth":{} }},
      *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Mock Tests retrieved successfully."),
-     *             @OA\Property(
-     *                 property="data",
+     *       response=200,
+     *       description="Mock pending quizzes retrieved successfully.",
+     *       @OA\JsonContent(
+     *         type="object",
+     *     
+     *         @OA\Property(property="status", type="boolean", example=true),
+     *     
+     *         @OA\Property(
+     *           property="data",
+     *           type="object",
+     *     
+     *           @OA\Property(
+     *             property="data",
+     *             type="array",
+     *             @OA\Items(
+     *               type="object",
+     *     
+     *               @OA\Property(property="id", type="integer", example=2442),
+     *               @OA\Property(property="exam_name", type="string", example="MDMS Mock Test"),
+     *               @OA\Property(property="is_negative_marking", type="boolean", example=false),
+     *               @OA\Property(property="negative_marking_point", type="integer", example=0),
+     *               @OA\Property(property="status", type="string", example="mock"),
+     *               @OA\Property(property="questions_count", type="integer", example=200),
+     *     
+     *               @OA\Property(
+     *                 property="user",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=16),
+     *                 @OA\Property(property="fullname", type="string", example="Loksewa preparation")
+     *               ),
+     *     
+     *               @OA\Property(
+     *                 property="players",
      *                 type="array",
      *                 @OA\Items(
+     *                   type="object",
+     *                   @OA\Property(property="id", type="integer", example=12473),
+     *                   @OA\Property(property="name", type="string", example="Bijay"),
+     *     
+     *                   @OA\Property(
+     *                     property="solutions",
      *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="exam_name", type="string", example="Mock Tests 1"),
-     *                     @OA\Property(property="status", type="string", example="3"),
-     *                     @OA\Property(property="user", type="object", nullable=true,
-     *                         @OA\Property(property="id", type="integer", example=5),
-     *                         @OA\Property(property="fullname", type="string", example="John Doe")
-     *                     )
+     *                     @OA\Property(property="corrected", type="integer", example=156)
+     *                   ),
+     *     
+     *                   @OA\Property(property="corrected", type="integer", example=156)
      *                 )
+     *               )
      *             )
+     *           ),
+     *     
+     *           @OA\Property(property="current_page", type="integer", example=1),
+     *           @OA\Property(property="last_page", type="integer", example=7),
+     *           @OA\Property(property="total", type="integer", example=81)
+     *         ),
+     *     
+     *         @OA\Property(
+     *           property="message",
+     *           type="string",
+     *           example="Mock pending quizzes retrieved successfully."
      *         )
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Subscription Inactive",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Your subscription is inactive. Please subscribe to access Mock Tests.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal Server Error"
+     *       )
      *     )
      * )
      */
     public function getPendingMockTest()
     {
         $mock_quiz = Exam::mockType()->authUserPending()->paginate();
-        $data = $this->setupPagination($mock_quiz, ExamCollection::class)->data;
+        $data = $this->setupPagination($mock_quiz, StudentExamListCollection::class)->data;
 
         return Response::apiSuccess('Mock pending quizzes retrieved successfully.', $data);
     }

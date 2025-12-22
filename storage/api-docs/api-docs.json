@@ -11366,85 +11366,115 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Free pending quizzes retrieved successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "status": {
                                             "type": "boolean",
                                             "example": true
                                         },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Free quizzes retrieved successfully."
-                                        },
                                         "data": {
                                             "properties": {
-                                                "current_page": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
                                                 "data": {
                                                     "type": "array",
                                                     "items": {
                                                         "properties": {
                                                             "id": {
                                                                 "type": "integer",
-                                                                "example": 1
+                                                                "example": 2127
                                                             },
                                                             "exam_name": {
                                                                 "type": "string",
-                                                                "example": "Math Quiz"
+                                                                "example": "Physiology Quiz on Blood Pressure and Regulation"
+                                                            },
+                                                            "is_negative_marking": {
+                                                                "type": "boolean",
+                                                                "example": false
+                                                            },
+                                                            "negative_marking_point": {
+                                                                "type": "integer",
+                                                                "example": 0
                                                             },
                                                             "status": {
                                                                 "type": "string",
                                                                 "example": "free"
                                                             },
-                                                            "user_id": {
+                                                            "questions_count": {
                                                                 "type": "integer",
-                                                                "example": 12
+                                                                "example": 30
                                                             },
                                                             "user": {
                                                                 "properties": {
                                                                     "id": {
                                                                         "type": "integer",
-                                                                        "example": 12
+                                                                        "example": 175
                                                                     },
                                                                     "fullname": {
                                                                         "type": "string",
-                                                                        "example": "John Doe"
+                                                                        "example": "Paradise Study Center"
                                                                     }
                                                                 },
                                                                 "type": "object"
+                                                            },
+                                                            "players": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 12056
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string",
+                                                                            "example": "Lokaratna Gyawali"
+                                                                        },
+                                                                        "solutions": {
+                                                                            "properties": {
+                                                                                "corrected": {
+                                                                                    "type": "integer",
+                                                                                    "example": 23
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        },
+                                                                        "corrected": {
+                                                                            "type": "integer",
+                                                                            "example": 23
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
                                                             }
                                                         },
                                                         "type": "object"
                                                     }
                                                 },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
                                                 "last_page": {
                                                     "type": "integer",
-                                                    "example": 5
-                                                },
-                                                "per_page": {
-                                                    "type": "integer",
-                                                    "example": 10
+                                                    "example": 14
                                                 },
                                                 "total": {
                                                     "type": "integer",
-                                                    "example": 50
+                                                    "example": 14
                                                 }
                                             },
                                             "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Free pending quizzes retrieved successfully."
                                         }
                                     },
                                     "type": "object"
                                 }
                             }
                         }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -11563,102 +11593,119 @@
                 "summary": "Get Pending Sprint Quizzes (for users)",
                 "description": "Retrieve a list of pending sprint quizzes. Requires an active subscription.",
                 "operationId": "getPendingSprintQuiz",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number for pagination",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Sprint pending quizzes retrieved successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "status": {
                                             "type": "boolean",
                                             "example": true
                                         },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Sprint quizzes retrieved successfully."
-                                        },
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "exam_name": {
-                                                        "type": "string",
-                                                        "example": "Sprint Test 1"
-                                                    },
-                                                    "status": {
-                                                        "type": "string",
-                                                        "example": "3"
-                                                    },
-                                                    "user": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
                                                         "properties": {
                                                             "id": {
                                                                 "type": "integer",
-                                                                "example": 5
+                                                                "example": 2517
                                                             },
-                                                            "fullname": {
+                                                            "exam_name": {
                                                                 "type": "string",
-                                                                "example": "John Doe"
+                                                                "example": "MDMS Microbiology Based Sprint Quiz"
+                                                            },
+                                                            "is_negative_marking": {
+                                                                "type": "boolean",
+                                                                "example": false
+                                                            },
+                                                            "negative_marking_point": {
+                                                                "type": "integer",
+                                                                "example": 0
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "sprint"
+                                                            },
+                                                            "questions_count": {
+                                                                "type": "integer",
+                                                                "example": 30
+                                                            },
+                                                            "user": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 16
+                                                                    },
+                                                                    "fullname": {
+                                                                        "type": "string",
+                                                                        "example": "Loksewa preparation"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "players": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 12639
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string",
+                                                                            "example": "Amit Kumar chaudhary"
+                                                                        },
+                                                                        "solutions": {
+                                                                            "properties": {
+                                                                                "corrected": {
+                                                                                    "type": "integer",
+                                                                                    "example": 29
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        },
+                                                                        "corrected": {
+                                                                            "type": "integer",
+                                                                            "example": 29
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
                                                             }
                                                         },
-                                                        "type": "object",
-                                                        "nullable": true
+                                                        "type": "object"
                                                     }
                                                 },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Subscription Inactive",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 7
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 73
+                                                }
+                                            },
+                                            "type": "object"
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Your subscription is inactive. Please subscribe to access sprint quizzes."
+                                            "example": "Sprint pending quizzes retrieved successfully."
                                         }
                                     },
                                     "type": "object"
                                 }
                             }
                         }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/mock-test/completed": {
@@ -11789,81 +11836,115 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Mock pending quizzes retrieved successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "status": {
                                             "type": "boolean",
                                             "example": true
                                         },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Mock Tests retrieved successfully."
-                                        },
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "exam_name": {
-                                                        "type": "string",
-                                                        "example": "Mock Tests 1"
-                                                    },
-                                                    "status": {
-                                                        "type": "string",
-                                                        "example": "3"
-                                                    },
-                                                    "user": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
                                                         "properties": {
                                                             "id": {
                                                                 "type": "integer",
-                                                                "example": 5
+                                                                "example": 2442
                                                             },
-                                                            "fullname": {
+                                                            "exam_name": {
                                                                 "type": "string",
-                                                                "example": "John Doe"
+                                                                "example": "MDMS Mock Test"
+                                                            },
+                                                            "is_negative_marking": {
+                                                                "type": "boolean",
+                                                                "example": false
+                                                            },
+                                                            "negative_marking_point": {
+                                                                "type": "integer",
+                                                                "example": 0
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "mock"
+                                                            },
+                                                            "questions_count": {
+                                                                "type": "integer",
+                                                                "example": 200
+                                                            },
+                                                            "user": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 16
+                                                                    },
+                                                                    "fullname": {
+                                                                        "type": "string",
+                                                                        "example": "Loksewa preparation"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "players": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 12473
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string",
+                                                                            "example": "Bijay"
+                                                                        },
+                                                                        "solutions": {
+                                                                            "properties": {
+                                                                                "corrected": {
+                                                                                    "type": "integer",
+                                                                                    "example": 156
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        },
+                                                                        "corrected": {
+                                                                            "type": "integer",
+                                                                            "example": 156
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
                                                             }
                                                         },
-                                                        "type": "object",
-                                                        "nullable": true
+                                                        "type": "object"
                                                     }
                                                 },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Subscription Inactive",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 7
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 81
+                                                }
+                                            },
+                                            "type": "object"
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Your subscription is inactive. Please subscribe to access Mock Tests."
+                                            "example": "Mock pending quizzes retrieved successfully."
                                         }
                                     },
                                     "type": "object"
                                 }
                             }
                         }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 },
                 "security": [
