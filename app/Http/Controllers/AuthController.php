@@ -294,14 +294,14 @@ class AuthController extends Controller
         }
 
         // Ensure the user is an admin
-        Log::info($admin);
+        // Log::info($admin);
         // if ($admin->role !== 'admin') {
         //     return response()->json(['error' => 'Unauthorized: Not an admin user'], 403);
         // }
 
         // // Verify that the password is correct
         if ($admin && !$admin->isAdmin()) {
-            return response()->json(['error' => 'Unauthorized: Not an teacher'], 403);
+            return response()->json(['error' => 'Admin role required.'], 403);
         }
         if (!Hash::check($credentials['password'], $admin->password)) {
             return response()->json(['error' => 'Incorrect password'], 401);
@@ -377,7 +377,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         $user = User::where('email', $credentials['email'])->first();
         if ($user && !$user->isTeacher()) {
-            return response()->json(['error' => 'Unauthorized: Not an teacher'], 403);
+            return response()->json(['error' => 'Teacher role required.'], 403);
         }
         if (!Hash::check($credentials['password'], $user->password)) {
             return response()->json(['error' => 'Incorrect password'], 401);
