@@ -12958,6 +12958,18 @@
                 "summary": "Get all students",
                 "description": "Retrieve a list of all students from the StudentProfile model.",
                 "operationId": "getAllStudents",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search student based on email",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": ""
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Students list fetched successfully.",

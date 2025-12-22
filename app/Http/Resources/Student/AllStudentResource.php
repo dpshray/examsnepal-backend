@@ -18,7 +18,7 @@ class AllStudentResource extends JsonResource
          return [
             'id'=>$this->id,
             'name'=> $this->name,
-            'email'=> $this->email,
+            'email'=> strtolower($this->email),
             'phone'=> $this->phone,
             'email_verified_at'=>$this->email_verified_at ? 'Verified':'Not Verified',
             'exam_type'=> optional($this->examType)->name,

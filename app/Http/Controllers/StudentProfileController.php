@@ -137,6 +137,13 @@ class StudentProfileController extends Controller
      *     description="Retrieve a list of all students from the StudentProfile model.",
      *     operationId="getAllStudents",
      *     tags={"Students"},
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         required=false,
+     *         description="Search student based on email",
+     *         @OA\Schema(type="string", example="")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Students list fetched successfully.",
