@@ -23,7 +23,7 @@ class CorporateExamSectionRequest extends FormRequest
     {
         $rules = [
             'title' => 'required|max:255',
-            'detail' => 'required',
+            'detail' => 'nullable',
             'is_published' => 'nullable'
         ];
         return $rules;
