@@ -15516,7 +15516,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Teacher (Loksewa) Exam List with Total Questions",
+                        "description": "Teacher exam list",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -15533,32 +15533,57 @@
                                                         "properties": {
                                                             "id": {
                                                                 "type": "integer",
-                                                                "example": 368
+                                                                "example": 2544
                                                             },
-                                                            "publised": {
+                                                            "published": {
                                                                 "type": "integer",
-                                                                "example": 0
+                                                                "example": 1
                                                             },
                                                             "exam_type": {
                                                                 "properties": {
                                                                     "id": {
                                                                         "type": "integer",
-                                                                        "example": 4
+                                                                        "example": 1
                                                                     },
                                                                     "name": {
                                                                         "type": "string",
-                                                                        "example": "Administration Loksewa all levels Exams"
+                                                                        "example": "Medical NMCLE / Loksewa / MDMS Exams"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "category_type": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "MOCK_TEST"
                                                                     }
                                                                 },
                                                                 "type": "object"
                                                             },
                                                             "exam_name": {
                                                                 "type": "string",
-                                                                "example": "Loksewa Online Exam for Nasu & Kharidar"
+                                                                "example": "Nerea Guy"
+                                                            },
+                                                            "live": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Et sunt molestias re"
+                                                            },
+                                                            "assign": {
+                                                                "type": "integer",
+                                                                "example": 1
                                                             },
                                                             "total_questions": {
                                                                 "type": "integer",
-                                                                "example": 50
+                                                                "example": 0
                                                             }
                                                         },
                                                         "type": "object"
@@ -15570,18 +15595,18 @@
                                                 },
                                                 "last_page": {
                                                     "type": "integer",
-                                                    "example": 1
+                                                    "example": 2167
                                                 },
                                                 "total": {
                                                     "type": "integer",
-                                                    "example": 9
+                                                    "example": 2167
                                                 }
                                             },
                                             "type": "object"
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "teacher(loksewa) exam list"
+                                            "example": "teacher(TEST ADMIN) exam list"
                                         }
                                     },
                                     "type": "object"

@@ -374,9 +374,10 @@ class TeacherQuestionController extends Controller
     }
 
     private function isExamOwner(Exam $exam){
-        throw_if($exam->user->isNot(Auth::guard('users')->user()), AuthorizationException::class, 'You are not the owner');
+        throw_if(!Auth::user()->isAdmin() && $exam->user->isNot(Auth::guard('users')->user()), AuthorizationException::class, 'You are not the owner');
     }
+
     private function isQuestionOwner(Question $question){
-        throw_if($question->exam->user->isNot(Auth::guard('users')->user()), AuthorizationException::class, 'You are not the owner');
+        throw_if(!Auth::user()->isAdmin() && $question->exam->user->isNot(Auth::guard('users')->user()), AuthorizationException::class, 'You are not the owner');
     }
 }

@@ -54,8 +54,9 @@ class TeacherExamController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Teacher (Loksewa) Exam List with Total Questions",
+     *         description="Teacher exam list",
      *         @OA\JsonContent(
+     *             type="object",
      *             @OA\Property(property="status", type="boolean", example=true),
      *             @OA\Property(
      *                 property="data",
@@ -64,23 +65,33 @@ class TeacherExamController extends Controller
      *                     property="data",
      *                     type="array",
      *                     @OA\Items(
-     *                         @OA\Property(property="id", type="integer", example=368),
-     *                         @OA\Property(property="publised", type="integer", example=0),
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=2544),
+     *                         @OA\Property(property="published", type="integer", example=1),
      *                         @OA\Property(
      *                             property="exam_type",
      *                             type="object",
-     *                             @OA\Property(property="id", type="integer", example=4),
-     *                             @OA\Property(property="name", type="string", example="Administration Loksewa all levels Exams")
+     *                             @OA\Property(property="id", type="integer", example=1),
+     *                             @OA\Property(property="name", type="string", example="Medical NMCLE / Loksewa / MDMS Exams")
      *                         ),
-     *                         @OA\Property(property="exam_name", type="string", example="Loksewa Online Exam for Nasu & Kharidar"),
-     *                         @OA\Property(property="total_questions", type="integer", example=50)
+     *                         @OA\Property(
+     *                             property="category_type",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=1),
+     *                             @OA\Property(property="name", type="string", example="MOCK_TEST")
+     *                         ),
+     *                         @OA\Property(property="exam_name", type="string", example="Nerea Guy"),
+     *                         @OA\Property(property="live", type="integer", example=1),
+     *                         @OA\Property(property="description", type="string", example="Et sunt molestias re"),
+     *                         @OA\Property(property="assign", type="integer", example=1),
+     *                         @OA\Property(property="total_questions", type="integer", example=0)
      *                     )
      *                 ),
      *                 @OA\Property(property="current_page", type="integer", example=1),
-     *                 @OA\Property(property="last_page", type="integer", example=1),
-     *                 @OA\Property(property="total", type="integer", example=9)
+     *                 @OA\Property(property="last_page", type="integer", example=2167),
+     *                 @OA\Property(property="total", type="integer", example=2167)
      *             ),
-     *             @OA\Property(property="message", type="string", example="teacher(loksewa) exam list")
+     *             @OA\Property(property="message", type="string", example="teacher(TEST ADMIN) exam list")
      *         )
      *     )
      * )
@@ -89,11 +100,14 @@ class TeacherExamController extends Controller
     {
         $per_page = $request->query('per_page', 10);
         $examTypeId   = $request->query('exam_type');
+        $category_type = $request->query('category_type');
         $teacher = Auth::guard('users')->user();
-        $pagination = $teacher->teacherExams()
+        $pagination = Exam::query()
+            ->when(!$teacher->isAdmin(), fn($qry) => $qry->where('user_id', $teacher->id))
             ->when($examTypeId, function ($q) use ($examTypeId) {
                 $q->where('exam_type_id', $examTypeId);
             })
+            ->when($category_type, fn($qry) => $qry->where('status', $category_type))
             ->with(['examType:id,name'])
             ->withCount(['questions'])
             ->orderBy('id', 'DESC')
@@ -309,6 +323,6 @@ class TeacherExamController extends Controller
 
     private function isOwner(Exam $exam)
     {
-        throw_if($exam->user->isNot(Auth::guard('users')->user()), AuthorizationException::class, 'You are not the owner');
+        throw_if(!Auth::user()->isAdmin() && $exam->user->isNot(Auth::guard('users')->user()), AuthorizationException::class, 'You are not the owner');
     }
 }
