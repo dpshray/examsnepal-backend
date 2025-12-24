@@ -32,7 +32,18 @@ class StudentExamListResource extends JsonResource
             "status" =>  $status,
             "questions_count" => $this->whenCounted('questions', fn() => (int) $this->questions_count),
             "user" => $this->whenLoaded('user'), #<---added_by
-            'players' => $this->whenLoaded('student_exams', fn() => new PlayerExamScoreCollection($this->student_exams))
+            // 'players' => $this->whenLoaded('student_exams', fn() => new PlayerExamScoreCollection($this->student_exams))
+            'players' => $this->student_exams->map(
+                fn($SE) =>
+                [
+                    'id' => $SE->student->id,
+                    'name' => $SE->student->name,
+                    'solutions' => [
+                        'corrected' => (int)$SE->correct_answers_count, # right answered
+                        'total' => (int)$this->questions_count # total questions
+                    ]
+                ]
+            )
         ];
     }
 }

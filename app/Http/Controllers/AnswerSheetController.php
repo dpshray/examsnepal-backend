@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExamTypeEnum;
 use App\Http\Requests\AnswerStoreRequest;
 use App\Http\Resources\QuestionCollection;
 use Illuminate\Http\Request;
 use App\Models\Answersheet;
 use App\Models\Exam;
 use App\Models\StudentExam;
+use App\Services\ScoreService;
 use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -186,11 +188,14 @@ class AnswerSheetController extends Controller
         // return $temp;
         DB::transaction(fn() => $student_exam->answers()->upsert($temp,['student_exam_id','question_id'],['selected_option_id','is_correct']));
 
-        $scores = [
-            'exam_id' => $exam_id,
-            'total_question' => $exam_question_option->questions->count(),
-            'correct_answered' => $student_exam->answers()->where('is_correct', true)->count()
-        ];
+        $student_exam->refresh();
+        $student_exam->load(['answers', 'exam.questions'])
+            ->loadCount([
+            'answers as correct_answer_count' => fn($q) => $q->where('is_correct', 1),
+            'answers as incorrect_answer_count' => fn($q) => $q->where('is_correct', 0),
+            'answers as missed_answer_count' => fn($q) => $q->where('is_correct', null),
+            ]);
+        $scores = (new ScoreService())->fetchExamScore($student_exam);
         return Response::apiSuccess('Answer Saved Successfully', $scores, 200);
     }
 
