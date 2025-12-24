@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('exams', function (Blueprint $table) {
             $table->decimal('negative_marking_point',5,2)->nullable()->after('exam_type_id');
-            $table->boolean('is_negative_marking')->default(0)->after('exam_type_id');
+            $table->boolean('is_negative_marking')->nullable()->after('exam_type_id');
         });
     }
 
