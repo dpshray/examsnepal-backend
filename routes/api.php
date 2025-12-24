@@ -289,10 +289,6 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('/doubt/{id}', [DoubtController::class, 'show']);
 
     Route::post('/students/notifications', [NotificationController::class ,'sendBulkPushNotification']);
-});
-
-Route::middleware(['auth:users', 'role:teacher'])->group(function () {
-    // Route::get('/subjects', [SubjectController::class, 'index']);
     Route::get('/admin/manual-student-email-verify/{student_profile_id}', [AuthController::class, 'manualStudentEmailVerifier']);
 });
 
