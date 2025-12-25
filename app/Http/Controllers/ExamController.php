@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ExamTypeEnum;
+use App\Http\Resources\PlayerExamScoreCollection;
 use Illuminate\Http\Request;
 use App\Models\Exam;
+use App\Traits\PaginatorTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rule;
 
 class ExamController extends Controller
 {
+    use PaginatorTrait;
     /**
      * Display a listing of the resource.
      */
@@ -447,6 +450,20 @@ class ExamController extends Controller
      *         description="ID of the exam",
      *         @OA\Schema(type="integer")
      *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page no of player list",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         required=false,
+     *         description="Number of players per response",
+     *         @OA\Schema(type="integer")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="List of exams retrieved successfully",
@@ -481,17 +498,34 @@ class ExamController extends Controller
      *     )
      * )
     */
-    public function examPlayersScoreList(Exam $exam)
-    {
-        $exam = $exam->load([
-            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])
-                ->with(['student:id,name'])
-                ->withCount('correct_answers')
-                ->orderBy('correct_answers_count', 'DESC')
-                ->orderBy('id', 'DESC')
-        ]);
+    public function examPlayersScoreList(Request $request, Exam $exam)
+    {       
+        $per_page = $request->query('per_page',10);
+        // $per_page = $per_page ? $per_page : ;
+        $status = null;
+        if (!empty($exam->status)) {
+            $raw = ExamTypeEnum::getKeyByValue($exam->status);
+            $status = explode('_', strtolower($raw))[0];
+        }
+        $student_exams = $exam->student_exams()
+            ->select(['id', 'student_id', 'exam_id'])
+            ->with([
+                'student:id,name',
+                'exam.questions'
+            ])
+            ->withCount('correct_answers')
+            ->orderBy('correct_answers_count', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->paginate($per_page);
 
-        $data = new \App\Http\Resources\ExamResource($exam);
+        // $data = new \App\Http\Resources\ExamResource($exam);
+        $data = [
+            "id" => $exam->id,
+            "exam_name" => $exam->exam_name,
+            "status" =>  $status,
+            // "user" => $exam->user, #<---added_by
+            'players' => $this->setupPagination($student_exams, PlayerExamScoreCollection::class)->data
+        ];
         return Response::apiSuccess('exam with its lists of players with scores', $data);
     }
 }
