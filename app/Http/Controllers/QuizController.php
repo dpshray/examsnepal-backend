@@ -93,6 +93,7 @@ class QuizController extends Controller
                     ->where('student_exams.student_id', Auth::guard('api')->id());
             })
             ->select('exams.*')
+            ->withCount('questions')
             ->orderByDesc('student_exams.id')
             ->paginate();
         $data = $this->setupPagination($free_quiz_query, StudentExamCompletedListCollection::class)->data;
@@ -179,8 +180,8 @@ class QuizController extends Controller
      * )
      */
     public function getPendingFreeQuiz()
-    {
-        $free_quiz_query = Exam::freeType()->authUserPending()->orderBy('id','DESC')->paginate();
+    {    
+        $free_quiz_query = Exam::freeType()->authUserPending()->withCount('questions')->orderBy('id','DESC')->paginate();
         $data = $this->setupPagination($free_quiz_query, StudentExamListCollection::class)->data;
 
         return Response::apiSuccess('Free pending quizzes retrieved successfully.', $data);
@@ -262,6 +263,7 @@ class QuizController extends Controller
                     ->where('student_exams.student_id', Auth::guard('api')->id());
             })
             ->select('exams.*')
+            ->withCount('questions')
             ->orderByDesc('student_exams.id')
             ->paginate();
         $data = $this->setupPagination($sprint_quiz_query, StudentExamCompletedListCollection::class)->data;
@@ -348,7 +350,7 @@ class QuizController extends Controller
      */
     public function getPendingSprintQuiz()
     {
-        $sprint_quiz_query = Exam::sprintType()->authUserPending()->orderBy('id', 'DESC')->paginate();
+        $sprint_quiz_query = Exam::sprintType()->authUserPending()->withCount('questions')->orderBy('id', 'DESC')->paginate();
         $data = $this->setupPagination($sprint_quiz_query, StudentExamListCollection::class)->data;
 
         return Response::apiSuccess('Sprint pending quizzes retrieved successfully.', $data);
@@ -430,6 +432,7 @@ class QuizController extends Controller
                     ->where('student_exams.student_id', Auth::guard('api')->id());
             })
             ->select('exams.*')
+            ->withCount('questions')
             ->orderByDesc('student_exams.id')
             ->paginate();
         $data = $this->setupPagination($mock_quiz_query, StudentExamCompletedListCollection::class)->data;
