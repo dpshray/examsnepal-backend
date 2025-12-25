@@ -19,10 +19,10 @@ class PlayerExamScoreResource extends JsonResource
         return [
             'id' => $this->whenLoaded('student', fn() => $this->student->id),
             'name' => $this->whenLoaded('student', fn() => $this->student->name),
-            'solutions' => $this->whenLoaded('answers', fn() => [
+            'solutions' => [
                 'corrected' => (int)$this->correct_answers_count, # right answered
-                'total' => '$this->exam->questions->count()' # total questions
-            ]),
+                'total' => $this->exam->questions->count() # total questions
+            ],
             // 'corrected' => $this->whenCounted('correct_answers')
         ];
     }
