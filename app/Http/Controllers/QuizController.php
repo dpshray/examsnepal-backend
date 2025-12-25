@@ -86,7 +86,15 @@ class QuizController extends Controller
      */
     public function getCompletedFreeQuiz()
     {
-        $free_quiz_query = Exam::freeType()->authUserCompleted()->paginate();
+        $free_quiz_query = Exam::freeType()
+            ->authUserCompleted()
+            ->leftJoin('student_exams', function ($join) {
+                $join->on('student_exams.exam_id', '=', 'exams.id')
+                    ->where('student_exams.student_id', Auth::guard('api')->id());
+            })
+            ->select('exams.*')
+            ->orderByDesc('student_exams.id')
+            ->paginate();
         $data = $this->setupPagination($free_quiz_query, StudentExamCompletedListCollection::class)->data;
 
         return Response::apiSuccess('Free completed quizzes retrieved successfully.', $data);
@@ -172,7 +180,7 @@ class QuizController extends Controller
      */
     public function getPendingFreeQuiz()
     {
-        $free_quiz_query = Exam::freeType()->authUserPending()->paginate();
+        $free_quiz_query = Exam::freeType()->authUserPending()->orderBy('id','DESC')->paginate();
         $data = $this->setupPagination($free_quiz_query, StudentExamListCollection::class)->data;
 
         return Response::apiSuccess('Free pending quizzes retrieved successfully.', $data);
@@ -247,7 +255,15 @@ class QuizController extends Controller
      */
     public function getCompletedSprintQuiz()
     {
-        $sprint_quiz_query = Exam::sprintType()->authUserCompleted()->paginate();
+        $sprint_quiz_query = Exam::sprintType()
+            ->authUserCompleted()
+            ->leftJoin('student_exams', function ($join) {
+                $join->on('student_exams.exam_id', '=', 'exams.id')
+                    ->where('student_exams.student_id', Auth::guard('api')->id());
+            })
+            ->select('exams.*')
+            ->orderByDesc('student_exams.id')
+            ->paginate();
         $data = $this->setupPagination($sprint_quiz_query, StudentExamCompletedListCollection::class)->data;
 
         return Response::apiSuccess('Sprint completed quizzes retrieved successfully.', $data);
@@ -332,7 +348,7 @@ class QuizController extends Controller
      */
     public function getPendingSprintQuiz()
     {
-        $sprint_quiz_query = Exam::sprintType()->authUserPending()->paginate();
+        $sprint_quiz_query = Exam::sprintType()->authUserPending()->orderBy('id', 'DESC')->paginate();
         $data = $this->setupPagination($sprint_quiz_query, StudentExamListCollection::class)->data;
 
         return Response::apiSuccess('Sprint pending quizzes retrieved successfully.', $data);
@@ -407,7 +423,15 @@ class QuizController extends Controller
      */
     public function getCompletedMockTest()
     {
-        $mock_quiz_query = Exam::mockType()->authUserCompleted()->paginate();
+        $mock_quiz_query = Exam::mockType()
+            ->authUserCompleted()
+            ->leftJoin('student_exams', function ($join) {
+                $join->on('student_exams.exam_id', '=', 'exams.id')
+                    ->where('student_exams.student_id', Auth::guard('api')->id());
+            })
+            ->select('exams.*')
+            ->orderByDesc('student_exams.id')
+            ->paginate();
         $data = $this->setupPagination($mock_quiz_query, StudentExamCompletedListCollection::class)->data;
 
         return Response::apiSuccess('Mock completed quizzes retrieved successfully.', $data);
@@ -496,7 +520,7 @@ class QuizController extends Controller
      */
     public function getPendingMockTest()
     {
-        $mock_quiz = Exam::mockType()->authUserPending()->paginate();
+        $mock_quiz = Exam::mockType()->authUserPending()->orderBy('id', 'DESC')->paginate();
         $data = $this->setupPagination($mock_quiz, StudentExamListCollection::class)->data;
 
         return Response::apiSuccess('Mock pending quizzes retrieved successfully.', $data);

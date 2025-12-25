@@ -113,8 +113,8 @@ class Exam extends Model
             ->withCount('questions')
             ->has('questions')
             ->where('live', 1)
-            ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id))
-            ->orderBy('id', 'DESC');
+            ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id));
+            // ->orderBy('id', 'DESC');
     }
 
 
