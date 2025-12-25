@@ -40,8 +40,15 @@ class StudentExam extends Model
     {
         return $this->hasMany(Exam::class);
     }
+
     public function exam()
     {
         return $this->belongsTo(Exam::class, 'exam_id');
+    }
+
+    public function incorrect_answers()
+    {
+        return $this->hasMany(Answersheet::class)
+            ->where('is_correct', false);
     }
 }

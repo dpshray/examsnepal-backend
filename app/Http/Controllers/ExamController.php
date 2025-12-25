@@ -498,17 +498,51 @@ class ExamController extends Controller
      *         )
      *     )
      * )
-    */
+     */
     public function examPlayersScoreList(Request $request, Exam $exam)
-    {       
-        $per_page = $request->query('per_page',10);
+    {
+        $per_page = $request->query('per_page', 10);
         // $per_page = $per_page ? $per_page : ;
         $status = null;
         if (!empty($exam->status)) {
             $raw = ExamTypeEnum::getKeyByValue($exam->status);
             $status = explode('_', strtolower($raw))[0];
         }
+        $exam = Exam::findOrFail(2127);
+
         $student_exams = $exam->student_exams()
+            ->select([
+                'student_exams.id',
+                'student_exams.student_id',
+                'student_exams.exam_id',
+                'student_exams.created_at',
+            ])
+            ->with([
+                'student:id,name',
+                'exam.questions'
+            ])
+            ->withCount([
+                'correct_answers as correct_answer_count',
+                'incorrect_answers as incorrect_answer_count'
+            ])
+            ->selectRaw('
+                (
+                    (select count(*) from answersheets 
+                    where answersheets.student_exam_id = student_exams.id 
+                    and is_correct = 1)
+                    -
+                    (
+                        (select count(*) from answersheets 
+                        where answersheets.student_exam_id = student_exams.id 
+                        and is_correct = 0) * ?
+                    )
+                ) as marks
+            ', [$exam->negative_marking_point])
+            ->orderByDesc('marks')
+            ->orderByDesc('correct_answer_count')
+            ->paginate($per_page);
+
+        /* $student_exams = $exam->student_exams()
             ->select(['id', 'student_id', 'exam_id','created_at'])
             ->with([
                 'student:id,name',
@@ -521,15 +555,16 @@ class ExamController extends Controller
             ])
             ->orderBy('correct_answer_count', 'DESC')
             ->orderBy('id', 'DESC')
-            ->paginate($per_page);
+            ->paginate($per_page); */
 
         // $data = new \App\Http\Resources\ExamResource($exam);
+        $players = $this->setupPagination($student_exams, PlayerExamScoreCollection::class)->data;
         $data = [
             "id" => $exam->id,
             "exam_name" => $exam->exam_name,
             "status" =>  $status,
             // "user" => $exam->user, #<---added_by
-            'players' => $this->setupPagination($student_exams, PlayerExamScoreCollection::class)->data
+            'players' => $players
         ];
         return Response::apiSuccess('exam with its lists of players with scores', $data);
     }
