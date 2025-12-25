@@ -31,7 +31,7 @@ class StudentExamCompletedListResource extends JsonResource
             "questions_count" => $this->whenCounted('questions', fn() => (int) $this->questions_count),
             "user" => $this->whenLoaded('user'), #<---added_by
             // 'players' => $this->whenLoaded('student_exams', fn() => new PlayerExamScoreCollection($this->student_exams))
-            'players' => $this->student_exams->map(fn($SE) =>
+            /* 'players' => $this->student_exams->map(fn($SE) =>
                 [
                     'id' => $SE->student->id,
                     'name' => $SE->student->name,
@@ -40,7 +40,7 @@ class StudentExamCompletedListResource extends JsonResource
                         'total' => $this->questions_count # total questions
                     ]
                 ]
-            )
+            ) */
         ];
     }
 }

@@ -65,10 +65,12 @@ class Exam extends Model
     public function scopeAuthUserPending(Builder $query): Builder
     {
         return $query->with([
-            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])->with([
-                'student:id,name',
-                'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
-            ])
+            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])
+                # commented since no player needed no show
+                /* ->with([
+                    'student:id,name',
+                    'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
+                ]) */
                 ->withCount([
                     'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
                 ])
@@ -85,10 +87,12 @@ class Exam extends Model
     public function scopeAuthUserCompleted(Builder $query): Builder
     {
         return $query->with([
-            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])->with([
-                'student:id,name',
-                'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
-            ])
+            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])
+                # commented since no player needed no show
+                /* ->with([
+                    'student:id,name',
+                    'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
+                ]) */
                 ->withCount([
                     'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
                 ])

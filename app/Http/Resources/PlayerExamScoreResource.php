@@ -2,8 +2,10 @@
 
 namespace App\Http\Resources;
 
+use App\Services\ScoreService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 class PlayerExamScoreResource extends JsonResource
 {
@@ -15,13 +17,30 @@ class PlayerExamScoreResource extends JsonResource
     public function toArray(Request $request): array
     {
         // return parent::toArray($request);
-        $student_exam = $this->student_exams;
+        // $student_exam = $this->student_exams;
+        [
+            "correct_answer_count" => $correct_answer_count,
+            'is_negative_marking' => $is_negative_marking,
+            'negative_marking_point' => $negative_marking_point,
+            'incorrect_answer_count' => $incorrect_answer_count,
+            'missed_answer_count' => $missed_answer_count,
+            'total_point_reduction_based_on_negative_marking_point' => $total_point_reduction_based_on_negative_marking_point,
+            // 'final_exam_marks_after_reduction_of_negative_marking_point' => $correct_answer_count - $total_point_reduction_based_on_negative_marking_point,
+
+        ] = (new ScoreService())->fetchExamScore($this->resource);
+        // Log::info($this->resource);
         return [
             'id' => $this->whenLoaded('student', fn() => $this->student->id),
             'name' => $this->whenLoaded('student', fn() => $this->student->name),
             'solutions' => [
-                'corrected' => (int)$this->correct_answers_count, # right answered
-                'total' => $this->exam->questions->count() # total questions
+                'marks' => (float)($correct_answer_count - $total_point_reduction_based_on_negative_marking_point), # right answered
+                'full_marks' => $this->exam->questions->count(), # total questions,
+                'correct_answer_count' => $correct_answer_count,
+                'is_negative_marking' => $is_negative_marking,
+                'negative_marking_point' => $negative_marking_point,
+                'incorrect_answer_count' => $incorrect_answer_count,
+                'missed_answer_count' => $missed_answer_count,
+                'total_point_reduction_based_on_negative_marking_point' => $total_point_reduction_based_on_negative_marking_point,
             ],
             // 'corrected' => $this->whenCounted('correct_answers')
         ];

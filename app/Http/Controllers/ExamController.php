@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Exam;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rule;
 
@@ -508,13 +509,17 @@ class ExamController extends Controller
             $status = explode('_', strtolower($raw))[0];
         }
         $student_exams = $exam->student_exams()
-            ->select(['id', 'student_id', 'exam_id'])
+            ->select(['id', 'student_id', 'exam_id','created_at'])
             ->with([
                 'student:id,name',
                 'exam.questions'
             ])
-            ->withCount('correct_answers')
-            ->orderBy('correct_answers_count', 'DESC')
+            ->withCount([
+                'answers as correct_answer_count' => fn($q) => $q->where('is_correct', 1),
+                'answers as incorrect_answer_count' => fn($q) => $q->where('is_correct', 0),
+                'answers as missed_answer_count' => fn($q) => $q->where('is_correct', null),
+            ])
+            ->orderBy('correct_answer_count', 'DESC')
             ->orderBy('id', 'DESC')
             ->paginate($per_page);
 
