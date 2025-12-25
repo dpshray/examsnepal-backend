@@ -520,7 +520,6 @@ class ExamController extends Controller
             $raw = ExamTypeEnum::getKeyByValue($exam->status);
             $status = explode('_', strtolower($raw))[0];
         }
-        $exam = Exam::findOrFail(2127);
 
         $student_exams = $exam->student_exams()
             ->select([
