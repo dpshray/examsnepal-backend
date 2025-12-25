@@ -18,7 +18,7 @@ class ScoreService
 
         $missed_answer_count = ($total_answer_count == ($correct_answer_count + $incorrect_answer_count + $missed_answer_count)) ? $missed_answer_count : ($total_answer_count - ($correct_answer_count + $incorrect_answer_count));
 
-        $total_point_reduction_based_on_negative_marking_point = $is_negative_marking ? ($incorrect_answer_count + $missed_answer_count) * $exam->negative_marking_point : 0;
+        $total_point_reduction_based_on_negative_marking_point = $is_negative_marking ? ($incorrect_answer_count) * $exam->negative_marking_point : 0;
 
 
         $scores = [
