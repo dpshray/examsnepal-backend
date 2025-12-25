@@ -32,7 +32,8 @@ class ScoreService
             'incorrect_answer_count' => (int)$incorrect_answer_count,
             'missed_answer_count' => (int)$missed_answer_count,
             'total_point_reduction_based_on_negative_marking_point' => $total_point_reduction_based_on_negative_marking_point,
-            'final_exam_marks_after_reduction_of_negative_marking_point' => $correct_answer_count - $total_point_reduction_based_on_negative_marking_point
+            'final_exam_marks_after_reduction_of_negative_marking_point' => $correct_answer_count - $total_point_reduction_based_on_negative_marking_point,
+            'submitted_at' => $student_exam->created_at->format('Y/m/d')
         ];
         return $scores;
     }
