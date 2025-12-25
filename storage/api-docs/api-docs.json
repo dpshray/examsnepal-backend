@@ -7404,68 +7404,108 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of exams retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer",
-                                                "example": 1
-                                            },
-                                            "exam_name": {
-                                                "type": "string",
-                                                "example": "Math Final"
-                                            },
-                                            "exam_date": {
-                                                "type": "string",
-                                                "format": "date",
-                                                "example": "2025-06-10"
-                                            },
-                                            "organization": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "ABC University"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            },
-                                            "examType": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "Final Exam"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        },
-                                        "type": "object"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server error",
+                        "description": "Exam with its lists of players with scores",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "Internal server error"
+                                            "example": "exam with its lists of players with scores"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 2127
+                                                },
+                                                "exam_name": {
+                                                    "type": "string",
+                                                    "example": "Physiology Quiz on Blood Pressure and Regulation"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "free"
+                                                },
+                                                "players": {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 7570
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Saroj sah"
+                                                                    },
+                                                                    "solutions": {
+                                                                        "properties": {
+                                                                            "marks": {
+                                                                                "type": "number",
+                                                                                "format": "float",
+                                                                                "example": 23
+                                                                            },
+                                                                            "full_marks": {
+                                                                                "type": "integer",
+                                                                                "example": 30
+                                                                            },
+                                                                            "correct_answer_count": {
+                                                                                "type": "integer",
+                                                                                "example": 23
+                                                                            },
+                                                                            "is_negative_marking": {
+                                                                                "type": "boolean",
+                                                                                "example": true
+                                                                            },
+                                                                            "negative_marking_point": {
+                                                                                "type": "number",
+                                                                                "format": "float",
+                                                                                "example": 0.25
+                                                                            },
+                                                                            "incorrect_answer_count": {
+                                                                                "type": "integer",
+                                                                                "example": 0
+                                                                            },
+                                                                            "missed_answer_count": {
+                                                                                "type": "integer",
+                                                                                "example": 7
+                                                                            },
+                                                                            "total_point_reduction_based_on_negative_marking_point": {
+                                                                                "type": "number",
+                                                                                "format": "float",
+                                                                                "example": 0
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "current_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 7
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 104
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"

@@ -467,34 +467,46 @@ class ExamController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="List of exams retrieved successfully",
+     *         description="Exam with its lists of players with scores",
      *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="exam with its lists of players with scores"),
+     *             @OA\Property(
+     *                 property="data",
      *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
-     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
+     *                 @OA\Property(property="id", type="integer", example=2127),
+     *                 @OA\Property(property="exam_name", type="string", example="Physiology Quiz on Blood Pressure and Regulation"),
+     *                 @OA\Property(property="status", type="string", example="free"),
      *                 @OA\Property(
-     *                     property="organization",
+     *                     property="players",
      *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="name", type="string", example="ABC University")
-     *                 ),
-     *                 @OA\Property(
-     *                     property="examType",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="name", type="string", example="Final Exam")
+     *                     @OA\Property(
+     *                         property="data",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=7570),
+     *                             @OA\Property(property="name", type="string", example="Saroj sah"),
+     *                             @OA\Property(
+     *                                 property="solutions",
+     *                                 type="object",
+     *                                 @OA\Property(property="marks", type="number", format="float", example=23),
+     *                                 @OA\Property(property="full_marks", type="integer", example=30),
+     *                                 @OA\Property(property="correct_answer_count", type="integer", example=23),
+     *                                 @OA\Property(property="is_negative_marking", type="boolean", example=true),
+     *                                 @OA\Property(property="negative_marking_point", type="number", format="float", example=0.25),
+     *                                 @OA\Property(property="incorrect_answer_count", type="integer", example=0),
+     *                                 @OA\Property(property="missed_answer_count", type="integer", example=7),
+     *                                 @OA\Property(property="total_point_reduction_based_on_negative_marking_point", type="number", format="float", example=0)
+     *                             )
+     *                         )
+     *                     ),
+     *                     @OA\Property(property="current_page", type="integer", example=1),
+     *                     @OA\Property(property="last_page", type="integer", example=7),
+     *                     @OA\Property(property="total", type="integer", example=104)
      *                 )
      *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Internal server error")
      *         )
      *     )
      * )
