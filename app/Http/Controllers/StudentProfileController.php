@@ -847,7 +847,8 @@ class StudentProfileController extends Controller
                     'answers as correct_answer_count' => fn($q) => $q->where('is_correct', 1),
                     'answers as incorrect_answer_count' => fn($q) => $q->where('is_correct', 0),
                     'answers as missed_answer_count' => fn($q) => $q->where('is_correct', null),
-                ]);
+                ])
+                ->orderBy('id','DESC');
             }])
             ->firstOrFail();
         $scores = new StudentAllExamScoreDetailResource($exams_score);
