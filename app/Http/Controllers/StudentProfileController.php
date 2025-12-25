@@ -922,7 +922,7 @@ class StudentProfileController extends Controller
             ])
             ->firstWhere('student_id', Auth::id());
         if (empty($student_exam)) {
-            return Response::apiError('Student exam does not exists.');
+            return Response::apiError('This exam has not been attempted by you.');
         }
 
         $scores = (new ScoreService())->fetchExamScore($student_exam);
