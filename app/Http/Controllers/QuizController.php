@@ -172,7 +172,7 @@ class QuizController extends Controller
      */
     public function getPendingFreeQuiz()
     {
-        $free_quiz_query = Exam::freeType()->authUserPending()->paginate(1);
+        $free_quiz_query = Exam::freeType()->authUserPending()->paginate();
         $data = $this->setupPagination($free_quiz_query, StudentExamListCollection::class)->data;
 
         return Response::apiSuccess('Free pending quizzes retrieved successfully.', $data);
