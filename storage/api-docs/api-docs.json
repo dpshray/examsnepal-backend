@@ -1908,54 +1908,40 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Successful Login",
+                        "description": "Successful login",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "access_token": {
-                                            "type": "string",
-                                            "example": "your_generated_jwt_token"
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
                                         },
-                                        "token_type": {
+                                        "message": {
                                             "type": "string",
-                                            "example": "bearer"
+                                            "example": "welcome, examsnepal"
                                         },
-                                        "expires_in": {
-                                            "type": "integer",
-                                            "example": 3600
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Incorrect password"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "user Not Found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "type": "string",
-                                            "example": "user not found"
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "username": {
+                                                            "type": "string",
+                                                            "example": "examsnepal"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "hariofhungi@gmail.com"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FwaS5leGFtc25lcGFsLmR3b3JrbGFicy5jb20vYXBpL2FkbWluL2xvZ2luIiwiaWF0IjoxNzY2NjU0MTc0LCJuYmYiOjE3NjY2NTQxNzQsImp0aSI6IkZVNkc2amdCbFpWVThoZ3YiLCJzdWIiOiIxNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.ZdTS4H6TBHUe6yQtIt41PMCS0MFzekaYJftTrqMJdLY"
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
