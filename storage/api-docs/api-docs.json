@@ -12936,68 +12936,55 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of completed free exams retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer",
-                                                "example": 1
-                                            },
-                                            "exam_name": {
-                                                "type": "string",
-                                                "example": "Math Final"
-                                            },
-                                            "exam_date": {
-                                                "type": "string",
-                                                "format": "date",
-                                                "example": "2025-06-10"
-                                            },
-                                            "organization": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "ABC University"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            },
-                                            "examType": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "Final Exam"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        },
-                                        "type": "object"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server error",
+                        "description": "Student's free exam completed status",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 2497
+                                                            },
+                                                            "exam_name": {
+                                                                "type": "string",
+                                                                "example": "MDMS Revision All Subjects"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "free"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "Internal server error"
+                                            "example": "Student's free exam completed status"
                                         }
                                     },
                                     "type": "object"
@@ -13030,68 +13017,55 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of completed sprint exams retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer",
-                                                "example": 1
-                                            },
-                                            "exam_name": {
-                                                "type": "string",
-                                                "example": "Math Final"
-                                            },
-                                            "exam_date": {
-                                                "type": "string",
-                                                "format": "date",
-                                                "example": "2025-06-10"
-                                            },
-                                            "organization": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "ABC University"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            },
-                                            "examType": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "Final Exam"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        },
-                                        "type": "object"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server error",
+                        "description": "Student's sprint exam completed status",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 2519
+                                                            },
+                                                            "exam_name": {
+                                                                "type": "string",
+                                                                "example": "MDMS Forensic Medicine Based Sprint Quiz"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "sprint"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 7
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "Internal server error"
+                                            "example": "Student's sprint exam completed status"
                                         }
                                     },
                                     "type": "object"
@@ -13124,68 +13098,55 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of completed sprint exams retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer",
-                                                "example": 1
-                                            },
-                                            "exam_name": {
-                                                "type": "string",
-                                                "example": "Math Final"
-                                            },
-                                            "exam_date": {
-                                                "type": "string",
-                                                "format": "date",
-                                                "example": "2025-06-10"
-                                            },
-                                            "organization": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "ABC University"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            },
-                                            "examType": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "Final Exam"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        },
-                                        "type": "object"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Server error",
+                        "description": "Student's mock exam completed status",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 2496
+                                                            },
+                                                            "exam_name": {
+                                                                "type": "string",
+                                                                "example": "MDMS Full Mock Test"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "mock"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "Internal server error"
+                                            "example": "Student's mock exam completed status"
                                         }
                                     },
                                     "type": "object"

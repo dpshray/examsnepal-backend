@@ -867,34 +867,28 @@ class QuizController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="List of completed free exams retrieved successfully",
+     *         description="Student's free exam completed status",
      *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
      *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
-     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
      *                 @OA\Property(
-     *                     property="organization",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="name", type="string", example="ABC University")
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=2497),
+     *                         @OA\Property(property="exam_name", type="string", example="MDMS Revision All Subjects"),
+     *                         @OA\Property(property="status", type="string", example="free")
+     *                     )
      *                 ),
-     *                 @OA\Property(
-     *                     property="examType",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="name", type="string", example="Final Exam")
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="last_page", type="integer", example=1),
+     *                 @OA\Property(property="total", type="integer", example=10)
+     *             ),
+     *             @OA\Property(property="message", type="string", example="Student's free exam completed status")
      *         )
      *     )
      * )
@@ -903,6 +897,7 @@ class QuizController extends Controller
     {
         $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
                     ->freeType()
+                    ->orderBy('id','DESC')
                     ->paginate();
         $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
@@ -925,34 +920,36 @@ class QuizController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="List of completed sprint exams retrieved successfully",
+     *         description="Student's sprint exam completed status",
      *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
      *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
-     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
      *                 @OA\Property(
-     *                     property="organization",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="name", type="string", example="ABC University")
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=2519),
+     *                         @OA\Property(
+     *                             property="exam_name",
+     *                             type="string",
+     *                             example="MDMS Forensic Medicine Based Sprint Quiz"
+     *                         ),
+     *                         @OA\Property(property="status", type="string", example="sprint")
+     *                     )
      *                 ),
-     *                 @OA\Property(
-     *                     property="examType",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="name", type="string", example="Final Exam")
-     *                 )
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="last_page", type="integer", example=1),
+     *                 @OA\Property(property="total", type="integer", example=7)
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Student's sprint exam completed status"
      *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Internal server error")
      *         )
      *     )
      * )
@@ -961,6 +958,7 @@ class QuizController extends Controller
     {
         $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
                     ->sprintType()
+                    ->orderBy('id','DESC')
                     ->paginate();
         $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
@@ -983,34 +981,36 @@ class QuizController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="List of completed sprint exams retrieved successfully",
+     *         description="Student's mock exam completed status",
      *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
      *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
-     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
      *                 @OA\Property(
-     *                     property="organization",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="name", type="string", example="ABC University")
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=2496),
+     *                         @OA\Property(
+     *                             property="exam_name",
+     *                             type="string",
+     *                             example="MDMS Full Mock Test"
+     *                         ),
+     *                         @OA\Property(property="status", type="string", example="mock")
+     *                     )
      *                 ),
-     *                 @OA\Property(
-     *                     property="examType",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="name", type="string", example="Final Exam")
-     *                 )
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="last_page", type="integer", example=1),
+     *                 @OA\Property(property="total", type="integer", example=3)
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Student's mock exam completed status"
      *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Internal server error")
      *         )
      *     )
      * )
@@ -1019,6 +1019,7 @@ class QuizController extends Controller
     {
         $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
                     ->mockType()
+                    ->orderBy('id','DESC')
                     ->paginate();
         $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
