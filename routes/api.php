@@ -131,6 +131,7 @@ Route::middleware(['auth:api','verified'])->group(function () {
 
     Route::get('get-student-performance-data', [StudentProfileController::class, 'studentPerformanceReport']);
     Route::get('/students/me/exams/scores', [StudentProfileController::class, 'myExamScores']);
+    Route::get('/students/get-my-exams-score/{exam}', [StudentProfileController::class, 'myAnExamScore']);
 
     Route::get('/student/questions', [ForumController::class, 'fetchQuestions']);
     Route::get('/student/questions/answer/{id}', [ForumController::class, 'question_answer']);
@@ -288,10 +289,6 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('/doubt/{id}', [DoubtController::class, 'show']);
 
     Route::post('/students/notifications', [NotificationController::class ,'sendBulkPushNotification']);
-});
-
-Route::middleware(['auth:users', 'role:teacher'])->group(function () {
-    // Route::get('/subjects', [SubjectController::class, 'index']);
     Route::get('/admin/manual-student-email-verify/{student_profile_id}', [AuthController::class, 'manualStudentEmailVerifier']);
 });
 

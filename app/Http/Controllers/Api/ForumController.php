@@ -30,6 +30,14 @@ use Illuminate\Support\Facades\Cache;
  * @OA\Server(
  *     url="http://192.168.100.18:8000/api/",
  *     description="Localhost API Server 2"
+ * ),
+ * @OA\Server(
+ *     url="http://192.168.100.23:8000/api/",
+ *     description="Localhost API Server 3"
+ * ),
+ * @OA\Server(
+ *     url="http://127.0.0.1:8000/api/",
+ *     description="Localhost API Server 4"
  * )
  *
  * @OA\Tag(

@@ -17,6 +17,8 @@ use App\Enums\RequestedFromEnum;
 use App\Http\Resources\Student\AllStudentResource;
 use App\Http\Resources\Student\Exam\StudentAllExamScoreDetailResource;
 use App\Http\Resources\StudentProfileResource;
+use App\Models\Exam;
+use App\Services\ScoreService;
 use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
@@ -136,6 +138,13 @@ class StudentProfileController extends Controller
      *     description="Retrieve a list of all students from the StudentProfile model.",
      *     operationId="getAllStudents",
      *     tags={"Students"},
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         required=false,
+     *         description="Search student based on email",
+     *         @OA\Schema(type="string", example="")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Students list fetched successfully.",
@@ -784,7 +793,7 @@ class StudentProfileController extends Controller
      *     tags={"Students"},
      *     @OA\Response(
      *         response=200,
-     *         description="Student overall exam score results.",
+     *         description="Student overall exam score results",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(
@@ -797,25 +806,24 @@ class StudentProfileController extends Controller
      *                 type="array",
      *                 @OA\Items(
      *                     type="object",
+     *                     @OA\Property(property="exam_id", type="integer", example=2460),
+     *                     @OA\Property(property="exam_name", type="string", example="MDMS CEE Revision all Subject"),
+     *                     @OA\Property(property="type", type="string", example="FREE_QUIZ"),
+     *                     @OA\Property(property="is_negative_marking", type="boolean", example=false),
+     *                     @OA\Property(property="negative_marking_point", type="number", nullable=true, example=null),
+     *                     @OA\Property(property="total_question_count", type="integer", example=30),
+     *                     @OA\Property(property="correct_answer_count", type="integer", example=21),
+     *                     @OA\Property(property="incorrect_answer_count", type="integer", example=8),
+     *                     @OA\Property(property="missed_answer_count", type="integer", example=1),
      *                     @OA\Property(
-     *                         property="exam_name",
-     *                         type="string",
-     *                         example="MDMS CEE Revision all Subject"
+     *                         property="total_point_reduction_based_on_negative_marking_point",
+     *                         type="number",
+     *                         example=0
      *                     ),
      *                     @OA\Property(
-     *                         property="type",
-     *                         type="string",
-     *                         example="FREE_QUIZ"
-     *                     ),
-     *                     @OA\Property(
-     *                         property="total_question_count",
-     *                         type="integer",
-     *                         example=30
-     *                     ),
-     *                     @OA\Property(
-     *                         property="correct_answer_count",
-     *                         type="integer",
-     *                         example=22
+     *                         property="final_exam_marks_after_reduction_of_negative_marking_point",
+     *                         type="number",
+     *                         example=21
      *                     )
      *                 )
      *             ),
@@ -836,11 +844,89 @@ class StudentProfileController extends Controller
                     'exam' => fn($q) => $q->withCount('questions')
                 ])
                 ->withCount([
-                    'answers as correct_answer_count' => fn($q) => $q->where('is_correct', 1)
-                ]);
+                    'answers as correct_answer_count' => fn($q) => $q->where('is_correct', 1),
+                    'answers as incorrect_answer_count' => fn($q) => $q->where('is_correct', 0),
+                    'answers as missed_answer_count' => fn($q) => $q->where('is_correct', null),
+                ])
+                ->orderBy('id','DESC');
             }])
             ->firstOrFail();
         $scores = new StudentAllExamScoreDetailResource($exams_score);
         return Response::apiSuccess('Student overall exam score results.', $scores);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/students/get-my-exams-score/{exam_id}",
+     *     summary="Get student exam end score results.",
+     *     description="Get student end score results.",
+     *     operationId="StudentScoreReport",
+     *     tags={"Students"},
+     *     @OA\Parameter(
+     *         name="exam_id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of an exam",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Student exam score results",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="boolean",
+     *                 example=true
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="exam_id", type="integer", example=2460),
+     *                 @OA\Property(property="exam_name", type="string", example="MDMS CEE Revision all Subject"),
+     *                 @OA\Property(property="type", type="string", example="FREE_QUIZ"),
+     *                 @OA\Property(property="is_negative_marking", type="boolean", example=false),
+     *                 @OA\Property(property="negative_marking_point", type="number", nullable=true, example=null),
+     *                 @OA\Property(property="total_question_count", type="integer", example=30),
+     *                 @OA\Property(property="correct_answer_count", type="integer", example=21),
+     *                 @OA\Property(property="incorrect_answer_count", type="integer", example=8),
+     *                 @OA\Property(property="missed_answer_count", type="integer", example=1),
+     *                 @OA\Property(
+     *                     property="total_point_reduction_based_on_negative_marking_point",
+     *                     type="number",
+     *                     example=0
+     *                 ),
+     *                 @OA\Property(
+     *                     property="final_exam_marks_after_reduction_of_negative_marking_point",
+     *                     type="number",
+     *                     example=21
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Student exam score results."
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    function myAnExamScore(Exam $exam)
+    {
+        $student_exam = $exam->student_exams()
+            ->with(['answers', 'exam.questions'])
+            ->withCount([
+                'answers as correct_answer_count' => fn($q) => $q->where('is_correct', 1),
+                'answers as incorrect_answer_count' => fn($q) => $q->where('is_correct', 0),
+                'answers as missed_answer_count' => fn($q) => $q->where('is_correct', null),
+            ])
+            ->firstWhere('student_id', Auth::id());
+        if (empty($student_exam)) {
+            return Response::apiError('This exam has not been attempted by you.');
+        }
+
+        $scores = (new ScoreService())->fetchExamScore($student_exam);
+
+        return Response::apiSuccess('Student exam score results.', $scores);
     }
 }

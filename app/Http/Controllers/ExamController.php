@@ -3,14 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ExamTypeEnum;
+use App\Http\Resources\PlayerExamScoreCollection;
 use Illuminate\Http\Request;
 use App\Models\Exam;
+use App\Traits\PaginatorTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rule;
 
 class ExamController extends Controller
 {
+    use PaginatorTrait;
     /**
      * Display a listing of the resource.
      */
@@ -447,51 +451,132 @@ class ExamController extends Controller
      *         description="ID of the exam",
      *         @OA\Schema(type="integer")
      *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page no of player list",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         required=false,
+     *         description="Number of players per response",
+     *         @OA\Schema(type="integer")
+     *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="List of exams retrieved successfully",
+     *         description="Exam with its lists of players with scores",
      *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="exam with its lists of players with scores"),
+     *             @OA\Property(
+     *                 property="data",
      *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="exam_name", type="string", example="Math Final"),
-     *                 @OA\Property(property="exam_date", type="string", format="date", example="2025-06-10"),
+     *                 @OA\Property(property="id", type="integer", example=2127),
+     *                 @OA\Property(property="exam_name", type="string", example="Physiology Quiz on Blood Pressure and Regulation"),
+     *                 @OA\Property(property="status", type="string", example="free"),
      *                 @OA\Property(
-     *                     property="organization",
+     *                     property="players",
      *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="name", type="string", example="ABC University")
-     *                 ),
-     *                 @OA\Property(
-     *                     property="examType",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="name", type="string", example="Final Exam")
+     *                     @OA\Property(
+     *                         property="data",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=7570),
+     *                             @OA\Property(property="name", type="string", example="Saroj sah"),
+     *                             @OA\Property(
+     *                                 property="solutions",
+     *                                 type="object",
+     *                                 @OA\Property(property="marks", type="number", format="float", example=23),
+     *                                 @OA\Property(property="full_marks", type="integer", example=30),
+     *                                 @OA\Property(property="correct_answer_count", type="integer", example=23),
+     *                                 @OA\Property(property="is_negative_marking", type="boolean", example=true),
+     *                                 @OA\Property(property="negative_marking_point", type="number", format="float", example=0.25),
+     *                                 @OA\Property(property="incorrect_answer_count", type="integer", example=0),
+     *                                 @OA\Property(property="missed_answer_count", type="integer", example=7),
+     *                                 @OA\Property(property="total_point_reduction_based_on_negative_marking_point", type="number", format="float", example=0)
+     *                             )
+     *                         )
+     *                     ),
+     *                     @OA\Property(property="current_page", type="integer", example=1),
+     *                     @OA\Property(property="last_page", type="integer", example=7),
+     *                     @OA\Property(property="total", type="integer", example=104)
      *                 )
      *             )
      *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Internal server error")
-     *         )
      *     )
      * )
-    */
-    public function examPlayersScoreList(Exam $exam)
+     */
+    public function examPlayersScoreList(Request $request, Exam $exam)
     {
-        $exam = $exam->load([
-            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])
-                ->with(['student:id,name'])
-                ->withCount('correct_answers')
-                ->orderBy('correct_answers_count', 'DESC')
-                ->orderBy('id', 'DESC')
-        ]);
+        $per_page = $request->query('per_page', 10);
+        // $per_page = $per_page ? $per_page : ;
+        $status = null;
+        if (!empty($exam->status)) {
+            $raw = ExamTypeEnum::getKeyByValue($exam->status);
+            $status = explode('_', strtolower($raw))[0];
+        }
 
-        $data = new \App\Http\Resources\ExamResource($exam);
+        $student_exams = $exam->student_exams()
+            ->select([
+                'student_exams.id',
+                'student_exams.student_id',
+                'student_exams.exam_id',
+                'student_exams.created_at',
+            ])
+            ->with([
+                'student:id,name',
+                'exam.questions'
+            ])
+            ->withCount([
+                'correct_answers as correct_answer_count',
+                'incorrect_answers as incorrect_answer_count'
+            ])
+            ->selectRaw('
+                (
+                    (select count(*) from answersheets 
+                    where answersheets.student_exam_id = student_exams.id 
+                    and is_correct = 1)
+                    -
+                    (
+                        (select count(*) from answersheets 
+                        where answersheets.student_exam_id = student_exams.id 
+                        and is_correct = 0) * ?
+                    )
+                ) as marks
+            ', [$exam->negative_marking_point])
+            ->orderByDesc('marks')
+            ->orderByDesc('correct_answer_count')
+            ->paginate($per_page);
+
+        /* $student_exams = $exam->student_exams()
+            ->select(['id', 'student_id', 'exam_id','created_at'])
+            ->with([
+                'student:id,name',
+                'exam.questions'
+            ])
+            ->withCount([
+                'answers as correct_answer_count' => fn($q) => $q->where('is_correct', 1),
+                'answers as incorrect_answer_count' => fn($q) => $q->where('is_correct', 0),
+                'answers as missed_answer_count' => fn($q) => $q->where('is_correct', null),
+            ])
+            ->orderBy('correct_answer_count', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->paginate($per_page); */
+
+        // $data = new \App\Http\Resources\ExamResource($exam);
+        $players = $this->setupPagination($student_exams, PlayerExamScoreCollection::class)->data;
+        $data = [
+            "id" => $exam->id,
+            "exam_name" => $exam->exam_name,
+            "status" =>  $status,
+            // "user" => $exam->user, #<---added_by
+            'players' => $players
+        ];
         return Response::apiSuccess('exam with its lists of players with scores', $data);
     }
 }

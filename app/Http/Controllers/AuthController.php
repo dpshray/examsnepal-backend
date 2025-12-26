@@ -252,27 +252,24 @@ class AuthController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Successful Login",
+     *         description="Successful login",
      *         @OA\JsonContent(
-     *             @OA\Property(property="access_token", type="string", example="your_generated_jwt_token"),
-     *             @OA\Property(property="token_type", type="string", example="bearer"),
-     *             @OA\Property(property="expires_in", type="integer", example=3600)
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="welcome, examsnepal"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="user",
+     *                     type="object",
+     *                     @OA\Property(property="username", type="string", example="examsnepal"),
+     *                     @OA\Property(property="email", type="string", example="hariofhungi@gmail.com")
+     *                 ),
+     *                 @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FwaS5leGFtc25lcGFsLmR3b3JrbGFicy5jb20vYXBpL2FkbWluL2xvZ2luIiwiaWF0IjoxNzY2NjU0MTc0LCJuYmYiOjE3NjY2NTQxNzQsImp0aSI6IkZVNkc2amdCbFpWVThoZ3YiLCJzdWIiOiIxNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.ZdTS4H6TBHUe6yQtIt41PMCS0MFzekaYJftTrqMJdLY")
+     *             )
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="error", type="string", example="Incorrect password")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="user Not Found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="error", type="string", example="user not found")
-     *         )
-     *     )
      * )
      */
 
@@ -294,14 +291,14 @@ class AuthController extends Controller
         }
 
         // Ensure the user is an admin
-        Log::info($admin);
+        // Log::info($admin);
         // if ($admin->role !== 'admin') {
         //     return response()->json(['error' => 'Unauthorized: Not an admin user'], 403);
         // }
 
         // // Verify that the password is correct
         if ($admin && !$admin->isAdmin()) {
-            return response()->json(['error' => 'Unauthorized: Not an teacher'], 403);
+            return response()->json(['error' => 'Admin role required.'], 403);
         }
         if (!Hash::check($credentials['password'], $admin->password)) {
             return response()->json(['error' => 'Incorrect password'], 401);
@@ -377,7 +374,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         $user = User::where('email', $credentials['email'])->first();
         if ($user && !$user->isTeacher()) {
-            return response()->json(['error' => 'Unauthorized: Not an teacher'], 403);
+            return response()->json(['error' => 'Teacher role required.'], 403);
         }
         if (!Hash::check($credentials['password'], $user->password)) {
             return response()->json(['error' => 'Incorrect password'], 401);

@@ -30,6 +30,9 @@ class Exam extends Model
         'assign',
         'live',
         'is_question_bank',
+        'is_negative_marking',
+        'negative_marking_point',
+        'points_per_question',
     ];
 
     protected function casts(): array
@@ -63,10 +66,12 @@ class Exam extends Model
     public function scopeAuthUserPending(Builder $query): Builder
     {
         return $query->with([
-            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])->with([
-                'student:id,name',
-                'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
-            ])
+            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])
+                # commented since no player needed no show
+                ->with([
+                    'student:id,name',
+                    'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
+                ])
                 ->withCount([
                     'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
                 ])
@@ -83,10 +88,12 @@ class Exam extends Model
     public function scopeAuthUserCompleted(Builder $query): Builder
     {
         return $query->with([
-            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])->with([
-                'student:id,name',
-                'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
-            ])
+            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])
+                # commented since no player needed no show
+                ->with([
+                    'student:id,name',
+                    'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
+                ])
                 ->withCount([
                     'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
                 ])
@@ -102,13 +109,13 @@ class Exam extends Model
 
     public function scopeAllAvailableExams(Builder $query): Builder
     {
-        return $query->select(['id', 'exam_name', 'status', 'user_id'])
+        return $query->select(['id', 'exam_name', 'status', 'user_id','is_negative_marking', 'negative_marking_point', 'points_per_question'])
             ->with('user:id,fullname')
             ->withCount('questions')
             ->has('questions')
             ->where('live', 1)
-            ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id))
-            ->orderBy('id', 'DESC');
+            ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id));
+            // ->orderBy('id', 'DESC');
     }
 
 

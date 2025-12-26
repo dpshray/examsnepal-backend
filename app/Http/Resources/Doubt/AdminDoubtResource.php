@@ -19,7 +19,7 @@ class AdminDoubtResource extends JsonResource
             'id' => $this->id,
             'status' => $this->status ? 'Not Resolved':'Resolved',
             'doubt' => $this->doubt,
-            'date' => $this->date,
+            'date' => $this->date ?? $this->created_at,
             'remark' => $this->remark,
             'question' => [
                 'question' => $this->question->question ?? null,
