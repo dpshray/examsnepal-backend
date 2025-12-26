@@ -29,6 +29,7 @@ class StudentExamListResource extends JsonResource
             "exam_name" => $this->exam_name,
             'is_negative_marking' => (bool)$this->is_negative_marking,
             'negative_marking_point' => (float)$this->negative_marking_point,
+            'correct_marking_point' => (float)$this->points_per_question,
             "status" =>  $status,
             "questions_count" => $this->whenCounted('questions', fn() => (int) $this->questions_count),
             "user" => $this->whenLoaded('user'), #<---added_by

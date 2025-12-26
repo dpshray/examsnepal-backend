@@ -109,7 +109,7 @@ class Exam extends Model
 
     public function scopeAllAvailableExams(Builder $query): Builder
     {
-        return $query->select(['id', 'exam_name', 'status', 'user_id','is_negative_marking', 'negative_marking_point'])
+        return $query->select(['id', 'exam_name', 'status', 'user_id','is_negative_marking', 'negative_marking_point', 'points_per_question'])
             ->with('user:id,fullname')
             ->withCount('questions')
             ->has('questions')
