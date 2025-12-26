@@ -13387,6 +13387,16 @@
                 "operationId": "getAllStudents",
                 "parameters": [
                     {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number of pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": "1"
+                        }
+                    },
+                    {
                         "name": "search",
                         "in": "query",
                         "description": "Search student based on email",
@@ -13399,7 +13409,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Students list fetched successfully.",
+                        "description": "Students list fetched successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -13409,46 +13419,86 @@
                                             "example": "Students List fetched successfully."
                                         },
                                         "students": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "fullname": {
-                                                        "type": "string",
-                                                        "example": "John Doe"
-                                                    },
-                                                    "email": {
-                                                        "type": "string",
-                                                        "format": "email",
-                                                        "example": "johndoe@example.com"
-                                                    },
-                                                    "phone": {
-                                                        "type": "string",
-                                                        "example": "+977-9800000000"
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    },
-                                                    "updated_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 12824
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Joh"
+                                                            },
+                                                            "email": {
+                                                                "type": "string",
+                                                                "example": "tim@getairmail.com"
+                                                            },
+                                                            "phone": {
+                                                                "type": "string",
+                                                                "example": "+1234567890"
+                                                            },
+                                                            "email_verified_at": {
+                                                                "description": "Verified / Not Verified",
+                                                                "type": "string",
+                                                                "example": "Verified"
+                                                            },
+                                                            "exam_type": {
+                                                                "type": "string",
+                                                                "example": "Medical NMCLE / Loksewa / MDMS Exams"
+                                                            },
+                                                            "registered_date": {
+                                                                "type": "string",
+                                                                "example": "12/26/2025 04:33:37 pm"
+                                                            },
+                                                            "is_subscripted": {
+                                                                "description": "Subscribed / Not Subscribed",
+                                                                "type": "string",
+                                                                "example": "Not Subscribed"
+                                                            },
+                                                            "subscription_start_date": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "subscription_end_date": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "remark": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
                                                     }
                                                 },
-                                                "type": "object"
-                                            }
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1247
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 12470
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
                                 }
                             }
                         }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -16139,6 +16189,144 @@
             }
         },
         "/teacher/exam/{exam}": {
+            "get": {
+                "tags": [
+                    "TeacherExam"
+                ],
+                "summary": "Get exam detail",
+                "description": "Get exam detail",
+                "operationId": "teacher_exam_detail",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Exam id of exam",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam detail fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "exam_type_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "assign": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "live": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "points_per_question": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 1
+                                                },
+                                                "is_negative_marking": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "negative_marking_point": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 0.25
+                                                },
+                                                "exam_name": {
+                                                    "type": "string",
+                                                    "example": "Bibek 3"
+                                                },
+                                                "exam_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "exam_time": {
+                                                    "type": "string",
+                                                    "format": "time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "end_time": {
+                                                    "type": "string",
+                                                    "format": "time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "payment_st": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "sklaflksfdlhslgllks"
+                                                },
+                                                "topic": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "in_progress": {
+                                                    "type": "boolean",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "template": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "remark": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "exam detail fetched successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "put": {
                 "tags": [
                     "TeacherExam"

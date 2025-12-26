@@ -139,6 +139,13 @@ class StudentProfileController extends Controller
      *     operationId="getAllStudents",
      *     tags={"Students"},
      *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         description="Page number of pagination",
+     *         @OA\Schema(type="integer", example="1")
+     *     ),
+     *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         required=false,
@@ -147,28 +154,75 @@ class StudentProfileController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Students list fetched successfully.",
+     *         description="Students list fetched successfully",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="message", type="string", example="Students List fetched successfully."),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Students List fetched successfully."
+     *             ),
      *             @OA\Property(
      *                 property="students",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="fullname", type="string", example="John Doe"),
-     *                     @OA\Property(property="email", type="string", format="email", example="johndoe@example.com"),
-     *                     @OA\Property(property="phone", type="string", example="+977-9800000000"),
-     *                     @OA\Property(property="created_at", type="string", format="date-time"),
-     *                     @OA\Property(property="updated_at", type="string", format="date-time")
-     *                 )
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=12824),
+     *                         @OA\Property(property="name", type="string", example="Joh"),
+     *                         @OA\Property(property="email", type="string", example="tim@getairmail.com"),
+     *                         @OA\Property(property="phone", type="string", example="+1234567890"),
+     *                         @OA\Property(
+     *                             property="email_verified_at",
+     *                             type="string",
+     *                             example="Verified",
+     *                             description="Verified / Not Verified"
+     *                         ),
+     *                         @OA\Property(
+     *                             property="exam_type",
+     *                             type="string",
+     *                             example="Medical NMCLE / Loksewa / MDMS Exams"
+     *                         ),
+     *                         @OA\Property(
+     *                             property="registered_date",
+     *                             type="string",
+     *                             example="12/26/2025 04:33:37 pm"
+     *                         ),
+     *                         @OA\Property(
+     *                             property="is_subscripted",
+     *                             type="string",
+     *                             example="Not Subscribed",
+     *                             description="Subscribed / Not Subscribed"
+     *                         ),
+     *                         @OA\Property(
+     *                             property="subscription_start_date",
+     *                             type="string",
+     *                             format="date-time",
+     *                             nullable=true,
+     *                             example=null
+     *                         ),
+     *                         @OA\Property(
+     *                             property="subscription_end_date",
+     *                             type="string",
+     *                             format="date-time",
+     *                             nullable=true,
+     *                             example=null
+     *                         ),
+     *                         @OA\Property(
+     *                             property="remark",
+     *                             type="string",
+     *                             nullable=true,
+     *                             example=null
+     *                         )
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="last_page", type="integer", example=1247),
+     *                 @OA\Property(property="total", type="integer", example=12470)
      *             )
      *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal Server Error"
      *     )
      * )
      */

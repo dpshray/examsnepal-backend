@@ -8,6 +8,7 @@ use App\Http\Requests\Teacher\TeacherExamStoreRequest;
 use App\Http\Requests\Teacher\UpdateTeacherExamRequest;
 use App\Http\Resources\ExamCollection;
 use App\Http\Resources\ExamResource;
+use App\Http\Resources\Teacher\TeacherExamDetailResource;
 use App\Http\Resources\Teacher\TeacherExamResource;
 use App\Models\Exam;
 use App\Models\StudentProfile;
@@ -169,9 +170,121 @@ class TeacherExamController extends Controller
     /**
      * Display the specified resource.
      */
+    /**
+     * @OA\Get(
+     *     path="/teacher/exam/{exam}",
+     *     summary="Get exam detail",
+     *     description="Get exam detail",
+     *     operationId="teacher_exam_detail",
+     *     tags={"TeacherExam"},
+     *     @OA\Parameter(
+     *         name="exam",
+     *         in="path",
+     *         required=true,
+     *         description="Exam id of exam",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Exam detail fetched successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="is_active", type="boolean", example=true),
+     *                 @OA\Property(property="exam_type_id", type="integer", example=1),
+     *                 @OA\Property(property="assign", type="boolean", example=true),
+     *                 @OA\Property(property="live", type="boolean", example=true),
+     *                 @OA\Property(
+     *                     property="points_per_question",
+     *                     type="number",
+     *                     format="float",
+     *                     example=1
+     *                 ),
+     *                 @OA\Property(property="is_negative_marking", type="boolean", example=true),
+     *                 @OA\Property(
+     *                     property="negative_marking_point",
+     *                     type="number",
+     *                     format="float",
+     *                     example=0.25
+     *                 ),
+     *                 @OA\Property(property="exam_name", type="string", example="Bibek 3"),
+     *                 @OA\Property(
+     *                     property="exam_date",
+     *                     type="string",
+     *                     format="date",
+     *                     nullable=true,
+     *                     example=null
+     *                 ),
+     *                 @OA\Property(
+     *                     property="exam_time",
+     *                     type="string",
+     *                     format="time",
+     *                     nullable=true,
+     *                     example=null
+     *                 ),
+     *                 @OA\Property(
+     *                     property="end_time",
+     *                     type="string",
+     *                     format="time",
+     *                     nullable=true,
+     *                     example=null
+     *                 ),
+     *                 @OA\Property(property="status", type="integer", example=3),
+     *                 @OA\Property(
+     *                     property="price",
+     *                     type="number",
+     *                     format="float",
+     *                     nullable=true,
+     *                     example=null
+     *                 ),
+     *                 @OA\Property(
+     *                     property="payment_st",
+     *                     type="string",
+     *                     nullable=true,
+     *                     example=null
+     *                 ),
+     *                 @OA\Property(property="description", type="string", example="sklaflksfdlhslgllks"),
+     *                 @OA\Property(
+     *                     property="topic",
+     *                     type="string",
+     *                     nullable=true,
+     *                     example=null
+     *                 ),
+     *                 @OA\Property(
+     *                     property="in_progress",
+     *                     type="boolean",
+     *                     nullable=true,
+     *                     example=null
+     *                 ),
+     *                 @OA\Property(
+     *                     property="template",
+     *                     type="string",
+     *                     nullable=true,
+     *                     example=null
+     *                 ),
+     *                 @OA\Property(
+     *                     property="remark",
+     *                     type="string",
+     *                     nullable=true,
+     *                     example=null
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="exam detail fetched successfully"
+     *             )
+     *         )
+     *     )
+     * )
+     */
     public function show(Exam $exam)
     {
-        //
+        $data = new TeacherExamDetailResource($exam);
+        return Response::apiSuccess('exam detail fetched successfully', $data);
     }
 
     /**
@@ -245,7 +358,7 @@ class TeacherExamController extends Controller
         $data['status'] = $request->category_type;
         $data['is_active'] = $request->publish;
         $exam->updateQuietly($data);
-        $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
+        /* $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
         if ($data['is_active'] == 1) {
 
             // get students who match exam type
@@ -262,7 +375,7 @@ class TeacherExamController extends Controller
                 // send notification to all tokens
                 $fcmService->notify($students->pluck('fcm_token')->toArray());
             }
-        }
+        } */
         return Response::apiSuccess('exam updated successfully');
     }
 
