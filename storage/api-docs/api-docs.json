@@ -15813,6 +15813,10 @@
                                     "negative_marking_point": {
                                         "type": "integer",
                                         "example": 0
+                                    },
+                                    "points_per_question": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -15917,6 +15921,10 @@
                                     "negative_marking_point": {
                                         "type": "integer",
                                         "example": 0
+                                    },
+                                    "points_per_question": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"

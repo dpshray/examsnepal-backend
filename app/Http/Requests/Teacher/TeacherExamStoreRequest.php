@@ -32,8 +32,8 @@ class TeacherExamStoreRequest extends FormRequest
             'assign' => 'required|between:0,1',
             'live' => 'required|between:0,1',
             'is_negative_marking' => 'required|between:0,1',
-            'negative_marking_point' => [Rule::requiredIf($this->is_negative_marking == 1)]
-
+            'negative_marking_point' => [Rule::requiredIf($this->is_negative_marking == 1)],
+            'points_per_question' => 'sometimes|nullable|decimal:5,2'
         ];
     }
 

@@ -31,7 +31,8 @@ class Exam extends Model
         'live',
         'is_question_bank',
         'is_negative_marking',
-        'negative_marking_point'
+        'negative_marking_point',
+        'points_per_question',
     ];
 
     protected function casts(): array
@@ -67,10 +68,10 @@ class Exam extends Model
         return $query->with([
             'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])
                 # commented since no player needed no show
-                /* ->with([
+                ->with([
                     'student:id,name',
                     'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
-                ]) */
+                ])
                 ->withCount([
                     'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
                 ])
@@ -89,10 +90,10 @@ class Exam extends Model
         return $query->with([
             'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])
                 # commented since no player needed no show
-                /* ->with([
+                ->with([
                     'student:id,name',
                     'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
-                ]) */
+                ])
                 ->withCount([
                     'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
                 ])
