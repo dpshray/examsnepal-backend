@@ -38,6 +38,9 @@ class ScoreService
             // 'final_exam_marks_after_reduction_of_negative_marking_point' => $correct_answer_count - $total_point_reduction_based_on_negative_marking_point,
             // 'total_points' => (float)$total_points,
             'correct_marking_point' => (float)$points_per_question,
+
+            'full_marks' => (float)($total_answer_count * $points_per_question),
+            
             'submitted_at' => $student_exam->created_at?->format('Y/m/d')
         ];
         return $scores;
