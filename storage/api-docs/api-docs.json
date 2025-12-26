@@ -6221,6 +6221,330 @@
                 ]
             }
         },
+        "/corporate/exams/submitted-exams": {
+            "get": {
+                "tags": [
+                    "Corporate Exam Submissions"
+                ],
+                "summary": "Get list of submitted exam attempts",
+                "description": "Returns paginated list of submitted, evaluating, or evaluated exam attempts for the logged-in teacher's corporate exams.",
+                "operationId": "be59fa2c6e37e525b17766bf5cf19c8e",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of records per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Filter by student name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Ram"
+                        }
+                    },
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "Filter by student email",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "ram@gmail.com"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Submission status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "submitted",
+                                "evaluating",
+                                "evaluated"
+                            ],
+                            "example": "submitted"
+                        }
+                    },
+                    {
+                        "name": "exam_id",
+                        "in": "query",
+                        "description": "Filter by exam ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of submissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "List Of All Submissions"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "attempt_number": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Ram"
+                                                            },
+                                                            "email": {
+                                                                "type": "string",
+                                                                "example": "ram@gmail.com"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "submitted"
+                                                            },
+                                                            "submitted_at": {
+                                                                "type": "string",
+                                                                "example": "2025-05-10 12:30:00"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/exams/submitted-exams/{attempts}": {
+            "get": {
+                "tags": [
+                    "Corporate Exam Submissions"
+                ],
+                "summary": "Get submitted exam detail",
+                "description": "Returns detailed exam submission with student answers.",
+                "operationId": "14ad99ddd1503575af14ee5e7cfb8541",
+                "parameters": [
+                    {
+                        "name": "attempts",
+                        "in": "path",
+                        "description": "Exam attempt ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 12
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Submission detail",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Submissions detail"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attempt_number": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "student": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 10
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Ram"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "ram@gmail.com"
+                                                        },
+                                                        "phone": {
+                                                            "type": "string",
+                                                            "example": "98XXXXXXXX"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "exam": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "title": {
+                                                            "type": "string",
+                                                            "example": "PHP Final Exam"
+                                                        },
+                                                        "exam_type": {
+                                                            "type": "string",
+                                                            "example": "mcq"
+                                                        },
+                                                        "duration": {
+                                                            "type": "integer",
+                                                            "example": 60
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "section": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 3
+                                                        },
+                                                        "title": {
+                                                            "type": "string",
+                                                            "example": "Section A"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "started_at": {
+                                                    "type": "string",
+                                                    "example": "2025-05-10 11:30:00"
+                                                },
+                                                "submitted_at": {
+                                                    "type": "string",
+                                                    "example": "2025-05-10 12:30:00"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "evaluated"
+                                                },
+                                                "total_mark": {
+                                                    "type": "number",
+                                                    "example": 100
+                                                },
+                                                "obtained_mark": {
+                                                    "type": "number",
+                                                    "example": 85
+                                                },
+                                                "percentage": {
+                                                    "type": "number",
+                                                    "example": 85
+                                                },
+                                                "answers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "question": {
+                                                                "type": "string",
+                                                                "example": "What is PHP?"
+                                                            },
+                                                            "question_type": {
+                                                                "type": "string",
+                                                                "example": "subjective"
+                                                            },
+                                                            "full_marks": {
+                                                                "type": "integer",
+                                                                "example": 10
+                                                            },
+                                                            "marks_obtained": {
+                                                                "type": "integer",
+                                                                "example": 8
+                                                            },
+                                                            "student_answer": {
+                                                                "type": "string",
+                                                                "example": "PHP is a scripting language"
+                                                            },
+                                                            "correct_answer": {
+                                                                "type": "string",
+                                                                "nullable": true
+                                                            },
+                                                            "is_correct": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            },
+                                                            "needs_evaluation": {
+                                                                "type": "boolean",
+                                                                "example": false
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/doubt/student/solved": {
             "get": {
                 "tags": [
@@ -16593,6 +16917,10 @@
         {
             "name": "Corporate Participants",
             "description": "Corporate Participants"
+        },
+        {
+            "name": "Corporate Exam Submissions",
+            "description": "Corporate Exam Submissions"
         },
         {
             "name": "ExamCategory",

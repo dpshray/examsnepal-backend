@@ -24,7 +24,7 @@ class CorporateExamResource extends JsonResource
             "end_time" => $this->end_time,
             "description" => $this->description,
             "instructions" => $this->instructions,
-            "is_published" => $this->is_published,
+            "is_published" => (bool)$this->is_published,
             "duration" => $this->duration,
             "is_shuffled_question" => $this->is_shuffled_question,
             "is_shuffled_option" => $this->is_shuffled_option,

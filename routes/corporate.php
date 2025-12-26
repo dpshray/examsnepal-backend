@@ -6,6 +6,7 @@ use App\Http\Controllers\Corporate\CorporateExamSectionController;
 use App\Http\Controllers\Corporate\CorporateQuestionController;
 use App\Http\Controllers\Corporate\Exam\AddParticipantToExamController;
 use App\Http\Controllers\Corporate\Participant\CorporateParticipantController;
+use App\Http\Controllers\Corporate\Participant\Exam\ParticipantExamSubmitController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('corporate')->group(function () {
@@ -28,6 +29,12 @@ Route::prefix('corporate')->group(function () {
             Route::Post('exams/{exam}/participants','store');
             Route::delete('exams/participants','destroy');
             Route::post('exams/{exam}/bulk-upload-participants','bulk_upload_in_exam');
+        });
+        Route::post('/exam-publish/{exam}',[CorporateExamController::class,'published_exam']);
+        // Route::apiResource('/exam/submission',ParticipantExamSubmitController::class)->only(['index','show']);
+        Route::controller(ParticipantExamSubmitController::class)->group(function (){
+            Route::get('/exams/submitted-exams','index');
+            Route::get('/exams/submitted-exams/{attempts}','show');
         });
     });
 });

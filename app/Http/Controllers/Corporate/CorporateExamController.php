@@ -306,12 +306,29 @@ class CorporateExamController extends Controller
             throw new AuthorizationException('You do not have permission to do this.');
         }
     }
-    function public_exam(CorporateExam $exam)
+    function published_exam(CorporateExam $exam)
     {
-        $total_section=$exam->sections()->count();
-        if($total_section>1)
-        {
-            return Response::apiError('');
+        // Check if exam has exactly 1 section
+        $total_section = $exam->sections()->count();
+
+        if ($total_section < 1) {
+            return Response::apiError('To Published exam ,1 section must be created . Current sections: ' . $total_section);
         }
+
+        // Get the section
+        $section = $exam->sections()->first();
+
+        // Check if section has at least 1 question
+        $total_questions = $section->questions()->count();
+
+        if ($total_questions < 1) {
+            return Response::apiError('Section must have at least 1 question. Current questions: ' . $total_questions);
+        }
+
+        // All conditions passed - make exam public
+        $exam->is_published = true;
+        $exam->save();
+
+        return Response::apiSuccess('Exam has been published');
     }
 }
