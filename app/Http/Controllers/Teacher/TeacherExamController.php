@@ -163,25 +163,6 @@ class TeacherExamController extends Controller
         $exam = Auth::user()
         ->teacherExams()
         ->createQuietly($data);
-        $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
-        if ($data['is_active'] == 1) {
-
-            // get students who match exam type
-            $students = StudentProfile::where('exam_type_id', $exam->exam_type_id)
-                ->get();
-            // return $students;
-            if (!empty($students)) {
-                $fcmService = new FCMService(
-                    'New Exam',
-                    'A new '.$type.' exam has been added by your teacher. Please check and start preparing for it.',
-                    $type,
-                    $students->pluck('id')->toArray()
-                );
-                // send notification to all tokens
-                $fcmService->notify($students->pluck('fcm_token')->toArray());
-            }
-        }
-
         return Response::apiSuccess('exam added successfully');
     }
 

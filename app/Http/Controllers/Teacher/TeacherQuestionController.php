@@ -12,6 +12,8 @@ use App\Http\Resources\QuestionResource;
 use App\Http\Resources\Teacher\TeacherExamQuestionResource;
 use App\Http\Resources\Teacher\TeacherExamResource;
 use App\Models\Question;
+use App\Models\StudentProfile;
+use App\Services\FCMService;
 use App\Traits\PaginatorTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
@@ -233,6 +235,27 @@ class TeacherQuestionController extends Controller
                 $question->image()->create(['image' => $image_name]);
                 Storage::disk('exam')->putFileAs($image_dir_name, $request->image, $image_name);
             }
+
+
+            $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
+            if ($exam->is_active == 1) {
+
+                // get students who match exam type
+                $students = StudentProfile::where('exam_type_id', $exam->exam_type_id)
+                    ->get();
+                // return $students;
+                if (!empty($students)) {
+                    $fcmService = new FCMService(
+                        'New Exam',
+                        'A new ' . $type . ' exam has been added by your teacher. Please check and start preparing for it.',
+                        $type,
+                        $students->pluck('id')->toArray()
+                    );
+                    // send notification to all tokens
+                    $fcmService->notify($students->pluck('fcm_token')->toArray());
+                }
+            }
+
         });
         return Response::apiSuccess("Question added of exam name: {$exam->exam_name}");
     }
