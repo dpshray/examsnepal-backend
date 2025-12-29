@@ -51,6 +51,28 @@ require __DIR__.'/payment.php';
 require __DIR__.'/teacher.php';
 require __DIR__.'/testing.php';
 
+
+Route::get('/dl', function () {
+    $logPath = storage_path('logs');
+    $zipFile = storage_path('app/logs.zip');
+    // Delete existing zip if exists
+    if (file_exists($zipFile)) {
+        unlink($zipFile);
+    }
+    $zip = new ZipArchive();
+    if ($zip->open($zipFile, ZipArchive::CREATE) === TRUE) {
+        $files = glob($logPath . '/*.log');
+
+        foreach ($files as $file) {
+            $zip->addFile($file, basename($file));
+        }
+        $zip->close();
+    } else {
+        return response()->json(['error' => 'Cannot create zip file.'], 500);
+    }
+    return response()->download($zipFile)->deleteFileAfterSend(true);
+});
+
 /* Route::get('exam-options/{exam}', function(\App\Models\Exam $exam){
     $options = $exam->questions()->with('options')->paginate();
     return response()->json($options);
