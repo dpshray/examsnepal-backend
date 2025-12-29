@@ -99,6 +99,7 @@ class CorporateExamController extends Controller
                 ['corporate_id', Auth::guard('users')->id()],
                 // ['is_published', $published]
             ])
+            ->OrderBy('id','desc')
             ->paginate($per_page);
         $data = $this->setupPagination($pagination, CorporateExamCollection::class)->data;
         return Response::apiSuccess("corporate exam list", $data);

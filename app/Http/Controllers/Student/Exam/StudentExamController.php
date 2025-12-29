@@ -356,7 +356,9 @@ class StudentExamController extends Controller
 
         // If question option shuffled is on
         if ($exam->is_shuffled_option) {
-            $questions->getCollection()->transform(function ($question) use ($attempt) {
+            $questions->getCollection()->transform(function ($question, $index) use ($attempt, $questions) {
+                //set question or generate number 1,2, ...etc
+                 $question->number = $questions->firstItem() + $index;
                 // Only shuffle for MCQ/objective type questions
                 if ($question->question_type === 'mcq' || $question->question_type === 'objective') {
                     // Create a unique seed for each question using attempt_id + question_id

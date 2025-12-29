@@ -97,8 +97,7 @@ class ParticipantExamSubmitController extends Controller
     function index(Request $request)
     {
         $per_page = $request->query('per_page', 10);
-        $name = $request->input('name');
-        $email = $request->input('email');
+        $search = $request->input('search');
         $status = $request->input('status'); //submitted, evaluating, evaluated
         $exam_id = $request->input('exam_id');
         $teacher = Auth::user();
@@ -109,14 +108,16 @@ class ParticipantExamSubmitController extends Controller
             ->whereHas('exam', function ($q) use ($corporate_id) {
                 $q->where('corporate_id', $corporate_id);
             });
-        // Filter by participant/student name
-        if ($name) {
-            $query->where('name', 'like', "%{$name}%");
-        }
-
-        // Filter by email
-        if ($email) {
-            $query->where('email', 'like', "%{$email}%");
+        // Filter by participant/student name and email
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhereHas('exam', function ($subQ) use ($search) {
+                        $subQ->where('title', 'like', "%{$search}%");
+                    });
+            });
         }
         // Filter by status
         if ($status) {
@@ -222,9 +223,8 @@ class ParticipantExamSubmitController extends Controller
 
     function show(ExamAttempt $attempts)
     {
-        $attempts = $attempts->loadMissing(['exam', 'section', 'participant','studentAnswers']);
+        $attempts = $attempts->loadMissing(['exam', 'section', 'participant', 'studentAnswers']);
         $data = new ParticipantExamDetailResource($attempts);
         return Response::apiSuccess('Submissions detail', $data);
     }
-
 }
