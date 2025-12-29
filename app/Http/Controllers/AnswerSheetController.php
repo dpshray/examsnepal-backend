@@ -278,7 +278,7 @@ class AnswerSheetController extends Controller
 
         $items = ($data['data'])->toArray(request());
         foreach ($items as $key => $value) {
-            $items[$key]['user_choosed'] = $user_choosed[$items[$key]['id']];
+            $items[$key]['user_choosed'] = $user_choosed->has($items[$key]['id']) ? $user_choosed[$items[$key]['id']] : null;
         }
         $data['data'] = $items;
         return Response::apiSuccess('User Exam Solutions', $data);
