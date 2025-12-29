@@ -966,7 +966,7 @@ class QuestionController extends Controller
         }
 
         $questions = $exam->questions()
-                        ->with('options')
+                        ->with('options:id,question_id,option')
                         ->select('id', 'exam_id', 'question', 'explanation')
                         ->paginate();
         $append = compact('token');
@@ -1081,7 +1081,7 @@ class QuestionController extends Controller
 
         $questionsMockTest = $exam
                                 ->questions()
-                                ->with('options')
+                                ->with('options:id,question_id,option')
                                 ->select('id', 'exam_id', 'question', 'explanation')
                                 ->paginate();
         $append = compact('token');
@@ -1195,7 +1195,7 @@ class QuestionController extends Controller
         }
 
         $questionsSprintQuiz = $exam->questions()
-            ->with('options')
+            ->with('options:id,question_id,option')
             ->select('id', 'exam_id', 'question', 'explanation')
             ->paginate();
         $append = compact('token');
