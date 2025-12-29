@@ -237,7 +237,7 @@ class TeacherQuestionController extends Controller
             }
 
 
-            $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
+            /* $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
             if ($exam->is_active == 1) {
 
                 // get students who match exam type
@@ -254,7 +254,7 @@ class TeacherQuestionController extends Controller
                     // send notification to all tokens
                     $fcmService->notify($students->pluck('fcm_token')->toArray());
                 }
-            }
+            } */
 
         });
         return Response::apiSuccess("Question added of exam name: {$exam->exam_name}");

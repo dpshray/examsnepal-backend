@@ -28,7 +28,10 @@ class TeacherExamResource extends JsonResource
             "live"=>$this->live,
             "description"=>$this->description,
             "assign"=>$this->assign,
-            'total_questions' => $this->whenCounted('questions')
+            'total_questions' => $this->whenCounted('questions'),
+            "is_negative_marking" => (bool)$this->is_negative_marking,
+            "negative_marking_point" => (float)$this->negative_marking_point,
+            "points_per_question" => (float)$this->points_per_question,
         ];
     }
 }
