@@ -16153,13 +16153,9 @@
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "exam_time": {
+                                    "duration": {
                                         "type": "string",
-                                        "example": "08:45"
-                                    },
-                                    "end_time": {
-                                        "type": "string",
-                                        "example": "10:00"
+                                        "example": "02:45"
                                     }
                                 },
                                 "type": "object"
@@ -16270,13 +16266,9 @@
                                                     "type": "integer",
                                                     "example": 1
                                                 },
-                                                "exam_time": {
+                                                "duration": {
                                                     "type": "string",
-                                                    "example": "08:45"
-                                                },
-                                                "end_time": {
-                                                    "type": "string",
-                                                    "example": "10:00"
+                                                    "example": "03:00"
                                                 }
                                             },
                                             "type": "object"
@@ -16365,13 +16357,9 @@
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "exam_time": {
+                                    "duration": {
                                         "type": "string",
-                                        "example": "08:45"
-                                    },
-                                    "end_time": {
-                                        "type": "string",
-                                        "example": "10:00"
+                                        "example": "02:45"
                                     }
                                 },
                                 "type": "object"

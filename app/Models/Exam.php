@@ -25,6 +25,7 @@ class Exam extends Model
         'exam_date',
         'exam_time',
         'end_time',
+        'duration',
         'is_active',
         'price',
         'assign_id', # ID belongs to users table

@@ -34,8 +34,7 @@ class TeacherExamStoreRequest extends FormRequest
             'is_negative_marking' => 'required|between:0,1',
             'negative_marking_point' => [Rule::requiredIf($this->is_negative_marking == 1)],
             'points_per_question' => 'required|numeric|min:1',
-            'exam_time' => 'sometimes|nullable|date_format:H:i',
-            'end_time' => 'sometimes|nullable|date_format:H:i|after:exam_time',
+            'duration' => 'sometimes|nullable|date_format:H:i',
         ];
     }
 

@@ -141,8 +141,7 @@ class TeacherExamController extends Controller
      *             @OA\Property(property="is_negative_marking", type="integer", example=0),
      *             @OA\Property(property="negative_marking_point", type="integer", example=0),
      *             @OA\Property(property="points_per_question", type="integer", example=1),
-     *             @OA\Property(property="exam_time", type="string", example="08:45"),
-     *             @OA\Property(property="end_time", type="string", example="10:00"),
+     *             @OA\Property(property="duration", type="string", example="02:45"),
      *         )
      *     ),
      *     @OA\Response(
@@ -227,8 +226,7 @@ class TeacherExamController extends Controller
      *                 @OA\Property(property="is_negative_marking", type="boolean", example=false),
      *                 @OA\Property(property="negative_marking_point", type="number", format="float", example=0),
      *                 @OA\Property(property="points_per_question", type="integer", example=1),
-     *                 @OA\Property(property="exam_time", type="string", example="08:45"),
-     *                 @OA\Property(property="end_time", type="string", example="10:00"),
+     *                 @OA\Property(property="duration", type="string", example="03:00")
      *             ),
      *             @OA\Property(
      *                 property="message",
@@ -276,8 +274,7 @@ class TeacherExamController extends Controller
      *             @OA\Property(property="is_negative_marking", type="integer", example=0),
      *             @OA\Property(property="negative_marking_point", type="integer", example=0),
      *             @OA\Property(property="points_per_question", type="integer", example=1),
-     *             @OA\Property(property="exam_time", type="string", example="08:45"),
-     *             @OA\Property(property="end_time", type="string", example="10:00"),
+     *             @OA\Property(property="duration", type="string", example="02:45")
      *         )
      *     ),
      *     @OA\Response(
