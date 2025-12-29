@@ -32,6 +32,7 @@ class StudentExamListResource extends JsonResource
             'correct_marking_point' => (float)$this->points_per_question,
             "status" =>  $status,
             "questions_count" => $this->whenCounted('questions', fn() => (int) $this->questions_count),
+            'duration' => $this->minToHis(),
             "user" => $this->whenLoaded('user'), #<---added_by
             // 'players' => $this->whenLoaded('student_exams', fn() => new PlayerExamScoreCollection($this->student_exams))
             /* 'players' => $this->student_exams->map(

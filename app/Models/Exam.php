@@ -46,8 +46,16 @@ class Exam extends Model
             'is_active' => 'integer',
             'status' => 'integer',
             'live' => 'integer',
-            'assign' => 'integer',
+            'assign' => 'integer'
         ];
+    }
+
+    function minToHis() {
+        if (empty($this->duration)) {
+            return null;
+        }
+        [$hours, $minutes, $seconds] = array_map('intval', explode(':', $this->duration));
+        return ($hours * 60) + $minutes;
     }
 
     public function scopeFreeType(Builder $query): Builder
@@ -111,7 +119,16 @@ class Exam extends Model
 
     public function scopeAllAvailableExams(Builder $query): Builder
     {
-        return $query->select(['id', 'exam_name', 'status', 'user_id','is_negative_marking', 'negative_marking_point', 'points_per_question'])
+        return $query->select([
+                'id', 
+                'exam_name', 
+                'status', 
+                'user_id',
+                'is_negative_marking', 
+                'negative_marking_point', 
+                'points_per_question',
+                'duration'
+            ])
             ->with('user:id,fullname')
             ->withCount('questions')
             ->has('questions')

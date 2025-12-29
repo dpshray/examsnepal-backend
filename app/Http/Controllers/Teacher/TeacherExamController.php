@@ -141,7 +141,7 @@ class TeacherExamController extends Controller
      *             @OA\Property(property="is_negative_marking", type="integer", example=0),
      *             @OA\Property(property="negative_marking_point", type="integer", example=0),
      *             @OA\Property(property="points_per_question", type="integer", example=1),
-     *             @OA\Property(property="duration", type="string", example="02:45"),
+     *             @OA\Property(property="duration", type="string", example="60"),
      *         )
      *     ),
      *     @OA\Response(
@@ -158,18 +158,14 @@ class TeacherExamController extends Controller
 
     public function store(TeacherExamStoreRequest $request)
     {
-        // return $request->validated();
-        // dd($request->all());
         $data = $request->validated();
-        $data['is_active'] = $request->publish;
-        $data['status'] = $request->category_type;
-        $exam = Auth::user()
-        ->teacherExams()
-        ->createQuietly($data);
+        $data['is_active'] = $data['publish'];
+        $data['status'] = $data['category_type'];
+        $data['duration'] = $request->duration;
 
-        $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
-        
+        $exam = Auth::user()->teacherExams()->createQuietly($data);
         if ($data['is_active'] == 1 && (bool)$request->assign && (bool)$request->live) {
+            $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
 
             // get students who match exam type
             $students = StudentProfile::where('exam_type_id', $exam->exam_type_id)
@@ -274,7 +270,7 @@ class TeacherExamController extends Controller
      *             @OA\Property(property="is_negative_marking", type="integer", example=0),
      *             @OA\Property(property="negative_marking_point", type="integer", example=0),
      *             @OA\Property(property="points_per_question", type="integer", example=1),
-     *             @OA\Property(property="duration", type="string", example="02:45")
+     *             @OA\Property(property="duration", type="string", example="90")
      *         )
      *     ),
      *     @OA\Response(
@@ -312,11 +308,13 @@ class TeacherExamController extends Controller
         //
         $this->isOwner($exam);
         $data = $request->validated();
-        $data['status'] = $request->category_type;
-        $data['is_active'] = $request->publish;
+        $data['status'] = $data['category_type'];
+        $data['is_active'] = $data['publish'];
+        $data['duration'] = $request->duration;
+
         $exam->updateQuietly($data);
-        $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
         if ($data['is_active'] == 1 && (bool)$request->assign && (bool)$request->live) {
+            $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
 
             // get students who match exam type
             $students = StudentProfile::where('exam_type_id', $exam->exam_type_id)
