@@ -26,6 +26,8 @@ class TeacherExamDetailResource extends JsonResource
             "is_negative_marking" => (bool)$this->is_negative_marking,
             "negative_marking_point" => (float)$this->negative_marking_point,
             "points_per_question" => (float)$this->points_per_question,
+            "exam_time" => $this->exam_time,
+            "end_time" => $this->end_time,
         ];
     }
 }

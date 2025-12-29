@@ -16152,6 +16152,14 @@
                                     "points_per_question": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "exam_time": {
+                                        "type": "string",
+                                        "example": "08:45"
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "example": "10:00"
                                     }
                                 },
                                 "type": "object"
@@ -16221,96 +16229,54 @@
                                         },
                                         "data": {
                                             "properties": {
-                                                "is_active": {
-                                                    "type": "boolean",
-                                                    "example": true
-                                                },
                                                 "exam_type_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "category_type": {
                                                     "type": "integer",
                                                     "example": 1
                                                 },
+                                                "exam_name": {
+                                                    "type": "string",
+                                                    "example": "This is some exam name"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "This is some description of exam"
+                                                },
+                                                "publish": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
                                                 "assign": {
                                                     "type": "boolean",
-                                                    "example": true
+                                                    "example": false
                                                 },
                                                 "live": {
                                                     "type": "boolean",
-                                                    "example": true
-                                                },
-                                                "points_per_question": {
-                                                    "type": "number",
-                                                    "format": "float",
-                                                    "example": 1
+                                                    "example": false
                                                 },
                                                 "is_negative_marking": {
                                                     "type": "boolean",
-                                                    "example": true
+                                                    "example": false
                                                 },
                                                 "negative_marking_point": {
                                                     "type": "number",
                                                     "format": "float",
-                                                    "example": 0.25
+                                                    "example": 0
                                                 },
-                                                "exam_name": {
-                                                    "type": "string",
-                                                    "example": "Bibek 3"
-                                                },
-                                                "exam_date": {
-                                                    "type": "string",
-                                                    "format": "date",
-                                                    "example": null,
-                                                    "nullable": true
+                                                "points_per_question": {
+                                                    "type": "integer",
+                                                    "example": 1
                                                 },
                                                 "exam_time": {
                                                     "type": "string",
-                                                    "format": "time",
-                                                    "example": null,
-                                                    "nullable": true
+                                                    "example": "08:45"
                                                 },
                                                 "end_time": {
                                                     "type": "string",
-                                                    "format": "time",
-                                                    "example": null,
-                                                    "nullable": true
-                                                },
-                                                "status": {
-                                                    "type": "integer",
-                                                    "example": 3
-                                                },
-                                                "price": {
-                                                    "type": "number",
-                                                    "format": "float",
-                                                    "example": null,
-                                                    "nullable": true
-                                                },
-                                                "payment_st": {
-                                                    "type": "string",
-                                                    "example": null,
-                                                    "nullable": true
-                                                },
-                                                "description": {
-                                                    "type": "string",
-                                                    "example": "sklaflksfdlhslgllks"
-                                                },
-                                                "topic": {
-                                                    "type": "string",
-                                                    "example": null,
-                                                    "nullable": true
-                                                },
-                                                "in_progress": {
-                                                    "type": "boolean",
-                                                    "example": null,
-                                                    "nullable": true
-                                                },
-                                                "template": {
-                                                    "type": "string",
-                                                    "example": null,
-                                                    "nullable": true
-                                                },
-                                                "remark": {
-                                                    "type": "string",
-                                                    "example": null,
-                                                    "nullable": true
+                                                    "example": "10:00"
                                                 }
                                             },
                                             "type": "object"
@@ -16398,6 +16364,14 @@
                                     "points_per_question": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "exam_time": {
+                                        "type": "string",
+                                        "example": "08:45"
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "example": "10:00"
                                     }
                                 },
                                 "type": "object"

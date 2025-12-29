@@ -141,6 +141,8 @@ class TeacherExamController extends Controller
      *             @OA\Property(property="is_negative_marking", type="integer", example=0),
      *             @OA\Property(property="negative_marking_point", type="integer", example=0),
      *             @OA\Property(property="points_per_question", type="integer", example=1),
+     *             @OA\Property(property="exam_time", type="string", example="08:45"),
+     *             @OA\Property(property="end_time", type="string", example="10:00"),
      *         )
      *     ),
      *     @OA\Response(
@@ -157,6 +159,7 @@ class TeacherExamController extends Controller
 
     public function store(TeacherExamStoreRequest $request)
     {
+        // return $request->validated();
         // dd($request->all());
         $data = $request->validated();
         $data['is_active'] = $request->publish;
@@ -214,84 +217,18 @@ class TeacherExamController extends Controller
      *             @OA\Property(
      *                 property="data",
      *                 type="object",
-     *                 @OA\Property(property="is_active", type="boolean", example=true),
-     *                 @OA\Property(property="exam_type_id", type="integer", example=1),
-     *                 @OA\Property(property="assign", type="boolean", example=true),
-     *                 @OA\Property(property="live", type="boolean", example=true),
-     *                 @OA\Property(
-     *                     property="points_per_question",
-     *                     type="number",
-     *                     format="float",
-     *                     example=1
-     *                 ),
-     *                 @OA\Property(property="is_negative_marking", type="boolean", example=true),
-     *                 @OA\Property(
-     *                     property="negative_marking_point",
-     *                     type="number",
-     *                     format="float",
-     *                     example=0.25
-     *                 ),
-     *                 @OA\Property(property="exam_name", type="string", example="Bibek 3"),
-     *                 @OA\Property(
-     *                     property="exam_date",
-     *                     type="string",
-     *                     format="date",
-     *                     nullable=true,
-     *                     example=null
-     *                 ),
-     *                 @OA\Property(
-     *                     property="exam_time",
-     *                     type="string",
-     *                     format="time",
-     *                     nullable=true,
-     *                     example=null
-     *                 ),
-     *                 @OA\Property(
-     *                     property="end_time",
-     *                     type="string",
-     *                     format="time",
-     *                     nullable=true,
-     *                     example=null
-     *                 ),
-     *                 @OA\Property(property="status", type="integer", example=3),
-     *                 @OA\Property(
-     *                     property="price",
-     *                     type="number",
-     *                     format="float",
-     *                     nullable=true,
-     *                     example=null
-     *                 ),
-     *                 @OA\Property(
-     *                     property="payment_st",
-     *                     type="string",
-     *                     nullable=true,
-     *                     example=null
-     *                 ),
-     *                 @OA\Property(property="description", type="string", example="sklaflksfdlhslgllks"),
-     *                 @OA\Property(
-     *                     property="topic",
-     *                     type="string",
-     *                     nullable=true,
-     *                     example=null
-     *                 ),
-     *                 @OA\Property(
-     *                     property="in_progress",
-     *                     type="boolean",
-     *                     nullable=true,
-     *                     example=null
-     *                 ),
-     *                 @OA\Property(
-     *                     property="template",
-     *                     type="string",
-     *                     nullable=true,
-     *                     example=null
-     *                 ),
-     *                 @OA\Property(
-     *                     property="remark",
-     *                     type="string",
-     *                     nullable=true,
-     *                     example=null
-     *                 )
+     *                 @OA\Property(property="exam_type_id", type="integer", example=5),
+     *                 @OA\Property(property="category_type", type="integer", example=1),
+     *                 @OA\Property(property="exam_name", type="string", example="This is some exam name"),
+     *                 @OA\Property(property="description", type="string", example="This is some description of exam"),
+     *                 @OA\Property(property="publish", type="boolean", example=false),
+     *                 @OA\Property(property="assign", type="boolean", example=false),
+     *                 @OA\Property(property="live", type="boolean", example=false),
+     *                 @OA\Property(property="is_negative_marking", type="boolean", example=false),
+     *                 @OA\Property(property="negative_marking_point", type="number", format="float", example=0),
+     *                 @OA\Property(property="points_per_question", type="integer", example=1),
+     *                 @OA\Property(property="exam_time", type="string", example="08:45"),
+     *                 @OA\Property(property="end_time", type="string", example="10:00"),
      *             ),
      *             @OA\Property(
      *                 property="message",
@@ -339,6 +276,8 @@ class TeacherExamController extends Controller
      *             @OA\Property(property="is_negative_marking", type="integer", example=0),
      *             @OA\Property(property="negative_marking_point", type="integer", example=0),
      *             @OA\Property(property="points_per_question", type="integer", example=1),
+     *             @OA\Property(property="exam_time", type="string", example="08:45"),
+     *             @OA\Property(property="end_time", type="string", example="10:00"),
      *         )
      *     ),
      *     @OA\Response(
