@@ -6221,15 +6221,163 @@
                 ]
             }
         },
-        "/corporate/exams/submitted-exams": {
+        "/corporate/exams/evaluate/{attempt}": {
+            "post": {
+                "tags": [
+                    "Corporate Exam Evaluation"
+                ],
+                "summary": "Evaluate subjective answers of an exam attempt",
+                "description": "Allows a teacher to evaluate subjective answers and assign marks. Objective marks are auto-calculated.",
+                "operationId": "2a8edaadc815c5d51bec5460e3ca5356",
+                "parameters": [
+                    {
+                        "name": "attempt",
+                        "in": "path",
+                        "description": "Exam Attempt ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 25
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "answers"
+                                ],
+                                "properties": {
+                                    "answers": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "student_answer_id",
+                                                "marks_obtained"
+                                            ],
+                                            "properties": {
+                                                "student_answer_id": {
+                                                    "type": "integer",
+                                                    "example": 101
+                                                },
+                                                "marks_obtained": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 7.5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Evaluation completed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Evaluation completed successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "attempt_id": {
+                                                    "type": "integer",
+                                                    "example": 25
+                                                },
+                                                "evaluated_count": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "remaining_count": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "evaluated"
+                                                },
+                                                "marks": {
+                                                    "properties": {
+                                                        "total_marks": {
+                                                            "type": "number",
+                                                            "example": 100
+                                                        },
+                                                        "obtained_marks": {
+                                                            "type": "number",
+                                                            "example": 82.5
+                                                        },
+                                                        "percentage": {
+                                                            "type": "number",
+                                                            "example": 82.5
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "errors": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/exams/{exam}/submitted-exams": {
             "get": {
                 "tags": [
                     "Corporate Exam Submissions"
                 ],
                 "summary": "Get list of submitted exam attempts",
-                "description": "Returns paginated list of submitted, evaluating, or evaluated exam attempts for the logged-in teacher's corporate exams.",
-                "operationId": "be59fa2c6e37e525b17766bf5cf19c8e",
+                "description": "Returns paginated list of submitted, evaluating, or evaluated exam attempts for the logged-in teacher's corporate exam.",
+                "operationId": "8fae4ff23cc235f41fa609ad064df2fe",
                 "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Exam slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": ""
+                        }
+                    },
                     {
                         "name": "per_page",
                         "in": "query",
@@ -6241,23 +6389,13 @@
                         }
                     },
                     {
-                        "name": "name",
+                        "name": "search",
                         "in": "query",
-                        "description": "Filter by student name",
+                        "description": "Search by name, email, phone, or exam title",
                         "required": false,
                         "schema": {
                             "type": "string",
                             "example": "Ram"
-                        }
-                    },
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "description": "Filter by student email",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "ram@gmail.com"
                         }
                     },
                     {
@@ -6276,13 +6414,13 @@
                         }
                     },
                     {
-                        "name": "exam_id",
+                        "name": "section",
                         "in": "query",
-                        "description": "Filter by exam ID",
+                        "description": "Filter by section slug",
                         "required": false,
                         "schema": {
-                            "type": "integer",
-                            "example": 5
+                            "type": "string",
+                            "example": "section-a"
                         }
                     }
                 ],
@@ -6307,9 +6445,13 @@
                                                     "type": "integer",
                                                     "example": 1
                                                 },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
                                                 "total": {
                                                     "type": "integer",
-                                                    "example": 20
+                                                    "example": 25
                                                 },
                                                 "data": {
                                                     "type": "array",
@@ -6351,6 +6493,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "description": "Exam not found"
                     }
                 },
                 "security": [
@@ -6536,6 +6681,50 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/corporate/exams/{exam}/download-results": {
+            "get": {
+                "tags": [
+                    "orporate Exam Results"
+                ],
+                "summary": "Download exam results as Excel",
+                "description": "Download evaluated exam results in Excel format. Supports filtering by section and status.",
+                "operationId": "aa60a3cf94a444c7b433a8b5a6baf5b6",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Corporate Exam slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "exam-slug"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Excel file download",
+                        "content": {
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Exam not found or no results available"
+                    },
+                    "500": {
+                        "description": "Internal server error"
                     }
                 },
                 "security": [
@@ -17068,8 +17257,16 @@
             "description": "Corporate Participants"
         },
         {
+            "name": "Corporate Exam Evaluation",
+            "description": "Corporate Exam Evaluation"
+        },
+        {
             "name": "Corporate Exam Submissions",
             "description": "Corporate Exam Submissions"
+        },
+        {
+            "name": "orporate Exam Results",
+            "description": "orporate Exam Results"
         },
         {
             "name": "ExamCategory",

@@ -9,6 +9,7 @@ use App\Http\Resources\Corporate\CorporateExamSectionCollection;
 use App\Http\Resources\Corporate\CorporateExamSectionResource;
 use App\Models\Corporate\CorporateExam;
 use App\Models\Corporate\CorporateExamSection;
+use App\Models\ExamAttempt;
 use App\Traits\PaginatorTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
@@ -295,5 +296,67 @@ class CorporateExamSectionController extends Controller
         if ($exam->corporate->isNot(Auth::guard('users')->user())) {
             throw new AuthorizationException('You do not have permission to do this.');
         }
+    }
+    public function participantList(Request $request, CorporateExam $exam)
+    {
+        $perPage = $request->query('per_page', 10);
+        $search  = $request->query('search');
+
+        // PUBLIC EXAM
+        if ($exam->exam_type === 'public') {
+
+            $attempts = ExamAttempt::where('corporate_exam_id', $exam->id)
+                ->when($search, function ($q) use ($search) {
+                    $q->where(function ($sub) use ($search) {
+                        $sub->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+                })
+                ->select('name', 'email', 'phone')
+                ->paginate($perPage);
+
+            $data = $attempts->getCollection()->map(function ($attempt) {
+                return [
+                    'name'  => $attempt->name,
+                    'email' => $attempt->email,
+                    'phone' => $attempt->phone,
+                ];
+            });
+
+            return Response::apiSuccess(
+                'Participant List of this exam',
+                $this->setupPagination($attempts, fn() => $data)->data
+            );
+        }
+
+        // PRIVATE / CORPORATE EXAM
+        $participants = $exam->participants()
+            ->select('participants.id', 'participants.name', 'participants.email', 'participants.phone')
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('participants.name', 'like', "%{$search}%")
+                        ->orWhere('participants.email', 'like', "%{$search}%");
+                });
+            })
+            ->withExists([
+                'examAttempts as exam_taken' => function ($q) use ($exam) {
+                    $q->where('corporate_exam_id', $exam->id);
+                }
+            ])
+            ->paginate($perPage);
+
+        $data = $participants->getCollection()->map(function ($participant) {
+            return [
+                'name'       => $participant->name,
+                'email'      => $participant->email,
+                'phone'      => $participant->phone,
+                'exam_taken' => (bool) $participant->exam_taken,
+            ];
+        });
+
+        return Response::apiSuccess(
+            'Participant List of this exam',
+            $this->setupPagination($participants, fn() => $data)->data
+        );
     }
 }

@@ -28,4 +28,8 @@ class Participant extends Authenticatable implements JWTSubject
     {
         return [];
     }
+    public function examAttempts()
+    {
+        return $this->hasMany(ExamAttempt::class, 'participant_id');
+    }
 }

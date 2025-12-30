@@ -39,6 +39,7 @@ class AllSubmissionResource extends JsonResource
             'section' => [
                 'id' => $this->section->id,
                 'title' => $this->section->title,
+                'slug'=>$this->section->slug,
             ],
 
             // Timing
