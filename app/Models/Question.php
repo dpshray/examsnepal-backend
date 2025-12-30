@@ -72,7 +72,7 @@ class Question extends Model
     }
 
     public function student_answers() {
-        return $this->hasMany(Answersheet::class);
+        return $this->hasMany(Answersheet::class,'question_id');
     }
     
     public function image(){

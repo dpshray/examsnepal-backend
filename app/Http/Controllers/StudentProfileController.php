@@ -974,9 +974,11 @@ class StudentProfileController extends Controller
                 'answers as incorrect_answer_count' => fn($q) => $q->where('is_correct', 0),
                 'answers as missed_answer_count' => fn($q) => $q->where('is_correct', null),
             ])
-            ->firstWhere('student_id', Auth::id());
+            ->where('student_id', Auth::id())
+            ->where('is_exam_completed',1)
+            ->first();
         if (empty($student_exam)) {
-            return Response::apiError('This exam has not been attempted by you.');
+            return Response::apiError("Please complete the exam before viewing your result.");
         }
 
         $scores = (new ScoreService())->fetchExamScore($student_exam);

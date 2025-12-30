@@ -363,12 +363,17 @@
                                 "required": [
                                     "exam_id",
                                     "question_id",
-                                    "answer_id"
+                                    "answer_id",
+                                    "is_exam_completed"
                                 ],
                                 "properties": {
                                     "exam_id": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "is_exam_completed": {
+                                        "type": "integer",
+                                        "example": 0
                                     },
                                     "question_ids": {
                                         "type": "array",
@@ -552,74 +557,87 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successfully retrieved solutions",
+                        "description": "User Exam Solutions",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Solutions retrieved successfully"
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
                                         },
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "exam_id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "student_id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "answer": {
-                                                        "type": "string"
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    },
-                                                    "updated_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 188718
+                                                            },
+                                                            "exam_id": {
+                                                                "type": "integer",
+                                                                "example": 2443
+                                                            },
+                                                            "question": {
+                                                                "type": "string",
+                                                                "example": "Which electrolyte disturbance is most commonly associated with chronic kidney disease?"
+                                                            },
+                                                            "explanation": {
+                                                                "type": "string",
+                                                                "example": "CKD impairs renal potassium excretion, leading to hyperkalemia, which can cause arrhythmias."
+                                                            },
+                                                            "options": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 3273733
+                                                                        },
+                                                                        "question_id": {
+                                                                            "type": "integer",
+                                                                            "example": 188718
+                                                                        },
+                                                                        "option": {
+                                                                            "type": "string",
+                                                                            "example": "Hypernatremia"
+                                                                        },
+                                                                        "value": {
+                                                                            "type": "integer",
+                                                                            "example": 0
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "user_choosed": {
+                                                                "type": "integer",
+                                                                "example": 3273734
+                                                            }
+                                                        },
+                                                        "type": "object"
                                                     }
                                                 },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "No solutions found for this exam",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 30
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "No solutions found for this exam."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - The user is not authenticated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Unauthorized"
+                                            "example": "User Exam Solutions"
                                         }
                                     },
                                     "type": "object"
@@ -11038,16 +11056,6 @@
                             "type": "integer",
                             "example": 1
                         }
-                    },
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "token for security reason",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "fja6meujqoRgSDQBn7SqaEZ7h"
-                        }
                     }
                 ],
                 "responses": {
@@ -11057,148 +11065,81 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "status": {
                                             "type": "boolean",
                                             "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 191820
+                                                            },
+                                                            "exam_id": {
+                                                                "type": "integer",
+                                                                "example": 2496
+                                                            },
+                                                            "question": {
+                                                                "type": "string"
+                                                            },
+                                                            "explanation": {
+                                                                "type": "string"
+                                                            },
+                                                            "options": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 3286337
+                                                                        },
+                                                                        "question_id": {
+                                                                            "type": "integer",
+                                                                            "example": 191820
+                                                                        },
+                                                                        "option": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "user_choosed": {
+                                                                "type": "integer",
+                                                                "example": 3286337,
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                },
+                                                "duration": {
+                                                    "type": "integer",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
                                         },
                                         "message": {
                                             "type": "string",
                                             "example": "Questions retrieved successfully!"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "exam_id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "question": {
-                                                        "type": "string",
-                                                        "example": "What is the capital of Nepal?"
-                                                    },
-                                                    "option_1": {
-                                                        "type": "string",
-                                                        "example": "Kathmandu"
-                                                    },
-                                                    "option_value_1": {
-                                                        "type": "boolean",
-                                                        "example": true
-                                                    },
-                                                    "option_2": {
-                                                        "type": "string",
-                                                        "example": "Pokhara"
-                                                    },
-                                                    "option_value_2": {
-                                                        "type": "boolean",
-                                                        "example": false
-                                                    },
-                                                    "option_3": {
-                                                        "type": "string",
-                                                        "example": "Lalitpur",
-                                                        "nullable": true
-                                                    },
-                                                    "option_value_3": {
-                                                        "type": "boolean",
-                                                        "example": true,
-                                                        "nullable": true
-                                                    },
-                                                    "option_4": {
-                                                        "type": "string",
-                                                        "example": "Bhaktapur",
-                                                        "nullable": true
-                                                    },
-                                                    "option_value_4": {
-                                                        "type": "boolean",
-                                                        "example": false,
-                                                        "nullable": true
-                                                    },
-                                                    "explanation": {
-                                                        "type": "string",
-                                                        "example": "Kathmandu is the capital of Nepal.",
-                                                        "nullable": true
-                                                    },
-                                                    "subject": {
-                                                        "type": "string",
-                                                        "example": "Geography",
-                                                        "nullable": true
-                                                    },
-                                                    "exam_type": {
-                                                        "type": "string",
-                                                        "example": "MCQ",
-                                                        "nullable": true
-                                                    },
-                                                    "remark": {
-                                                        "type": "string",
-                                                        "example": "Important question",
-                                                        "nullable": true
-                                                    },
-                                                    "serial": {
-                                                        "type": "integer",
-                                                        "example": 1,
-                                                        "nullable": true
-                                                    },
-                                                    "old_exam_id": {
-                                                        "type": "integer",
-                                                        "example": 123,
-                                                        "nullable": true
-                                                    },
-                                                    "mark_type": {
-                                                        "type": "string",
-                                                        "example": "Numerical",
-                                                        "nullable": true
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "No active questions found for the specified exam ID",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "No active questions found for this exam."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Failed to retrieve questions. Please try again."
-                                        },
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Database error or other internal error"
                                         }
                                     },
                                     "type": "object"
@@ -11237,16 +11178,6 @@
                             "type": "integer",
                             "example": 1
                         }
-                    },
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "pagination token",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "kj8s7afd"
-                        }
                     }
                 ],
                 "responses": {
@@ -11256,148 +11187,81 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "status": {
                                             "type": "boolean",
                                             "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 191820
+                                                            },
+                                                            "exam_id": {
+                                                                "type": "integer",
+                                                                "example": 2496
+                                                            },
+                                                            "question": {
+                                                                "type": "string"
+                                                            },
+                                                            "explanation": {
+                                                                "type": "string"
+                                                            },
+                                                            "options": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 3286337
+                                                                        },
+                                                                        "question_id": {
+                                                                            "type": "integer",
+                                                                            "example": 191820
+                                                                        },
+                                                                        "option": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "user_choosed": {
+                                                                "type": "integer",
+                                                                "example": 3286337,
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                },
+                                                "duration": {
+                                                    "type": "integer",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
                                         },
                                         "message": {
                                             "type": "string",
                                             "example": "Questions retrieved successfully!"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "exam_id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "question": {
-                                                        "type": "string",
-                                                        "example": "What is the capital of Nepal?"
-                                                    },
-                                                    "option_1": {
-                                                        "type": "string",
-                                                        "example": "Kathmandu"
-                                                    },
-                                                    "option_value_1": {
-                                                        "type": "boolean",
-                                                        "example": true
-                                                    },
-                                                    "option_2": {
-                                                        "type": "string",
-                                                        "example": "Pokhara"
-                                                    },
-                                                    "option_value_2": {
-                                                        "type": "boolean",
-                                                        "example": false
-                                                    },
-                                                    "option_3": {
-                                                        "type": "string",
-                                                        "example": "Lalitpur",
-                                                        "nullable": true
-                                                    },
-                                                    "option_value_3": {
-                                                        "type": "boolean",
-                                                        "example": true,
-                                                        "nullable": true
-                                                    },
-                                                    "option_4": {
-                                                        "type": "string",
-                                                        "example": "Bhaktapur",
-                                                        "nullable": true
-                                                    },
-                                                    "option_value_4": {
-                                                        "type": "boolean",
-                                                        "example": false,
-                                                        "nullable": true
-                                                    },
-                                                    "explanation": {
-                                                        "type": "string",
-                                                        "example": "Kathmandu is the capital of Nepal.",
-                                                        "nullable": true
-                                                    },
-                                                    "subject": {
-                                                        "type": "string",
-                                                        "example": "Geography",
-                                                        "nullable": true
-                                                    },
-                                                    "exam_type": {
-                                                        "type": "string",
-                                                        "example": "MCQ",
-                                                        "nullable": true
-                                                    },
-                                                    "remark": {
-                                                        "type": "string",
-                                                        "example": "Important question",
-                                                        "nullable": true
-                                                    },
-                                                    "serial": {
-                                                        "type": "integer",
-                                                        "example": 1,
-                                                        "nullable": true
-                                                    },
-                                                    "old_exam_id": {
-                                                        "type": "integer",
-                                                        "example": 123,
-                                                        "nullable": true
-                                                    },
-                                                    "mark_type": {
-                                                        "type": "string",
-                                                        "example": "Numerical",
-                                                        "nullable": true
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "No active questions found for the specified exam ID",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "No active questions found for this exam."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Failed to retrieve questions. Please try again."
-                                        },
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Database error or other internal error"
                                         }
                                     },
                                     "type": "object"
@@ -11436,16 +11300,6 @@
                             "type": "integer",
                             "example": 1
                         }
-                    },
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "pagination token",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "kj8s7afd"
-                        }
                     }
                 ],
                 "responses": {
@@ -11455,148 +11309,81 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "status": {
                                             "type": "boolean",
                                             "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 191820
+                                                            },
+                                                            "exam_id": {
+                                                                "type": "integer",
+                                                                "example": 2496
+                                                            },
+                                                            "question": {
+                                                                "type": "string"
+                                                            },
+                                                            "explanation": {
+                                                                "type": "string"
+                                                            },
+                                                            "options": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 3286337
+                                                                        },
+                                                                        "question_id": {
+                                                                            "type": "integer",
+                                                                            "example": 191820
+                                                                        },
+                                                                        "option": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "user_choosed": {
+                                                                "type": "integer",
+                                                                "example": 3286337,
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                },
+                                                "duration": {
+                                                    "type": "integer",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
                                         },
                                         "message": {
                                             "type": "string",
                                             "example": "Questions retrieved successfully!"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "exam_id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "question": {
-                                                        "type": "string",
-                                                        "example": "What is the capital of Nepal?"
-                                                    },
-                                                    "option_1": {
-                                                        "type": "string",
-                                                        "example": "Kathmandu"
-                                                    },
-                                                    "option_value_1": {
-                                                        "type": "boolean",
-                                                        "example": true
-                                                    },
-                                                    "option_2": {
-                                                        "type": "string",
-                                                        "example": "Pokhara"
-                                                    },
-                                                    "option_value_2": {
-                                                        "type": "boolean",
-                                                        "example": false
-                                                    },
-                                                    "option_3": {
-                                                        "type": "string",
-                                                        "example": "Lalitpur",
-                                                        "nullable": true
-                                                    },
-                                                    "option_value_3": {
-                                                        "type": "boolean",
-                                                        "example": true,
-                                                        "nullable": true
-                                                    },
-                                                    "option_4": {
-                                                        "type": "string",
-                                                        "example": "Bhaktapur",
-                                                        "nullable": true
-                                                    },
-                                                    "option_value_4": {
-                                                        "type": "boolean",
-                                                        "example": false,
-                                                        "nullable": true
-                                                    },
-                                                    "explanation": {
-                                                        "type": "string",
-                                                        "example": "Kathmandu is the capital of Nepal.",
-                                                        "nullable": true
-                                                    },
-                                                    "subject": {
-                                                        "type": "string",
-                                                        "example": "Geography",
-                                                        "nullable": true
-                                                    },
-                                                    "exam_type": {
-                                                        "type": "string",
-                                                        "example": "MCQ",
-                                                        "nullable": true
-                                                    },
-                                                    "remark": {
-                                                        "type": "string",
-                                                        "example": "Important question",
-                                                        "nullable": true
-                                                    },
-                                                    "serial": {
-                                                        "type": "integer",
-                                                        "example": 1,
-                                                        "nullable": true
-                                                    },
-                                                    "old_exam_id": {
-                                                        "type": "integer",
-                                                        "example": 123,
-                                                        "nullable": true
-                                                    },
-                                                    "mark_type": {
-                                                        "type": "string",
-                                                        "example": "Numerical",
-                                                        "nullable": true
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "No active questions found for the specified exam ID",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "No active questions found for this exam."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Failed to retrieve questions. Please try again."
-                                        },
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Database error or other internal error"
                                         }
                                     },
                                     "type": "object"
@@ -16155,7 +15942,7 @@
                                     },
                                     "duration": {
                                         "type": "string",
-                                        "example": "02:45"
+                                        "example": "60"
                                     }
                                 },
                                 "type": "object"
@@ -16359,7 +16146,7 @@
                                     },
                                     "duration": {
                                         "type": "string",
-                                        "example": "02:45"
+                                        "example": "90"
                                     }
                                 },
                                 "type": "object"

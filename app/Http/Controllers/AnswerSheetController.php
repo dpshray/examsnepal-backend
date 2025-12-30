@@ -13,6 +13,7 @@ use App\Services\ScoreService;
 use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
 
@@ -33,11 +34,16 @@ class AnswerSheetController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"exam_id", "question_id", "answer_id"},
+     *             required={"exam_id","question_id","answer_id","is_exam_completed"},
      *             @OA\Property(
      *                 property="exam_id",
      *                 type="integer",
      *                 example=1
+     *             ),
+     *             @OA\Property(
+     *                 property="is_exam_completed",
+     *                 type="integer",
+     *                 example=0
      *             ),
      *             @OA\Property(
      *                 property="question_ids",
@@ -125,6 +131,7 @@ class AnswerSheetController extends Controller
             'question_id.*' => 'integer|exists:questions,id',
             'option_id' => 'nullable|array',
             'option_id.*' => 'integer|exists:option_questions,id',
+            'is_exam_completed' => 'required|between:0,1'
             // 'question_ids' => 'required|array',
             // 'question_ids.*' => 'integer|exists:option_questions,id'
         ]);
@@ -186,7 +193,11 @@ class AnswerSheetController extends Controller
             }
         }
         // return $temp;
-        DB::transaction(fn() => $student_exam->answers()->upsert($temp,['student_exam_id','question_id'],['selected_option_id','is_correct']));
+        // Log::info($validatedData);
+        DB::transaction(function() use($student_exam, $temp, $validatedData){
+            $student_exam->answers()->upsert($temp, ['student_exam_id', 'question_id'], ['selected_option_id', 'is_correct']);
+            $student_exam->update(['is_exam_completed' => $validatedData['is_exam_completed']]);
+        });
 
         $student_exam->refresh();
         $student_exam->load(['answers', 'exam.questions'])
@@ -196,7 +207,8 @@ class AnswerSheetController extends Controller
             'answers as missed_answer_count' => fn($q) => $q->where('is_correct', null),
             ]);
         $scores = (new ScoreService())->fetchExamScore($student_exam);
-        return Response::apiSuccess('Answer Saved Successfully', $scores, 200);
+        $scores['is_exam_completed'] = (bool)$validatedData['is_exam_completed'];
+        return Response::apiSuccess('Exam completed successfully.', $scores, 200);
     }
 
     /**
@@ -206,7 +218,7 @@ class AnswerSheetController extends Controller
      *     description="Fetch all answers for the given exam for the authenticated student.",
      *     operationId="getResultsWithExam",
      *     tags={"Quiz"},
-     * @OA\Parameter(
+     *     @OA\Parameter(
      *         name="page",
      *         in="query",
      *         required=false,
@@ -222,39 +234,41 @@ class AnswerSheetController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Successfully retrieved solutions",
+     *         description="User Exam Solutions",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="message", type="string", example="Solutions retrieved successfully"),
+     *             @OA\Property(property="status", type="boolean", example=true),
      *             @OA\Property(
      *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer"),
-     *                     @OA\Property(property="exam_id", type="integer"),
-     *                     @OA\Property(property="student_id", type="integer"),
-     *                     @OA\Property(property="answer", type="string"),
-     *                     @OA\Property(property="created_at", type="string", format="date-time"),
-     *                     @OA\Property(property="updated_at", type="string", format="date-time")
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="No solutions found for this exam",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="No solutions found for this exam.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthorized - The user is not authenticated",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Unauthorized")
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=188718),
+     *                         @OA\Property(property="exam_id", type="integer", example=2443),
+     *                         @OA\Property(property="question", type="string", example="Which electrolyte disturbance is most commonly associated with chronic kidney disease?"),
+     *                         @OA\Property(property="explanation", type="string", example="CKD impairs renal potassium excretion, leading to hyperkalemia, which can cause arrhythmias."),
+     *                         @OA\Property(
+     *                             property="options",
+     *                             type="array",
+     *                             @OA\Items(
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer", example=3273733),
+     *                                 @OA\Property(property="question_id", type="integer", example=188718),
+     *                                 @OA\Property(property="option", type="string", example="Hypernatremia"),
+     *                                 @OA\Property(property="value", type="integer", example=0)
+     *                             )
+     *                         ),
+     *                         @OA\Property(property="user_choosed", type="integer", example=3273734)
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="last_page", type="integer", example=3),
+     *                 @OA\Property(property="total", type="integer", example=30)
+     *             ),
+     *             @OA\Property(property="message", type="string", example="User Exam Solutions")
      *         )
      *     ),
      *     security={

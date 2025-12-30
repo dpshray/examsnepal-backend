@@ -39,4 +39,8 @@ class Answersheet extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    function student_exam() {
+        return $this->belongsTo(StudentExam::class);
+    }
 }

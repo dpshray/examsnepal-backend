@@ -9,7 +9,8 @@ class StudentExam extends Model
     protected $fillable = [
         'exam_id',
         'student_id',
-        'first_time_token'
+        'first_time_token',
+        'is_exam_completed'
     ];
 
     protected function casts(): array

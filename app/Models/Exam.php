@@ -58,6 +58,15 @@ class Exam extends Model
         return ($hours * 60) + $minutes;
     }
 
+    function hisToMin() {
+        if (empty($this->duration)) {
+            return null;
+        }
+        [$hours, $minutes, $seconds] = explode(':', $this->duration);
+        $totalMinutes = ($hours * 60) + $minutes + ($seconds / 60);
+        return $totalMinutes; // 150
+    }
+
     public function scopeFreeType(Builder $query): Builder
     {
         return $query->where('status', ExamTypeEnum::FREE_QUIZ->value);
@@ -77,44 +86,57 @@ class Exam extends Model
     {
         return $query->with([
             'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])
+                ->when(Auth::guard('api')->check(), fn($q) => $q->where('student_id', Auth::guard('api')->id()))
                 # commented since no player needed no show
-                ->with([
+                /* ->with([
                     'student:id,name',
                     'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
-                ])
+                ]) */
                 ->withCount([
                     'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
                 ])
                 ->orderBy('correct_answers_count', 'DESC')
                 ->orderBy('id', 'DESC')
         ])
-            ->allAvailableExams()
-            ->when(
-                Auth::guard('api')->check(),
-                fn($qry) => $qry->whereDoesntHave('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))
-            );
+        ->allAvailableExams()
+        ->when(
+            Auth::guard('api')->check(),
+            fn($qry) => $qry->where(function ($q) {
+                $q->whereDoesntHave('student_exams', function ($q) {
+                    $q->where('student_id', Auth::guard('api')->id());
+                })
+                ->orWhereHas('student_exams', function ($q) {
+                    $q->where('student_id', Auth::guard('api')->id())
+                      ->where('is_exam_completed', 0);
+                });
+            })
+        );
     }
 
     public function scopeAuthUserCompleted(Builder $query): Builder
     {
         return $query->with([
-            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id'])
+            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id','is_exam_completed'])
+                ->when(Auth::guard('api')->check(), fn($q) => $q->where('student_id', Auth::guard('api')->id()))
                 # commented since no player needed no show
-                ->with([
+                /* ->with([
                     'student:id,name',
                     'answers' => fn($q) => $q->select('student_exam_id', 'is_correct')->where('is_correct', 1),
-                ])
+                ]) */
                 ->withCount([
                     'answers as correct_answers_count' => fn($q) => $q->where('is_correct', 1),
                 ])
                 ->orderBy('correct_answers_count', 'DESC')
                 ->orderBy('id', 'DESC')
         ])
-            ->when(
-                Auth::guard('api')->check(),
-                fn($qry) => $qry->whereHas('student_exams', fn($qry) => $qry->where('student_id', Auth::guard('api')->id()))
-            )
-            ->allAvailableExams();
+        // ->whereRelation('student_exams','is_exam_completed',1)
+        ->when(
+            Auth::guard('api')->check(),
+            fn($qry) => $qry->whereHas('student_exams', fn($qry) => 
+                    $qry->where('student_id', Auth::guard('api')->id())->where('is_exam_completed',1)
+                )
+        )
+        ->allAvailableExams();
     }
 
     public function scopeAllAvailableExams(Builder $query): Builder

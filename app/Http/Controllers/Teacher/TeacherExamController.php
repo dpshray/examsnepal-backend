@@ -100,11 +100,14 @@ class TeacherExamController extends Controller
     public function index(Request $request)
     {
         $per_page = $request->query('per_page', 10);
-        $examTypeId   = $request->query('exam_type');
-        $category_type = $request->query('category_type');
+        $examTypeId   = $request->query('exam_type'); #MDMS...
+        $category_type = $request->query('category_type'); # mock,free, sprint
+        $search = $request->query('search');
+        
         $teacher = Auth::guard('users')->user();
         $pagination = Exam::query()
             ->when(!$teacher->isAdmin(), fn($qry) => $qry->where('user_id', $teacher->id))
+            ->when($search, fn($q) => $q->whereLike('exam_name', '%'.$search.'%'))
             ->when($examTypeId, function ($q) use ($examTypeId) {
                 $q->where('exam_type_id', $examTypeId);
             })

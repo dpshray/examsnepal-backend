@@ -20,7 +20,8 @@ class QuestionResource extends JsonResource
             'exam_id' => $this->exam_id,
             'question' => $this->question,
             'explanation' => $this->explanation,
-            'options' => $this->whenLoaded('options')
+            'options' => $this->whenLoaded('options'),
+            'user_choosed' => $this->student_answers->count() ? $this->student_answers->first()->selected_option_id : null 
         ];
     }
 }

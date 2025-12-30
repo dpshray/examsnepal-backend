@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ExamTypeEnum;
+use App\Exceptions\ClientStudentExamException;
 use App\Http\Resources\QuestionCollection;
 use App\Models\Exam;
 use App\Models\ExamType;
@@ -884,65 +885,57 @@ class QuestionController extends Controller
      *             example=1
      *         )
      *     ),
-     *     @OA\Parameter(
-     *         name="token",
-     *         in="query",
-     *         required=false,
-     *         description="token for security reason",
-     *         @OA\Schema(
-     *             type="string",
-     *             example="fja6meujqoRgSDQBn7SqaEZ7h"
-     *         )
-     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Questions retrieved successfully",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Questions retrieved successfully!"),
-     *             @OA\Property(property="data", type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="exam_id", type="integer", example=1),
-     *                     @OA\Property(property="question", type="string", example="What is the capital of Nepal?"),
-     *                     @OA\Property(property="option_1", type="string", example="Kathmandu"),
-     *                     @OA\Property(property="option_value_1", type="boolean", example=true),
-     *                     @OA\Property(property="option_2", type="string", example="Pokhara"),
-     *                     @OA\Property(property="option_value_2", type="boolean", example=false),
-     *                     @OA\Property(property="option_3", type="string", nullable=true, example="Lalitpur"),
-     *                     @OA\Property(property="option_value_3", type="boolean", nullable=true, example=true),
-     *                     @OA\Property(property="option_4", type="string", nullable=true, example="Bhaktapur"),
-     *                     @OA\Property(property="option_value_4", type="boolean", nullable=true, example=false),
-     *                     @OA\Property(property="explanation", type="string", nullable=true, example="Kathmandu is the capital of Nepal."),
-     *                     @OA\Property(property="subject", type="string", nullable=true, example="Geography"),
-     *                     @OA\Property(property="exam_type", type="string", nullable=true, example="MCQ"),
-     *                     @OA\Property(property="remark", type="string", nullable=true, example="Important question"),
-     *                     @OA\Property(property="serial", type="integer", nullable=true, example=1),
-     *                     @OA\Property(property="old_exam_id", type="integer", nullable=true, example=123),
-     *                     @OA\Property(property="mark_type", type="string", nullable=true, example="Numerical")
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=191820),
+     *                         @OA\Property(property="exam_id", type="integer", example=2496),
+     *                         @OA\Property(property="question", type="string"),
+     *                         @OA\Property(property="explanation", type="string"),
+     *                         @OA\Property(
+     *                             property="options",
+     *                             type="array",
+     *                             @OA\Items(
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer", example=3286337),
+     *                                 @OA\Property(property="question_id", type="integer", example=191820),
+     *                                 @OA\Property(property="option", type="string")
+     *                             )
+     *                         ),
+     *                         @OA\Property(
+     *                             property="user_choosed",
+     *                             type="integer",
+     *                             nullable=true,
+     *                             example=3286337
+     *                         )
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="last_page", type="integer", example=20),
+     *                 @OA\Property(property="total", type="integer", example=200),
+     *                 @OA\Property(
+     *                     property="duration",
+     *                     type="integer",
+     *                     nullable=true,
+     *                     example=null
      *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Questions retrieved successfully!"
      *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="No active questions found for the specified exam ID",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="No active questions found for this exam.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Failed to retrieve questions. Please try again."),
-     *             @OA\Property(property="error", type="string", example="Database error or other internal error")
      *         )
      *     )
      * )
@@ -958,19 +951,23 @@ class QuestionController extends Controller
             ], 404);
         }
 
-        $token = null;
         try {
-            $token = $this->checkIfExamHasBeenStartedPreviously($exam, request('token', null));
-        } catch (\Exception $e) {
+            $this->checkIfExamHasBeenStartedPreviously($exam);
+        } catch (ClientStudentExamException $e) {
             return Response::apiError($e->getMessage(), null, 409);
         }
 
         $questions = $exam->questions()
-                        ->with('options:id,question_id,option')
-                        ->select('id', 'exam_id', 'question', 'explanation')
-                        ->paginate();
-        $append = compact('token');
-        $data = $this->setupPagination($questions, QuestionCollection::class, $append)->data;
+            ->with([
+                'options:id,question_id,option',
+                'student_answers' => fn($q) => $q->whereHas('student_exam', function($q){
+                    return $q->where('student_id', Auth::id());
+                })
+            ])
+            ->select('id', 'exam_id', 'question', 'explanation')
+            ->paginate();
+        $duration = ['duration' => $exam->hisToMin()];
+        $data = $this->setupPagination($questions, QuestionCollection::class, $duration)->data;
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
     }
@@ -999,65 +996,57 @@ class QuestionController extends Controller
      *             example=1
      *         )
      *     ),
-     *     @OA\Parameter(
-     *         name="token",
-     *         in="query",
-     *         required=false,
-     *         description="pagination token",
-     *         @OA\Schema(
-     *             type="string",
-     *             example="kj8s7afd"
-     *         )
-     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Questions retrieved successfully",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Questions retrieved successfully!"),
-     *             @OA\Property(property="data", type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="exam_id", type="integer", example=1),
-     *                     @OA\Property(property="question", type="string", example="What is the capital of Nepal?"),
-     *                     @OA\Property(property="option_1", type="string", example="Kathmandu"),
-     *                     @OA\Property(property="option_value_1", type="boolean", example=true),
-     *                     @OA\Property(property="option_2", type="string", example="Pokhara"),
-     *                     @OA\Property(property="option_value_2", type="boolean", example=false),
-     *                     @OA\Property(property="option_3", type="string", nullable=true, example="Lalitpur"),
-     *                     @OA\Property(property="option_value_3", type="boolean", nullable=true, example=true),
-     *                     @OA\Property(property="option_4", type="string", nullable=true, example="Bhaktapur"),
-     *                     @OA\Property(property="option_value_4", type="boolean", nullable=true, example=false),
-     *                     @OA\Property(property="explanation", type="string", nullable=true, example="Kathmandu is the capital of Nepal."),
-     *                     @OA\Property(property="subject", type="string", nullable=true, example="Geography"),
-     *                     @OA\Property(property="exam_type", type="string", nullable=true, example="MCQ"),
-     *                     @OA\Property(property="remark", type="string", nullable=true, example="Important question"),
-     *                     @OA\Property(property="serial", type="integer", nullable=true, example=1),
-     *                     @OA\Property(property="old_exam_id", type="integer", nullable=true, example=123),
-     *                     @OA\Property(property="mark_type", type="string", nullable=true, example="Numerical")
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=191820),
+     *                         @OA\Property(property="exam_id", type="integer", example=2496),
+     *                         @OA\Property(property="question", type="string"),
+     *                         @OA\Property(property="explanation", type="string"),
+     *                         @OA\Property(
+     *                             property="options",
+     *                             type="array",
+     *                             @OA\Items(
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer", example=3286337),
+     *                                 @OA\Property(property="question_id", type="integer", example=191820),
+     *                                 @OA\Property(property="option", type="string")
+     *                             )
+     *                         ),
+     *                         @OA\Property(
+     *                             property="user_choosed",
+     *                             type="integer",
+     *                             nullable=true,
+     *                             example=3286337
+     *                         )
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="last_page", type="integer", example=20),
+     *                 @OA\Property(property="total", type="integer", example=200),
+     *                 @OA\Property(
+     *                     property="duration",
+     *                     type="integer",
+     *                     nullable=true,
+     *                     example=null
      *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Questions retrieved successfully!"
      *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="No active questions found for the specified exam ID",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="No active questions found for this exam.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Failed to retrieve questions. Please try again."),
-     *             @OA\Property(property="error", type="string", example="Database error or other internal error")
      *         )
      *     )
      * )
@@ -1072,20 +1061,24 @@ class QuestionController extends Controller
             ], 404);
         }
 
-        $token = null;
         try {
-            $token = $this->checkIfExamHasBeenStartedPreviously($exam, request('token', null));
+            $this->checkIfExamHasBeenStartedPreviously($exam);
         } catch (\Exception $e) {
             return Response::apiError($e->getMessage(), null, 409);
         }
 
         $questionsMockTest = $exam
                                 ->questions()
-                                ->with('options:id,question_id,option')
+                                ->with([
+                                    'options:id,question_id,option',
+                                    'student_answers' => fn($q) => $q->whereHas('student_exam', function ($q) {
+                                        return $q->where('student_id', Auth::id());
+                                    })
+                                ])
                                 ->select('id', 'exam_id', 'question', 'explanation')
                                 ->paginate();
-        $append = compact('token');
-        $data = $this->setupPagination($questionsMockTest, QuestionCollection::class, $append)->data;
+        $duration = ['duration' => $exam->hisToMin()];
+        $data = $this->setupPagination($questionsMockTest, QuestionCollection::class, $duration)->data;
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
     }
@@ -1114,65 +1107,57 @@ class QuestionController extends Controller
      *             example=1
      *         )
      *     ),
-     *     @OA\Parameter(
-     *         name="token",
-     *         in="query",
-     *         required=false,
-     *         description="pagination token",
-     *         @OA\Schema(
-     *             type="string",
-     *             example="kj8s7afd"
-     *         )
-     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Questions retrieved successfully",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Questions retrieved successfully!"),
-     *             @OA\Property(property="data", type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="exam_id", type="integer", example=1),
-     *                     @OA\Property(property="question", type="string", example="What is the capital of Nepal?"),
-     *                     @OA\Property(property="option_1", type="string", example="Kathmandu"),
-     *                     @OA\Property(property="option_value_1", type="boolean", example=true),
-     *                     @OA\Property(property="option_2", type="string", example="Pokhara"),
-     *                     @OA\Property(property="option_value_2", type="boolean", example=false),
-     *                     @OA\Property(property="option_3", type="string", nullable=true, example="Lalitpur"),
-     *                     @OA\Property(property="option_value_3", type="boolean", nullable=true, example=true),
-     *                     @OA\Property(property="option_4", type="string", nullable=true, example="Bhaktapur"),
-     *                     @OA\Property(property="option_value_4", type="boolean", nullable=true, example=false),
-     *                     @OA\Property(property="explanation", type="string", nullable=true, example="Kathmandu is the capital of Nepal."),
-     *                     @OA\Property(property="subject", type="string", nullable=true, example="Geography"),
-     *                     @OA\Property(property="exam_type", type="string", nullable=true, example="MCQ"),
-     *                     @OA\Property(property="remark", type="string", nullable=true, example="Important question"),
-     *                     @OA\Property(property="serial", type="integer", nullable=true, example=1),
-     *                     @OA\Property(property="old_exam_id", type="integer", nullable=true, example=123),
-     *                     @OA\Property(property="mark_type", type="string", nullable=true, example="Numerical")
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=191820),
+     *                         @OA\Property(property="exam_id", type="integer", example=2496),
+     *                         @OA\Property(property="question", type="string"),
+     *                         @OA\Property(property="explanation", type="string"),
+     *                         @OA\Property(
+     *                             property="options",
+     *                             type="array",
+     *                             @OA\Items(
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer", example=3286337),
+     *                                 @OA\Property(property="question_id", type="integer", example=191820),
+     *                                 @OA\Property(property="option", type="string")
+     *                             )
+     *                         ),
+     *                         @OA\Property(
+     *                             property="user_choosed",
+     *                             type="integer",
+     *                             nullable=true,
+     *                             example=3286337
+     *                         )
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="last_page", type="integer", example=20),
+     *                 @OA\Property(property="total", type="integer", example=200),
+     *                 @OA\Property(
+     *                     property="duration",
+     *                     type="integer",
+     *                     nullable=true,
+     *                     example=null
      *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Questions retrieved successfully!"
      *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="No active questions found for the specified exam ID",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="No active questions found for this exam.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Failed to retrieve questions. Please try again."),
-     *             @OA\Property(property="error", type="string", example="Database error or other internal error")
      *         )
      *     )
      * )
@@ -1187,45 +1172,57 @@ class QuestionController extends Controller
             ], 404);
         }
 
-        $token = null;
         try {
-            $token = $this->checkIfExamHasBeenStartedPreviously($exam, request('token', null));
+            $this->checkIfExamHasBeenStartedPreviously($exam);
         } catch (\Exception $e) {
             return Response::apiError($e->getMessage(), null, 409);
         }
 
         $questionsSprintQuiz = $exam->questions()
-            ->with('options:id,question_id,option')
+            ->with([
+                'options:id,question_id,option',
+                'student_answers' => fn($q) => $q->whereHas('student_exam', function ($q) {
+                    return $q->where('student_id', Auth::id());
+                })
+            ])
             ->select('id', 'exam_id', 'question', 'explanation')
             ->paginate();
-        $append = compact('token');
-        $data = $this->setupPagination($questionsSprintQuiz, QuestionCollection::class, $append)->data;
+        $duration = ['duration' => $exam->hisToMin()];
+
+        $data = $this->setupPagination($questionsSprintQuiz, QuestionCollection::class, $duration)->data;
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
     }
 
-    private function checkIfExamHasBeenStartedPreviously(Exam $exam, $FTT): String
+    private function checkIfExamHasBeenStartedPreviously(Exam $exam)
     {
-        $user      = Auth::guard('api')->user();
-        $user_exam = $user->student_exams()->firstWhere('exam_id', $exam->id);
-
-        if ($user_exam == null) {
-            # this is the first time user giving this exam
-            $first_time_token = str()->random(25);
-            $data             = $exam->questions->pluck('id')->map(fn($id) => ['question_id' => $id]);
-            DB::transaction(function () use($user, $exam, $first_time_token,$data){
-                $user->student_exams()->create(['exam_id' => $exam->id, 'first_time_token' => $first_time_token])
-                    ->answers()
-                    ->createMany($data);
-            });
-            return $first_time_token;
-        } else {
-            # check token to verify if this is first time user attending this exam via token
-            if ($user_exam->first_time_token !== $FTT) {
-                throw new \Exception('This exam has already been completed by the user.(token is missing/incorrect)');
+        $user = Auth::guard('api')->user();
+        // Wrap in transaction for atomicity
+        DB::transaction(function () use ($user, $exam, &$user_exam) {
+            // Try to find or create the student_exam
+            $user_exam = $user->student_exams()->firstOrCreate(
+                ['exam_id' => $exam->id], // lookup condition
+                [] // no extra fields on creation
+            );
+            // If the student_exam was just created, create answers for all questions
+            if ($user_exam->wasRecentlyCreated) {
+                $answersData = $exam->questions
+                    ->pluck('id')
+                    ->map(fn($id) => ['question_id' => $id])
+                    ->toArray();
+        
+                $user_exam->answers()->createMany($answersData);
             }
-            return $FTT;
-        }
+            // If exam already exists, check if it is completed
+            if ($user_exam->exists && $user_exam->is_exam_completed) {
+                throw new ClientStudentExamException(
+                    "This exam is no longer available — already completed."
+                );
+            }
+        
+        });
+        // $user_exam now contains the record, new or existing
+        return $user_exam;
     }
 
     /**

@@ -549,6 +549,7 @@ class ExamController extends Controller
                     )
                 ) as marks
             ', [$exam->negative_marking_point])
+            ->where('is_exam_completed', 1)
             ->orderByDesc('marks')
             ->orderByDesc('correct_answer_count')
             ->paginate($per_page);

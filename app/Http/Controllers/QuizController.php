@@ -11,6 +11,7 @@ use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -96,6 +97,7 @@ class QuizController extends Controller
             ->withCount('questions')
             ->orderByDesc('student_exams.id')
             ->paginate();
+        // Log::info($free_quiz_query);
         $data = $this->setupPagination($free_quiz_query, StudentExamCompletedListCollection::class)->data;
 
         return Response::apiSuccess('Free completed quizzes retrieved successfully.', $data);
