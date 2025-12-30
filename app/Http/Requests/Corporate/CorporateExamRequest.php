@@ -36,4 +36,10 @@ class CorporateExamRequest extends FormRequest
             'exam_type' => 'required|sometimes|string',
         ];
     }
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'limit_attempts' => $this->input('limit_attempts', 1),
+        ]);
+    }
 }

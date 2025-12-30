@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Corporate\Participant\Exam;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Corporate\Exam\Submission\AllSubmissionCollection;
 use App\Http\Resources\Corporate\Exam\Submission\ParticipantExamDetailResource;
+use App\Models\Corporate\CorporateExam;
 use App\Models\ExamAttempt;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
@@ -17,11 +18,19 @@ class ParticipantExamSubmitController extends Controller
     use PaginatorTrait;
     /**
      * @OA\Get(
-     *     path="/corporate/exams/submitted-exams",
+     *     path="/corporate/exams/{exam}/submitted-exams",
      *     summary="Get list of submitted exam attempts",
-     *     description="Returns paginated list of submitted, evaluating, or evaluated exam attempts for the logged-in teacher's corporate exams.",
+     *     description="Returns paginated list of submitted, evaluating, or evaluated exam attempts for the logged-in teacher's corporate exam.",
      *     tags={"Corporate Exam Submissions"},
      *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="exam",
+     *         in="path",
+     *         description="Exam slug",
+     *         required=true,
+     *         @OA\Schema(type="string", example="")
+     *     ),
      *
      *     @OA\Parameter(
      *         name="per_page",
@@ -30,20 +39,15 @@ class ParticipantExamSubmitController extends Controller
      *         required=false,
      *         @OA\Schema(type="integer", example=10)
      *     ),
+     *
      *     @OA\Parameter(
-     *         name="name",
+     *         name="search",
      *         in="query",
-     *         description="Filter by student name",
+     *         description="Search by name, email, phone, or exam title",
      *         required=false,
      *         @OA\Schema(type="string", example="Ram")
      *     ),
-     *     @OA\Parameter(
-     *         name="email",
-     *         in="query",
-     *         description="Filter by student email",
-     *         required=false,
-     *         @OA\Schema(type="string", example="ram@gmail.com")
-     *     ),
+     *
      *     @OA\Parameter(
      *         name="status",
      *         in="query",
@@ -55,12 +59,13 @@ class ParticipantExamSubmitController extends Controller
      *             example="submitted"
      *         )
      *     ),
+     *
      *     @OA\Parameter(
-     *         name="exam_id",
+     *         name="section",
      *         in="query",
-     *         description="Filter by exam ID",
+     *         description="Filter by section slug",
      *         required=false,
-     *         @OA\Schema(type="integer", example=5)
+     *         @OA\Schema(type="string", example="section-a")
      *     ),
      *
      *     @OA\Response(
@@ -74,7 +79,8 @@ class ParticipantExamSubmitController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="current_page", type="integer", example=1),
-     *                 @OA\Property(property="total", type="integer", example=20),
+     *                 @OA\Property(property="per_page", type="integer", example=10),
+     *                 @OA\Property(property="total", type="integer", example=25),
      *                 @OA\Property(
      *                     property="data",
      *                     type="array",
@@ -90,25 +96,42 @@ class ParticipantExamSubmitController extends Controller
      *                 )
      *             )
      *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Exam not found"
      *     )
      * )
      */
-
-    function index(Request $request)
+    public function index(Request $request, CorporateExam $exam)
     {
-        $per_page = $request->query('per_page', 10);
-        $search = $request->input('search');
-        $status = $request->input('status'); //submitted, evaluating, evaluated
-        $exam_id = $request->input('exam_id');
-        $teacher = Auth::user();
+        $per_page     = $request->query('per_page', 10);
+        $search       = $request->input('search');
+        $status       = $request->input('status'); // submitted | evaluating | evaluated
+        $section_slug = $request->input('section');
+
+        $teacher      = Auth::user();
         $corporate_id = $teacher->id;
-        $query = ExamAttempt::query()
-            ->with(['exam', 'section', 'participant'])
-            // Only get attempts for this teacher's corporate exams
-            ->whereHas('exam', function ($q) use ($corporate_id) {
-                $q->where('corporate_id', $corporate_id);
-            });
-        // Filter by participant/student name and email
+
+        // Security: ensure exam belongs to teacher
+        if ($exam->corporate_id !== $corporate_id) {
+            return Response::apiError('Unauthorized access to exam', 403);
+        }
+
+        $query = ExamAttempt::with(['exam', 'section', 'participant'])
+            ->where('corporate_exam_id', $exam->id)
+            ->whereIn('status', ['submitted', 'evaluating', 'evaluated']);
+
+        // Filter by section
+        if ($section_slug) {
+            $section = $exam->sections()->where('slug', $section_slug)->first();
+            if ($section) {
+                $query->where('corporate_exam_section_id', $section->id);
+            }
+        }
+
+        // Search filter
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -119,23 +142,24 @@ class ParticipantExamSubmitController extends Controller
                     });
             });
         }
-        // Filter by status
+
+        // Status filter
         if ($status) {
             $query->where('status', $status);
         }
 
-        // Filter by exam
-        if ($exam_id) {
-            $query->where('corporate_exam_id', $exam_id);
-        }
-        // Only get submitted attempts
-        $query->whereIn('status', ['submitted', 'evaluating', 'evaluated']);
-        // Order by latest first
-        $query->orderBy('submitted_at', 'desc');
-        $attempts = $query->paginate($per_page);
-        $data = $this->setupPagination($attempts, AllSubmissionCollection::class)->data;
-        return Response::apiSuccess('List Of All Submissions ', $data);
+        $attempts = $query
+            ->orderBy('submitted_at', 'desc')
+            ->paginate($per_page);
+
+        $data = $this->setupPagination(
+            $attempts,
+            AllSubmissionCollection::class
+        )->data;
+
+        return Response::apiSuccess('List Of All Submissions', $data);
     }
+
     /**
      * @OA\Get(
      *     path="/corporate/exams/submitted-exams/{attempts}",

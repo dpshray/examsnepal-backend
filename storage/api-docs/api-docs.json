@@ -6359,15 +6359,25 @@
                 ]
             }
         },
-        "/corporate/exams/submitted-exams": {
+        "/corporate/exams/{exam}/submitted-exams": {
             "get": {
                 "tags": [
                     "Corporate Exam Submissions"
                 ],
                 "summary": "Get list of submitted exam attempts",
-                "description": "Returns paginated list of submitted, evaluating, or evaluated exam attempts for the logged-in teacher's corporate exams.",
-                "operationId": "be59fa2c6e37e525b17766bf5cf19c8e",
+                "description": "Returns paginated list of submitted, evaluating, or evaluated exam attempts for the logged-in teacher's corporate exam.",
+                "operationId": "8fae4ff23cc235f41fa609ad064df2fe",
                 "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Exam slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": ""
+                        }
+                    },
                     {
                         "name": "per_page",
                         "in": "query",
@@ -6379,23 +6389,13 @@
                         }
                     },
                     {
-                        "name": "name",
+                        "name": "search",
                         "in": "query",
-                        "description": "Filter by student name",
+                        "description": "Search by name, email, phone, or exam title",
                         "required": false,
                         "schema": {
                             "type": "string",
                             "example": "Ram"
-                        }
-                    },
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "description": "Filter by student email",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "ram@gmail.com"
                         }
                     },
                     {
@@ -6414,13 +6414,13 @@
                         }
                     },
                     {
-                        "name": "exam_id",
+                        "name": "section",
                         "in": "query",
-                        "description": "Filter by exam ID",
+                        "description": "Filter by section slug",
                         "required": false,
                         "schema": {
-                            "type": "integer",
-                            "example": 5
+                            "type": "string",
+                            "example": "section-a"
                         }
                     }
                 ],
@@ -6445,9 +6445,13 @@
                                                     "type": "integer",
                                                     "example": 1
                                                 },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
                                                 "total": {
                                                     "type": "integer",
-                                                    "example": 20
+                                                    "example": 25
                                                 },
                                                 "data": {
                                                     "type": "array",
@@ -6489,6 +6493,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "description": "Exam not found"
                     }
                 },
                 "security": [

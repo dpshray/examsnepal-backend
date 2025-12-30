@@ -9,6 +9,7 @@ use App\Http\Controllers\Corporate\Exam\AddParticipantToExamController;
 use App\Http\Controllers\Corporate\Participant\CorporateParticipantController;
 use App\Http\Controllers\Corporate\Participant\Exam\ExamEvaluationController;
 use App\Http\Controllers\Corporate\Participant\Exam\ParticipantExamSubmitController;
+use App\Http\Controllers\Corporate\Participant\Exam\Result\CorporateResultController;
 use App\Http\Controllers\Corporate\Participant\Exam\Result\ExamResultController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,7 +37,7 @@ Route::prefix('corporate')->group(function () {
         Route::post('/exam-publish/{exam}',[CorporateExamController::class,'published_exam']);
         // Route::apiResource('/exam/submission',ParticipantExamSubmitController::class)->only(['index','show']);
         Route::controller(ParticipantExamSubmitController::class)->group(function (){
-            Route::get('/exams/submitted-exams','index');
+            Route::get('/exams/{exam}/submitted-exams','index');
             Route::get('/exams/submitted-exams/{attempts}','show');
         });
         Route::controller(ExamEvaluationController::class)->group(function (){
@@ -46,5 +47,9 @@ Route::prefix('corporate')->group(function () {
             Route::get('/dashboard','dashboard');
         });
         Route::get('/exams/{exam}/download-results', [ExamResultController::class, 'downloadExamResults']);
+        Route::get('/exam/{exam}/get-participant',[CorporateExamSectionController::class,'participantList']);
+        Route::controller(CorporateResultController::class)->group(function(){
+            Route::get('/exams/{exam}/results','ExamResultList');
+        });
     });
 });

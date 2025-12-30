@@ -82,7 +82,8 @@ class CorporateExamController extends Controller
     public function index(Request $request)
     {
         $per_page = $request->query('per_page', 12);
-        // $published = $request->query('published',1);
+        $status = $request->query('status');
+        $search = $request->query('search');
         $pagination = CorporateExam::withCount([
             'sections',
             'participants',
@@ -99,7 +100,13 @@ class CorporateExamController extends Controller
                 ['corporate_id', Auth::guard('users')->id()],
                 // ['is_published', $published]
             ])
-            ->OrderBy('id','desc')
+            ->when($search, function ($query, $search) {
+                $query->where('title', 'like', '%' . $search . '%');
+            })
+            ->when(!is_null($status), function ($query) use ($status) {
+                $query->where('is_published', $status);
+            })
+            ->OrderBy('id', 'desc')
             ->paginate($per_page);
         $data = $this->setupPagination($pagination, CorporateExamCollection::class)->data;
         return Response::apiSuccess("corporate exam list", $data);
