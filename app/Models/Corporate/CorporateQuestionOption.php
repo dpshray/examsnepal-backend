@@ -8,4 +8,7 @@ class CorporateQuestionOption extends Model
 {
     //
     protected $fillable = ['corporate_question_id', 'option', 'value'];
+    protected $casts = [
+        'value'=>'integer'
+    ];
 }

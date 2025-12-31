@@ -50,6 +50,8 @@ Route::prefix('corporate')->group(function () {
         Route::get('/exam/{exam}/get-participant',[CorporateExamSectionController::class,'participantList']);
         Route::controller(CorporateResultController::class)->group(function(){
             Route::get('/exams/{exam}/results','ExamResultList');
+            Route::get('/exams/{exam}/results/detail/{result_token}','studentExamResultDetail');
+            Route::get('/exams/{exam}/results/section-detail/{result_token}/{section}','studentSectionWiseDetail');
         });
     });
 });
