@@ -354,11 +354,13 @@ class StudentExamController extends Controller
         }
         $questions = $questionsQuery->paginate($per_page);
 
-        // If question option shuffled is on
-        if ($exam->is_shuffled_option) {
-            $questions->getCollection()->transform(function ($question, $index) use ($attempt, $questions) {
-                //set question or generate number 1,2, ...etc
-                 $question->number = $questions->firstItem() + $index;
+        // Transform all questions - add numbering and shuffle options if needed
+        $questions->getCollection()->transform(function ($question, $index) use ($attempt, $questions, $exam) {
+            // Set question number for ALL questions (1, 2, 3, etc.)
+            $question->number = $questions->firstItem() + $index;
+
+            // If question option shuffled is on, shuffle options for MCQ/objective
+            if ($exam->is_shuffled_option) {
                 // Only shuffle for MCQ/objective type questions
                 if ($question->question_type === 'mcq' || $question->question_type === 'objective') {
                     // Create a unique seed for each question using attempt_id + question_id
@@ -371,10 +373,11 @@ class StudentExamController extends Controller
                     // Replace the options collection with shuffled one
                     $question->setRelation('options', $options);
                 }
+            }
 
-                return $question;
-            });
-        }
+            return $question;
+        });
+
         $data = $this->setupPagination($questions, StudentExamQuestionCollection::class)->data;
         $response = array_merge(
             [
@@ -382,7 +385,7 @@ class StudentExamController extends Controller
                 'title'      => $section->title,
                 'slug'       => $section->slug,
                 'detail'     => $section->detail,
-                'duration'=>$exam->duration,
+                'duration'   => $exam->duration,
             ],
             $data
         );
