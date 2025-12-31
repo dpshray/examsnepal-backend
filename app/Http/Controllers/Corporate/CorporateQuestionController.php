@@ -9,6 +9,7 @@ use App\Http\Resources\Corporate\CorporateQuestionResource;
 use App\Models\Corporate\CorporateExamSection;
 use App\Models\Corporate\CorporateQuestion;
 use App\Traits\PaginatorTrait;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -437,8 +438,8 @@ class CorporateQuestionController extends Controller
         $user=Auth::user();
         Log::info('Authenticated user ID: ' . $user->id);
         Log::info('Exam corporate ID: ' . $section->exam->corporate_id);
-        if ($user->id !== $section->exam->corporate_id) {
-            abort(403, 'Unauthorized: You do not own this exam.');
+        if ($section->exam->corporate->isNot(Auth::guard('users')->user())) {
+            throw new AuthorizationException('You do not have permission to do this.');
         }
     }
 }
