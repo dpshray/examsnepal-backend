@@ -230,11 +230,7 @@ class TeacherQuestionController extends Controller
             clone($question)->options()->createMany($options);
 
             if ($request->hasFile('image')) {
-                $image_dir_name = $question->id;
-                $image_ext = $request->image->getClientOriginalExtension();
-                $image_name = 'question-image-' . $image_dir_name . '.'. $image_ext;
-                $question->image()->create(['image' => $image_name]);
-                Storage::disk('exam')->putFileAs($image_dir_name, $request->image, $image_name);
+                $question->addMedia($request->file('image'))->toMediaCollection(Question::QUESTION_IMAGE);
             }
 
 

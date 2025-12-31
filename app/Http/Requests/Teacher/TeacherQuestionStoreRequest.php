@@ -22,17 +22,27 @@ class TeacherQuestionStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'question' => 'required',
-            'option_a' => 'required',
-            'option_a_is_true' => 'required|between:0,1',
-            'option_b' => 'required',
-            'option_b_is_true' => 'required|between:0,1',
-            'option_c' => 'required',
-            'option_c_is_true' => 'required|between:0,1',
-            'option_d' => 'required',
-            'option_d_is_true' => 'required|between:0,1',
-            'explanation' => 'required',
-            'image' => 'sometimes|image',
+            "question" => 'required',
+            "explanation" => 'required',
+            "option_a" => 'required|max:255',
+            "option_b" => 'required|max:255',
+            "option_c" => 'required|max:255',
+            "option_d" => 'required|max:255',
+            "image" => 'sometimes|nullable|image',
+            "option_a_is_true" => 'required|boolean',
+            "option_b_is_true" => 'required|boolean',
+            "option_c_is_true" => 'required|boolean',
+            "option_d_is_true" => 'required|boolean',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'option_a_is_true' => filter_var($this->option_a_is_true, FILTER_VALIDATE_BOOLEAN) ? true : false,
+            'option_b_is_true' => filter_var($this->option_b_is_true, FILTER_VALIDATE_BOOLEAN) ? true : false,
+            'option_c_is_true' => filter_var($this->option_c_is_true, FILTER_VALIDATE_BOOLEAN) ? true : false,
+            'option_d_is_true' => filter_var($this->option_d_is_true, FILTER_VALIDATE_BOOLEAN) ? true : false,
+        ]);
     }
 }
