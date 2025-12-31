@@ -13518,78 +13518,24 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "Student successfully registered",
+                    "200": {
+                        "description": "Mail sent successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "Student registered successfully."
-                                        },
-                                        "student": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "John Doe"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "example": "johndoe@example.com"
-                                                },
-                                                "phone": {
-                                                    "type": "string",
-                                                    "example": "+1234567890"
-                                                },
-                                                "exam_type": {
-                                                    "type": "string",
-                                                    "example": "mdms"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "errors": {
-                                            "properties": {
-                                                "name": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The name field is required."
-                                                    }
-                                                },
-                                                "email": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The email has already been taken."
-                                                    }
-                                                },
-                                                "password": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The password confirmation does not match."
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
+                                            "example": "A mail has been sent to your email"
                                         }
                                     },
                                     "type": "object"
@@ -13605,8 +13551,8 @@
                 "tags": [
                     "Student Authentication"
                 ],
-                "summary": "Send password reset token for verification",
-                "description": "This endpoint checks token received from email which was sent for password reset token.",
+                "summary": "Verify token sent on mail of student during password reset process.",
+                "description": "Verify token sent on mail of student during password reset process.",
                 "operationId": "verifyPasswordResetOtp",
                 "requestBody": {
                     "required": true,
@@ -13669,37 +13615,33 @@
                             }
                         }
                     },
-                    "422": {
-                        "description": "Validation error",
+                    "200": {
+                        "description": "Token verified successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "errors": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
                                             "properties": {
-                                                "name": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The name field is required."
-                                                    }
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "YBBAK"
                                                 },
                                                 "email": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The email has already been taken."
-                                                    }
-                                                },
-                                                "password": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The password confirmation does not match."
-                                                    }
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "bamshankar98@gmail.com"
                                                 }
                                             },
                                             "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token is verified"
                                         }
                                     },
                                     "type": "object"
@@ -13753,78 +13695,23 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "Student successfully registered",
+                    "200": {
+                        "description": "Password updated successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "example": null,
+                                            "nullable": true
+                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "Student registered successfully."
-                                        },
-                                        "student": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "John Doe"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "example": "johndoe@example.com"
-                                                },
-                                                "phone": {
-                                                    "type": "string",
-                                                    "example": "+1234567890"
-                                                },
-                                                "exam_type": {
-                                                    "type": "string",
-                                                    "example": "mdms"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "errors": {
-                                            "properties": {
-                                                "name": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The name field is required."
-                                                    }
-                                                },
-                                                "email": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The email has already been taken."
-                                                    }
-                                                },
-                                                "password": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The password confirmation does not match."
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
+                                            "example": "Password has been updated"
                                         }
                                     },
                                     "type": "object"

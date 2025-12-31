@@ -40,6 +40,7 @@ use App\Http\Controllers\Student\Exam\StudentSubmitAnswersController;
 use App\Http\Controllers\Student\ExamRegister\StudentExamRegisterController;
 use App\Http\Controllers\SubscriptionTypeController;
 use App\Http\Middleware\AuthEitherUser;
+use App\Http\Middleware\CheckTokenVersionMiddleware;
 use App\Models\Exam;
 use App\Models\SubscriptionType;
 use Illuminate\Http\Request;
@@ -143,7 +144,7 @@ Route::middleware(AuthEitherUser::class)->group(function(){
 });
 
 // Protected Routes (for authenticated students)
-Route::middleware(['auth:api','verified'])->group(function () {
+Route::middleware(['auth:api','verified', CheckTokenVersionMiddleware::class])->group(function () {
     Route::get('test', [BlogController::class,'test']);
     Route::get('auth-student', [AuthController::class, 'studentAuthResponse']);
     Route::post('/student/logout', [AuthController::class, 'logoutStudent']);

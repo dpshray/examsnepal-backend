@@ -200,9 +200,9 @@ class AuthController extends Controller
         $student = StudentProfile::where('email', $credentials['email'])->first();
         $email_is_not_verified = !$student->hasVerifiedEmail();
         if ($email_is_not_verified) {
-            return Response::apiError('Email is not verified.', null, 403);
+            return Response::apiError('Email is not verified.', null, 422);
         } elseif (empty($student->exam_type_id)) {
-            return Response::apiError('Exam type not found.', null, 403);
+            return Response::apiError('Exam type not found.', null, 422);
         }
         // if (!$student) {
         //     return response()->json(['error' => 'Student not found'], 404);
@@ -212,7 +212,7 @@ class AuthController extends Controller
         if (!Hash::check($credentials['password'], $student->password)) {
             return response()->json([
                 'error' => 'Incorrect password',
-            ], 401);
+            ], 422);
         }
 
         // Attempt to generate a token

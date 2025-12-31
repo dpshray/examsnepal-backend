@@ -33,7 +33,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
         'date',
         'email_verified_at',
         'fcm_token',
-        'requested_from'
+        'requested_from',
+        'token_version'
     ];
 
     protected $hidden = ['password'];
@@ -109,8 +110,11 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
     // Required for JWT
     public function getJWTCustomClaims()
     {
-        return [];
+        return [
+            'token_version' => $this->token_version,
+        ];
     }
+
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class, 'student_id');

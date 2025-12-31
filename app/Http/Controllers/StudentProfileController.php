@@ -350,7 +350,8 @@ class StudentProfileController extends Controller
         $data = [
             "name" => $validatedData["name"],
             // "email" => $validatedData["email"],
-            "phone" => $validatedData['phone']
+            "phone" => $validatedData['phone'],
+            'token_version' => $student->token_version + 1,
         ];
         if (array_key_exists('previous_password', $validatedData)) {
             if (!Hash::check($validatedData['previous_password'], $student->password)) {
@@ -361,7 +362,9 @@ class StudentProfileController extends Controller
                 $data['password'] = Hash::make($validatedData['new_password']);
             }
         }
-        StudentProfile::find($student_id)->update($data);
+        DB::transaction(function() use($student_id, $data){
+            StudentProfile::find($student_id)->update($data);
+        });
         return Response::apiSuccess('User profile updated');
     }
 
@@ -408,27 +411,25 @@ class StudentProfileController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=201,
-     *         description="Student successfully registered",
+     *         response=200,
+     *         description="Mail sent successfully",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Student registered successfully."),
-     *             @OA\Property(property="student", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="John Doe"),
-     *                 @OA\Property(property="email", type="string", example="johndoe@example.com"),
-     *                 @OA\Property(property="phone", type="string", example="+1234567890"),
-     *                 @OA\Property(property="exam_type", type="string", example="mdms")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="errors", type="object",
-     *                 @OA\Property(property="name", type="array", @OA\Items(type="string", example="The name field is required.")),
-     *                 @OA\Property(property="email", type="array", @OA\Items(type="string", example="The email has already been taken.")),
-     *                 @OA\Property(property="password", type="array", @OA\Items(type="string", example="The password confirmation does not match.")),
+     *             type="object",
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="boolean",
+     *                 example=true
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="string",
+     *                 nullable=true,
+     *                 example=null
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="A mail has been sent to your email"
      *             )
      *         )
      *     )
@@ -460,8 +461,8 @@ class StudentProfileController extends Controller
     /**
      * @OA\Post(
      *     path="/verify-password-reset-otp",
-     *     summary="Send password reset token for verification",
-     *     description="This endpoint checks token received from email which was sent for password reset token.",
+     *     summary="Verify token sent on mail of student during password reset process.",
+     *     description="Verify token sent on mail of student during password reset process.",
      *     operationId="verifyPasswordResetOtp",
      *     tags={"Student Authentication"},
      *     @OA\RequestBody(
@@ -487,13 +488,34 @@ class StudentProfileController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=422,
-     *         description="Validation error",
+     *         response=200,
+     *         description="Token verified successfully",
      *         @OA\JsonContent(
-     *             @OA\Property(property="errors", type="object",
-     *                 @OA\Property(property="name", type="array", @OA\Items(type="string", example="The name field is required.")),
-     *                 @OA\Property(property="email", type="array", @OA\Items(type="string", example="The email has already been taken.")),
-     *                 @OA\Property(property="password", type="array", @OA\Items(type="string", example="The password confirmation does not match.")),
+     *             type="object",
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="boolean",
+     *                 example=true
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="token",
+     *                     type="string",
+     *                     example="YBBAK"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="email",
+     *                     type="string",
+     *                     format="email",
+     *                     example="bamshankar98@gmail.com"
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Token is verified"
      *             )
      *         )
      *     )
@@ -534,27 +556,24 @@ class StudentProfileController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=201,
-     *         description="Student successfully registered",
+     *         response=200,
+     *         description="Password updated successfully",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Student registered successfully."),
-     *             @OA\Property(property="student", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="John Doe"),
-     *                 @OA\Property(property="email", type="string", example="johndoe@example.com"),
-     *                 @OA\Property(property="phone", type="string", example="+1234567890"),
-     *                 @OA\Property(property="exam_type", type="string", example="mdms")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="errors", type="object",
-     *                 @OA\Property(property="name", type="array", @OA\Items(type="string", example="The name field is required.")),
-     *                 @OA\Property(property="email", type="array", @OA\Items(type="string", example="The email has already been taken.")),
-     *                 @OA\Property(property="password", type="array", @OA\Items(type="string", example="The password confirmation does not match.")),
+     *             type="object",
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="boolean",
+     *                 example=true
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 nullable=true,
+     *                 example=null
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Password has been updated"
      *             )
      *         )
      *     )
@@ -580,8 +599,10 @@ class StudentProfileController extends Controller
         }
         DB::transaction(function () use($row, $request){
             $row->delete();
-            StudentProfile::where('email',$request->email)->update([
-                'password' => Hash::make($request->password)
+            $student_profile = StudentProfile::firstWhere('email',$request->email);
+            $student_profile->update([
+                'password' => Hash::make($request->password),
+                'token_version' => $student_profile->token_version + 1,
             ]);
         });
 
