@@ -942,6 +942,7 @@ class QuestionController extends Controller
      */
     public function freeQuizQuestions(Exam $exam_id)
     {
+        // return 'here';
         $exam = $exam_id;
         // Check if the exam exists and has an active status
         if ($exam->status != ExamTypeEnum::FREE_QUIZ->value || $exam->exam_type_id != Auth::guard('api')->user()->exam_type_id) {
@@ -964,10 +965,26 @@ class QuestionController extends Controller
                     return $q->where('student_id', Auth::id());
                 })
             ])
-            ->select('id', 'exam_id', 'question', 'explanation')
+            /* ->withCount([
+                'student_answers as total_choosed_questions' => function ($q) {
+                    $q->whereNotNull('selected_option_id')
+                        ->whereHas('student_exam', function ($q) {
+                            $q->where('student_id', Auth::id());
+                        });
+                }
+            ]) */
+            // ->select('id', 'exam_id', 'question', 'explanation')
             ->paginate();
-        $duration = ['duration' => $exam->hisToMin()];
-        $data = $this->setupPagination($questions, QuestionCollection::class, $duration)->data;
+            $total_choosed_options = $exam->student_exams()
+                ->firstWhere('student_id', Auth::id())
+                ->answers()
+                ->where('selected_option_id','<>',null)
+                ->count();
+
+        $data = $this->setupPagination($questions, QuestionCollection::class, [
+            'duration' => $exam->hisToMin(), 
+            'total_choosed_questions' => $total_choosed_options
+            ])->data;
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
     }
@@ -1077,8 +1094,16 @@ class QuestionController extends Controller
                                 ])
                                 ->select('id', 'exam_id', 'question', 'explanation')
                                 ->paginate();
-        $duration = ['duration' => $exam->hisToMin()];
-        $data = $this->setupPagination($questionsMockTest, QuestionCollection::class, $duration)->data;
+        $total_choosed_options = $exam->student_exams()
+            ->firstWhere('student_id', Auth::id())
+            ->answers()
+            ->where('selected_option_id', '<>', null)
+            ->count();
+        $extra_data = [
+            'duration' => $exam->hisToMin(),
+            'total_choosed_options' => $total_choosed_options
+        ];
+        $data = $this->setupPagination($questionsMockTest, QuestionCollection::class, $extra_data)->data;
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
     }
@@ -1187,9 +1212,17 @@ class QuestionController extends Controller
             ])
             ->select('id', 'exam_id', 'question', 'explanation')
             ->paginate();
-        $duration = ['duration' => $exam->hisToMin()];
+        $total_choosed_options = $exam->student_exams()
+            ->firstWhere('student_id', Auth::id())
+            ->answers()
+            ->where('selected_option_id', '<>', null)
+            ->count();
+        $extra_data = [
+            'duration' => $exam->hisToMin(),
+            'total_choosed_options' => $total_choosed_options
+        ];
 
-        $data = $this->setupPagination($questionsSprintQuiz, QuestionCollection::class, $duration)->data;
+        $data = $this->setupPagination($questionsSprintQuiz, QuestionCollection::class, $extra_data)->data;
 
         return Response::apiSuccess('Questions retrieved successfully!', $data);
     }

@@ -205,4 +205,16 @@ class Exam extends Model
     {
         return $this->hasMany(AnswerSheet::class);
     }
+
+    public function answers()
+    {
+        return $this->hasManyThrough(
+            Answersheet::class,
+            StudentExam::class,
+            'exam_id',          // FK on student_exams
+            'student_exam_id',  // FK on answers
+            'id',               // local key on exams
+            'id'                // local key on student_exams
+        );
+    }
 }

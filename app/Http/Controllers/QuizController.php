@@ -183,7 +183,19 @@ class QuizController extends Controller
      */
     public function getPendingFreeQuiz()
     {    
-        $free_quiz_query = Exam::freeType()->authUserPending()->withCount('questions')->orderBy('id','DESC')->paginate();
+        $free_quiz_query = Exam::freeType()
+            ->authUserPending()
+            ->withCount('questions')
+            ->withCount([
+                'answers as total_choosed_options' => function ($q) {
+                    $q->whereNotNull('selected_option_id')
+                        ->whereHas('student_exam', function ($q2) {
+                            $q2->where('student_id', Auth::id());
+                        });
+                }
+            ])
+            ->orderBy('id','DESC')
+            ->paginate();
         $data = $this->setupPagination($free_quiz_query, StudentExamListCollection::class)->data;
 
         return Response::apiSuccess('Free pending quizzes retrieved successfully.', $data);
@@ -352,7 +364,19 @@ class QuizController extends Controller
      */
     public function getPendingSprintQuiz()
     {
-        $sprint_quiz_query = Exam::sprintType()->authUserPending()->withCount('questions')->orderBy('id', 'DESC')->paginate();
+        $sprint_quiz_query = Exam::sprintType()
+            ->authUserPending()
+            ->withCount('questions')
+            ->withCount([
+                'answers as total_choosed_options' => function ($q) {
+                    $q->whereNotNull('selected_option_id')
+                        ->whereHas('student_exam', function ($q2) {
+                            $q2->where('student_id', Auth::id());
+                        });
+                }
+            ])
+            ->orderBy('id', 'DESC')
+            ->paginate();
         $data = $this->setupPagination($sprint_quiz_query, StudentExamListCollection::class)->data;
 
         return Response::apiSuccess('Sprint pending quizzes retrieved successfully.', $data);
@@ -525,7 +549,17 @@ class QuizController extends Controller
      */
     public function getPendingMockTest()
     {
-        $mock_quiz = Exam::mockType()->authUserPending()->orderBy('id', 'DESC')->paginate();
+        $mock_quiz = Exam::mockType()->authUserPending()
+            ->withCount([
+                'answers as total_choosed_options' => function ($q) {
+                    $q->whereNotNull('selected_option_id')
+                        ->whereHas('student_exam', function ($q2) {
+                            $q2->where('student_id', Auth::id());
+                        });
+                }
+            ])
+            ->orderBy('id', 'DESC')
+            ->paginate();
         $data = $this->setupPagination($mock_quiz, StudentExamListCollection::class)->data;
 
         return Response::apiSuccess('Mock pending quizzes retrieved successfully.', $data);

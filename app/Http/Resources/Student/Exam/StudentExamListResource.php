@@ -33,6 +33,7 @@ class StudentExamListResource extends JsonResource
             "status" =>  $status,
             "questions_count" => $this->whenCounted('questions', fn() => (int) $this->questions_count),
             'duration' => $this->minToHis(),
+            'total_choosed_questions' => $this->total_choosed_options,
             'is_interrupted' => $this->isInterrupted($this->student_exams),
             "user" => $this->whenLoaded('user'), #<---added_by
             // 'players' => $this->whenLoaded('student_exams', fn() => new PlayerExamScoreCollection($this->student_exams))
