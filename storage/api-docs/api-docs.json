@@ -16579,6 +16579,89 @@
             }
         },
         "/teacher/question/{question}": {
+            "get": {
+                "tags": [
+                    "TeacherQuestion"
+                ],
+                "summary": "Get detail of question.",
+                "description": "Get detail of question.",
+                "operationId": "teacher_exam_question_detail",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "description": "Question id of an exam",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Question fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 193158
+                                                },
+                                                "question": {
+                                                    "type": "string",
+                                                    "example": "Velit accusantium v"
+                                                },
+                                                "explanation": {
+                                                    "type": "string",
+                                                    "example": "Laboriosam velit e sadaffd"
+                                                },
+                                                "options": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 3291781
+                                                            },
+                                                            "question_id": {
+                                                                "type": "integer",
+                                                                "example": 193158
+                                                            },
+                                                            "option": {
+                                                                "type": "string",
+                                                                "example": "Voluptas qui est eos"
+                                                            },
+                                                            "value": {
+                                                                "type": "integer",
+                                                                "example": 0
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question fetched successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "tags": [
                     "TeacherQuestion"
@@ -16622,6 +16705,22 @@
                                     "explanation": {
                                         "type": "string",
                                         "example": "Kathmandu is the capital city."
+                                    },
+                                    "option_a_id": {
+                                        "type": "integer",
+                                        "example": "12345"
+                                    },
+                                    "option_b_id": {
+                                        "type": "integer",
+                                        "example": "12345"
+                                    },
+                                    "option_c_id": {
+                                        "type": "integer",
+                                        "example": "12345"
+                                    },
+                                    "option_d_id": {
+                                        "type": "integer",
+                                        "example": "12345"
                                     },
                                     "option_a": {
                                         "type": "string",

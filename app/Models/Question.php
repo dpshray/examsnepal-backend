@@ -4,9 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
-class Question extends Model
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+class Question extends Model implements HasMedia
 {
+    use InteractsWithMedia;
+
+    const QUESTION_IMAGE = 'QUESTION_IMAGE';
     protected $perPage = 10;
 
     public $timestamps = false;
@@ -77,5 +82,10 @@ class Question extends Model
     
     public function image(){
         return $this->morphOne(Image::class,'imagable');
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection(self::QUESTION_IMAGE)->singleFile();
     }
 }

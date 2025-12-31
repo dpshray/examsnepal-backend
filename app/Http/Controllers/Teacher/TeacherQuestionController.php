@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Teacher;
 
 use App\Enums\ExamTypeEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Question\AdminStoreQuestionRequest;
 use App\Models\Exam;
 use App\Http\Requests\StoreExamRequest;
 use App\Http\Requests\Teacher\TeacherQuestionStoreRequest;
@@ -263,9 +264,55 @@ class TeacherQuestionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Exam $exam)
+    /**
+     * @OA\Get(
+     *     path="/teacher/question/{question}",
+     *     summary="Get detail of question.",
+     *     description="Get detail of question.",
+     *     operationId="teacher_exam_question_detail",
+     *     tags={"TeacherQuestion"},
+     *     @OA\Parameter(
+     *         name="question",
+     *         in="path",
+     *         required=true,
+     *         description="Question id of an exam",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Question fetched successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=193158),
+     *                 @OA\Property(property="question", type="string", example="Velit accusantium v"),
+     *                 @OA\Property(property="explanation", type="string", example="Laboriosam velit e sadaffd"),
+     *                 @OA\Property(
+     *                     property="options",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=3291781),
+     *                         @OA\Property(property="question_id", type="integer", example=193158),
+     *                         @OA\Property(property="option", type="string", example="Voluptas qui est eos"),
+     *                         @OA\Property(property="value", type="integer", example=0)
+     *                     )
+     *                 )
+     *             ),
+     *             @OA\Property(property="message", type="string", example="Question fetched successfully.")
+     *         )
+     *     )
+     * )
+     */
+    public function show(Exam $exam, Question $question)
     {
-        //
+        $this->isQuestionOwner($question);
+        $question->load(['options']);
+        $question = new TeacherExamQuestionResource($question);
+        return Response::apiSuccess('Question fetched successfully.', $question);
     }
 
     /**
@@ -294,6 +341,10 @@ class TeacherQuestionController extends Controller
      *                 @OA\Property(property="question", type="string", example="What is the capital of Nepal?"),
      *                 @OA\Property(property="_method", type="string", example="patch"),
      *                 @OA\Property(property="explanation", type="string", example="Kathmandu is the capital city."),
+     *                 @OA\Property(property="option_a_id", type="integer", example="12345"),
+     *                 @OA\Property(property="option_b_id", type="integer", example="12345"),
+     *                 @OA\Property(property="option_c_id", type="integer", example="12345"),
+     *                 @OA\Property(property="option_d_id", type="integer", example="12345"),
      *                 @OA\Property(property="option_a", type="string", example="Kathmandu"),
      *                 @OA\Property(property="option_a_is_true", type="boolean", example=true),
      *                 @OA\Property(property="option_b", type="string", example="Pokhara"),
@@ -317,12 +368,23 @@ class TeacherQuestionController extends Controller
      *     )
      * )
     */
-
-    public function update(Request $request ,Question $question)
+    function update(AdminStoreQuestionRequest $request ,Question $question)
     {
         //
-        // $this->isExamOwner($exam);
         $this->isQuestionOwner($question);
+        $request_option_id_not_match_with_existing_question_option_id = $question->options
+            ->pluck('id')
+            ->diff($request->only([
+                "option_d_id",
+                "option_c_id",
+                "option_b_id",
+                "option_a_id",
+            ]))
+            ->isNotEmpty();
+        if ($request_option_id_not_match_with_existing_question_option_id) {
+            return Response::apiError("The selected option does not belong to this question.");
+        }
+
         DB::transaction(function () use ($request, $question) {
             //update question
             $question->update([
@@ -330,34 +392,30 @@ class TeacherQuestionController extends Controller
                 'explanation' => $request->explanation ?? $question->explanation,
             ]);
             //update option
-            if ($request->has(['option_a', 'option_b', 'option_c', 'option_d'])) {
+            // if ($request->has(['option_a', 'option_b', 'option_c', 'option_d'])) {
                 // Remove old options
-                $question->options()->delete();
+                // $question->options()->delete();
                 // Recreate new options
                 $options = [
-                    ['option' => $request->option_a, 'value' => $request->option_a_is_true],
-                    ['option' => $request->option_b, 'value' => $request->option_b_is_true],
-                    ['option' => $request->option_c, 'value' => $request->option_c_is_true],
-                    ['option' => $request->option_d, 'value' => $request->option_d_is_true],
+                    ['option_id' => $request->option_a_id, 'option' => $request->option_a, 'value' => $request->option_a_is_true],
+                    ['option_id' => $request->option_b_id, 'option' => $request->option_b, 'value' => $request->option_b_is_true],
+                    ['option_id' => $request->option_c_id, 'option' => $request->option_c, 'value' => $request->option_c_is_true],
+                    ['option_id' => $request->option_d_id, 'option' => $request->option_d, 'value' => $request->option_d_is_true],
                 ];
-                $question->options()->createMany($options);
-            }
+                foreach ($options as $option) {
+                    $question->options()->where('id', $option['option_id'])
+                        ->update([
+                            'option' => $option['option'],
+                            'value' => $option['value']
+                        ]);
+                }
+            // }
             //update image if exists
             if ($request->hasFile('image')) {
-                $image_dir_name = $question->id;
-                $image_ext = $request->image->getClientOriginalExtension();
-                $image_name = 'question-image-' . $image_dir_name . '.' . $image_ext;
-                // Delete old image if exists
-                if ($question->image) {
-                    Storage::disk('exam')->delete($image_dir_name . '/' . $question->image->image);
-                    $question->image()->delete();
-                }
-                // Save new image
-                $question->image()->create(['image' => $image_name]);
-                Storage::disk('exam')->putFileAs($image_dir_name, $request->image, $image_name);
+                $question->addMedia($request->file('image'))->toMediaCollection(Question::QUESTION_IMAGE);
             }
         });
-        return Response::apiSuccess("Question updated for exam:");
+        return Response::apiSuccess("Question has been updated.");
     }
 
     /**

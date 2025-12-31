@@ -12,5 +12,6 @@ Route::prefix('teacher')->group(function(){
         ->group(function(){
             Route::apiResource('exam', TeacherExamController::class);
             Route::resource('exam.question', TeacherQuestionController::class)->shallow()->except(['create','edit']);
+            Route::get('question/{question}', [TeacherQuestionController::class, 'show']);
         });
 });
