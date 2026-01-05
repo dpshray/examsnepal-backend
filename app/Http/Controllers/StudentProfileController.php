@@ -914,6 +914,7 @@ class StudentProfileController extends Controller
     function myExamScores() {
         $exams_score = StudentProfile::where('id', Auth::id())
             ->has('student_exams')
+            // ->whereRelation('student_exams','is_exam_completed',1)
             ->with(['student_exams' => function ($q) {
                 $q->with([
                     'exam' => fn($q) => $q->withCount('questions')
@@ -923,6 +924,7 @@ class StudentProfileController extends Controller
                     'answers as incorrect_answer_count' => fn($q) => $q->where('is_correct', 0),
                     'answers as missed_answer_count' => fn($q) => $q->where('is_correct', null),
                 ])
+                ->where('is_exam_completed', 1)
                 ->orderBy('id','DESC');
             }])
             ->firstOrFail();

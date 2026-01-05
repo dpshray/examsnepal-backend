@@ -931,10 +931,13 @@ class QuizController extends Controller
      */
     public function getFreeExamStatus()
     {
-        $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
-                    ->freeType()
-                    ->orderBy('id','DESC')
-                    ->paginate();
+        $exams = Exam::whereHas('student_exams', fn($q) => 
+                    $q->where('student_id', Auth::guard('api')->id())
+                    ->where('is_exam_completed', 1)
+                )
+                ->freeType()
+                ->orderBy('id','DESC')
+                ->paginate();
         $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's free exam completed status", $data);
@@ -992,10 +995,12 @@ class QuizController extends Controller
      */
     public function getSprintExamStatus()
     {
-        $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
-                    ->sprintType()
-                    ->orderBy('id','DESC')
-                    ->paginate();
+        $exams = Exam::whereHas('student_exams', fn($q) =>
+                    $q->where('student_id', Auth::guard('api')->id())->where('is_exam_completed', 1)
+                )
+                ->sprintType()
+                ->orderBy('id','DESC')
+                ->paginate();
         $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's sprint exam completed status", $data);
@@ -1053,10 +1058,12 @@ class QuizController extends Controller
      */
     public function getMockExamStatus()
     {
-        $exams = Exam::whereRelation('student_exams', 'student_id', Auth::guard('api')->id())
-                    ->mockType()
-                    ->orderBy('id','DESC')
-                    ->paginate();
+        $exams = Exam::whereHas('student_exams', fn($q) =>
+                        $q->where('student_id', Auth::guard('api')->id())->where('is_exam_completed', 1)
+                )
+                ->mockType()
+                ->orderBy('id','DESC')
+                ->paginate();
         $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's mock exam completed status", $data);
