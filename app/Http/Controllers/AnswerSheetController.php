@@ -280,9 +280,13 @@ class AnswerSheetController extends Controller
     public function getResultsWithExam(Exam $exam_id)
     {
         $exam = $exam_id;
-        $student_exam = Auth::guard('api')->user()->student_exams()->firstWhere('exam_id', $exam->id);
+        $student_exam = Auth::guard('api')->user()
+            ->student_exams()
+            ->firstWhere('exam_id', $exam->id);
         if ($student_exam == null) {
             return Response::apiSuccess('User exam not found', null, 403);
+        }elseif ($student_exam->is_exam_completed == 0) {
+            return Response::apiError('You must finish this exam before accessing the solution.');
         }
 
         $questions = $exam->questions()->with('options')->paginate();
