@@ -190,4 +190,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
             throw new \Exception('Something went wrong while sending mail');
         }
     }
+
+    function notificationReads() {
+        return $this->hasMany(StudentNotificationRead::class);
+    }
 }

@@ -13,5 +13,15 @@ class StudentNotification extends Model
         'body',
         'type',
         'is_read',
+        'exam_id'
     ];
+
+    public function reads()
+    {
+        return $this->hasMany(StudentNotificationRead::class);
+    }
+
+    function exam() {
+        return $this->belongsTo(Exam::class);
+    }
 }

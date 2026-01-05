@@ -15,11 +15,13 @@ class StudentExamNotificationResource extends JsonResource
     public function toArray(Request $request): array
     {
         // return parent::toArray($request);
-        $item = json_decode($this->data);
+        // $item = json_decode($this->data);
+        $notification = $this->studentNotification;
         return [
-            'title' => $this->title,
-            'body' => $this->body,
-            'notified_at' => $this->created_at,
+            'notification_id' => $this->id,
+            'title' => $notification->title,
+            'body' => $notification->body,
+            'notified_at' => $notification->created_at,
         ];
     }
 }

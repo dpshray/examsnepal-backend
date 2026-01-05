@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Log;
 
 class TeacherExamController extends Controller
 {
@@ -168,22 +169,7 @@ class TeacherExamController extends Controller
 
         $exam = Auth::user()->teacherExams()->createQuietly($data);
         if ($data['is_active'] == 1 && (bool)$request->assign && (bool)$request->live) {
-            $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
-
-            // get students who match exam type
-            $students = StudentProfile::where('exam_type_id', $exam->exam_type_id)
-                ->get();
-
-            if (!empty($students)) {
-                $fcmService = new FCMService(
-                    'New Exam',
-                    'A new ' . $type . ' exam has been added by your teacher. Please check and start preparing for it.',
-                    $type,
-                    $students->pluck('id')->toArray()
-                );
-                // send notification to all tokens
-                $fcmService->notify($students->pluck('fcm_token')->toArray());
-            }
+            $exam->sendFCMNotifications();
         }
 
         return Response::apiSuccess('exam added successfully');
@@ -317,22 +303,7 @@ class TeacherExamController extends Controller
 
         $exam->updateQuietly($data);
         if ($data['is_active'] == 1 && (bool)$request->assign && (bool)$request->live) {
-            $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($exam->status)));
-
-            // get students who match exam type
-            $students = StudentProfile::where('exam_type_id', $exam->exam_type_id)
-                ->get();
-
-            if (!empty($students)) {
-                $fcmService = new FCMService(
-                    'New Exam',
-                    'A new '.$type.' exam has been added by your teacher. Please check and start preparing for it.',
-                    $type,
-                    $students->pluck('id')->toArray()
-                );
-                // send notification to all tokens
-                $fcmService->notify($students->pluck('fcm_token')->toArray());
-            }
+            $exam->sendFCMNotifications();
         }
         return Response::apiSuccess('exam updated successfully');
     }

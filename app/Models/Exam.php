@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\ExamTypeEnum;
+use App\Enums\NotificationTypeEnum;
+use App\Services\FCMService;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -216,5 +218,24 @@ class Exam extends Model
             'id',               // local key on exams
             'id'                // local key on student_exams
         );
+    }
+
+    function sendFCMNotifications($send_and_store = true) {
+        $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($this->status)));
+
+        // get students who match exam type
+        $students = StudentProfile::where('exam_type_id', $this->exam_type_id)->get();
+
+        if (!empty($students)) {
+            $fcmService = new FCMService(
+                'New Exam',
+                'A new ' . $type . ' exam has been added by your teacher. Please check and start preparing for it.',
+                NotificationTypeEnum::NEW_EXAM->value,
+                $students->pluck('id')->toArray()
+            );
+            $fcmService->exam_id = $this->id;
+            // send notification to all tokens
+            $fcmService->notify($students->pluck('fcm_token')->toArray(), $send_and_store);
+        }
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\StudentNotification;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
@@ -12,7 +13,14 @@ use Kreait\Firebase\Messaging\RegistrationToken;
 class FCMService
 {
     private $factory;
-    public function __construct(public string $title, public string $body, public ?string $type = null, public ?array $students = null)
+    private $notification_type = null;
+    public $exam_id = null;
+
+    public function __construct(
+        public string $title, 
+        public string $body, 
+        public ?string $type = null, 
+        public ?array $students = null)
     {
         $this->factory = (new Factory())->withServiceAccount(
             base_path('exams-nepal-661f4-firebase-adminsdk-fbsvc-7bb2520f4b.json')
@@ -47,19 +55,25 @@ class FCMService
 
         $title = $this->title;
         $body  = $this->body;
-        $type  = $this->type ?? 'notification';
+        $type  = $this->type ?? 'Default';
         $students = $this->students ?? [];
 
         // Save notification records
-        if ($send_and_save) {            
+        if ($send_and_save) {  
+            $temp = [];
             foreach ($students as $studentId) {
-                StudentNotification::create([
+                $temp[] = [
                     'student_profile_id' => $studentId,
+                ];
+            }
+            DB::transaction(fn ()  =>                 
+                StudentNotification::create([
                     'title' => $title,
                     'body' => $body,
                     'type' => $type,
-                ]);
-            }
+                    'exam_id' => $this->exam_id,
+                ])->reads()->createMany($temp)
+            );
         }
 
         $notification = Notification::create($title, $body);

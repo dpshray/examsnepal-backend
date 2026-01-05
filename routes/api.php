@@ -2,6 +2,7 @@
 
 use App\Enums\ExamTypeEnum;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\Notification\AdminNotificationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\Api\ForumController;
@@ -312,7 +313,11 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('/doubts', [DoubtController::class, 'index']);
     Route::get('/doubt/{id}', [DoubtController::class, 'show']);
 
-    Route::post('/students/notifications', [NotificationController::class ,'sendBulkPushNotification']);
+    
+    Route::post('students/notifications', [AdminNotificationController::class ,'sendBulkPushNotification']);
+    Route::apiResource('admin/students-notifications', AdminNotificationController::class);
+    // Route::post('/students/notification/{student_notification}', [NotificationController::class , 'deleteNotification']);
+
     Route::get('/admin/manual-student-email-verify/{student_profile_id}', [AuthController::class, 'manualStudentEmailVerifier']);
 });
 
