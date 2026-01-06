@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\NotificationTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminUpdateSubRequest;
 use App\Http\Resources\Doubt\AdminDoubtResource;
@@ -18,6 +19,7 @@ use App\Services\FCMService;
 use App\Traits\PaginatorTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
@@ -338,41 +340,120 @@ class AdminController extends Controller
 
         return Response::apiSuccess('doubt list', $data);
     }
+
+    /**
+     * @OA\POST(
+     *     path="/doubtsresolve/{id}",
+     *     summary="Update a question to resolvea doubt.",
+     *     description="Update a question to resolvea doubt.",
+     *     operationId="AdminSolveDoubt",
+     *     tags={"AdminSolveDoubt"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of doubt",
+     *         @OA\Schema(type="integer", example=100)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 required={"option_a","option_b","option_c","option_d"},
+     *                 @OA\Property(property="question", type="string", example="What is the capital of Nepal?"),
+     *                 @OA\Property(property="explanation", type="string", example="Kathmandu is the capital city."),
+     *                 @OA\Property(property="option_a_id", type="integer", example=12345),
+     *                 @OA\Property(property="option_b_id", type="integer", example=12345),
+     *                 @OA\Property(property="option_c_id", type="integer", example=12345),
+     *                 @OA\Property(property="option_d_id", type="integer", example=12345),
+     *                 @OA\Property(property="option_a", type="string", example="Kathmandu"),
+     *                 @OA\Property(property="option_a_is_true", type="boolean", example=true),
+     *                 @OA\Property(property="option_b", type="string", example="Pokhara"),
+     *                 @OA\Property(property="option_b_is_true", type="boolean", example=false),
+     *                 @OA\Property(property="option_c", type="string", example="Lalitpur"),
+     *                 @OA\Property(property="option_c_is_true", type="boolean", example=false),
+     *                 @OA\Property(property="option_d", type="string", example="Bhaktapur"),
+     *                 @OA\Property(property="option_d_is_true", type="boolean", example=false),
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Question Updated Successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="data", type="string", nullable=true, example=null),
+     *             @OA\Property(property="message", type="string", example="Question updated for exam: Example Exam Name")
+     *         )
+     *     )
+     * )
+     */
     public function resolve(Doubt $doubt, Request $request)
     {
-        $request->validate([
+        $form_data = $request->validate([
+            "question" => 'required',
+            "explanation" => 'required',
+            "option_d_id" => 'required|exists:option_questions,id',
+            "option_c_id" => 'required|exists:option_questions,id',
+            "option_b_id" => 'required|exists:option_questions,id',
+            "option_a_id" => 'required|exists:option_questions,id',
+            "option_a" => 'required|max:255',
+            "option_b" => 'required|max:255',
+            "option_c" => 'required|max:255',
+            "option_d" => 'required|max:255',
+            "image" => 'sometimes|nullable|image',
+            "option_a_is_true" => 'required|boolean',
+            "option_b_is_true" => 'required|boolean',
+            "option_c_is_true" => 'required|boolean',
+            "option_d_is_true" => 'required|boolean',
             'remark' => 'nullable|string|max:250'
         ]);
-        $question = Question::find($doubt->question_id);
-        $question->update([
-            'question' => $request->question,
-            'explanation' => $request->explanation,
-        ]);
-        if ($request->has(['option_a', 'option_b', 'option_c', 'option_d'])) {
-            // Remove old options
-            $question->options()->delete();
-            // Recreate new options
-            $options = [
-                ['option' => $request->option_a, 'value' => $request->option_a_is_true],
-                ['option' => $request->option_b, 'value' => $request->option_b_is_true],
-                ['option' => $request->option_c, 'value' => $request->option_c_is_true],
-                ['option' => $request->option_d, 'value' => $request->option_d_is_true],
-            ];
-            $question->options()->createMany($options);
+
+        $question = $doubt->question;
+        $request_option_id_not_match_with_existing_question_option_id = $question->options
+            ->pluck('id')
+            ->diff($request->only([
+                "option_a_id",
+                "option_b_id",
+                "option_c_id",
+                "option_d_id",
+            ]))
+            ->isNotEmpty();
+        if ($request_option_id_not_match_with_existing_question_option_id) {
+            return Response::apiError("The selected option does not belong to this question.");
         }
-        $doubt->update([
-            'status' => 0,
-            'remark' => $request->remark ?? null,
-        ]);
-        // Send FCM notification to student
-        $fcmService = new FCMService(
-            'Doubt Resolved',
-            'Your doubt for question ID ' . $doubt->question_id . ' has been resolved.',
-            'Notification',
-            [$doubt->student->id]
-        );
-        $fcmService->notify([$doubt->student->fcm_token]);
-        // return $doubt->student->fcm_token;
-        return Response::apiSuccess('Update successful');
+
+        DB::transaction(function () use($doubt, $question, $form_data) {
+            $question->update([
+                'question' => $form_data['question'],
+                'explanation' => $form_data['explanation'],
+            ]);
+            $options = [
+                ['option_id' => $form_data['option_a_id'], 'option' => $form_data['option_a'], 'value' => $form_data['option_a_is_true']],
+                ['option_id' => $form_data['option_b_id'], 'option' => $form_data['option_b'], 'value' => $form_data['option_b_is_true']],
+                ['option_id' => $form_data['option_c_id'], 'option' => $form_data['option_c'], 'value' => $form_data['option_c_is_true']],
+                ['option_id' => $form_data['option_d_id'], 'option' => $form_data['option_d'], 'value' => $form_data['option_d_is_true']],
+            ];
+            foreach ($options as $option) {
+                $question->options()->where('id', $option['option_id'])
+                    ->update([
+                        'option' => $option['option'],
+                        'value' => $option['value']
+                    ]);
+            }
+            $doubt->update([
+                'status' => 0,
+                'remark' => $request->remark ?? null,
+            ]);
+            $fcmService = new FCMService(
+                'Doubt Resolved',
+                'Your doubt for question ID ' . $doubt->question_id . ' has been resolved.',
+                NotificationTypeEnum::DOUBT_RESOLVED->value,
+                [$doubt->student->id]
+            );
+            $fcmService->notify([$doubt->student->fcm_token]);
+        });
+        return Response::apiSuccess('Doubt question updated successfully.');
     }
 }

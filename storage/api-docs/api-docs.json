@@ -347,6 +347,129 @@
                 }
             }
         },
+        "/doubtsresolve/{id}": {
+            "post": {
+                "tags": [
+                    "AdminSolveDoubt"
+                ],
+                "summary": "Update a question to resolvea doubt.",
+                "description": "Update a question to resolvea doubt.",
+                "operationId": "AdminSolveDoubt",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of doubt",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "option_a",
+                                    "option_b",
+                                    "option_c",
+                                    "option_d"
+                                ],
+                                "properties": {
+                                    "question": {
+                                        "type": "string",
+                                        "example": "What is the capital of Nepal?"
+                                    },
+                                    "explanation": {
+                                        "type": "string",
+                                        "example": "Kathmandu is the capital city."
+                                    },
+                                    "option_a_id": {
+                                        "type": "integer",
+                                        "example": 12345
+                                    },
+                                    "option_b_id": {
+                                        "type": "integer",
+                                        "example": 12345
+                                    },
+                                    "option_c_id": {
+                                        "type": "integer",
+                                        "example": 12345
+                                    },
+                                    "option_d_id": {
+                                        "type": "integer",
+                                        "example": 12345
+                                    },
+                                    "option_a": {
+                                        "type": "string",
+                                        "example": "Kathmandu"
+                                    },
+                                    "option_a_is_true": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "option_b": {
+                                        "type": "string",
+                                        "example": "Pokhara"
+                                    },
+                                    "option_b_is_true": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "option_c": {
+                                        "type": "string",
+                                        "example": "Lalitpur"
+                                    },
+                                    "option_c_is_true": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "option_d": {
+                                        "type": "string",
+                                        "example": "Bhaktapur"
+                                    },
+                                    "option_d_is_true": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Question Updated Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Question updated for exam: Example Exam Name"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/admin/students-notifications": {
             "get": {
                 "tags": [
@@ -17033,6 +17156,10 @@
         {
             "name": "Doubts",
             "description": "Doubts"
+        },
+        {
+            "name": "AdminSolveDoubt",
+            "description": "AdminSolveDoubt"
         },
         {
             "name": "Notification",
