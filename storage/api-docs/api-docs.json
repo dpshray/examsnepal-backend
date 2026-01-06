@@ -347,6 +347,177 @@
                 }
             }
         },
+        "/admin/students-notifications": {
+            "get": {
+                "tags": [
+                    "Notification"
+                ],
+                "summary": "Get all student notifications(ADMIN)",
+                "description": "Get all student notifications(ADMIN)",
+                "operationId": "AdminStudentNotifications",
+                "responses": {
+                    "200": {
+                        "description": "User notifications",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "some title here"
+                                                    },
+                                                    "body": {
+                                                        "type": "string",
+                                                        "example": "some body here"
+                                                    },
+                                                    "notified_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-06-05 16:45:52"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User anonymous user notifications"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/students-notifications/{id}": {
+            "delete": {
+                "tags": [
+                    "Notification"
+                ],
+                "summary": "Delete a studet notification(ADMIN)",
+                "description": "Delete a studet notification(ADMIN)",
+                "operationId": "AdminStudentNotificationDelete",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of a notification to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bank deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Bank deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/students/notifications": {
+            "post": {
+                "tags": [
+                    "Notification"
+                ],
+                "summary": "Send notification to student(verified) based on ther exam type.",
+                "description": "Send notification to student(verified) based on ther exam type.",
+                "operationId": "BulkNotification",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "body"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "This is a title."
+                                    },
+                                    "body": {
+                                        "type": "string",
+                                        "example": "This is a description."
+                                    },
+                                    "exam_type_id": {
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "send_and_store": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Notification response data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Notification send with 1 success and 0 failure"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/submit-answer": {
             "post": {
                 "tags": [
@@ -8642,8 +8813,8 @@
                 "tags": [
                     "Notification"
                 ],
-                "summary": "Get all student notifications",
-                "description": "Get all student notifications",
+                "summary": "Get all student notifications(STUDENT)",
+                "description": "Get all student notifications(STUDENT)",
                 "operationId": "StudentNotifications",
                 "responses": {
                     "200": {
@@ -8693,74 +8864,6 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/students/notifications": {
-            "post": {
-                "tags": [
-                    "Notification"
-                ],
-                "summary": "Send notification to student(verified) based on ther exam type.",
-                "description": "Send notification to student(verified) based on ther exam type.",
-                "operationId": "BulkNotification",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "title",
-                                    "body"
-                                ],
-                                "properties": {
-                                    "title": {
-                                        "type": "string",
-                                        "example": "This is a title."
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "This is a description."
-                                    },
-                                    "exam_type_id": {
-                                        "type": "integer",
-                                        "example": 0
-                                    },
-                                    "send_and_store": {
-                                        "type": "boolean",
-                                        "example": false
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Notification response data",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Notification send with 1 success and 0 failure"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
             }
         },
         "/organization": {
@@ -16932,6 +17035,10 @@
             "description": "Doubts"
         },
         {
+            "name": "Notification",
+            "description": "Notification"
+        },
+        {
             "name": "Quiz",
             "description": "Quiz"
         },
@@ -17018,10 +17125,6 @@
         {
             "name": "AnswerSheet Migration",
             "description": "AnswerSheet Migration"
-        },
-        {
-            "name": "Notification",
-            "description": "Notification"
         },
         {
             "name": "Organizations",
