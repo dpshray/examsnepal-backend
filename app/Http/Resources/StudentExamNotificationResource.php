@@ -18,7 +18,7 @@ class StudentExamNotificationResource extends JsonResource
         // $item = json_decode($this->data);
         $notification = $this->studentNotification;
         return [
-            'notification_id' => $this->id,
+            // 'notification_id' => $this->id,
             'title' => $notification->title,
             'body' => $notification->body,
             'notified_at' => $notification->created_at,
