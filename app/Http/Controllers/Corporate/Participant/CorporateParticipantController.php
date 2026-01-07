@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Corporate\Participant\ParticipantRequest;
 use App\Http\Resources\Corporate\Participant\CorporateParticipantCollection;
 use App\Http\Resources\Corporate\Participant\CorporateParticipantResource;
+use App\Models\Corporate\CorporateExam;
 use App\Models\Participant;
+use App\Models\ParticipantExam;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -119,27 +121,38 @@ class CorporateParticipantController extends Controller
      *   )
      * )
      */
-    function store(ParticipantRequest $request)
+    public function store(ParticipantRequest $request, CorporateExam $exam)
     {
         $data = $request->validated();
         $user = Auth::user();
-        $data['corporate_id'] = $user->id;
-        $exists = Participant::where('corporate_id', $user->id)
-            ->where('email', $data['email'])
-            ->exists();
 
-        if ($exists) {
+        // Create participant if not exists (by corporate_id + email)
+        $participant = Participant::firstOrCreate(
+            [
+                'corporate_id' => $user->id,
+                'email'        => $data['email'],
+            ],
+            [
+                'name'     => $data['name'],
+                'phone'    => $data['phone'],
+                'password' => Hash::make($data['password']),
+            ]
+        );
+
+        // If participant already existed
+        if (! $participant->wasRecentlyCreated) {
             return Response::apiError('This email already exists');
         }
-        Participant::create([
-            'corporate_id' => $data['corporate_id'],
-            'name'     => $data['name'],
-            'phone' => $data['phone'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
+
+        // Attach participant to exam (prevent duplicate)
+        ParticipantExam::firstOrCreate([
+            'corporate_exam_id' => $exam->id,
+            'participant_id'    => $participant->id,
         ]);
+
         return Response::apiSuccess('Participant created successfully from form');
     }
+
     /**
      * Display a listing of the participants.
      *
@@ -249,7 +262,7 @@ class CorporateParticipantController extends Controller
      *     )
      * )
      */
-    function show(Participant $participant)
+    function show(CorporateExam $exam, Participant $participant)
     {
         $user = Auth::user();
         if ($participant->corporate_id != $user->id) {
@@ -282,11 +295,16 @@ class CorporateParticipantController extends Controller
      * )
      * )
      */
-    function destroy(Participant $participant)
+    function destroy(CorporateExam $exam, Participant $participant)
     {
         $user = Auth::user();
         if ($participant->corporate_id != $user->id) {
             return Response::apiError('Unauthorized', [], 403);
+        }
+        if ($exam->exam_type == 'private') {
+            ParticipantExam::where('participant_id', $participant->id)
+                ->where('corporate_exam_id', $exam->id)
+                ->delete();
         }
         $participant->delete();
         return Response::apiSuccess('Participant deleted successfully');
@@ -324,21 +342,39 @@ class CorporateParticipantController extends Controller
      * )
      * )
      */
-    function update(ParticipantRequest $request, Participant $participant)
-    {
+    public function update(CorporateExam $exam,ParticipantRequest $request,Participant $participant) {
         $user = Auth::user();
-        if ($participant->corporate_id != $user->id) {
+
+        // Authorization check
+        if ($participant->corporate_id !== $user->id) {
             return Response::apiError('Unauthorized', [], 403);
         }
+
         $data = $request->validated();
+
+        // Prevent duplicate email within same corporate
+        $emailExists = Participant::where('corporate_id', $user->id)
+            ->where('email', $data['email'])
+            ->where('id', '!=', $participant->id)
+            ->exists();
+
+        if ($emailExists) {
+            return Response::apiError('This email already exists');
+        }
+
+        // Update participant
         $participant->update([
-            'name' => $data['name'],
+            'name'  => $data['name'],
             'phone' => $data['phone'],
             'email' => $data['email'],
-            'password' => isset($data['password']) ? Hash::make($data['password']) : $participant->password,
+            'password' => !empty($data['password'])
+                ? Hash::make($data['password'])
+                : $participant->password,
         ]);
+
         return Response::apiSuccess('Participant updated successfully');
     }
+
     /**
      * Bulk delete participants.
      *
@@ -371,17 +407,21 @@ class CorporateParticipantController extends Controller
      *   )
      * )
      */
-    function bulk_delete(Request $request)
+    function bulk_delete(CorporateExam $exam,Request $request)
     {
         $user = Auth::user();
         $data = $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'integer|exists:participants,id',
         ]);
-        foreach ($data['ids'] as $id) {
-            $participant = Participant::find($id);
-            if ($participant && $participant->corporate_id == $user->id) {
-                $participant->delete();
+        if($exam->exam_type=='private')
+        {
+            foreach ($data['ids'] as $id) {
+                $participant = Participant::find($id);
+                if ($participant && $participant->corporate_id == $user->id) {
+                    ParticipantExam::where('participant_id',$participant->id)->where('corporate_exam_id',$exam->id)->delete();
+                    $participant->delete();
+                }
             }
         }
         return Response::apiSuccess('Participants deleted successfully');

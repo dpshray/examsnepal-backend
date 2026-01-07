@@ -312,7 +312,7 @@ class CorporateExamSectionController extends Controller
                             ->orWhere('email', 'like', "%{$search}%");
                     });
                 })
-                ->select('name', 'email', 'phone')
+                ->select('name', 'email', 'phone','created_at')
                 ->paginate($perPage);
 
             $data = $attempts->getCollection()->map(function ($attempt) {
@@ -320,6 +320,7 @@ class CorporateExamSectionController extends Controller
                     'name'  => $attempt->name,
                     'email' => $attempt->email,
                     'phone' => $attempt->phone,
+                    'joined_at' => $attempt->created_at,
                 ];
             });
 
@@ -331,7 +332,7 @@ class CorporateExamSectionController extends Controller
 
         // PRIVATE / CORPORATE EXAM
         $participants = $exam->participants()
-            ->select('participants.id', 'participants.name', 'participants.email', 'participants.phone')
+            ->select('participants.id', 'participants.name', 'participants.email', 'participants.phone', 'participants.created_at')
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($sub) use ($search) {
                     $sub->where('participants.name', 'like', "%{$search}%")
@@ -347,10 +348,12 @@ class CorporateExamSectionController extends Controller
 
         $data = $participants->getCollection()->map(function ($participant) {
             return [
+                'id'=> $participant->id,
                 'name'       => $participant->name,
                 'email'      => $participant->email,
                 'phone'      => $participant->phone,
                 'exam_taken' => (bool) $participant->exam_taken,
+                'joined_at' => $participant->created_at,
             ];
         });
 

@@ -11,6 +11,8 @@ use App\Http\Controllers\Corporate\Participant\Exam\ExamEvaluationController;
 use App\Http\Controllers\Corporate\Participant\Exam\ParticipantExamSubmitController;
 use App\Http\Controllers\Corporate\Participant\Exam\Result\CorporateResultController;
 use App\Http\Controllers\Corporate\Participant\Exam\Result\ExamResultController;
+use App\Http\Controllers\Corporate\Participant_Group\CorporateGroupController;
+use App\Http\Controllers\Corporate\Participant_Group\CorporateParticipantGroupController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('corporate')->group(function () {
@@ -25,9 +27,9 @@ Route::prefix('corporate')->group(function () {
         Route::apiResource('exam', CorporateExamController::class)->scoped(['exam'=>'slug']);
         Route::apiResource('exam.section', CorporateExamSectionController::class)->scoped(['exam'=>'slug','section'=>'slug']);;
         Route::apiResource('exam/section.questions', CorporateQuestionController::class)->scoped(['section'=>'slug']);
-        Route::apiResource('participants', CorporateParticipantController::class);
+        Route::apiResource('exam/{exam}/participants', CorporateParticipantController::class);
         Route::post('participants/import', [CorporateParticipantController::class, 'store_from_excel']);
-        Route::post('participants/bulk-delete', [CorporateParticipantController::class, 'bulk_delete']);
+        Route::post('/exam/{exam}/participants/bulk-delete', [CorporateParticipantController::class, 'bulk_delete']);
         Route::controller(AddParticipantToExamController::class)->group(function () {
             Route::get('exams/{exam}/participants','index');
             Route::Post('exams/{exam}/participants','store');
@@ -35,6 +37,7 @@ Route::prefix('corporate')->group(function () {
             Route::post('exams/{exam}/bulk-upload-participants','bulk_upload_in_exam');
         });
         Route::post('/exam-publish/{exam}',[CorporateExamController::class,'published_exam']);
+        Route::post('/exam/{exam}/group-participants',[CorporateExamController::class,'add_group_participants']);
         // Route::apiResource('/exam/submission',ParticipantExamSubmitController::class)->only(['index','show']);
         Route::controller(ParticipantExamSubmitController::class)->group(function (){
             Route::get('/exams/{exam}/submitted-exams','index');
@@ -53,5 +56,9 @@ Route::prefix('corporate')->group(function () {
             Route::get('/exams/{exam}/results/detail/{result_token}','studentExamResultDetail');
             Route::get('/exams/{exam}/results/section-detail/{result_token}/{section}','studentSectionWiseDetail');
         });
+        Route::apiResource('groups',CorporateGroupController::class)->scoped(['group'=>'slug']);
+        Route::apiResource('groups.members',CorporateParticipantGroupController::class)->scoped(['group'=>'slug','members'=>'id']);
+        Route::post('/groups/{group}/members/bulk-delete',[CorporateParticipantGroupController::class,'bulk_delete']);
+        Route::post('/groups/{group}/members/bulk-upload',[CorporateParticipantGroupController::class,'bulk_upload']);
     });
 });
