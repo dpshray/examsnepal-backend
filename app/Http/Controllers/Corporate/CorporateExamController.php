@@ -7,10 +7,12 @@ use App\Http\Requests\Corporate\CorporateExamRequest;
 use App\Http\Resources\Corporate\CorporateExamCollection;
 use App\Http\Resources\Corporate\CorporateExamResource;
 use App\Models\Corporate\CorporateExam;
+use App\Models\Corporate\ParticipantGroup;
 use App\Traits\PaginatorTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
 class CorporateExamController extends Controller
@@ -338,5 +340,50 @@ class CorporateExamController extends Controller
         $exam->save();
 
         return Response::apiSuccess('Exam has been published');
+    }
+    function upload_group_participants(Request $request, CorporateExam $exam)
+    {
+        $request->validate([
+            'group_slug' => 'required|exists:corporate_participant_groups,slug',
+        ]);
+        $user=Auth::user();
+        $participantIds = collect();
+        $groupDetails = [];
+
+        DB::transaction(function () use ($request, $exam, $user, &$participantIds, &$groupDetails) {
+            foreach ($request->group_slug as $group_slug) {
+                // Get the group and verify ownership
+                $group = ParticipantGroup::where('slug', $group_slug)
+                    ->where('Corporate_id', $user->id)
+                    ->firstOrFail();
+
+                // Get all participants in this group
+                $groupParticipants = $group->participants()
+                    ->where('corporate_id', $user->id)
+                    ->pluck('participants.id');
+
+                // Collect participant IDs
+                $participantIds = $participantIds->merge($groupParticipants);
+
+                // Track group details for response
+                $groupDetails[] = [
+                    'group_name' => $group->group_name,
+                    'group_slug' => $group->slug,
+                    'participant_count' => $groupParticipants->count(),
+                ];
+            }
+
+            // Remove duplicates
+            $participantIds = $participantIds->unique();
+
+            // Attach participants to exam (avoid duplicates)
+            $exam->participants()->syncWithoutDetaching($participantIds->toArray());
+        });
+
+        return Response::apiSuccess("Participants from groups added to exam successfully", [
+            'exam_id' => $exam->id,
+            'total_participants_added' => $participantIds->count(),
+            'groups_processed' => $groupDetails,
+        ]);
     }
 }
