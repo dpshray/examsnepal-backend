@@ -88,16 +88,17 @@ class StudentExamController extends Controller
     function examIntro($slug)
     {
         $token = JWTAuth::parseToken()->getPayload();
-        // $per_page = $request->query('per_page', 12);
         $exam = CorporateExam::where('slug', $slug)
             ->where('is_published', true)
             ->with(['sections'])
             ->first();
+
         if (!$exam) {
             return Response::apiError('exam not found or not published');
         }
 
-        // Check if participant has access (for private exams)
+        $completedSections = [];
+
         if ($exam->exam_type === 'private') {
             $participant = Auth::guard('participant')->user();
 
@@ -113,21 +114,27 @@ class StudentExamController extends Controller
                 return Response::apiError('You do not have access to this exam');
             }
 
-            // Get attempt count for private exam
-            $attemptCount = ExamAttempt::where('corporate_exam_id', $exam->id)
+            // For private exam, use participant_id (don't use whereNull)
+            $completedSections = ExamAttempt::where('corporate_exam_id', $exam->id)
                 ->where('participant_id', $participant->id)
-                ->count();
+                ->whereIn('status', ['submitted', 'evaluated', 'evaluating'])
+                ->pluck('corporate_exam_section_id')
+                ->toArray();
         } else {
-            // For public exam, get attempt count by email
+            // For public exam
             $email = $token->get('email');
-            $attemptCount = ExamAttempt::where('corporate_exam_id', $exam->id)
+
+            // For public exams, participant_id should be NULL
+            $completedSections = ExamAttempt::where('corporate_exam_id', $exam->id)
                 ->where('email', $email)
-                ->whereNull('participant_id')
-                ->count();
+                ->whereNull('participant_id') // Keep this for public exams
+                ->whereIn('status', ['submitted', 'evaluated', 'evaluating'])
+                ->pluck('corporate_exam_section_id')
+                ->toArray();
         }
-        // $pagination = $exam->loadMissing('sections')->paginate($per_page);
-        // $data = $this->setupPagination($pagination, StudentExamDetailCollection::class)->data;
-        $data = new StudentExamDetailResource($exam);
+        // return $completedSections;
+        $data = new StudentExamDetailResource($exam, $completedSections);
+
         return Response::apiSuccess("list of section in exam", $data);
     }
     /**
@@ -190,64 +197,98 @@ class StudentExamController extends Controller
     function startsectionexam(CorporateExam $exam, CorporateExamSection $section)
     {
         $token = JWTAuth::parseToken()->getPayload();
-        // Check attempt limit at EXAM level (not section level)
-        // If exam allows 1 attempt, user can attempt each section once
+
+        // Determine user info based on exam type
         if ($exam->exam_type === 'public') {
             $email = $token->get('email');
-
-            // Check section-specific attempts
-            $sectionAttemptCount = ExamAttempt::where('corporate_exam_id', $exam->id)
-                ->where('corporate_exam_section_id', $section->id)
-                ->where('email', $email)
-                ->whereNull('participant_id')
-                ->count();
+            $participantId = null;
+            $userName = $token->get('name');
+            $userPhone = $token->get('phone');
         } else {
             $participant = Auth::guard('participant')->user();
             if (!$participant) {
                 return Response::apiError('Authentication required');
             }
-
-            // Check section-specific attempts
-            $sectionAttemptCount = ExamAttempt::where('corporate_exam_id', $exam->id)
-                ->where('corporate_exam_section_id', $section->id)
-                ->where('participant_id', $participant->id)
-                ->count();
+            $email = $participant->email;
+            $participantId = $participant->id;
+            $userName = $participant->name;
+            $userPhone = $participant->phone;
         }
 
-        // Each section can be attempted up to exam's limit_attempts times
+        // Check for existing incomplete attempt for this section
+        $existingAttemptQuery = ExamAttempt::where('corporate_exam_id', $exam->id)
+            ->where('corporate_exam_section_id', $section->id)
+            ->whereNotIn('status', ['submitted', 'evaluated', 'evaluating']);
+
+        if ($exam->exam_type === 'public') {
+            $existingAttemptQuery->where('email', $email)->whereNull('participant_id');
+        } else {
+            $existingAttemptQuery->where('participant_id', $participantId);
+        }
+
+        $existingAttempt = $existingAttemptQuery->first();
+
+        // If there's an existing incomplete attempt
+        if ($existingAttempt) {
+            // Check if attempt has expired based on duration
+            $startedAt = Carbon::parse($existingAttempt->started_at);
+            $currentTime = Carbon::now();
+            $elapsedMinutes = $startedAt->diffInMinutes($currentTime);
+
+            // If exam has duration and time has expired, auto-submit
+            if ($exam->duration > 0 && $elapsedMinutes >= $exam->duration) {
+                $existingAttempt->update([
+                    'status' => 'submitted',
+                    'submitted_at' => Carbon::now(),
+                ]);
+
+                return Response::apiError('Your previous attempt has expired and been auto-submitted. Please start a new attempt.', 400);
+            }
+
+            // Return existing attempt if still valid
+            $attempt = new StudentExamAttemptResource($existingAttempt);
+            return Response::apiSuccess("Resuming existing attempt", $attempt);
+        }
+
+        // Count completed attempts for this section
+        $sectionAttemptCount = ExamAttempt::where('corporate_exam_id', $exam->id)
+            ->where('corporate_exam_section_id', $section->id);
+
+        if ($exam->exam_type === 'public') {
+            $sectionAttemptCount->where('email', $email)->whereNull('participant_id');
+        } else {
+            $sectionAttemptCount->where('participant_id', $participantId);
+        }
+
+        $sectionAttemptCount = $sectionAttemptCount->count();
+
+        // Check attempt limit
         if ($exam->limit_attempts > 0 && $sectionAttemptCount >= $exam->limit_attempts) {
-            return Response::apiError('You have reached the maximum number of attempts for this section');
+            return Response::apiError('You have reached the maximum number of attempts for this section', 403);
         }
-        // Get totalsum of full_marks
+
+        // Get total marks for this section
         $totalMarks = CorporateQuestion::where('corporate_exam_section_id', $section->id)
             ->sum('full_marks');
 
-        // Create exam attempt
+        // Create new exam attempt
         $attemptData = [
             'corporate_exam_id' => $exam->id,
             'corporate_exam_section_id' => $section->id,
+            'participant_id' => $participantId,
+            'name' => $userName,
+            'email' => $email,
+            'phone' => $userPhone,
             'attempt_number' => $sectionAttemptCount + 1,
             'started_at' => Carbon::now(),
             'status' => 'started',
             'total_mark' => $totalMarks,
         ];
 
-        // Add data based on exam type
-        if ($exam->exam_type === 'public') {
-            $attemptData['participant_id'] = null;
-            $attemptData['name'] = $token->get('name');
-            $attemptData['email'] = $token->get('email');
-            $attemptData['phone'] = $token->get('phone');
-        } else {
-            $participant = Auth::guard('participant')->user();
-            $attemptData['participant_id'] = $participant->id;
-            $attemptData['name'] = $participant->name;
-            $attemptData['email'] = $participant->email;
-            $attemptData['phone'] = $participant->phone;
-        }
         $attempt = ExamAttempt::create($attemptData);
         $attempt = new StudentExamAttemptResource($attempt);
-        return Response::apiSuccess("Attempt detail", $attempt);
+
+        return Response::apiSuccess("New attempt started",$attempt );
     }
     /**
      * Get questions for an exam attempt.

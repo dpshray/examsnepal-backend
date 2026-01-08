@@ -420,7 +420,7 @@ class CorporateParticipantController extends Controller
                 $participant = Participant::find($id);
                 if ($participant && $participant->corporate_id == $user->id) {
                     ParticipantExam::where('participant_id',$participant->id)->where('corporate_exam_id',$exam->id)->delete();
-                    $participant->delete();
+                    // $participant->delete();
                 }
             }
         }
