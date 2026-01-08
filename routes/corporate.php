@@ -25,7 +25,7 @@ Route::prefix('corporate')->group(function () {
     });
     Route::middleware('auth:users')->group(function () {
         Route::apiResource('exam', CorporateExamController::class)->scoped(['exam'=>'slug']);
-        Route::apiResource('exam.section', CorporateExamSectionController::class)->scoped(['exam'=>'slug','section'=>'slug']);;
+        Route::apiResource('exam.section', CorporateExamSectionController::class)->scoped(['exam'=>'slug','section'=>'slug']);
         Route::apiResource('exam/section.questions', CorporateQuestionController::class)->scoped(['section'=>'slug']);
         Route::apiResource('exam/{exam}/participants', CorporateParticipantController::class);
         Route::post('participants/import', [CorporateParticipantController::class, 'store_from_excel']);
@@ -37,7 +37,7 @@ Route::prefix('corporate')->group(function () {
             Route::post('exams/{exam}/bulk-upload-participants','bulk_upload_in_exam');
         });
         Route::post('/exam-publish/{exam}',[CorporateExamController::class,'published_exam']);
-        Route::post('/exam/{exam}/group-participants',[CorporateExamController::class,'add_group_participants']);
+        Route::post('/exam/{exam}/group-participants',[CorporateExamController::class,'upload_group']);
         // Route::apiResource('/exam/submission',ParticipantExamSubmitController::class)->only(['index','show']);
         Route::controller(ParticipantExamSubmitController::class)->group(function (){
             Route::get('/exams/{exam}/submitted-exams','index');
@@ -60,5 +60,6 @@ Route::prefix('corporate')->group(function () {
         Route::apiResource('groups.members',CorporateParticipantGroupController::class)->scoped(['group'=>'slug','members'=>'id']);
         Route::post('/groups/{group}/members/bulk-delete',[CorporateParticipantGroupController::class,'bulk_delete']);
         Route::post('/groups/{group}/members/bulk-upload',[CorporateParticipantGroupController::class,'bulk_upload']);
+        Route::post('exams/{exam}/send-invitations', [CorporateExamController::class, 'send_email']);
     });
 });

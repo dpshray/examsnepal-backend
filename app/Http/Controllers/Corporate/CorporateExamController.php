@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Corporate\CorporateExamRequest;
 use App\Http\Resources\Corporate\CorporateExamCollection;
 use App\Http\Resources\Corporate\CorporateExamResource;
+use App\Mail\Corporate\MailParticipant\ExamInvitationMail;
 use App\Models\Corporate\CorporateExam;
 use App\Models\Corporate\ParticipantGroup;
 use App\Traits\PaginatorTrait;
@@ -13,6 +14,8 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 
 class CorporateExamController extends Controller
@@ -341,17 +344,17 @@ class CorporateExamController extends Controller
 
         return Response::apiSuccess('Exam has been published');
     }
-    function upload_group_participants(Request $request, CorporateExam $exam)
+    function upload_group(Request $request, CorporateExam $exam)
     {
         $request->validate([
-            'group_slug' => 'required|exists:corporate_participant_groups,slug',
+            'group_slugs' => 'required|array|exists:participant_groups,slug',
         ]);
-        $user=Auth::user();
+        $user = Auth::user();
         $participantIds = collect();
         $groupDetails = [];
 
-        DB::transaction(function () use ($request, $exam, $user, &$participantIds, &$groupDetails) {
-            foreach ($request->group_slug as $group_slug) {
+        DB::transaction(function () use ($request, $exam, $user, $participantIds, $groupDetails) {
+            foreach ($request->group_slugs as $group_slug) {
                 // Get the group and verify ownership
                 $group = ParticipantGroup::where('slug', $group_slug)
                     ->where('Corporate_id', $user->id)
@@ -360,7 +363,7 @@ class CorporateExamController extends Controller
                 // Get all participants in this group
                 $groupParticipants = $group->participants()
                     ->where('corporate_id', $user->id)
-                    ->pluck('participants.id');
+                    ->pluck('participant_id');
 
                 // Collect participant IDs
                 $participantIds = $participantIds->merge($groupParticipants);
@@ -385,5 +388,26 @@ class CorporateExamController extends Controller
             'total_participants_added' => $participantIds->count(),
             'groups_processed' => $groupDetails,
         ]);
+    }
+    function send_email(CorporateExam $exam)
+    {
+        $user = Auth::user();
+        if ($exam->exam_type == 'private') {
+            $participants = $exam->participants()
+                ->where('corporate_id', $user->id)
+                ->get();
+            foreach ($participants as $participant) {
+                try {
+                    Mail::to($participant->email)
+                        ->send(new ExamInvitationMail($exam, $participant, $user));
+
+                    Log::info("Email queued for: " . $participant->email);
+                } catch (\Exception $e) {
+                    Log::error("Failed to queue email for {$participant->email}: " . $e->getMessage());
+                }
+            }
+            return Response::apiSuccess("Exam invitation emails have been sent to all participants.");
+        }
+        return Response::apiError("Emails can only be sent for private exams.");
     }
 }

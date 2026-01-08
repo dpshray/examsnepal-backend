@@ -4,6 +4,7 @@ namespace App\Http\Resources\Student\Exam;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 class StudentExamDetailResource extends JsonResource
 {
@@ -28,11 +29,17 @@ class StudentExamDetailResource extends JsonResource
             "limit_attempts" => $this->limit_attempts,
             "exam_type" => $this->exam_type,
             'sections' => $this->sections->map(function ($section) {
+                $completedSections = $this->completedSections ?? [];
+                $isCompleted = (bool)in_array($section->id, $completedSections);
+                Log::info($completedSections);
+                Log::info($section->id);
+                Log::info($this->completedSections);
                 return [
                     "id" => $section->id,
                     "title" => $section->title,
                     "slug" => $section->slug,
                     "detail" => $section->detail,
+                    'is_completed' => $isCompleted,
                 ];
             }),
 
