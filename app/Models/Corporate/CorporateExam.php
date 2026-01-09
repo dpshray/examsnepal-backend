@@ -2,6 +2,7 @@
 
 namespace App\Models\Corporate;
 
+use App\Models\ExamAttempt;
 use App\Models\Participant;
 use App\Models\ParticipantExam;
 use App\Models\Traits\Uuid;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CorporateExam extends Model
 {
-    use  SoftDeletes,SlugTrait; // use the trait
+    use  SoftDeletes, SlugTrait; // use the trait
     protected $fillable =
     [
         'corporate_id',
@@ -69,10 +70,14 @@ class CorporateExam extends Model
             'corporate_exam_id',
             'participant_id'
         )
-        ->withPivot('id');
+            ->withPivot('id');
     }
     public function getRouteKeyName()
     {
         return 'slug';
+    }
+    public function attempts()
+    {
+        return $this->hasMany(ExamAttempt::class, 'corporate_exam_id');
     }
 }

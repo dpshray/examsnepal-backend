@@ -282,6 +282,7 @@ class AddParticipantToExamController extends Controller
                         'name'     => $row[0] ?? null,
                         'phone'    => $row[1] ?? null,
                         'password' => isset($row[3]) ? Hash::make($row[3]) : null,
+                        'raw_password' => isset($row[3]) ? $row[3] : null,
                     ]
                 );
 

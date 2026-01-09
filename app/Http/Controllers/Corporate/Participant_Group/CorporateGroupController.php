@@ -21,7 +21,7 @@ class CorporateGroupController extends Controller
         $per_page = $request->query('per_page', 12);
         $search = $request->query('search');
         $user = Auth::user();
-        $pagination = ParticipantGroup::where('Corporate_id', $user->id)->when($search, function ($query, $search) {
+        $pagination = ParticipantGroup::where('Corporate_id', $user->id)->withCount('participants')->when($search, function ($query, $search) {
             $query->where('group_name', 'like', '%' . $search . '%');
         })->paginate($per_page);
         $data = $this->setupPagination($pagination, CorporateGroupCollection::class)->data;

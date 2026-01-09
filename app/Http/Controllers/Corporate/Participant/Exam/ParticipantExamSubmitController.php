@@ -10,6 +10,7 @@ use App\Models\ExamAttempt;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 
 class ParticipantExamSubmitController extends Controller
@@ -112,6 +113,8 @@ class ParticipantExamSubmitController extends Controller
         $section_slug = $request->input('section');
 
         $teacher      = Auth::user();
+        Log::info($teacher);
+        Log::info($exam->toArray());
         // Security: ensure exam belongs to teacher
         if ($exam->corporate_id !== $teacher->id) {
             return Response::apiError('Unauthorized access to exam', 403);
