@@ -27,8 +27,6 @@ class CorporateResultController extends Controller
         if ($exam->corporate_id !== $teacher->id) {
             return Response::apiError('Unauthorized access to this exam');
         }
-        Log::info($teacher);
-        Log::info($exam->toArray());
         // Get all evaluated attempts
         $attempts = ExamAttempt::where('corporate_exam_id', $exam->id)
             ->where('status', 'evaluated')
@@ -113,8 +111,6 @@ class CorporateResultController extends Controller
     function studentExamResultDetail(CorporateExam $exam, $result_token)
     {
         $teacher = Auth::user();
-        Log::info($teacher);
-        Log::info($exam->toArray());
         if ($exam->corporate_id !== $teacher->id) {
             return Response::apiError('Unauthorized access to this exam');
         }
@@ -201,8 +197,6 @@ class CorporateResultController extends Controller
     function studentSectionWiseDetail(Request $request, CorporateExam $exam, $result_token, CorporateExamSection $section)
     {
         $teacher = Auth::user();
-        Log::info($teacher);
-        Log::info($exam->toArray());
         if ($exam->corporate_id !== $teacher->id) {
             return Response::apiError('Unauthorized access to this exam');
         }
