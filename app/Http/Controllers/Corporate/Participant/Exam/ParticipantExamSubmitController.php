@@ -113,8 +113,6 @@ class ParticipantExamSubmitController extends Controller
         $section_slug = $request->input('section');
 
         $teacher      = Auth::user();
-        Log::info($teacher);
-        Log::info($exam->toArray());
         // Security: ensure exam belongs to teacher
         if ($exam->corporate_id !== $teacher->id) {
             return Response::apiError('Unauthorized access to exam', 403);
