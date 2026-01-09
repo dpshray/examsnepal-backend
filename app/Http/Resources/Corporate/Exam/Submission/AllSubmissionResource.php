@@ -39,7 +39,7 @@ class AllSubmissionResource extends JsonResource
             'section' => [
                 'id' => $this->section->id,
                 'title' => $this->section->title,
-                'slug'=>$this->section->slug,
+                'slug' => $this->section->slug,
             ],
 
             // Timing
@@ -55,6 +55,9 @@ class AllSubmissionResource extends JsonResource
             'percentage' => $this->total_mark > 0
                 ? round(($this->obtained_mark / $this->total_mark) * 100, 2)
                 : 0,
+
+            //tab open 
+            'tab_open' => $this->tab_switch_count ?? 0,
         ];
     }
 }

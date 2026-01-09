@@ -33,7 +33,7 @@ class CorporateParticipantGroupController extends Controller
         $data = $this->setupPagination($pagination, CorporateGroupParticipantCollection::class)->data;
         return Response::apiSuccess("corporate group participant list", $data);
     }
-    function show(ParticipantGroup $group,$member )
+    function show(ParticipantGroup $group, $member)
     {
         $user = Auth::user();
         // Verify the group belongs to the authenticated user
@@ -64,17 +64,18 @@ class CorporateParticipantGroupController extends Controller
                 'name' => $data['name'],
                 'phone' => $data['phone'] ?? null,
                 'password' => Hash::make($data['password']),
+                'raw_password' => $data['password']
             ]
         );
         // Add participant to the group (avoid duplicates)
         $group->participants()->syncWithoutDetaching([$participant->id]);
         return Response::apiSuccess("Participant added to group successfully");
     }
-    function update(ParticipantRequest $request,ParticipantGroup $group,$member )
+    function update(ParticipantRequest $request, ParticipantGroup $group, $member)
     {
         $data = $request->validated();
         $user = Auth::user();
-        $members= Participant::findOrFail($member);
+        $members = Participant::findOrFail($member);
         // Verify the group belongs to the authenticated user
         if ($group->Corporate_id !== $user->id) {
             return Response::apiError("Unauthorized access to this group", 403);
@@ -83,6 +84,7 @@ class CorporateParticipantGroupController extends Controller
             'name' => $data['name'] ?? $members->name,
             'phone' => $data['phone'] ?? $members->phone,
             'email' => $data['email'] ?? $members->email,
+            'raw_password' => $data['password'] ?? $members->raw_password,
         ];
 
         // Only update password if provided
@@ -94,7 +96,7 @@ class CorporateParticipantGroupController extends Controller
 
         return Response::apiSuccess("Participant updated successfully");
     }
-    function destroy(ParticipantGroup $group,$member)
+    function destroy(ParticipantGroup $group, $member)
     {
         $user = Auth::user();
 
@@ -102,13 +104,13 @@ class CorporateParticipantGroupController extends Controller
         if ($group->Corporate_id !== $user->id) {
             return Response::apiError("Unauthorized access to this group", 403);
         }
-        $members= Participant::findOrFail($member);
+        $members = Participant::findOrFail($member);
         // Remove participant from the group
         $group->participants()->detach($members->id);
 
         return Response::apiSuccess("Participant removed from group successfully");
     }
-    function bulk_delete(Request $request,$group)
+    function bulk_delete(Request $request, $group)
     {
         $data = $request->validate([
             'ids' => 'required|array',
@@ -126,7 +128,7 @@ class CorporateParticipantGroupController extends Controller
 
         return Response::apiSuccess("Participants removed from group successfully");
     }
-    function bulk_upload(Request $request,$group)
+    function bulk_upload(Request $request, $group)
     {
         $user = Auth::user();
 
@@ -159,6 +161,7 @@ class CorporateParticipantGroupController extends Controller
                         'name'     => $row[0] ?? null,
                         'phone'    => $row[1] ?? null,
                         'password' => isset($row[3]) ? Hash::make($row[3]) : null,
+                        'raw_password' => isset($row[3]) ? $row[3] : null,
                     ]
                 );
 

@@ -16,6 +16,7 @@ class Participant extends Authenticatable implements JWTSubject
         'phone',
         'password',
         'corporate_id',
+        'raw_password'
     ];
     // Required for JWT
     public function getJWTIdentifier()

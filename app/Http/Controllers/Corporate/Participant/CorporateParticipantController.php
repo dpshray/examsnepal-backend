@@ -88,6 +88,7 @@ class CorporateParticipantController extends Controller
                     'name'     => $row[0] ?? null,
                     'phone'    => $row[1] ?? null,
                     'password' => isset($row[3]) ? Hash::make($row[3]) : null,
+                    'raw_password' => isset($row[3]) ? $row[3] : null,
                 ]
             );
         }
@@ -136,6 +137,7 @@ class CorporateParticipantController extends Controller
                 'name'     => $data['name'],
                 'phone'    => $data['phone'],
                 'password' => Hash::make($data['password']),
+                'raw_password' => $data['password'],
             ]
         );
 
@@ -342,7 +344,8 @@ class CorporateParticipantController extends Controller
      * )
      * )
      */
-    public function update(CorporateExam $exam,ParticipantRequest $request,Participant $participant) {
+    public function update(CorporateExam $exam, ParticipantRequest $request, Participant $participant)
+    {
         $user = Auth::user();
 
         // Authorization check
@@ -370,6 +373,7 @@ class CorporateParticipantController extends Controller
             'password' => !empty($data['password'])
                 ? Hash::make($data['password'])
                 : $participant->password,
+            'raw_password' => $data['password'] ?? $participant->raw_password,
         ]);
 
         return Response::apiSuccess('Participant updated successfully');
@@ -407,19 +411,18 @@ class CorporateParticipantController extends Controller
      *   )
      * )
      */
-    function bulk_delete(CorporateExam $exam,Request $request)
+    function bulk_delete(CorporateExam $exam, Request $request)
     {
         $user = Auth::user();
         $data = $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'integer|exists:participants,id',
         ]);
-        if($exam->exam_type=='private')
-        {
+        if ($exam->exam_type == 'private') {
             foreach ($data['ids'] as $id) {
                 $participant = Participant::find($id);
                 if ($participant && $participant->corporate_id == $user->id) {
-                    ParticipantExam::where('participant_id',$participant->id)->where('corporate_exam_id',$exam->id)->delete();
+                    ParticipantExam::where('participant_id', $participant->id)->where('corporate_exam_id', $exam->id)->delete();
                     // $participant->delete();
                 }
             }

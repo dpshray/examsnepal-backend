@@ -32,7 +32,11 @@ class ExamInvitationMail extends Mailable
      */
     public function build()
     {
-        $examUrl = url("/exams/{$this->exam->slug}");
+        if ($this->exam->exam_type == 'private') {
+            $examUrl = "https://examsnepal.com/exam/{$this->exam->slug}?auth=1";
+        } else {
+            $examUrl = "https://examsnepal.com/exam/{$this->exam->slug}";
+        }
         $examTitle = $this->exam->title;
 
         return $this->subject("Invitation: {$examTitle}")
@@ -47,7 +51,7 @@ class ExamInvitationMail extends Mailable
                 'endDate' => $this->exam->end_date,
                 'loginEmail' => $this->participant->email,
                 'loginPhone' => $this->participant->phone,
-                'loginPassword' => $this->participant->password,
+                'loginPassword' => $this->participant->raw_password,
             ]);
     }
 }

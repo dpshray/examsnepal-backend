@@ -74,7 +74,6 @@ class StudentSubmitAnswersController extends Controller
         $attempt = ExamAttempt::where('id', $attempt_id)
             ->where('status', 'started')
             ->first();
-
         if (!$attempt) {
             return Response::apiError('Exam attempt not found or already submitted');
         }
@@ -167,6 +166,10 @@ class StudentSubmitAnswersController extends Controller
         if (!$attempt) {
             return Response::apiError('Exam attempt not found or already submitted');
         }
+        $attempt->update([
+            'tab_switch_count' => $request->tab_switch_count,
+        ]);
+        $attempt->save();
         // Verify ownership
         $token = JWTAuth::parseToken()->getPayload();
         $exam = $attempt->exam;

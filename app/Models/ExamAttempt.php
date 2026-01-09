@@ -10,9 +10,19 @@ class ExamAttempt extends Model
 {
     //
     protected $fillable = [
-        'corporate_exam_id', 'corporate_exam_section_id', 'participant_id',
-        'name', 'email', 'phone', 'attempt_number', 'started_at',
-        'submitted_at', 'status', 'total_mark', 'obtained_mark'
+        'corporate_exam_id',
+        'corporate_exam_section_id',
+        'participant_id',
+        'name',
+        'email',
+        'phone',
+        'attempt_number',
+        'started_at',
+        'submitted_at',
+        'status',
+        'total_mark',
+        'obtained_mark',
+        'tab_switch_count'
     ];
 
     protected $casts = [

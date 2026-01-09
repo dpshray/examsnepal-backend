@@ -88,17 +88,30 @@ class StudentExamController extends Controller
     function examIntro($slug)
     {
         $token = JWTAuth::parseToken()->getPayload();
+
+        // Load exam with sections and their attempts
         $exam = CorporateExam::where('slug', $slug)
             ->where('is_published', true)
-            ->with(['sections'])
+            ->with(['sections.attempts' => function ($query) use ($token) {
+                // This will be modified below based on exam type
+            }])
             ->first();
 
         if (!$exam) {
             return Response::apiError('exam not found or not published');
         }
+        //check exam date and time
+        if ($exam->exam_date) {
+            $now = Carbon::now();
+            if ($exam->exam_date > $now) {
+                return Response::apiError('exam is not started');
+            }
+            if ($exam->start_time > $now && $exam->end_time < $now) {
+                return Response::apiError('exam is not started');
+            }
+        }
 
-        $completedSections = [];
-
+        // Determine user context
         if ($exam->exam_type === 'private') {
             $participant = Auth::guard('participant')->user();
 
@@ -114,26 +127,28 @@ class StudentExamController extends Controller
                 return Response::apiError('You do not have access to this exam');
             }
 
-            // For private exam, use participant_id (don't use whereNull)
-            $completedSections = ExamAttempt::where('corporate_exam_id', $exam->id)
-                ->where('participant_id', $participant->id)
-                ->whereIn('status', ['submitted', 'evaluated', 'evaluating'])
-                ->pluck('corporate_exam_section_id')
-                ->toArray();
+            $userId = $participant->id;
+            $userType = 'participant';
         } else {
-            // For public exam
-            $email = $token->get('email');
-
-            // For public exams, participant_id should be NULL
-            $completedSections = ExamAttempt::where('corporate_exam_id', $exam->id)
-                ->where('email', $email)
-                ->whereNull('participant_id') // Keep this for public exams
-                ->whereIn('status', ['submitted', 'evaluated', 'evaluating'])
-                ->pluck('corporate_exam_section_id')
-                ->toArray();
+            $userId = $token->get('email');
+            $userType = 'public';
         }
-        // return $completedSections;
-        $data = new StudentExamDetailResource($exam, $completedSections);
+
+        // Reload with proper attempt filtering
+        $exam = CorporateExam::where('slug', $slug)
+            ->with(['sections.attempts' => function ($query) use ($userId, $userType) {
+                $query->whereIn('status', ['submitted', 'evaluated', 'evaluating']);
+
+                if ($userType === 'participant') {
+                    $query->where('participant_id', $userId);
+                } else {
+                    $query->where('email', $userId)
+                        ->whereNull('participant_id');
+                }
+            }])
+            ->first();
+
+        $data = new StudentExamDetailResource($exam);
 
         return Response::apiSuccess("list of section in exam", $data);
     }
@@ -288,7 +303,7 @@ class StudentExamController extends Controller
         $attempt = ExamAttempt::create($attemptData);
         $attempt = new StudentExamAttemptResource($attempt);
 
-        return Response::apiSuccess("New attempt started",$attempt );
+        return Response::apiSuccess("New attempt started", $attempt);
     }
     /**
      * Get questions for an exam attempt.

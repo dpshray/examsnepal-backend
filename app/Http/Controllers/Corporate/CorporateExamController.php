@@ -158,6 +158,7 @@ class CorporateExamController extends Controller
     {
         $form_data = $request->validated();
         $form_data['corporate_id'] = Auth::guard('users')->id();
+        $form_data['limit_attempts'] = 1;
         CorporateExam::create($form_data);
         return Response::apiSuccess('corporate exam added successfully');
     }

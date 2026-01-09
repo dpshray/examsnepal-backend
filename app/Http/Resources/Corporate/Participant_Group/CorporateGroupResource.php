@@ -16,11 +16,11 @@ class CorporateGroupResource extends JsonResource
     {
         // return parent::toArray($request);
         return [
-            'id'=>$this->id,
-            'group_name'=>$this->group_name,
-            'slug'=>$this->slug,
-            'created_at'=>$this->created_at,
-            'total_participant'=>0,
+            'id' => $this->id,
+            'group_name' => $this->group_name,
+            'slug' => $this->slug,
+            'created_at' => $this->created_at,
+            'total_participant' => $this->participants_count,
         ];
     }
 }
