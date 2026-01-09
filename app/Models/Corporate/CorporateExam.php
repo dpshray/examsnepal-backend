@@ -31,7 +31,9 @@ class CorporateExam extends Model
         'limit_attempts',
         'exam_type',
     ];
-
+    protected $casts = [
+        'corporate_id' => 'integer',
+    ];
     public function slugSource()
     {
         return 'title';

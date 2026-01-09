@@ -21,6 +21,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Contact\ContactController;
 use App\Http\Controllers\Corporate\CorporateExamController;
 use App\Http\Controllers\ExamCategoryController;
+use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\NotificationController;
@@ -48,10 +49,10 @@ use Illuminate\Http\Request;
 use App\Models\PromoCode;
 use Illuminate\Support\Facades\Log;
 
-require __DIR__.'/corporate.php';
-require __DIR__.'/payment.php';
-require __DIR__.'/teacher.php';
-require __DIR__.'/testing.php';
+require __DIR__ . '/corporate.php';
+require __DIR__ . '/payment.php';
+require __DIR__ . '/teacher.php';
+require __DIR__ . '/testing.php';
 
 
 Route::get('/dl', function () {
@@ -139,14 +140,14 @@ Route::post('/student/resend-email-verification', [AuthController::class, 'resen
 
 Route::apiResource('blog', BlogController::class)->scoped(['blog' => 'slug']);
 #routes accessed by both api and users guards
-Route::middleware(AuthEitherUser::class)->group(function(){
+Route::middleware(AuthEitherUser::class)->group(function () {
     Route::get('/subjects', [SubjectController::class, 'index']);
-    Route::get('total-exam-count', [QuizController::class,'totalExamCounter']);
+    Route::get('total-exam-count', [QuizController::class, 'totalExamCounter']);
 });
 
 // Protected Routes (for authenticated students)
-Route::middleware(['auth:api','verified', CheckTokenVersionMiddleware::class])->group(function () {
-    Route::get('test', [BlogController::class,'test']);
+Route::middleware(['auth:api', 'verified', CheckTokenVersionMiddleware::class])->group(function () {
+    Route::get('test', [BlogController::class, 'test']);
     Route::get('auth-student', [AuthController::class, 'studentAuthResponse']);
     Route::post('/student/logout', [AuthController::class, 'logoutStudent']);
     Route::post('/student/refresh', [AuthController::class, 'refreshStudent']);
@@ -222,7 +223,7 @@ Route::middleware(['auth:api','verified', CheckTokenVersionMiddleware::class])->
     Route::get('/mock-test/completed', [QuizController::class, 'getCompletedMockTest']);
 
     Route::get('/free-quiz/questions/{exam_id}', [QuestionController::class, 'freeQuizQuestions']);
-    Route::middleware(isStudentSubscribedMiddleware::class)->group(function(){
+    Route::middleware(isStudentSubscribedMiddleware::class)->group(function () {
         Route::get('/sprint-quiz/questions/{exam_id}', [QuestionController::class, 'sprintQuizQuestions']);
         Route::get('/mock-test/questions/{exam_id}', [QuestionController::class, 'mockTestQuestions']);
     });
@@ -238,10 +239,10 @@ Route::middleware(['auth:api','verified', CheckTokenVersionMiddleware::class])->
     Route::get('user-mock-exams-status', [QuizController::class, 'getMockExamStatus']);
 
 
-    Route::get('student-profile-fetcher', [StudentProfileController::class,'getStudentProfile']);
-    Route::put('update-student-profile', [StudentProfileController::class,'studentProfileUpdater']);
+    Route::get('student-profile-fetcher', [StudentProfileController::class, 'getStudentProfile']);
+    Route::put('update-student-profile', [StudentProfileController::class, 'studentProfileUpdater']);
 
-        #pool
+    #pool
     Route::get('get-todays-pool-players', [PoolController::class, 'fetchTodaysPoolPlayers']);
     Route::get('request-pool-question', [PoolController::class, 'getPoolQuestions']);
     Route::post('send-pool-response', [PoolController::class, 'sendPoolQuestionResponse']);
@@ -276,13 +277,13 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
 
     Route::get('/teachers', [TeacherController::class, 'index']);
     Route::get('/all-question-banks', [BankQuestionController::class, 'index']);
-    Route::post('/question-bank',[BankQuestionController::class,'store']);
+    Route::post('/question-bank', [BankQuestionController::class, 'store']);
     Route::get('/question-bank/{id}', [BankQuestionController::class, 'show']);
-    Route::put('/question-bank/{id}',[BankQuestionController::class,'update']);
-    Route::delete('/question-bank/{id}',[BankQuestionController::class,'destroy']);
+    Route::put('/question-bank/{id}', [BankQuestionController::class, 'update']);
+    Route::delete('/question-bank/{id}', [BankQuestionController::class, 'destroy']);
 
     //added subscriber to user by admin
-    Route::post('/add-subscriber/{studentId}',[AdminController::class,'addorupdate']);
+    Route::post('/add-subscriber/{studentId}', [AdminController::class, 'addorupdate']);
     Route::get('/subtype/{student}', [AdminController::class, 'subtype']);
     Route::get('/submissionslist', [AdminController::class, 'submissionsList']);
     Route::post('/logout', [AdminController::class, 'logoutadmin']);
@@ -292,12 +293,12 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('/doubtslist', [AdminController::class, 'doubtslist']);
     Route::post('/doubtsresolve/{doubt}', [AdminController::class, 'resolve']);
 
-    Route::post('/create-quiz',[QuizController::class,'examAsQuizStore']);
-    Route::get('/quiz/{id}',[QuizController::class,'show']);
-    Route::put('/update-quiz/{exam}',[QuizController::class,'updateExamAsQuiz']);
-    Route::delete('/quiz/{id}',[QuizController::class,'destroy']);
+    Route::post('/create-quiz', [QuizController::class, 'examAsQuizStore']);
+    Route::get('/quiz/{id}', [QuizController::class, 'show']);
+    Route::put('/update-quiz/{exam}', [QuizController::class, 'updateExamAsQuiz']);
+    Route::delete('/quiz/{id}', [QuizController::class, 'destroy']);
 
-     // for Questions
+    // for Questions
     //  Route::post('/questions', [QuestionController::class, 'store']);
     //  Route::get('/questions', [QuestionController::class, 'index']);
     //  Route::get('/questions/all', [QuestionController::class, 'getAllQuestion']);
@@ -313,36 +314,40 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('/doubts', [DoubtController::class, 'index']);
     Route::get('/doubt/{id}', [DoubtController::class, 'show']);
 
-    
-    Route::post('students/notifications', [AdminNotificationController::class ,'sendBulkPushNotification']);
+
+    Route::post('students/notifications', [AdminNotificationController::class, 'sendBulkPushNotification']);
     Route::apiResource('admin/students-notifications', AdminNotificationController::class);
     // Route::post('/students/notification/{student_notification}', [NotificationController::class , 'deleteNotification']);
 
     Route::get('/admin/manual-student-email-verify/{student_profile_id}', [AuthController::class, 'manualStudentEmailVerifier']);
 });
 
-Route::controller(ParticipantController::class)->group(function (){
-    Route::post('/store-participant','store');
-    Route::post('/excel-participant','store_from_excel');
-    Route::post('/update-participant/{participant}','update');
-    Route::delete('/delete-participant/{participant}','destroy');
+Route::controller(ParticipantController::class)->group(function () {
+    Route::post('/store-participant', 'store');
+    Route::post('/excel-participant', 'store_from_excel');
+    Route::post('/update-participant/{participant}', 'update');
+    Route::delete('/delete-participant/{participant}', 'destroy');
 });
 // Route::get('/all-students', [StudentProfileController::class, 'allStudents']);
-Route::post('/contact',[ContactController::class,'store']);
+Route::post('/contact', [ContactController::class, 'store']);
 
 //corparate student
-Route::controller(StudentExamController::class)->group(function (){
-    Route::get('exams/{exams}/examsdetail','examIntro');
-    Route::get('exam-type/{exams}','examtype');
-    Route::post('/exam/{exam}/section/{section}/startexam','startsectionexam');
-    Route::get('/get-question/{attempt_id}','getquestion');
+Route::controller(StudentExamController::class)->group(function () {
+    Route::get('exams/{exams}/examsdetail', 'examIntro');
+    Route::get('exam-type/{exams}', 'examtype');
+    Route::post('/exam/{exam}/section/{section}/startexam', 'startsectionexam');
+    Route::get('/get-question/{attempt_id}', 'getquestion');
 });
-Route::controller(StudentExamRegisterController::class)->group(function (){
-    Route::post('/exam/{exam}/private-login','login');
-    Route::post('/exam/{exam}/register-public','registerStudent_public_exam');
-    Route::post('/auth/logout','logout')->middleware('auth:sanctum');
+Route::controller(StudentExamRegisterController::class)->group(function () {
+    Route::post('/exam/{exam}/private-login', 'login');
+    Route::post('/exam/{exam}/register-public', 'registerStudent_public_exam');
+    Route::post('/auth/logout', 'logout')->middleware('auth:sanctum');
 });
-Route::controller(StudentSubmitAnswersController::class)->group(function (){
-    Route::post('/submit-answer/{attempt_id}','Submit_Answer');
-    Route::post('/submit-exam/{attempt_id}','submit_exam');
+Route::controller(StudentSubmitAnswersController::class)->group(function () {
+    Route::post('/submit-answer/{attempt_id}', 'Submit_Answer');
+    Route::post('/submit-exam/{attempt_id}', 'submit_exam');
+});
+Route::controller(FrontendController::class)->group(function () {
+    Route::get('/dashboard', 'dashboard');
+    Route::get('free/search-questions', 'searchQuestions');
 });

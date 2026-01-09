@@ -47,7 +47,6 @@ class User extends Authenticatable implements JWTSubject
         'linkedin',
         'org',
     ];
-
     /**
      * The attributes that should be hidden for serialization.
      *
