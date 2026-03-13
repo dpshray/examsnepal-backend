@@ -84,12 +84,12 @@ class AdminExamTypeController extends Controller
      */
     function index(Request $request)
     {
-        $per_page = $request->query('per_page');
+        $per_page = $request->query('per_page', 99);
         $search = $request->query('search');
         $examtype = ExamType::when($search, fn($qry) => $qry->where('name', 'like', '%' . $search . '%'))
-            ->orderBy('id', 'DESC');
-        $result = $per_page ? $examtype->paginate($per_page) : $examtype->get();
-        $data = $this->setupPagination($result, AdminExamTypeResource::class);
+            ->orderBy('id', 'DESC')
+            ->paginate($per_page);
+        $data = $this->setupPagination($examtype, AdminExamTypeResource::class);
         return Response::apiSuccess("Exam types", $data);
     }
     /**
