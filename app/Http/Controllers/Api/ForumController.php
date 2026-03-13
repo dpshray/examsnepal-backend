@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Cache;
  *     description="Localhost API Server 1"
  * ),
  * @OA\Server(
- *     url="http://192.168.100.18:8000/api/",
+ *     url="http://192.168.1.68:8001/api/",
  *     description="Localhost API Server 2"
  * ),
  * @OA\Server(
@@ -97,12 +97,12 @@ class ForumController extends Controller
     public function fetchQuestions()
     {
         $user = Auth::guard('api')->user();
-        $questions = ForumQuestion::whereRelation('studentProfile','exam_type_id', $user->exam_type_id)
+        $questions = ForumQuestion::whereRelation('studentProfile', 'exam_type_id', $user->exam_type_id)
             // ->where('exam_type_id', $user->exam_type_id)
             ->with(['studentProfile', 'answers.studentProfile'])
             ->withCount('answers')
             ->where('deleted', '0') // Only fetch non-deleted questions
-            ->orderBy('id','DESC')
+            ->orderBy('id', 'DESC')
             ->paginate(4);
 
         $data = $this->setupPagination($questions, ForumQuestionCollection::class);
@@ -146,7 +146,7 @@ class ForumController extends Controller
             ->with(['studentProfile', 'answers.studentProfile'])
             ->withCount('answers')
             ->where('deleted', '0') // Only fetch non-deleted questions
-            ->orderBy('id','DESC')
+            ->orderBy('id', 'DESC')
             ->paginate();
 
         $data = $this->setupPagination($questions, ForumQuestionCollection::class);
@@ -335,7 +335,7 @@ class ForumController extends Controller
     public function updateQuestion(Request $request, $id)
     {
         $student = Auth::guard('api')->user();
-        $forum_question = $student->forum_questions()->where('id', $id)->where('deleted',0)->first();
+        $forum_question = $student->forum_questions()->where('id', $id)->where('deleted', 0)->first();
         // $studentProfile = $this->getAuthenticatedStudentProfile();
 
         // if ($studentProfile instanceof \Illuminate\Http\JsonResponse) {
@@ -728,7 +728,7 @@ class ForumController extends Controller
      *     )
      *     )
      * )
-    */
+     */
     public function incrementForumQuestionView(Request $request, $id)
     {
         $user_id = Auth::id();
@@ -737,7 +737,7 @@ class ForumController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return Response::apiError('Question not found', null, 404);
         }
-        $cache_key = 'viewed_product_'.$user_id.'_'.$question->id;
+        $cache_key = 'viewed_product_' . $user_id . '_' . $question->id;
 
         if (!Cache::has($cache_key)) {
             $question->increment('view_count');
@@ -749,10 +749,10 @@ class ForumController extends Controller
     public function question_answer($id)
     {
         $question = ForumQuestion::with(['studentProfile', 'answers.studentProfile'])
-        ->findOrFail($id);
+            ->findOrFail($id);
         return response()->json([
-        'message' => 'Question fetched successfully',
-        'question' => new ReplyResource($question)
+            'message' => 'Question fetched successfully',
+            'question' => new ReplyResource($question)
         ]);
     }
 }

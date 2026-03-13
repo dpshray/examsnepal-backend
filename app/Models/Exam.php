@@ -52,7 +52,8 @@ class Exam extends Model
         ];
     }
 
-    function minToHis() {
+    function minToHis()
+    {
         if (empty($this->duration)) {
             return null;
         }
@@ -60,7 +61,8 @@ class Exam extends Model
         return ($hours * 60) + $minutes;
     }
 
-    function hisToMin() {
+    function hisToMin()
+    {
         if (empty($this->duration)) {
             return null;
         }
@@ -100,25 +102,25 @@ class Exam extends Model
                 ->orderBy('correct_answers_count', 'DESC')
                 ->orderBy('id', 'DESC')
         ])
-        ->allAvailableExams()
-        ->when(
-            Auth::guard('api')->check(),
-            fn($qry) => $qry->where(function ($q) {
-                $q->whereDoesntHave('student_exams', function ($q) {
-                    $q->where('student_id', Auth::guard('api')->id());
+            ->allAvailableExams()
+            ->when(
+                Auth::guard('api')->check(),
+                fn($qry) => $qry->where(function ($q) {
+                    $q->whereDoesntHave('student_exams', function ($q) {
+                        $q->where('student_id', Auth::guard('api')->id());
+                    })
+                        ->orWhereHas('student_exams', function ($q) {
+                            $q->where('student_id', Auth::guard('api')->id())
+                                ->where('is_exam_completed', 0);
+                        });
                 })
-                ->orWhereHas('student_exams', function ($q) {
-                    $q->where('student_id', Auth::guard('api')->id())
-                      ->where('is_exam_completed', 0);
-                });
-            })
-        );
+            );
     }
 
     public function scopeAuthUserCompleted(Builder $query): Builder
     {
         return $query->with([
-            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id','is_exam_completed'])
+            'student_exams' => fn($qry) => $qry->select(['id', 'student_id', 'exam_id', 'is_exam_completed'])
                 ->when(Auth::guard('api')->check(), fn($q) => $q->where('student_id', Auth::guard('api')->id()))
                 # commented since no player needed no show
                 /* ->with([
@@ -131,34 +133,36 @@ class Exam extends Model
                 ->orderBy('correct_answers_count', 'DESC')
                 ->orderBy('id', 'DESC')
         ])
-        // ->whereRelation('student_exams','is_exam_completed',1)
-        ->when(
-            Auth::guard('api')->check(),
-            fn($qry) => $qry->whereHas('student_exams', fn($qry) => 
-                    $qry->where('student_id', Auth::guard('api')->id())->where('is_exam_completed',1)
+            // ->whereRelation('student_exams','is_exam_completed',1)
+            ->when(
+                Auth::guard('api')->check(),
+                fn($qry) => $qry->whereHas(
+                    'student_exams',
+                    fn($qry) =>
+                    $qry->where('student_id', Auth::guard('api')->id())->where('is_exam_completed', 1)
                 )
-        )
-        ->allAvailableExams();
+            )
+            ->allAvailableExams();
     }
 
     public function scopeAllAvailableExams(Builder $query): Builder
     {
         return $query->select([
-                'id', 
-                'exam_name', 
-                'status', 
-                'user_id',
-                'is_negative_marking', 
-                'negative_marking_point', 
-                'points_per_question',
-                'duration'
-            ])
+            'id',
+            'exam_name',
+            'status',
+            'user_id',
+            'is_negative_marking',
+            'negative_marking_point',
+            'points_per_question',
+            'duration'
+        ])
             ->with('user:id,fullname')
             ->withCount('questions')
             ->has('questions')
             ->where('live', 1)
             ->when(Auth::guard('api')->check(), fn($qry) => $qry->where('exam_type_id', Auth::guard('api')->user()->exam_type_id));
-            // ->orderBy('id', 'DESC');
+        // ->orderBy('id', 'DESC');
     }
 
 
@@ -220,7 +224,8 @@ class Exam extends Model
         );
     }
 
-    function sendFCMNotifications($send_and_store = true) {
+    function sendFCMNotifications($send_and_store = true)
+    {
         $type = strtolower(str_replace('_', ' ', ExamTypeEnum::getKeyByValue($this->status)));
 
         // get students who match exam type
@@ -237,5 +242,14 @@ class Exam extends Model
             // send notification to all tokens
             $fcmService->notify($students->pluck('fcm_token')->toArray(), $send_and_store);
         }
+    }
+    function examTags()
+    {
+        return $this->belongsToMany(
+            ExamTag::class,
+            'tag_in_exams',
+            'exam_id',
+            'tag_id'
+        )->withTimestamps();
     }
 }

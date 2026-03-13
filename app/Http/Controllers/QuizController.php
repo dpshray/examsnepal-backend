@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Enums\ExamTypeEnum;
@@ -7,6 +8,7 @@ use App\Http\Resources\Student\Exam\StudentExamCompletedListCollection;
 use App\Http\Resources\Student\Exam\StudentExamListCollection;
 use App\Http\Resources\Student\Exam\StudentExamListResource;
 use App\Models\Exam;
+use App\Models\ExamTag;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +34,13 @@ class QuizController extends Controller
      *         required=false,
      *         description="Page number for pagination",
      *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="tag",
+     *         in="query",
+     *         required=false,
+     *         description="exam tag slug",
+     *         @OA\Schema(type="string", example="mcq")
      *     ),
      *     @OA\Response(
      *     response=200,
@@ -85,8 +94,9 @@ class QuizController extends Controller
      *    )
      * )
      */
-    public function getCompletedFreeQuiz()
+    public function getCompletedFreeQuiz(Request $request)
     {
+        $tagSlug = $request->query('tag');
         $free_quiz_query = Exam::freeType()
             ->authUserCompleted()
             ->leftJoin('student_exams', function ($join) {
@@ -95,6 +105,10 @@ class QuizController extends Controller
             })
             ->select('exams.*')
             ->withCount('questions')
+            ->with(['examTags:id,name,slug'])
+            ->when($tagSlug, function ($q) use ($tagSlug) {
+                $q->whereHas('examTags', fn($q) => $q->where('slug', $tagSlug));
+            })
             ->orderByDesc('student_exams.id')
             ->paginate();
         // Log::info($free_quiz_query);
@@ -116,6 +130,13 @@ class QuizController extends Controller
      *         required=false,
      *         description="Page number for pagination",
      *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="tag",
+     *         in="query",
+     *         required=false,
+     *         description="exam tag slug",
+     *         @OA\Schema(type="string", example="mcq")
      *     ),
      *     @OA\Response(
      *       response=200,
@@ -181,10 +202,12 @@ class QuizController extends Controller
      *     )
      * )
      */
-    public function getPendingFreeQuiz()
-    {    
+    public function getPendingFreeQuiz(Request $request)
+    {
+        $tagSlug = $request->query('tag');
         $free_quiz_query = Exam::freeType()
             ->authUserPending()
+            ->with(['examTags:id,name,slug'])
             ->withCount('questions')
             ->withCount([
                 'answers as total_choosed_options' => function ($q) {
@@ -194,7 +217,10 @@ class QuizController extends Controller
                         });
                 }
             ])
-            ->orderBy('id','DESC')
+            ->when($tagSlug, function ($q) use ($tagSlug) {
+                $q->whereHas('examTags', fn($q) => $q->where('slug', $tagSlug));
+            })
+            ->orderBy('id', 'DESC')
             ->paginate();
         $data = $this->setupPagination($free_quiz_query, StudentExamListCollection::class)->data;
 
@@ -214,6 +240,13 @@ class QuizController extends Controller
      *         required=false,
      *         description="Page number for pagination",
      *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="tag",
+     *         in="query",
+     *         required=false,
+     *         description="exam tag slug",
+     *         @OA\Schema(type="string", example="mcq")
      *     ),
      *     security={{ "bearerAuth":{} }},
      *     @OA\Response(
@@ -268,8 +301,9 @@ class QuizController extends Controller
      *  )
      * )
      */
-    public function getCompletedSprintQuiz()
+    public function getCompletedSprintQuiz(Request $request)
     {
+        $tagSlug = $request->query('tag');
         $sprint_quiz_query = Exam::sprintType()
             ->authUserCompleted()
             ->leftJoin('student_exams', function ($join) {
@@ -278,6 +312,10 @@ class QuizController extends Controller
             })
             ->select('exams.*')
             ->withCount('questions')
+            ->with(['examTags:id,name,slug'])
+            ->when($tagSlug, function ($q) use ($tagSlug) {
+                $q->whereHas('examTags', fn($q) => $q->where('slug', $tagSlug));
+            })
             ->orderByDesc('student_exams.id')
             ->paginate();
         $data = $this->setupPagination($sprint_quiz_query, StudentExamCompletedListCollection::class)->data;
@@ -362,8 +400,9 @@ class QuizController extends Controller
      *     )
      * )
      */
-    public function getPendingSprintQuiz()
+    public function getPendingSprintQuiz(Request $request)
     {
+        $tagSlug = $request->query('tag');
         $sprint_quiz_query = Exam::sprintType()
             ->authUserPending()
             ->withCount('questions')
@@ -375,6 +414,10 @@ class QuizController extends Controller
                         });
                 }
             ])
+            ->with(['examTags:id,name,slug'])
+            ->when($tagSlug, function ($q) use ($tagSlug) {
+                $q->whereHas('examTags', fn($q) => $q->where('slug', $tagSlug));
+            })
             ->orderBy('id', 'DESC')
             ->paginate();
         $data = $this->setupPagination($sprint_quiz_query, StudentExamListCollection::class)->data;
@@ -396,6 +439,13 @@ class QuizController extends Controller
      *         required=false,
      *         description="Page number for pagination",
      *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="tag",
+     *         in="query",
+     *         required=false,
+     *         description="exam tag slug",
+     *         @OA\Schema(type="string", example="mcq")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -449,8 +499,9 @@ class QuizController extends Controller
      *      )
      * )
      */
-    public function getCompletedMockTest()
+    public function getCompletedMockTest(Request $request)
     {
+        $tagSlug = $request->query('tag');
         $mock_quiz_query = Exam::mockType()
             ->authUserCompleted()
             ->leftJoin('student_exams', function ($join) {
@@ -460,6 +511,10 @@ class QuizController extends Controller
             ->select('exams.*')
             ->withCount('questions')
             ->orderByDesc('student_exams.id')
+            ->with(['examTags:id,name,slug'])
+            ->when($tagSlug, function ($q) use ($tagSlug) {
+                $q->whereHas('examTags', fn($q) => $q->where('slug', $tagSlug));
+            })
             ->paginate();
         $data = $this->setupPagination($mock_quiz_query, StudentExamCompletedListCollection::class)->data;
 
@@ -480,6 +535,13 @@ class QuizController extends Controller
      *         required=false,
      *         description="Page number for pagination",
      *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="tag",
+     *         in="query",
+     *         required=false,
+     *         description="exam tag slug",
+     *         @OA\Schema(type="string", example="mcq")
      *     ),
      *     @OA\Response(
      *       response=200,
@@ -547,8 +609,9 @@ class QuizController extends Controller
      *     )
      * )
      */
-    public function getPendingMockTest()
+    public function getPendingMockTest(Request $request)
     {
+        $tagSlug = $request->query('tag');
         $mock_quiz = Exam::mockType()->authUserPending()
             ->withCount([
                 'answers as total_choosed_options' => function ($q) {
@@ -558,6 +621,10 @@ class QuizController extends Controller
                         });
                 }
             ])
+            ->with(['examTags:id,name,slug'])
+            ->when($tagSlug, function ($q) use ($tagSlug) {
+                $q->whereHas('examTags', fn($q) => $q->where('slug', $tagSlug));
+            })
             ->orderBy('id', 'DESC')
             ->paginate();
         $data = $this->setupPagination($mock_quiz, StudentExamListCollection::class)->data;
@@ -931,13 +998,15 @@ class QuizController extends Controller
      */
     public function getFreeExamStatus()
     {
-        $exams = Exam::whereHas('student_exams', fn($q) => 
-                    $q->where('student_id', Auth::guard('api')->id())
-                    ->where('is_exam_completed', 1)
-                )
-                ->freeType()
-                ->orderBy('id','DESC')
-                ->paginate();
+        $exams = Exam::whereHas(
+            'student_exams',
+            fn($q) =>
+            $q->where('student_id', Auth::guard('api')->id())
+                ->where('is_exam_completed', 1)
+        )
+            ->freeType()
+            ->orderBy('id', 'DESC')
+            ->paginate();
         $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's free exam completed status", $data);
@@ -995,12 +1064,14 @@ class QuizController extends Controller
      */
     public function getSprintExamStatus()
     {
-        $exams = Exam::whereHas('student_exams', fn($q) =>
-                    $q->where('student_id', Auth::guard('api')->id())->where('is_exam_completed', 1)
-                )
-                ->sprintType()
-                ->orderBy('id','DESC')
-                ->paginate();
+        $exams = Exam::whereHas(
+            'student_exams',
+            fn($q) =>
+            $q->where('student_id', Auth::guard('api')->id())->where('is_exam_completed', 1)
+        )
+            ->sprintType()
+            ->orderBy('id', 'DESC')
+            ->paginate();
         $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's sprint exam completed status", $data);
@@ -1058,12 +1129,14 @@ class QuizController extends Controller
      */
     public function getMockExamStatus()
     {
-        $exams = Exam::whereHas('student_exams', fn($q) =>
-                        $q->where('student_id', Auth::guard('api')->id())->where('is_exam_completed', 1)
-                )
-                ->mockType()
-                ->orderBy('id','DESC')
-                ->paginate();
+        $exams = Exam::whereHas(
+            'student_exams',
+            fn($q) =>
+            $q->where('student_id', Auth::guard('api')->id())->where('is_exam_completed', 1)
+        )
+            ->mockType()
+            ->orderBy('id', 'DESC')
+            ->paginate();
         $data = $this->setupPagination($exams, ExamCollection::class)->data;
 
         return Response::apiSuccess("Student's mock exam completed status", $data);
@@ -1113,7 +1186,8 @@ class QuizController extends Controller
      *     )
      * )
      */
-    public function totalExamCounter(){
+    public function totalExamCounter()
+    {
         $free = Exam::freeType()->allAvailableExams()->count();
         $sprint = Exam::sprintType()->allAvailableExams()->count();
         $mock = Exam::mockType()->allAvailableExams()->count();
@@ -1122,26 +1196,26 @@ class QuizController extends Controller
         $sprint_quiz_query = Exam::sprintType()->authUserCompleted()->count();
         $mock_quiz_query = Exam::mockType()->authUserCompleted()->count();
 
-        $free_type_performance = ($free == 0) ? 0 : ($free_quiz_query/$free)*100;
-        $sprint_type_performance = ($sprint == 0) ? 0 : ($sprint_quiz_query/$sprint)*100;
-        $mock_type_performance = ($mock == 0) ? 0 : ($mock_quiz_query/$mock)*100;
-        
+        $free_type_performance = ($free == 0) ? 0 : ($free_quiz_query / $free) * 100;
+        $sprint_type_performance = ($sprint == 0) ? 0 : ($sprint_quiz_query / $sprint) * 100;
+        $mock_type_performance = ($mock == 0) ? 0 : ($mock_quiz_query / $mock) * 100;
+
 
 
         $stats = DB::table('student_profiles as sp')
-                    ->join('student_exams as se', 'sp.id', '=', 'se.student_id')
-                    ->join('answersheets as a', 'se.id', '=', 'a.student_exam_id')
-                    ->where('sp.id', Auth::guard('api')->id())
-                    ->selectRaw('
+            ->join('student_exams as se', 'sp.id', '=', 'se.student_id')
+            ->join('answersheets as a', 'se.id', '=', 'a.student_exam_id')
+            ->where('sp.id', Auth::guard('api')->id())
+            ->selectRaw('
                         COUNT(a.question_id) as total_questions,
                         SUM(CASE WHEN a.is_correct = 1 THEN 1 ELSE 0 END) as correct_answers
                     ')
-                    ->first();
+            ->first();
 
-                $totalQuestions = $stats->total_questions ?? 0;
-                $totalCorrect   = $stats->correct_answers ?? 0;
+        $totalQuestions = $stats->total_questions ?? 0;
+        $totalCorrect   = $stats->correct_answers ?? 0;
 
-                $average_score = $totalQuestions > 0 ? round(($totalCorrect / $totalQuestions) * 100, 2) : 0;
+        $average_score = $totalQuestions > 0 ? round(($totalCorrect / $totalQuestions) * 100, 2) : 0;
 
 
 
@@ -1162,5 +1236,36 @@ class QuizController extends Controller
         ];
         // $data = compact('free','sprint','mock');
         return Response::apiSuccess('Available Exams with their total', $data);
+    }
+    /**
+     * @OA\Get(
+     *     path="/exam-tag/{examTypeId}",
+     *     summary="Get tags by exam type",
+     *     tags={"Exam Tags"},
+     *
+     *     @OA\Parameter(
+     *         name="examTypeId",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Exam tags retrieved successfully"
+     *     )
+     * )
+     */
+
+    public function getTagsByExamType($examTypeId)
+    {
+        $tags = ExamTag::whereHas('exams', function ($q) use ($examTypeId) {
+            $q->where('exam_type_id', $examTypeId);
+        })
+            ->select('id', 'name', 'slug')
+            ->distinct()
+            ->get();
+
+        return Response::apiSuccess('Exam tags retrieved successfully.', $tags);
     }
 }
