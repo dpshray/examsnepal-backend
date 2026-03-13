@@ -2,6 +2,7 @@
 
 use App\Enums\ExamTypeEnum;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\Exam\Type\AdminExamTypeController;
 use App\Http\Controllers\Admin\Notification\AdminNotificationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentProfileController;
@@ -288,7 +289,8 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('/submissionslist', [AdminController::class, 'submissionsList']);
     Route::post('/logout', [AdminController::class, 'logoutadmin']);
 
-
+    // exam type
+    Route::apiResource('examtype', AdminExamTypeController::class);
     //added doubt list
     Route::get('/doubtslist', [AdminController::class, 'doubtslist']);
     Route::post('/doubtsresolve/{doubt}', [AdminController::class, 'resolve']);
