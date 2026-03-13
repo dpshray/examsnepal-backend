@@ -31,6 +31,10 @@ class StudentExamListResource extends JsonResource
             'negative_marking_point' => (float)$this->negative_marking_point,
             'correct_marking_point' => (float)$this->points_per_question,
             "status" =>  $status,
+            "exam_tags" => $this->whenLoaded(
+                'examTags',
+                fn() => $this->examTags->map(fn($tag) => ['name' => $tag->name, 'slug' => $tag->slug])
+            ),
             "questions_count" => $this->whenCounted('questions', fn() => (int) $this->questions_count),
             'duration' => $this->minToHis(),
             'total_choosed_questions' => $this->total_choosed_options,
@@ -51,10 +55,11 @@ class StudentExamListResource extends JsonResource
         ];
     }
 
-    function isInterrupted($student_exam) {
+    function isInterrupted($student_exam)
+    {
         $SE = $student_exam->where('student_id', Auth::id());
         if ($SE->isNotEmpty()) {
-            return $SE->where('is_exam_completed',0)->isNotEmpty();
+            return $SE->where('is_exam_completed', 0)->isNotEmpty();
         }
         return false;
     }

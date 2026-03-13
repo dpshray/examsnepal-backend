@@ -29,9 +29,13 @@ class StudentExamCompletedListResource extends JsonResource
             "status" =>  $status,
             'is_negative_marking' => (bool)$this->is_negative_marking,
             'negative_marking_point' => (float)$this->negative_marking_point,
-            'correct_marking_point' =>(float)$this->points_per_question,
+            'correct_marking_point' => (float)$this->points_per_question,
             "questions_count" => $this->whenCounted('questions', fn() => (int) $this->questions_count),
             'duration' => $this->minToHis(),
+            "exam_tags" => $this->whenLoaded(
+                'examTags',
+                fn() => $this->examTags->map(fn($tag) => ['name' => $tag->name, 'slug' => $tag->slug])
+            ),
             'is_exam_completed' => $this->student_exams->where('student_id', Auth::id())->where('is_exam_completed', 1)->isNotEmpty(),
             "user" => $this->whenLoaded('user'), #<---added_by
             // 'players' => $this->whenLoaded('student_exams', fn() => new PlayerExamScoreCollection($this->student_exams))

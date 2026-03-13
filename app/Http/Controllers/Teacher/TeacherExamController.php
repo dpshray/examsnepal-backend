@@ -11,6 +11,7 @@ use App\Http\Resources\ExamResource;
 use App\Http\Resources\Teacher\TeacherExamDetailResource;
 use App\Http\Resources\Teacher\TeacherExamResource;
 use App\Models\Exam;
+use App\Models\ExamTag;
 use App\Models\StudentProfile;
 use App\Services\FCMService;
 use App\Traits\PaginatorTrait;
@@ -104,16 +105,16 @@ class TeacherExamController extends Controller
         $examTypeId   = $request->query('exam_type'); #MDMS...
         $category_type = $request->query('category_type'); # mock,free, sprint
         $search = $request->query('search');
-        
+
         $teacher = Auth::guard('users')->user();
         $pagination = Exam::query()
             ->when(!$teacher->isAdmin(), fn($qry) => $qry->where('user_id', $teacher->id))
-            ->when($search, fn($q) => $q->whereLike('exam_name', '%'.$search.'%'))
+            ->when($search, fn($q) => $q->whereLike('exam_name', '%' . $search . '%'))
             ->when($examTypeId, function ($q) use ($examTypeId) {
                 $q->where('exam_type_id', $examTypeId);
             })
             ->when($category_type, fn($qry) => $qry->where('status', $category_type))
-            ->with(['examType:id,name'])
+            ->with(['examType:id,name', 'examTags:id,name,slug'])
             ->withCount(['questions'])
             ->orderBy('id', 'DESC')
             ->paginate($per_page);
@@ -168,6 +169,8 @@ class TeacherExamController extends Controller
         $data['duration'] = $request->duration;
 
         $exam = Auth::user()->teacherExams()->createQuietly($data);
+        $exam_tags = ExamTag::whereIn('slug', $data['exam_tags'])->pluck('id')->toArray();
+        $exam->examTags()->sync($exam_tags);
         if ($data['is_active'] == 1 && (bool)$request->assign && (bool)$request->live) {
             $exam->sendFCMNotifications();
         }
@@ -224,6 +227,7 @@ class TeacherExamController extends Controller
      */
     public function show(Exam $exam)
     {
+        $exam->loadMissing(['examType:id,name', 'examTags:id,name,slug']);
         $data = new TeacherExamDetailResource($exam);
         return Response::apiSuccess('exam detail fetched successfully', $data);
     }
@@ -302,6 +306,8 @@ class TeacherExamController extends Controller
         $data['duration'] = $request->duration;
 
         $exam->updateQuietly($data);
+        $exam_tags = ExamTag::whereIn('slug', $data['exam_tags'])->pluck('id')->toArray();
+        $exam->examTags()->sync($exam_tags);
         if ($data['is_active'] == 1 && (bool)$request->assign && (bool)$request->live) {
             $exam->sendFCMNotifications();
         }

@@ -2,6 +2,8 @@
 
 use App\Enums\ExamTypeEnum;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\Exam\Type\AdminExamTypeController;
+use App\Http\Controllers\Admin\ExamTag\AdminExamTagController;
 use App\Http\Controllers\Admin\Notification\AdminNotificationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentProfileController;
@@ -260,7 +262,7 @@ Route::middleware(['auth:api', 'verified', CheckTokenVersionMiddleware::class])-
 // for exam type
 Route::get('/exam-types', [ExamTypeController::class, 'index']);
 Route::get('/category-types', ExamCategoryController::class);
-
+Route::get('/exam-tag/{examTypeId}', [QuizController::class, 'getTagsByExamType']);
 // Route::get('/documentation', function () {
 //     return view('vendor.l5-swagger.index');
 // })->withoutMiddleware('auth:api');
@@ -288,7 +290,8 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('/submissionslist', [AdminController::class, 'submissionsList']);
     Route::post('/logout', [AdminController::class, 'logoutadmin']);
 
-
+    // exam type
+    Route::apiResource('admin/examtype', AdminExamTypeController::class);
     //added doubt list
     Route::get('/doubtslist', [AdminController::class, 'doubtslist']);
     Route::post('/doubtsresolve/{doubt}', [AdminController::class, 'resolve']);
@@ -320,6 +323,10 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     // Route::post('/students/notification/{student_notification}', [NotificationController::class , 'deleteNotification']);
 
     Route::get('/admin/manual-student-email-verify/{student_profile_id}', [AuthController::class, 'manualStudentEmailVerifier']);
+
+    //subscription type
+    Route::apiResource('admin/subscription-type', SubscriptionTypeController::class);
+    Route::apiResource('admin/exam-tags', AdminExamTagController::class);
 });
 
 Route::controller(ParticipantController::class)->group(function () {

@@ -20,14 +20,23 @@ class TeacherExamResource extends JsonResource
             "id" => $this->id,
             "published" => $this->is_active,
             "exam_type" => $this->whenLoaded('examType'),
-            "category_type"=> [
-                'id'=>$this->status,
-                'name'=>ExamTypeEnum::getKeyByValue($this->status),
+            "category_type" => [
+                'id' => $this->status,
+                'name' => ExamTypeEnum::getKeyByValue($this->status),
             ],
+            "exam_tags" => $this->whenLoaded('examTags', function () {
+                return $this->examTags->map(function ($tag) {
+                    return [
+                        'id' => $tag->id,
+                        'name' => $tag->name,
+                        'slug' => $tag->slug,
+                    ];
+                });
+            }),
             "exam_name" => $this->exam_name,
-            "live"=>$this->live,
-            "description"=>$this->description,
-            "assign"=>$this->assign,
+            "live" => $this->live,
+            "description" => $this->description,
+            "assign" => $this->assign,
             'total_questions' => $this->whenCounted('questions'),
             "is_negative_marking" => (bool)$this->is_negative_marking,
             "negative_marking_point" => (float)$this->negative_marking_point,

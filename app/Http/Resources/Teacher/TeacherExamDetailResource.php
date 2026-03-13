@@ -15,7 +15,7 @@ class TeacherExamDetailResource extends JsonResource
     public function toArray(Request $request): array
     {
         // return parent::toArray($request);
-        return [  
+        return [
             "exam_type_id" => $this->exam_type_id,
             "category_type" => $this->status,
             "exam_name" => $this->exam_name,
@@ -26,7 +26,16 @@ class TeacherExamDetailResource extends JsonResource
             "is_negative_marking" => (bool)$this->is_negative_marking,
             "negative_marking_point" => (float)$this->negative_marking_point,
             "points_per_question" => (float)$this->points_per_question,
-            'duration' => $this->minToHis()
+            'duration' => $this->minToHis(),
+            "exam_tags" => $this->whenLoaded('examTags', function () {
+                return $this->examTags->map(function ($tag) {
+                    return [
+                        'id' => $tag->id,
+                        'name' => $tag->name,
+                        'slug' => $tag->slug,
+                    ];
+                });
+            }),
         ];
     }
 }

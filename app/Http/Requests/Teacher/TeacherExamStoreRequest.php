@@ -35,6 +35,8 @@ class TeacherExamStoreRequest extends FormRequest
             'negative_marking_point' => [Rule::requiredIf($this->is_negative_marking == 1)],
             'points_per_question' => 'required|numeric|min:1',
             'duration' => 'sometimes|nullable|integer',
+            'exam_tags' => 'required|array',
+            'exam_tags.*' => 'exists:exam_tags,slug',
         ];
     }
 
@@ -45,7 +47,8 @@ class TeacherExamStoreRequest extends FormRequest
         ]);
     }
 
-    private function minToHis($minutes){
+    private function minToHis($minutes)
+    {
         $hours = intdiv($minutes, 60);
         $remainingMinutes = $minutes % 60;
 
