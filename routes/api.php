@@ -325,7 +325,8 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('/admin/manual-student-email-verify/{student_profile_id}', [AuthController::class, 'manualStudentEmailVerifier']);
 
     //subscription type
-    Route::apiResource('admin/subscription-type', SubscriptionTypeController::class);
+    Route::apiResource('admin/subscription-type', SubscriptionTypeController::class)->except(['index']);
+    Route::get('admin/subscription-type-list', [SubscriptionTypeController::class, 'subscriptionlist']);
     Route::apiResource('admin/exam-tags', AdminExamTagController::class);
 });
 

@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Admin\Subscription\AdminsubscriptionlistCollection;
+use App\Http\Resources\Admin\Subscription\AdminsubscriptionlistResource;
 use App\Http\Resources\StudentSubscriptionResource;
 use App\Http\Resources\Subscription\SubscriptionTypeResource;
 use App\Models\Subscriber;
 use App\Models\SubscriptionType;
+use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth, DB};
 use Illuminate\Support\Facades\Response;
 
 class SubscriptionTypeController extends Controller
 {
+    use PaginatorTrait;
     /**
      * @OA\Get(
      *     security={{"bearerAuth": {}}},
@@ -123,7 +127,14 @@ class SubscriptionTypeController extends Controller
         $data = SubscriptionTypeResource::collection($rows);
         return Response::apiSuccess('Active package list', $data);
     }
-
+    function subscriptionlist(Request $request)
+    {
+        $per_page = $request->per_page;
+        $examtpye = $request->exam_type_id;
+        $rows = SubscriptionType::with('examType')->when($examtpye, fn($qry) => $qry->where('exam_type_id', $examtpye))->orderBy('id', 'DESC')->paginate($per_page);
+        $data = $this->setupPagination($rows, AdminsubscriptionlistCollection::class);
+        return Response::apiSuccess('Active package list', $data);
+    }
     /**
      * Store a newly created resource in storage.
      * @OA\Post(
