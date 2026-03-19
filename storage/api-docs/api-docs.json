@@ -470,6 +470,1022 @@
                 }
             }
         },
+        "/admin/blog/category": {
+            "get": {
+                "tags": [
+                    "Admin Blog Category"
+                ],
+                "summary": "Get category list",
+                "description": "Returns paginated list of categories with search.",
+                "operationId": "58766adb8a092881793eddbed50a69cb",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by category title",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "lens"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category list returned successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Blog list returned successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 25
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Eyeglasses"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": "eyeglasses"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "example": "2025-11-25 09:00:00"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "example": "2025-11-25 09:00:00"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin Blog Category"
+                ],
+                "summary": "Create a new category",
+                "description": "Stores a new category.",
+                "operationId": "d5466a26b31e9463405ce467b8558c46",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Contact Lenses"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Category created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Category created successfull"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/blog/category/{slug}": {
+            "get": {
+                "tags": [
+                    "Admin Blog Category"
+                ],
+                "summary": "Get single category detail",
+                "description": "Returns detail of a specific category.",
+                "operationId": "showCategory",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Category slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "test"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category detail retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Category"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Sunglasses"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "sunglasses"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "All types of eyewear sunglasses"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "example": "2025-10-21 10:15:00"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "example": "2025-10-25 05:20:00"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin Blog Category"
+                ],
+                "summary": "Update category",
+                "description": "Updates an existing category.",
+                "operationId": "da01548d03c674210262904d4a64c8b7",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Category slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Updated Category Name"
+                                    },
+                                    "slug": {
+                                        "type": "string",
+                                        "example": "updated-category-name"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Category updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Category updated successfull"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin Blog Category"
+                ],
+                "summary": "Delete category",
+                "description": "Deletes a category by ID.",
+                "operationId": "e206f8a2522a4bcb5a9bb090332dc8e5",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Category slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Category deleted successfull"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/blogs": {
+            "get": {
+                "tags": [
+                    "Admin Blogs"
+                ],
+                "summary": "Get paginated list of blogs",
+                "description": "Returns paginated blogs with optional search",
+                "operationId": "cc26f525198e63b4bb973faebb2e69d2",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by blog title",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Blog list returned successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin Blogs"
+                ],
+                "summary": "Create a new blog",
+                "description": "Stores a new blog",
+                "operationId": "4b602503186fbf38f90676f5e15dbc2f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "description": "Blog title",
+                                        "type": "string",
+                                        "example": "My First Blog"
+                                    },
+                                    "content": {
+                                        "description": "Full blog content",
+                                        "type": "string",
+                                        "example": "This is the content of the blog."
+                                    },
+                                    "summary": {
+                                        "description": "Short summary of the blog",
+                                        "type": "string",
+                                        "example": "Short summary"
+                                    },
+                                    "author": {
+                                        "description": "Author name",
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "status": {
+                                        "description": "Blog status (draft/published)",
+                                        "type": "string",
+                                        "example": "published"
+                                    },
+                                    "Call_to_Action": {
+                                        "description": "Optional call to action",
+                                        "type": "string",
+                                        "example": "Read more"
+                                    },
+                                    "published_date": {
+                                        "description": "Published date",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-11-24"
+                                    },
+                                    "image": {
+                                        "description": "Blog image file",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "category_id": {
+                                        "description": "Array of category IDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2
+                                        ]
+                                    },
+                                    "tag_id": {
+                                        "description": "Array of tag IDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            3,
+                                            5
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Blog created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/blogs/{slug}": {
+            "get": {
+                "tags": [
+                    "Admin Blogs"
+                ],
+                "summary": "Get blog detail",
+                "description": "Returns details of a single blog",
+                "operationId": "66144fb0d971e0f1af2ebc2aaeff58ba",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "slug",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Blog detail returned successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin Blogs"
+                ],
+                "summary": "Update a blog",
+                "description": "Updates an existing blog",
+                "operationId": "2b19dd47f41732d7d2b87eb2dfb1cdf7",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Blog slug",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "description": "Blog title",
+                                        "type": "string",
+                                        "example": "My First Blog"
+                                    },
+                                    "content": {
+                                        "description": "Full blog content",
+                                        "type": "string",
+                                        "example": "This is the content of the blog."
+                                    },
+                                    "summary": {
+                                        "description": "Short summary of the blog",
+                                        "type": "string",
+                                        "example": "Short summary"
+                                    },
+                                    "author": {
+                                        "description": "Author name",
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "status": {
+                                        "description": "Blog status (draft/published)",
+                                        "type": "string",
+                                        "example": "published"
+                                    },
+                                    "Call_to_Action": {
+                                        "description": "Optional call to action",
+                                        "type": "string",
+                                        "example": "Read more"
+                                    },
+                                    "published_date": {
+                                        "description": "Published date",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-11-24"
+                                    },
+                                    "image": {
+                                        "description": "Blog image file",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "category_id": {
+                                        "description": "Array of category IDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2
+                                        ]
+                                    },
+                                    "tag_id": {
+                                        "description": "Array of tag IDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            3,
+                                            5
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Blog updated successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin Blogs"
+                ],
+                "summary": "Delete a blog",
+                "description": "Deletes a blog by ID",
+                "operationId": "a223dbd47686e5d865b1607ac0f218b8",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Blog slug",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Blog deleted successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/blog/tag": {
+            "get": {
+                "tags": [
+                    "Admin Blog Tag"
+                ],
+                "summary": "Get tag list",
+                "description": "Returns paginated list of Tag with search.",
+                "operationId": "3b016fe8963a945843f0666e1649ad8c",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by Tag title",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "lens"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tag list returned successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Blog list returned successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 25
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Eyeglasses"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": "eyeglasses"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "example": "2025-11-25 09:00:00"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "example": "2025-11-25 09:00:00"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin Blog Tag"
+                ],
+                "summary": "Create a new Tag",
+                "description": "Stores a new Tag.",
+                "operationId": "fda91e127b47859134df601772a92dc8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Contact Lenses"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tag created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tag created successfull"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/blog/tag/{slug}": {
+            "get": {
+                "tags": [
+                    "Admin Blog Tag"
+                ],
+                "summary": "Get single Tag detail",
+                "description": "Returns detail of a specific Tag.",
+                "operationId": "showTag",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Tag slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "test"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tag detail retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tag"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Sunglasses"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "sunglasses"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "All types of eyewear sunglasses"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "example": "2025-10-21 10:15:00"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "example": "2025-10-25 05:20:00"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tag not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin Blog Tag"
+                ],
+                "summary": "Update Tag",
+                "description": "Updates an existing Tag.",
+                "operationId": "11c147e4f7bbf23764706d568f782c8d",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Tag slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Updated Tag Name"
+                                    },
+                                    "slug": {
+                                        "type": "string",
+                                        "example": "updated-Tag-name"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tag updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tag updated successfull"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tag not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin Blog Tag"
+                ],
+                "summary": "Delete Tag",
+                "description": "Deletes a Tag by ID.",
+                "operationId": "8652ab9047e8e0b37208458c673ac79a",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Tag slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tag deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tag deleted successfull"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tag not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/admin/exam-tags": {
             "get": {
                 "tags": [
@@ -18183,6 +19199,18 @@
         {
             "name": "AdminSolveDoubt",
             "description": "AdminSolveDoubt"
+        },
+        {
+            "name": "Admin Blog Category",
+            "description": "Admin Blog Category"
+        },
+        {
+            "name": "Admin Blogs",
+            "description": "Admin Blogs"
+        },
+        {
+            "name": "Admin Blog Tag",
+            "description": "Admin Blog Tag"
         },
         {
             "name": "Admin Exam Tags",

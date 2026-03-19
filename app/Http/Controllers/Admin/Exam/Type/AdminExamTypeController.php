@@ -86,7 +86,9 @@ class AdminExamTypeController extends Controller
     {
         $per_page = $request->query('per_page', 99);
         $search = $request->query('search');
+        $status = $request->query('status');
         $examtype = ExamType::when($search, fn($qry) => $qry->where('name', 'like', '%' . $search . '%'))
+            ->when($status, fn($qry) => $qry->where('is_active', $status))
             ->orderBy('id', 'DESC')
             ->paginate($per_page);
         $data = $this->setupPagination($examtype, AdminExamTypeResource::class);

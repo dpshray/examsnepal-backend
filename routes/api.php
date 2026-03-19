@@ -2,6 +2,9 @@
 
 use App\Enums\ExamTypeEnum;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\Blog\AdminBlogCategoryController;
+use App\Http\Controllers\Admin\Blog\AdminBlogController;
+use App\Http\Controllers\Admin\Blog\AdminBlogTagController;
 use App\Http\Controllers\Admin\Exam\Type\AdminExamTypeController;
 use App\Http\Controllers\Admin\ExamTag\AdminExamTagController;
 use App\Http\Controllers\Admin\Notification\AdminNotificationController;
@@ -263,6 +266,9 @@ Route::middleware(['auth:api', 'verified', CheckTokenVersionMiddleware::class])-
 Route::get('/exam-types', [ExamTypeController::class, 'index']);
 Route::get('/category-types', ExamCategoryController::class);
 Route::get('/exam-tag/{examTypeId}', [QuizController::class, 'getTagsByExamType']);
+
+//blog
+Route::apiResource('user/blogs', AdminBlogController::class)->scoped(['blog' => 'slug'])->only(['index', 'show']);
 // Route::get('/documentation', function () {
 //     return view('vendor.l5-swagger.index');
 // })->withoutMiddleware('auth:api');
@@ -328,6 +334,11 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::apiResource('admin/subscription-type', SubscriptionTypeController::class)->except(['index']);
     Route::get('admin/subscription-type-list', [SubscriptionTypeController::class, 'subscriptionlist']);
     Route::apiResource('admin/exam-tags', AdminExamTagController::class);
+
+    //blog
+    Route::apiResource('admin/blog/category', AdminBlogCategoryController::class)->scoped(['category' => 'slug']);
+    Route::apiResource('admin/blog/tag', AdminBlogTagController::class)->scoped(['tag' => 'slug']);
+    Route::apiResource('admin/blogs', AdminBlogController::class)->scoped(['blog' => 'slug']);
 });
 
 Route::controller(ParticipantController::class)->group(function () {
