@@ -33,6 +33,7 @@ class CorporateExam extends Model
     ];
     protected $casts = [
         'corporate_id' => 'integer',
+        'exam_date' => 'datetime',
     ];
     public function slugSource()
     {
