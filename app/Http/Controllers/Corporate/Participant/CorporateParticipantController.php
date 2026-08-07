@@ -62,14 +62,20 @@ class CorporateParticipantController extends Controller
         //Import from Excel
         $user = Auth::user();
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv',
+            'file' => ['required', 'file', 'extensions:xlsx,xls,csv'],
         ]);
 
-        $file = $request->file('file')->getRealPath();
+        try {
+            $spreadsheet = IOFactory::load($request->file('file')->getRealPath());
+        } catch (\Throwable $e) {
+            return Response::apiError('Could not read this file. Please upload a valid Excel or CSV file.');
+        }
 
-        $spreadsheet = IOFactory::load($file);
         $sheet = $spreadsheet->getActiveSheet();
         $rows = $sheet->toArray();
+
+        $addedCount = 0;
+        $errors = [];
 
         foreach ($rows as $index => $row) {
             if ($index === 0) continue; // skip header
@@ -77,23 +83,39 @@ class CorporateParticipantController extends Controller
             $email = $row[2] ?? null;
             if (!$email) continue;
 
-
-            //Find or Create Participant
-            $participant = Participant::firstOrCreate(
-                [
-                    'corporate_id' => $user->id,
-                    'email'        => $email,
-                ],
-                [
-                    'name'     => $row[0] ?? null,
-                    'phone'    => $row[1] ?? null,
-                    'password' => isset($row[3]) ? Hash::make($row[3]) : null,
-                    'raw_password' => isset($row[3]) ? $row[3] : null,
-                ]
-            );
+            try {
+                //Find or Create Participant
+                Participant::firstOrCreate(
+                    [
+                        'corporate_id' => $user->id,
+                        'email'        => $email,
+                    ],
+                    [
+                        'name'     => $row[0] ?? null,
+                        'phone'    => $row[1] ?? null,
+                        'password' => isset($row[3]) ? Hash::make($row[3]) : null,
+                        'raw_password' => isset($row[3]) ? $row[3] : null,
+                    ]
+                );
+                $addedCount++;
+            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                $errors[] = [
+                    'row' => $index + 1,
+                    'reason' => "Phone \"{$row[1]}\" is already used by another participant in your list.",
+                ];
+            } catch (\Throwable $e) {
+                $errors[] = [
+                    'row' => $index + 1,
+                    'reason' => 'Failed to save: ' . $e->getMessage(),
+                ];
+            }
         }
 
-        return Response::apiSuccess('Participants imported successfully from Excel');
+        return Response::apiSuccess('Bulk import finished', [
+            'added_count' => $addedCount,
+            'failed_count' => count($errors),
+            'errors' => $errors,
+        ]);
     }
     /**
      * Store a newly created participant in storage.

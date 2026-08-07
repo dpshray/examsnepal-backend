@@ -8,6 +8,8 @@ use App\Services\FCMService;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class Exam extends Model
 {
@@ -232,15 +234,24 @@ class Exam extends Model
         $students = StudentProfile::where('exam_type_id', $this->exam_type_id)->get();
 
         if (!empty($students)) {
-            $fcmService = new FCMService(
-                'New Exam',
-                'A new ' . $type . ' exam has been added by your teacher. Please check and start preparing for it.',
-                NotificationTypeEnum::NEW_EXAM->value,
-                $students->pluck('id')->toArray()
-            );
-            $fcmService->exam_id = $this->id;
-            // send notification to all tokens
-            $fcmService->notify($students->pluck('fcm_token')->toArray(), $send_and_store);
+            try {
+                $fcmService = new FCMService(
+                    'New Exam',
+                    'A new ' . $type . ' exam has been added by your teacher. Please check and start preparing for it.',
+                    NotificationTypeEnum::NEW_EXAM->value,
+                    $students->pluck('id')->toArray()
+                );
+                $fcmService->exam_id = $this->id;
+                // send notification to all tokens
+                $fcmService->notify($students->pluck('fcm_token')->toArray(), $send_and_store);
+            } catch (Throwable $e) {
+                // Notifying students is a side effect of creating/updating an exam - it
+                // must never take the exam save down with it (e.g. missing/invalid
+                // Firebase credentials in local/staging environments).
+                Log::error('Failed to send new-exam FCM notifications: ' . $e->getMessage(), [
+                    'exam_id' => $this->id,
+                ]);
+            }
         }
     }
     function examTags()

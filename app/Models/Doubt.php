@@ -23,7 +23,7 @@ class Doubt extends Model
         'date',
         'remark',
         'status',
-        'solved_by',
+        'user_id',
     ];
 
     protected function casts(): array

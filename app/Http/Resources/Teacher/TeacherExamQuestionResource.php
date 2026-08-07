@@ -19,11 +19,14 @@ class TeacherExamQuestionResource extends JsonResource
             'id' => $this->id,
             'question' => $this->question,
             'explanation' => $this->explanation,
+            'image_url' => $this->image_url,
+            'explanation_image_url' => $this->explanation_image_url,
             'options' => $this->options->map(fn($option) => [
                 "id" => $option->id,
                 "question_id" => $option->question_id,
                 "option" => $option->option,
                 "value" => (bool)$option->value,
+                "image_url" => $option->image_url,
             ])
         ];
     }

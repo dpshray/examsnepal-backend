@@ -2,6 +2,7 @@
 
 use App\Enums\ExamTypeEnum;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminPayoutController;
 use App\Http\Controllers\Admin\Blog\AdminBlogCategoryController;
 use App\Http\Controllers\Admin\Blog\AdminBlogController;
 use App\Http\Controllers\Admin\Blog\AdminBlogTagController;
@@ -301,6 +302,14 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     //added doubt list
     Route::get('/doubtslist', [AdminController::class, 'doubtslist']);
     Route::post('/doubtsresolve/{doubt}', [AdminController::class, 'resolve']);
+
+    // teacher revenue-share payout approval
+    Route::get('/admin/payouts/summary', [AdminPayoutController::class, 'summary']);
+    Route::get('/admin/payouts', [AdminPayoutController::class, 'index']);
+    Route::get('/admin/payouts/{payout}', [AdminPayoutController::class, 'show']);
+    Route::post('/admin/payouts/{payout}/approve', [AdminPayoutController::class, 'approve']);
+    Route::post('/admin/payouts/{payout}/mark-paid', [AdminPayoutController::class, 'markPaid']);
+    Route::post('/admin/payouts/{payout}/revert', [AdminPayoutController::class, 'revert']);
 
     Route::post('/create-quiz', [QuizController::class, 'examAsQuizStore']);
     Route::get('/quiz/{id}', [QuizController::class, 'show']);

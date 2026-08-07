@@ -19,10 +19,12 @@ use App\Services\FCMService;
 use App\Traits\PaginatorTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
+use Throwable;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AdminController extends Controller
@@ -336,7 +338,7 @@ class AdminController extends Controller
             ->orderBy('id', 'DESC')
             ->paginate($limit);
 
-        $data = $this->setupPagination($doubts, fn($item) => AdminDoubtResource::collection($item));
+        $data = $this->setupPagination($doubts, fn($item) => AdminDoubtResource::collection($item))->data;
 
         return Response::apiSuccess('doubt list', $data);
     }
@@ -445,14 +447,23 @@ class AdminController extends Controller
             $doubt->update([
                 'status' => 0,
                 'remark' => $request->remark ?? null,
+                'user_id' => Auth::guard('users')->id(),
             ]);
-            $fcmService = new FCMService(
-                'Doubt Resolved',
-                'Your doubt for question ID ' . $doubt->question_id . ' has been resolved.',
-                NotificationTypeEnum::DOUBT_RESOLVED->value,
-                [$doubt->student->id]
-            );
-            $fcmService->notify([$doubt->student->fcm_token]);
+            if ($doubt->student && $doubt->student->fcm_token) {
+                try {
+                    $fcmService = new FCMService(
+                        'Doubt Resolved',
+                        'Your doubt for question ID ' . $doubt->question_id . ' has been resolved.',
+                        NotificationTypeEnum::DOUBT_RESOLVED->value,
+                        [$doubt->student->id]
+                    );
+                    $fcmService->notify([$doubt->student->fcm_token]);
+                } catch (Throwable $e) {
+                    Log::error('Failed to send doubt-resolved FCM notification: ' . $e->getMessage(), [
+                        'doubt_id' => $doubt->id,
+                    ]);
+                }
+            }
         });
         return Response::apiSuccess('Doubt question updated successfully.');
     }

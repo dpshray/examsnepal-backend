@@ -12,9 +12,11 @@ use App\Http\Requests\UpdateExamRequest;
 use App\Http\Resources\QuestionResource;
 use App\Http\Resources\Teacher\TeacherExamQuestionResource;
 use App\Http\Resources\Teacher\TeacherExamResource;
+use App\Models\OptionQuestion;
 use App\Models\Question;
 use App\Models\StudentProfile;
 use App\Services\FCMService;
+use App\Services\QuestionWordImportService;
 use App\Traits\PaginatorTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
@@ -22,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class TeacherQuestionController extends Controller
 {
@@ -127,7 +130,7 @@ class TeacherQuestionController extends Controller
         $per_page = $request->query('per_page',10);
         $exam_title = $exam->exam_name;
         $pagination = $exam->questions()
-                        ->with(['options'])
+                        ->with(['options.media', 'media'])
                         ->orderBy('id', 'DESC')
                         ->paginate($per_page);
         $questions = $this->setupPagination($pagination, fn($item) => TeacherExamQuestionResource::collection($item))->data;
@@ -219,6 +222,7 @@ class TeacherQuestionController extends Controller
             'added_by' => Auth::guard('users')->id()
         ]);
         DB::transaction(function () use($request,$exam){
+            $optionKeys = ['a', 'b', 'c', 'd'];
             $options = [
                 ['option' => $request->option_a, 'value' => $request->option_a_is_true],
                 ['option' => $request->option_b, 'value' => $request->option_b_is_true],
@@ -227,13 +231,147 @@ class TeacherQuestionController extends Controller
             ];
             $question = $request->only(['question', 'explanation','exam_type_id','added_by']);
             $question = $exam->questions()->create($question);
-            clone($question)->options()->createMany($options);
+            $createdOptions = $question->options()->createMany($options);
+
+            foreach ($optionKeys as $index => $key) {
+                if ($request->hasFile("option_{$key}_image")) {
+                    $createdOptions[$index]
+                        ->addMedia($request->file("option_{$key}_image"))
+                        ->toMediaCollection(OptionQuestion::OPTION_IMAGE);
+                }
+            }
 
             if ($request->hasFile('image')) {
                 $question->addMedia($request->file('image'))->toMediaCollection(Question::QUESTION_IMAGE);
             }
+            if ($request->hasFile('explanation_image')) {
+                $question->addMedia($request->file('explanation_image'))->toMediaCollection(Question::EXPLANATION_IMAGE);
+            }
         });
         return Response::apiSuccess("Question added of exam name: {$exam->exam_name}");
+    }
+
+    /**
+     * Bulk-import questions for an exam from an uploaded .docx file.
+     */
+    /**
+     * @OA\Post(
+     *     path="/teacher/exam/{exam}/questions/bulk-import",
+     *     summary="Bulk import questions from a Word document",
+     *     description="Parses an uploaded .docx file for numbered questions (4 lettered options, one marked with a trailing '*' as correct, and an Explanation line), creating a Question per valid entry. Malformed questions are skipped and reported back instead of failing the whole upload.",
+     *     operationId="teacher_question_bulk_import",
+     *     tags={"TeacherQuestion"},
+     *     @OA\Parameter(
+     *         name="exam",
+     *         in="path",
+     *         required=true,
+     *         description="exam id to import questions into",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"file"},
+     *                 @OA\Property(property="file", type="string", format="binary", description=".docx file")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Import finished (possibly with per-question errors)",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="created_count", type="integer", example=18),
+     *                 @OA\Property(property="failed_count", type="integer", example=2),
+     *                 @OA\Property(
+     *                     property="errors",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="question_number", type="integer", example=5),
+     *                         @OA\Property(property="reason", type="string", example="No correct option marked (add \"*\" after the correct option)")
+     *                     )
+     *                 )
+     *             ),
+     *             @OA\Property(property="message", type="string", example="Bulk import finished")
+     *         )
+     *     )
+     * )
+     */
+    public function bulkImport(Request $request, Exam $exam, QuestionWordImportService $importService)
+    {
+        $this->isExamOwner($exam);
+        $request->validate([
+            'file' => 'required|mimes:docx',
+        ]);
+
+        $parsed = $importService->parse($request->file('file')->getRealPath());
+        $errors = $parsed['errors'];
+        $createdCount = 0;
+        $addedBy = Auth::guard('users')->id();
+
+        foreach ($parsed['valid'] as $q) {
+            try {
+                DB::transaction(function () use ($q, $exam, $addedBy) {
+                    $question = $exam->questions()->create([
+                        'question' => $q['text'],
+                        'explanation' => $q['explanation'],
+                        'exam_type_id' => $exam->exam_type_id,
+                        'added_by' => $addedBy,
+                    ]);
+
+                    $optionLetters = ['A', 'B', 'C', 'D'];
+                    $createdOptions = $question->options()->createMany(array_map(
+                        fn ($letter) => [
+                            'option' => $q['options'][$letter]['text'],
+                            'value' => $q['options'][$letter]['is_correct'],
+                        ],
+                        $optionLetters
+                    ));
+
+                    foreach ($optionLetters as $index => $letter) {
+                        $image = $q['options'][$letter]['image'] ?? null;
+                        if ($image) {
+                            $createdOptions[$index]
+                                ->addMediaFromString($image->getImageString())
+                                ->usingFileName('option_' . strtolower($letter) . '.' . $image->getImageExtension())
+                                ->toMediaCollection(OptionQuestion::OPTION_IMAGE);
+                        }
+                    }
+
+                    if ($q['image']) {
+                        $question->addMediaFromString($q['image']->getImageString())
+                            ->usingFileName('question.' . $q['image']->getImageExtension())
+                            ->toMediaCollection(Question::QUESTION_IMAGE);
+                    }
+
+                    if ($q['explanation_image']) {
+                        $question->addMediaFromString($q['explanation_image']->getImageString())
+                            ->usingFileName('explanation.' . $q['explanation_image']->getImageExtension())
+                            ->toMediaCollection(Question::EXPLANATION_IMAGE);
+                    }
+                });
+                $createdCount++;
+            } catch (Throwable $e) {
+                $errors[] = [
+                    'question_number' => $q['number'],
+                    'reason' => 'Failed to save: ' . $e->getMessage(),
+                ];
+            }
+        }
+
+        usort($errors, fn ($a, $b) => $a['question_number'] <=> $b['question_number']);
+
+        return Response::apiSuccess('Bulk import finished', [
+            'created_count' => $createdCount,
+            'failed_count' => count($errors),
+            'errors' => $errors,
+        ]);
     }
 
     /**
@@ -285,7 +423,7 @@ class TeacherQuestionController extends Controller
     public function show(Exam $exam, Question $question)
     {
         $this->isQuestionOwner($question);
-        $question->load(['options']);
+        $question->load(['options.media', 'media']);
         $question = new TeacherExamQuestionResource($question);
         return Response::apiSuccess('Question fetched successfully.', $question);
     }
@@ -372,10 +510,10 @@ class TeacherQuestionController extends Controller
                 // $question->options()->delete();
                 // Recreate new options
                 $options = [
-                    ['option_id' => $request->option_a_id, 'option' => $request->option_a, 'value' => $request->option_a_is_true],
-                    ['option_id' => $request->option_b_id, 'option' => $request->option_b, 'value' => $request->option_b_is_true],
-                    ['option_id' => $request->option_c_id, 'option' => $request->option_c, 'value' => $request->option_c_is_true],
-                    ['option_id' => $request->option_d_id, 'option' => $request->option_d, 'value' => $request->option_d_is_true],
+                    ['key' => 'a', 'option_id' => $request->option_a_id, 'option' => $request->option_a, 'value' => $request->option_a_is_true],
+                    ['key' => 'b', 'option_id' => $request->option_b_id, 'option' => $request->option_b, 'value' => $request->option_b_is_true],
+                    ['key' => 'c', 'option_id' => $request->option_c_id, 'option' => $request->option_c, 'value' => $request->option_c_is_true],
+                    ['key' => 'd', 'option_id' => $request->option_d_id, 'option' => $request->option_d, 'value' => $request->option_d_is_true],
                 ];
                 foreach ($options as $option) {
                     $question->options()->where('id', $option['option_id'])
@@ -383,11 +521,20 @@ class TeacherQuestionController extends Controller
                             'option' => $option['option'],
                             'value' => $option['value']
                         ]);
+
+                    if ($request->hasFile("option_{$option['key']}_image")) {
+                        OptionQuestion::find($option['option_id'])
+                            ->addMedia($request->file("option_{$option['key']}_image"))
+                            ->toMediaCollection(OptionQuestion::OPTION_IMAGE);
+                    }
                 }
             // }
             //update image if exists
             if ($request->hasFile('image')) {
                 $question->addMedia($request->file('image'))->toMediaCollection(Question::QUESTION_IMAGE);
+            }
+            if ($request->hasFile('explanation_image')) {
+                $question->addMedia($request->file('explanation_image'))->toMediaCollection(Question::EXPLANATION_IMAGE);
             }
         });
         return Response::apiSuccess("Question has been updated.");

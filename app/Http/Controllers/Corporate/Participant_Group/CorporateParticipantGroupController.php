@@ -133,44 +133,63 @@ class CorporateParticipantGroupController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv',
+            'file' => ['required', 'file', 'extensions:xlsx,xls,csv'],
         ]);
 
-        $file = $request->file('file')->getRealPath();
-        $spreadsheet = IOFactory::load($file);
+        try {
+            $spreadsheet = IOFactory::load($request->file('file')->getRealPath());
+        } catch (\Throwable $e) {
+            return Response::apiError('Could not read this file. Please upload a valid Excel or CSV file.');
+        }
+
         $sheet = $spreadsheet->getActiveSheet();
         $rows = $sheet->toArray();
         $group = ParticipantGroup::where('slug', $group)->firstOrFail();
-        DB::transaction(function () use ($rows, $group, $user) {
 
-            foreach ($rows as $index => $row) {
+        $addedCount = 0;
+        $errors = [];
 
-                if ($index === 0) continue; // skip header
+        foreach ($rows as $index => $row) {
+            if ($index === 0) continue; // skip header
 
-                $email = $row[2] ?? null;
-                if (!$email) continue;
+            $email = $row[2] ?? null;
+            if (!$email) continue;
 
+            try {
+                DB::transaction(function () use ($row, $email, $group, $user) {
+                    $participant = Participant::updateOrCreate(
+                        [
+                            'corporate_id' => $user->id,
+                            'email'        => $email,
+                        ],
+                        [
+                            'name'     => $row[0] ?? null,
+                            'phone'    => $row[1] ?? null,
+                            'password' => isset($row[3]) ? Hash::make($row[3]) : null,
+                            'raw_password' => isset($row[3]) ? $row[3] : null,
+                        ]
+                    );
 
-                //Find or Create Participant
-                $participant = Participant::updateOrCreate(
-                    [
-                        'corporate_id' => $user->id,
-                        'email'        => $email,
-                    ],
-                    [
-                        'name'     => $row[0] ?? null,
-                        'phone'    => $row[1] ?? null,
-                        'password' => isset($row[3]) ? Hash::make($row[3]) : null,
-                        'raw_password' => isset($row[3]) ? $row[3] : null,
-                    ]
-                );
-
-
-                //Check if participant already added to group
-                $group->participants()->syncWithoutDetaching([$participant->id]);
+                    $group->participants()->syncWithoutDetaching([$participant->id]);
+                });
+                $addedCount++;
+            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                $errors[] = [
+                    'row' => $index + 1,
+                    'reason' => "Phone \"{$row[1]}\" is already used by another participant in your list.",
+                ];
+            } catch (\Throwable $e) {
+                $errors[] = [
+                    'row' => $index + 1,
+                    'reason' => 'Failed to save: ' . $e->getMessage(),
+                ];
             }
-        });
+        }
 
-        return Response::apiSuccess('Participants uploaded and added to group successfully');
+        return Response::apiSuccess('Bulk upload finished', [
+            'added_count' => $addedCount,
+            'failed_count' => count($errors),
+            'errors' => $errors,
+        ]);
     }
 }

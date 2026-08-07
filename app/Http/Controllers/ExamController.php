@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Exam;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rule;
@@ -513,6 +514,12 @@ class ExamController extends Controller
      */
     public function examPlayersScoreList(Request $request, Exam $exam)
     {
+        abort_unless(
+            $exam->exam_type_id === Auth::guard('api')->user()->exam_type_id,
+            403,
+            'This exam is not available to you.'
+        );
+
         $per_page = $request->query('per_page', 10);
         // $per_page = $per_page ? $per_page : ;
         $status = null;

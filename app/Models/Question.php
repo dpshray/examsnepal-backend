@@ -12,7 +12,9 @@ class Question extends Model implements HasMedia
     use InteractsWithMedia;
 
     const QUESTION_IMAGE = 'QUESTION_IMAGE';
+    const EXPLANATION_IMAGE = 'EXPLANATION_IMAGE';
     protected $perPage = 10;
+    protected $appends = ['image_url', 'explanation_image_url'];
 
     public $timestamps = false;
     use HasFactory;
@@ -87,5 +89,16 @@ class Question extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection(self::QUESTION_IMAGE)->singleFile();
+        $this->addMediaCollection(self::EXPLANATION_IMAGE)->singleFile();
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl(self::QUESTION_IMAGE) ?: null;
+    }
+
+    public function getExplanationImageUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl(self::EXPLANATION_IMAGE) ?: null;
     }
 }

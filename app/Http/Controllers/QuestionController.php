@@ -961,6 +961,8 @@ class QuestionController extends Controller
         $questions = $exam->questions()
             ->with([
                 'options:id,question_id,option',
+                'options.media',
+                'media',
                 'student_answers' => fn($q) => $q->whereHas('student_exam', function($q){
                     return $q->where('student_id', Auth::id());
                 })
@@ -1088,6 +1090,8 @@ class QuestionController extends Controller
                                 ->questions()
                                 ->with([
                                     'options:id,question_id,option',
+                                    'options.media',
+                                    'media',
                                     'student_answers' => fn($q) => $q->whereHas('student_exam', function ($q) {
                                         return $q->where('student_id', Auth::id());
                                     })
@@ -1206,6 +1210,8 @@ class QuestionController extends Controller
         $questionsSprintQuiz = $exam->questions()
             ->with([
                 'options:id,question_id,option',
+                'options.media',
+                'media',
                 'student_answers' => fn($q) => $q->whereHas('student_exam', function ($q) {
                     return $q->where('student_id', Auth::id());
                 })
