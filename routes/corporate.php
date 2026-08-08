@@ -24,7 +24,7 @@ Route::prefix('corporate')->group(function () {
         Route::match(['GET', 'POST'], 'password-resetor/{token}', 'paswordResetorFormHandler')->name('password.reset');
     });
     Route::middleware('auth:users')->group(function () {
-        Route::apiResource('exam', CorporateExamController::class)->scoped(['exam'=>'slug']);
+        Route::apiResource('exam', CorporateExamController::class)->scoped(['exam'=>'slug'])->names('corporate.exam');
         Route::apiResource('exam.section', CorporateExamSectionController::class)->scoped(['exam'=>'slug','section'=>'slug']);
         Route::apiResource('exam/section.questions', CorporateQuestionController::class)->scoped(['section'=>'slug']);
         Route::apiResource('exam/{exam}/participants', CorporateParticipantController::class);

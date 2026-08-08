@@ -256,7 +256,7 @@ Route::middleware(['auth:api', 'verified', CheckTokenVersionMiddleware::class])-
     Route::get('student-exams-stats', [StudentProfileController::class, 'studentProfileExamStats']);
 
     Route::get('user-subscription-status', [SubscriptionTypeController::class, 'subscribeStat']);
-    Route::apiResource('subscription-type', SubscriptionTypeController::class);
+    Route::apiResource('subscription-type', SubscriptionTypeController::class)->names('student.subscription-type');
     Route::post('esewa/save-transaction', [EsewaController::class, 'storeTransaction']);
 
     Route::post('verify-promo-code', [PromoCodeController::class, 'checkPromoCodes']);
@@ -269,7 +269,7 @@ Route::get('/category-types', ExamCategoryController::class);
 Route::get('/exam-tag/{examTypeId}', [QuizController::class, 'getTagsByExamType']);
 
 //blog
-Route::apiResource('user/blogs', AdminBlogController::class)->scoped(['blog' => 'slug'])->only(['index', 'show']);
+Route::apiResource('user/blogs', AdminBlogController::class)->scoped(['blog' => 'slug'])->only(['index', 'show'])->names('user.blogs');
 // Route::get('/documentation', function () {
 //     return view('vendor.l5-swagger.index');
 // })->withoutMiddleware('auth:api');
@@ -340,14 +340,14 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('/admin/manual-student-email-verify/{student_profile_id}', [AuthController::class, 'manualStudentEmailVerifier']);
 
     //subscription type
-    Route::apiResource('admin/subscription-type', SubscriptionTypeController::class)->except(['index']);
+    Route::apiResource('admin/subscription-type', SubscriptionTypeController::class)->except(['index'])->names('admin.subscription-type');
     Route::get('admin/subscription-type-list', [SubscriptionTypeController::class, 'subscriptionlist']);
     Route::apiResource('admin/exam-tags', AdminExamTagController::class);
 
     //blog
     Route::apiResource('admin/blog/category', AdminBlogCategoryController::class)->scoped(['category' => 'slug']);
     Route::apiResource('admin/blog/tag', AdminBlogTagController::class)->scoped(['tag' => 'slug']);
-    Route::apiResource('admin/blogs', AdminBlogController::class)->scoped(['blog' => 'slug']);
+    Route::apiResource('admin/blogs', AdminBlogController::class)->scoped(['blog' => 'slug'])->names('admin.blogs');
 });
 
 Route::controller(ParticipantController::class)->group(function () {

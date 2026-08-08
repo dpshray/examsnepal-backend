@@ -13,7 +13,7 @@ Route::prefix('teacher')->group(function(){
     Route::middleware('auth:users')
         ->controller(TeacherExamController::class)
         ->group(function(){
-            Route::apiResource('exam', TeacherExamController::class);
+            Route::apiResource('exam', TeacherExamController::class)->names('teacher.exam');
             Route::resource('exam.question', TeacherQuestionController::class)->shallow()->except(['create','edit']);
             Route::get('question/{question}', [TeacherQuestionController::class, 'show']);
             Route::post('exam/{exam}/questions/bulk-import', [TeacherQuestionController::class, 'bulkImport']);
