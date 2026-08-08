@@ -3,6 +3,7 @@
 namespace App\Models\Corporate;
 
 use App\Models\StudentAnswer;
+use App\Support\MojibakeFixer;
 use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
@@ -14,7 +15,6 @@ class CorporateQuestion extends Model implements HasMedia
     use InteractsWithMedia, HasEvents;
     const QUESTION_IMAGE = 'QUESTION_IMAGE';
     protected $fillable = [
-        'corporate_exam_id',
         'corporate_exam_section_id',
         'question',
         'description',
@@ -47,5 +47,15 @@ class CorporateQuestion extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection(self::QUESTION_IMAGE)->singleFile();
+    }
+
+    public function getQuestionAttribute(?string $value): ?string
+    {
+        return MojibakeFixer::fix($value);
+    }
+
+    public function getDescriptionAttribute(?string $value): ?string
+    {
+        return MojibakeFixer::fix($value);
     }
 }

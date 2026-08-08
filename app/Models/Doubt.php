@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\MojibakeFixer;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -44,6 +45,11 @@ class Doubt extends Model
     public function getUpdatedAtAttribute($value)
     {
         return Carbon::parse($value)->setTimezone('Asia/Kathmandu')->format('Y-m-d H:i:s');
+    }
+
+    public function getRemarkAttribute(?string $value): ?string
+    {
+        return MojibakeFixer::fix($value);
     }
 
     public function solver() {

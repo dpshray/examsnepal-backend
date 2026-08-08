@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\MojibakeFixer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\MediaLibrary\HasMedia;
@@ -100,5 +101,15 @@ class Question extends Model implements HasMedia
     public function getExplanationImageUrlAttribute(): ?string
     {
         return $this->getFirstMediaUrl(self::EXPLANATION_IMAGE) ?: null;
+    }
+
+    public function getQuestionAttribute(?string $value): ?string
+    {
+        return MojibakeFixer::fix($value);
+    }
+
+    public function getExplanationAttribute(?string $value): ?string
+    {
+        return MojibakeFixer::fix($value);
     }
 }

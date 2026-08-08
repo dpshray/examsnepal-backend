@@ -8,6 +8,7 @@ use App\Http\Resources\Corporate\CorporateQuestionCollection;
 use App\Http\Resources\Corporate\CorporateQuestionResource;
 use App\Models\Corporate\CorporateExamSection;
 use App\Models\Corporate\CorporateQuestion;
+use App\Services\QuestionWordImportService;
 use App\Traits\PaginatorTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
+use Throwable;
 
 class CorporateQuestionController extends Controller
 {
@@ -433,6 +435,110 @@ class CorporateQuestionController extends Controller
         $question->delete();
         return Response::apiSuccess('question deleted successfully');
     }
+    /**
+     * @OA\Post(
+     *     path="/corporate/exam/section/{section_id}/questions/bulk-import",
+     *     summary="Bulk import MCQ questions for a corporate exam section from a .docx file",
+     *     tags={"Corporate Exam Questions"},
+     *
+     *     @OA\Parameter(
+     *         name="section_id",
+     *         in="path",
+     *         required=true,
+     *         description="Corporate exam section ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"file"},
+     *                 @OA\Property(property="file", type="string", format="binary", description="A .docx file of MCQ questions")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Bulk import finished",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Bulk import finished"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="created_count", type="integer", example=18),
+     *                 @OA\Property(property="failed_count", type="integer", example=2),
+     *                 @OA\Property(
+     *                     property="errors",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="question_number", type="integer", example=5),
+     *                         @OA\Property(property="reason", type="string", example="Option C is missing")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    function bulkImport(Request $request, CorporateExamSection $section, QuestionWordImportService $importService)
+    {
+        $this->checkOwnership($section);
+        $request->validate([
+            'file' => 'required|mimes:docx',
+        ]);
+
+        $parsed = $importService->parse($request->file('file')->getRealPath());
+        $errors = $parsed['errors'];
+        $createdCount = 0;
+
+        foreach ($parsed['valid'] as $q) {
+            try {
+                DB::transaction(function () use ($q, $section) {
+                    $question = $section->questions()->create([
+                        'question' => $q['text'],
+                        'description' => $q['explanation'],
+                        'question_type' => 'mcq',
+                        'is_negative_marking' => false,
+                        'full_marks' => 1,
+                    ]);
+
+                    $optionLetters = ['A', 'B', 'C', 'D'];
+                    $question->options()->createMany(array_map(
+                        fn ($letter) => [
+                            'option' => $q['options'][$letter]['text'],
+                            'value' => $q['options'][$letter]['is_correct'],
+                        ],
+                        $optionLetters
+                    ));
+
+                    if ($q['image']) {
+                        $question->addMediaFromString($q['image']->getImageString())
+                            ->usingFileName('question.' . $q['image']->getImageExtension())
+                            ->toMediaCollection(CorporateQuestion::QUESTION_IMAGE);
+                    }
+                });
+                $createdCount++;
+            } catch (Throwable $e) {
+                $errors[] = [
+                    'question_number' => $q['number'],
+                    'reason' => 'Failed to save: ' . $e->getMessage(),
+                ];
+            }
+        }
+
+        usort($errors, fn ($a, $b) => $a['question_number'] <=> $b['question_number']);
+
+        return Response::apiSuccess('Bulk import finished', [
+            'created_count' => $createdCount,
+            'failed_count' => count($errors),
+            'errors' => $errors,
+        ]);
+    }
+
     private function checkOwnership(CorporateExamSection $section)
     {
         $user=Auth::user();

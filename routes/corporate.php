@@ -27,6 +27,7 @@ Route::prefix('corporate')->group(function () {
         Route::apiResource('exam', CorporateExamController::class)->scoped(['exam'=>'slug'])->names('corporate.exam');
         Route::apiResource('exam.section', CorporateExamSectionController::class)->scoped(['exam'=>'slug','section'=>'slug']);
         Route::apiResource('exam/section.questions', CorporateQuestionController::class)->scoped(['section'=>'slug']);
+        Route::post('exam/section/{section}/questions/bulk-import', [CorporateQuestionController::class, 'bulkImport']);
         Route::apiResource('exam/{exam}/participants', CorporateParticipantController::class);
         Route::post('participants/import', [CorporateParticipantController::class, 'store_from_excel']);
         Route::post('/exam/{exam}/participants/bulk-delete', [CorporateParticipantController::class, 'bulk_delete']);
