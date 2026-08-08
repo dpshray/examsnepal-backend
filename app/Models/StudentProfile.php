@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PaymentStatusEnum;
 use App\Enums\RequestedFromEnum;
+use App\Support\MojibakeFixer;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -157,6 +158,11 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
     public function getIsSubscriptedAttribute()
     {
         return $this->subscribed()->exists() ? 1 : 0;
+    }
+
+    public function getNameAttribute(?string $value): ?string
+    {
+        return MojibakeFixer::fix($value);
     }
     public function subscriptions()
     {

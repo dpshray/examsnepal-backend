@@ -38,6 +38,8 @@ class RepairMojibake extends Command
         ['corporate_questions', 'question'],
         ['corporate_questions', 'description'],
         ['corporate_question_options', 'option'],
+        ['users', 'fullname'],
+        ['student_profiles', 'name'],
     ];
 
     public function handle(): int

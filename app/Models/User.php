@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\RoleEnum;
+use App\Support\MojibakeFixer;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -110,5 +111,10 @@ class User extends Authenticatable implements JWTSubject
     public function isAdmin()
     {
         return $this->role->name == RoleEnum::ADMIN->value;
+    }
+
+    public function getFullnameAttribute(?string $value): ?string
+    {
+        return MojibakeFixer::fix($value);
     }
 }
