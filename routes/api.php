@@ -27,6 +27,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Contact\ContactController;
 use App\Http\Controllers\Corporate\CorporateExamController;
 use App\Http\Controllers\ExamCategoryController;
+use App\Http\Controllers\Frontend\ExamGuideController;
 use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
@@ -378,4 +379,19 @@ Route::controller(StudentSubmitAnswersController::class)->group(function () {
 Route::controller(FrontendController::class)->group(function () {
     Route::get('/dashboard', 'dashboard');
     Route::get('free/search-questions', 'searchQuestions');
+    Route::get('free/mcq/{slug}', 'showQuestionBySlug');
+    Route::get('free/mcq/{slug}/comments', 'questionComments');
+    Route::post('free/mcq/{slug}/comments', 'storeQuestionComment')->middleware('throttle:20,1');
+    Route::get('free/exam-categories', 'examCategories');
+    Route::get('free/exam-categories/{categorySlug}/questions', 'questionsByCategory');
+    Route::get('sitemap/mcq-meta', 'sitemapMcqMeta');
+    Route::get('sitemap/mcqs', 'sitemapMcqs');
+});
+
+// Exam-guide hub-and-spoke SEO pages (/exams/*) - distinct from the
+// MCQ-browsing "free/exam-categories" above, which is ExamType-based.
+Route::controller(ExamGuideController::class)->group(function () {
+    Route::get('free/exam-guides/categories', 'categories');
+    Route::get('free/exam-guides/categories/{categorySlug}', 'category');
+    Route::get('free/exam-guides/{categorySlug}/{examSlug}', 'guide');
 });

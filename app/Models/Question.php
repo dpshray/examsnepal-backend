@@ -3,14 +3,16 @@
 namespace App\Models;
 
 use App\Support\MojibakeFixer;
+use App\Traits\SlugTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class Question extends Model implements HasMedia
 {
-    use InteractsWithMedia;
+    use InteractsWithMedia, SlugTrait;
 
     const QUESTION_IMAGE = 'QUESTION_IMAGE';
     const EXPLANATION_IMAGE = 'EXPLANATION_IMAGE';
@@ -66,6 +68,16 @@ class Question extends Model implements HasMedia
         return $this->belongsTo(Exam::class, 'exam_id');
     }
 
+    public function examType()
+    {
+        return $this->belongsTo(ExamType::class, 'exam_type_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(QuestionComment::class);
+    }
+
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class, 'question_id');
@@ -111,5 +123,20 @@ class Question extends Model implements HasMedia
     public function getExplanationAttribute(?string $value): ?string
     {
         return MojibakeFixer::fix($value);
+    }
+
+    /**
+     * SlugTrait reads the column named here. Question text can run to a full
+     * paragraph, so we slug from a truncated virtual attribute instead of the
+     * raw column to keep URLs reasonable.
+     */
+    public function slugSource()
+    {
+        return 'slug_source';
+    }
+
+    public function getSlugSourceAttribute(): string
+    {
+        return Str::words(strip_tags((string) $this->question), 12, '');
     }
 }

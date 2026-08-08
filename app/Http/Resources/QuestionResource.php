@@ -18,10 +18,11 @@ class QuestionResource extends JsonResource
         return [
             'id' => $this->id,
             'exam_id' => $this->exam_id,
+            'slug' => $this->slug,
             'question' => $this->question,
             'explanation' => $this->explanation,
             'options' => $this->whenLoaded('options'),
-            'user_choosed' => $this->student_answers->count() ? $this->student_answers->first()->selected_option_id : null 
+            'user_choosed' => $this->student_answers->count() ? $this->student_answers->first()->selected_option_id : null
         ];
     }
 }

@@ -2,15 +2,21 @@
 
 namespace App\Models;
 
+use App\Traits\SlugTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ExamType extends Model
 {
     //
-    use HasFactory;
+    use HasFactory, SlugTrait;
 
     protected $fillable = ['name', 'is_active'];
+
+    public function slugSource()
+    {
+        return 'name';
+    }
 
     protected function casts(): array
     {
