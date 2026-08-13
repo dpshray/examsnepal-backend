@@ -1,8 +1,14 @@
 <?php
 
+use App\Http\Controllers\Corporate\Classroom\ClassExamController;
+use App\Http\Controllers\Corporate\Classroom\ClassMeetingLinkController;
+use App\Http\Controllers\Corporate\Classroom\ClassNoteController;
+use App\Http\Controllers\Corporate\Classroom\ClassroomController;
+use App\Http\Controllers\Corporate\Classroom\ClassStudentController;
 use App\Http\Controllers\Corporate\CorporateAuthController;
 use App\Http\Controllers\Corporate\CorporateExamController;
 use App\Http\Controllers\Corporate\CorporateExamSectionController;
+use App\Http\Controllers\Corporate\CorporateProfileController;
 use App\Http\Controllers\Corporate\CorporateQuestionController;
 use App\Http\Controllers\Corporate\Dashboard\CorporateDashboardController;
 use App\Http\Controllers\Corporate\Exam\AddParticipantToExamController;
@@ -50,6 +56,10 @@ Route::prefix('corporate')->group(function () {
         Route::controller(CorporateDashboardController::class)->group(function (){
             Route::get('/dashboard','dashboard');
         });
+        Route::controller(CorporateProfileController::class)->prefix('profile')->group(function () {
+            Route::get('/', 'show');
+            Route::post('/', 'update');
+        });
         Route::get('/exams/{exam}/download-results', [ExamResultController::class, 'downloadExamResults']);
         Route::get('/exam/{exam}/get-participant',[CorporateExamSectionController::class,'participantList']);
         Route::controller(CorporateResultController::class)->group(function(){
@@ -62,5 +72,30 @@ Route::prefix('corporate')->group(function () {
         Route::post('/groups/{group}/members/bulk-delete',[CorporateParticipantGroupController::class,'bulk_delete']);
         Route::post('/groups/{group}/members/bulk-upload',[CorporateParticipantGroupController::class,'bulk_upload']);
         Route::post('exams/{exam}/send-invitations', [CorporateExamController::class, 'send_email']);
+
+        Route::apiResource('classes', ClassroomController::class)->scoped(['class' => 'slug']);
+        Route::prefix('classes/{class}')->group(function () {
+            Route::get('notes', [ClassNoteController::class, 'index']);
+            Route::post('notes', [ClassNoteController::class, 'store']);
+            Route::post('notes/{note}', [ClassNoteController::class, 'update']);
+            Route::delete('notes/{note}', [ClassNoteController::class, 'destroy']);
+
+            Route::get('exams', [ClassExamController::class, 'index']);
+            Route::get('available-exams', [ClassExamController::class, 'available']);
+            Route::post('exams', [ClassExamController::class, 'store']);
+            Route::delete('exams/{exam}', [ClassExamController::class, 'destroy']);
+
+            Route::get('students', [ClassStudentController::class, 'index']);
+            Route::post('students', [ClassStudentController::class, 'store']);
+            Route::patch('students/{student}', [ClassStudentController::class, 'update']);
+            Route::delete('students/{student}', [ClassStudentController::class, 'destroy']);
+            Route::post('students/bulk-upload', [ClassStudentController::class, 'bulk_upload']);
+            Route::post('students/bulk-delete', [ClassStudentController::class, 'bulk_delete']);
+
+            Route::get('meeting-links', [ClassMeetingLinkController::class, 'index']);
+            Route::post('meeting-links', [ClassMeetingLinkController::class, 'store']);
+            Route::put('meeting-links/{meetingLink}', [ClassMeetingLinkController::class, 'update']);
+            Route::delete('meeting-links/{meetingLink}', [ClassMeetingLinkController::class, 'destroy']);
+        });
     });
 });

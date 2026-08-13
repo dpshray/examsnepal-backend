@@ -57,6 +57,7 @@ use App\Models\PromoCode;
 use Illuminate\Support\Facades\Log;
 
 require __DIR__ . '/corporate.php';
+require __DIR__ . '/institute.php';
 require __DIR__ . '/payment.php';
 require __DIR__ . '/teacher.php';
 require __DIR__ . '/testing.php';

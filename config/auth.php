@@ -55,6 +55,10 @@ return [
             'driver'   => 'jwt',
             'provider' => 'participants',
         ],
+        'institute_student' => [
+            'driver'   => 'jwt',
+            'provider' => 'institute_students',
+        ],
     ],
 
     /*
@@ -87,6 +91,10 @@ return [
         'participants' => [
             'driver' => 'eloquent',
             'model'  => App\Models\Participant::class,
+        ],
+        'institute_students' => [
+            'driver' => 'eloquent',
+            'model'  => App\Models\InstituteStudent::class,
         ],
     ],
 

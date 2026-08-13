@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class StudentExam extends Model
@@ -9,6 +10,7 @@ class StudentExam extends Model
     protected $fillable = [
         'exam_id',
         'student_id',
+        'institute_student_id',
         'first_time_token',
         'is_exam_completed'
     ];
@@ -18,8 +20,25 @@ class StudentExam extends Model
         return [
             'id' => 'integer',
             'exam_id' => 'integer',
-            'student_id' => 'integer'
+            'student_id' => 'integer',
+            'institute_student_id' => 'integer',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (StudentExam $model) {
+            if (is_null($model->student_id) === is_null($model->institute_student_id)) {
+                throw new \RuntimeException('StudentExam must belong to exactly one of student_id or institute_student_id.');
+            }
+        });
+    }
+
+    protected function source(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->institute_student_id !== null ? 'institute' : 'app',
+        );
     }
 
     public function answers()
@@ -35,6 +54,11 @@ class StudentExam extends Model
     function student()
     {
         return $this->belongsTo(StudentProfile::class, 'student_id');
+    }
+
+    function institute_student()
+    {
+        return $this->belongsTo(InstituteStudent::class, 'institute_student_id');
     }
 
     function exams()

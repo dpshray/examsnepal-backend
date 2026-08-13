@@ -205,6 +205,11 @@ class Exam extends Model
     {
         return $this->hasMany(Doubt::class);
     }
+
+    public function classes()
+    {
+        return $this->belongsToMany(\App\Models\Corporate\Classroom::class, 'class_exams', 'exam_id', 'class_id');
+    }
     public function questions()
     {
         return $this->hasMany(Question::class);

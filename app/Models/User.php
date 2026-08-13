@@ -8,6 +8,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -31,6 +33,7 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $fillable = [
         'username',
+        'slug',
         'password',
         'fullname',
         'role',
@@ -39,6 +42,7 @@ class User extends Authenticatable implements JWTSubject
         'created_date',
         'user',
         'image',
+        'banner_image',
         'about',
         'email',
         'phone',
@@ -99,6 +103,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class);
     }
 
+    public function publishedInstituteReviews()
+    {
+        return $this->hasMany(InstituteReview::class, 'institute_id')->where('is_published', true);
+    }
+
     public function isTeacher()
     {
         return $this->role->name == RoleEnum::TEACHER->value;
@@ -108,6 +117,22 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Exam::class);
     }
+
+    public function instituteStudents()
+    {
+        return $this->hasMany(InstituteStudent::class, 'institute_id');
+    }
+
+    public function instituteReviews()
+    {
+        return $this->hasMany(InstituteReview::class, 'institute_id');
+    }
+
+    public function classes()
+    {
+        return $this->hasMany(\App\Models\Corporate\Classroom::class, 'institute_id');
+    }
+
     public function isAdmin()
     {
         return $this->role->name == RoleEnum::ADMIN->value;
@@ -116,5 +141,50 @@ class User extends Authenticatable implements JWTSubject
     public function getFullnameAttribute(?string $value): ?string
     {
         return MojibakeFixer::fix($value);
+    }
+
+    public function logoUrl(): ?string
+    {
+        return $this->resolveStoredFileUrl($this->image);
+    }
+
+    public function bannerUrl(): ?string
+    {
+        return $this->resolveStoredFileUrl($this->banner_image);
+    }
+
+    private function resolveStoredFileUrl(?string $path): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        if (Str::startsWith($path, ['http://', 'https://'])) {
+            return $path;
+        }
+
+        return Storage::disk('public')->url($path);
+    }
+
+    /**
+     * Build a URL-safe slug from $source, unique across all users.
+     * Used for public institute links (examsnepal.com/institute/{slug}).
+     */
+    public static function generateUniqueSlug(string $source, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($source) ?: 'institute';
+        $slug = $base;
+        $suffix = 2;
+
+        while (
+            static::where('slug', $slug)
+                ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+                ->exists()
+        ) {
+            $slug = "{$base}-{$suffix}";
+            $suffix++;
+        }
+
+        return $slug;
     }
 }

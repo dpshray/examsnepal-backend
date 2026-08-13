@@ -36,14 +36,17 @@ class TeacherExamSubmissionDetailResource extends JsonResource
             ];
         });
 
+        $identity = $this->institute_student_id ? $this->institute_student : $this->student;
+
         return [
             'id' => $this->id,
-            'student' => $this->whenLoaded('student', fn () => [
-                'id' => $this->student->id,
-                'name' => $this->student->name,
-                'email' => $this->student->email,
-                'phone' => $this->student->phone,
-            ]),
+            'source' => $this->source,
+            'student' => $identity ? [
+                'id' => $identity->id,
+                'name' => $identity->name,
+                'email' => $identity->email,
+                'phone' => $identity->phone,
+            ] : null,
             'submitted_at' => $this->created_at?->toDateTimeString(),
             'score' => $score,
             'questions' => $questions,

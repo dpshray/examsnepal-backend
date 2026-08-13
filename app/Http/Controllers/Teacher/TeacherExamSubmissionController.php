@@ -52,18 +52,19 @@ class TeacherExamSubmissionController extends Controller
             ->select([
                 'student_exams.id',
                 'student_exams.student_id',
+                'student_exams.institute_student_id',
                 'student_exams.exam_id',
                 'student_exams.created_at',
             ])
-            ->with(['student:id,name,email,phone', 'exam.questions'])
+            ->with(['student:id,name,email,phone', 'institute_student:id,name,email,phone', 'exam.questions'])
             ->withCount([
                 'correct_answers as correct_answer_count',
                 'incorrect_answers as incorrect_answer_count',
             ])
-            ->when($search, fn ($q) => $q->whereHas(
-                'student',
-                fn ($sq) => $sq->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")
-            ))
+            ->when($search, fn ($q) => $q->where(function ($q) use ($search) {
+                $q->whereHas('student', fn ($sq) => $sq->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
+                    ->orWhereHas('institute_student', fn ($sq) => $sq->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
+            }))
             ->where('is_exam_completed', 1)
             ->orderByDesc('student_exams.created_at')
             ->paginate($perPage);
@@ -103,6 +104,7 @@ class TeacherExamSubmissionController extends Controller
             ])
             ->with([
                 'student:id,name,email,phone',
+                'institute_student:id,name,email,phone',
                 'exam.questions.options',
                 'answers',
             ])
@@ -132,7 +134,7 @@ class TeacherExamSubmissionController extends Controller
         $this->isExamOwner($exam);
 
         $studentExams = $exam->student_exams()
-            ->with(['student:id,name', 'exam.questions'])
+            ->with(['student:id,name', 'institute_student:id,name', 'exam.questions'])
             ->withCount([
                 'correct_answers as correct_answer_count',
                 'incorrect_answers as incorrect_answer_count',
@@ -145,7 +147,7 @@ class TeacherExamSubmissionController extends Controller
             $score = $scoreService->fetchExamScore($studentExam);
 
             return [
-                'name' => $studentExam->student->name ?? 'Unknown',
+                'name' => $studentExam->student->name ?? $studentExam->institute_student->name ?? 'Unknown',
                 'score' => $score['final_exam_marks_after_reduction_of_negative_marking_point'],
             ];
         })->sortByDesc('score')->values();

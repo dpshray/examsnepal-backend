@@ -167,6 +167,7 @@ class CorporateAuthController extends Controller
         $data['role_id'] = RoleEnum::CORPORATE->value;
         $user = User::create([
             'username' => $data['username'],
+            'slug' => User::generateUniqueSlug($data['username']),
             'fullname' => $data['fullname'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
