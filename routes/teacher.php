@@ -17,6 +17,7 @@ Route::prefix('teacher')->group(function(){
             Route::resource('exam.question', TeacherQuestionController::class)->shallow()->except(['create','edit']);
             Route::get('question/{question}', [TeacherQuestionController::class, 'show']);
             Route::post('exam/{exam}/questions/bulk-import', [TeacherQuestionController::class, 'bulkImport']);
+            Route::post('exam/{exam}/questions/bulk-import/publish', [TeacherQuestionController::class, 'publishBulkImport']);
             Route::get('exam/{exam}/submissions/export', [TeacherExamSubmissionController::class, 'export']);
             Route::get('exam/{exam}/submissions', [TeacherExamSubmissionController::class, 'index']);
             Route::get('exam/{exam}/submissions/{studentExam}', [TeacherExamSubmissionController::class, 'show']);

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Corporate;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Corporate\Question\CorporateBulkPublishQuestionRequest;
 use App\Http\Requests\Corporate\Question\CorporateQuestionRequest;
 use App\Http\Resources\Corporate\CorporateQuestionCollection;
 use App\Http\Resources\Corporate\CorporateQuestionResource;
 use App\Models\Corporate\CorporateExamSection;
 use App\Models\Corporate\CorporateQuestion;
 use App\Services\QuestionWordImportService;
+use App\Support\DataUriImage;
 use App\Traits\PaginatorTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
+use PhpOffice\PhpWord\Element\Image;
 use Throwable;
 
 class CorporateQuestionController extends Controller
@@ -484,6 +487,11 @@ class CorporateQuestionController extends Controller
      *     )
      * )
      */
+    /**
+     * Parse an uploaded .docx into question DTOs for the admin to preview and
+     * edit in the browser. Nothing is written to the database here - see
+     * publishBulkImport() for the step that actually creates records.
+     */
     function bulkImport(Request $request, CorporateExamSection $section, QuestionWordImportService $importService)
     {
         $this->checkOwnership($section);
@@ -492,10 +500,27 @@ class CorporateQuestionController extends Controller
         ]);
 
         $parsed = $importService->parse($request->file('file')->getRealPath());
-        $errors = $parsed['errors'];
+
+        return Response::apiSuccess('Parsed ' . count($parsed['valid']) . ' question(s)', [
+            'valid' => array_map([$this, 'questionToPreview'], $parsed['valid']),
+            'errors' => $parsed['errors'],
+        ]);
+    }
+
+    /**
+     * Create questions from the (possibly admin-edited) JSON produced by the
+     * preview step above. This is the only step in the bulk-import flow that
+     * writes to the database.
+     */
+    function publishBulkImport(CorporateBulkPublishQuestionRequest $request, CorporateExamSection $section)
+    {
+        $this->checkOwnership($section);
+
+        $questions = $request->validated()['questions'];
+        $errors = [];
         $createdCount = 0;
 
-        foreach ($parsed['valid'] as $q) {
+        foreach ($questions as $index => $q) {
             try {
                 DB::transaction(function () use ($q, $section) {
                     $question = $section->questions()->create([
@@ -506,37 +531,64 @@ class CorporateQuestionController extends Controller
                         'full_marks' => 1,
                     ]);
 
-                    $optionLetters = ['A', 'B', 'C', 'D'];
                     $question->options()->createMany(array_map(
-                        fn ($letter) => [
-                            'option' => $q['options'][$letter]['text'],
-                            'value' => $q['options'][$letter]['is_correct'],
+                        fn ($option) => [
+                            'option' => $option['text'],
+                            'value' => $option['is_correct'],
                         ],
-                        $optionLetters
+                        $q['options']
                     ));
 
-                    if ($q['image']) {
-                        $question->addMediaFromString($q['image']->getImageString())
-                            ->usingFileName('question.' . $q['image']->getImageExtension())
+                    if (!empty($q['image_data_uri'])) {
+                        $image = DataUriImage::decode($q['image_data_uri']);
+                        $question->addMediaFromString($image['binary'])
+                            ->usingFileName('question.' . $image['extension'])
                             ->toMediaCollection(CorporateQuestion::QUESTION_IMAGE);
                     }
                 });
                 $createdCount++;
             } catch (Throwable $e) {
                 $errors[] = [
-                    'question_number' => $q['number'],
+                    'question_number' => $index + 1,
                     'reason' => 'Failed to save: ' . $e->getMessage(),
                 ];
             }
         }
-
-        usort($errors, fn ($a, $b) => $a['question_number'] <=> $b['question_number']);
 
         return Response::apiSuccess('Bulk import finished', [
             'created_count' => $createdCount,
             'failed_count' => count($errors),
             'errors' => $errors,
         ]);
+    }
+
+    /**
+     * Convert a parsed question (which may hold raw PHPWord Image objects)
+     * into a JSON-safe shape for the preview response.
+     */
+    private function questionToPreview(array $q): array
+    {
+        $q['image'] = $this->imageToPreview($q['image']);
+
+        foreach ($q['options'] as $letter => $option) {
+            $q['options'][$letter]['image'] = $this->imageToPreview($option['image']);
+        }
+
+        unset($q['explanation_image']);
+
+        return $q;
+    }
+
+    private function imageToPreview(?Image $image): ?array
+    {
+        if ($image === null) {
+            return null;
+        }
+
+        return [
+            'data_uri' => 'data:' . $image->getImageType() . ';base64,' . $image->getImageStringData(true),
+            'filename' => 'image.' . $image->getImageExtension(),
+        ];
     }
 
     private function checkOwnership(CorporateExamSection $section)

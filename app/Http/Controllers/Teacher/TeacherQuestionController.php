@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Question\AdminStoreQuestionRequest;
 use App\Models\Exam;
 use App\Http\Requests\StoreExamRequest;
+use App\Http\Requests\Teacher\TeacherBulkPublishQuestionRequest;
 use App\Http\Requests\Teacher\TeacherQuestionStoreRequest;
 use App\Http\Requests\UpdateExamRequest;
 use App\Http\Resources\QuestionResource;
@@ -17,12 +18,14 @@ use App\Models\Question;
 use App\Models\StudentProfile;
 use App\Services\FCMService;
 use App\Services\QuestionWordImportService;
+use App\Support\DataUriImage;
 use App\Traits\PaginatorTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use PhpOffice\PhpWord\Element\Image;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
@@ -303,6 +306,11 @@ class TeacherQuestionController extends Controller
      *     )
      * )
      */
+    /**
+     * Parse an uploaded .docx into question DTOs for the admin to preview and
+     * edit in the browser. Nothing is written to the database here - see
+     * publishBulkImport() for the step that actually creates records.
+     */
     public function bulkImport(Request $request, Exam $exam, QuestionWordImportService $importService)
     {
         $this->isExamOwner($exam);
@@ -311,11 +319,28 @@ class TeacherQuestionController extends Controller
         ]);
 
         $parsed = $importService->parse($request->file('file')->getRealPath());
-        $errors = $parsed['errors'];
+
+        return Response::apiSuccess('Parsed ' . count($parsed['valid']) . ' question(s)', [
+            'valid' => array_map([$this, 'questionToPreview'], $parsed['valid']),
+            'errors' => $parsed['errors'],
+        ]);
+    }
+
+    /**
+     * Create questions from the (possibly admin-edited) JSON produced by the
+     * preview step above. This is the only step in the bulk-import flow that
+     * writes to the database.
+     */
+    public function publishBulkImport(TeacherBulkPublishQuestionRequest $request, Exam $exam)
+    {
+        $this->isExamOwner($exam);
+
+        $questions = $request->validated()['questions'];
+        $errors = [];
         $createdCount = 0;
         $addedBy = Auth::guard('users')->id();
 
-        foreach ($parsed['valid'] as $q) {
+        foreach ($questions as $index => $q) {
             try {
                 DB::transaction(function () use ($q, $exam, $addedBy) {
                     $question = $exam->questions()->create([
@@ -325,53 +350,80 @@ class TeacherQuestionController extends Controller
                         'added_by' => $addedBy,
                     ]);
 
-                    $optionLetters = ['A', 'B', 'C', 'D'];
                     $createdOptions = $question->options()->createMany(array_map(
-                        fn ($letter) => [
-                            'option' => $q['options'][$letter]['text'],
-                            'value' => $q['options'][$letter]['is_correct'],
+                        fn ($option) => [
+                            'option' => $option['text'],
+                            'value' => $option['is_correct'],
                         ],
-                        $optionLetters
+                        $q['options']
                     ));
 
-                    foreach ($optionLetters as $index => $letter) {
-                        $image = $q['options'][$letter]['image'] ?? null;
-                        if ($image) {
-                            $createdOptions[$index]
-                                ->addMediaFromString($image->getImageString())
-                                ->usingFileName('option_' . strtolower($letter) . '.' . $image->getImageExtension())
+                    foreach ($q['options'] as $optIndex => $option) {
+                        if (!empty($option['image_data_uri'])) {
+                            $image = DataUriImage::decode($option['image_data_uri']);
+                            $createdOptions[$optIndex]
+                                ->addMediaFromString($image['binary'])
+                                ->usingFileName('option_' . $optIndex . '.' . $image['extension'])
                                 ->toMediaCollection(OptionQuestion::OPTION_IMAGE);
                         }
                     }
 
-                    if ($q['image']) {
-                        $question->addMediaFromString($q['image']->getImageString())
-                            ->usingFileName('question.' . $q['image']->getImageExtension())
+                    if (!empty($q['image_data_uri'])) {
+                        $image = DataUriImage::decode($q['image_data_uri']);
+                        $question->addMediaFromString($image['binary'])
+                            ->usingFileName('question.' . $image['extension'])
                             ->toMediaCollection(Question::QUESTION_IMAGE);
                     }
 
-                    if ($q['explanation_image']) {
-                        $question->addMediaFromString($q['explanation_image']->getImageString())
-                            ->usingFileName('explanation.' . $q['explanation_image']->getImageExtension())
+                    if (!empty($q['explanation_image_data_uri'])) {
+                        $image = DataUriImage::decode($q['explanation_image_data_uri']);
+                        $question->addMediaFromString($image['binary'])
+                            ->usingFileName('explanation.' . $image['extension'])
                             ->toMediaCollection(Question::EXPLANATION_IMAGE);
                     }
                 });
                 $createdCount++;
             } catch (Throwable $e) {
                 $errors[] = [
-                    'question_number' => $q['number'],
+                    'question_number' => $index + 1,
                     'reason' => 'Failed to save: ' . $e->getMessage(),
                 ];
             }
         }
-
-        usort($errors, fn ($a, $b) => $a['question_number'] <=> $b['question_number']);
 
         return Response::apiSuccess('Bulk import finished', [
             'created_count' => $createdCount,
             'failed_count' => count($errors),
             'errors' => $errors,
         ]);
+    }
+
+    /**
+     * Convert a parsed question (which may hold raw PHPWord Image objects)
+     * into a JSON-safe shape for the preview response.
+     */
+    private function questionToPreview(array $q): array
+    {
+        $q['image'] = $this->imageToPreview($q['image']);
+        $q['explanation_image'] = $this->imageToPreview($q['explanation_image']);
+
+        foreach ($q['options'] as $letter => $option) {
+            $q['options'][$letter]['image'] = $this->imageToPreview($option['image']);
+        }
+
+        return $q;
+    }
+
+    private function imageToPreview(?Image $image): ?array
+    {
+        if ($image === null) {
+            return null;
+        }
+
+        return [
+            'data_uri' => 'data:' . $image->getImageType() . ';base64,' . $image->getImageStringData(true),
+            'filename' => 'image.' . $image->getImageExtension(),
+        ];
     }
 
     /**
