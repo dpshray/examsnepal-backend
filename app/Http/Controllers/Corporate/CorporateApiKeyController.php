@@ -18,16 +18,17 @@ class CorporateApiKeyController extends Controller
     {
         $user = Auth::guard('users')->user();
         if (!$user) {
-            return Response::apiError('Unauthorized', 401);
+            return Response::apiError('Unauthorized', null, 401);
         }
 
         $apiKey = $user->ensureApiSecretKey();
+        $slug = $user->ensureSlug();
 
         return Response::apiSuccess('Institute API key retrieved', [
             'api_secret_key' => $apiKey,
             'api_secret_key_rotated_at' => $user->api_secret_key_rotated_at,
             'sandbox_test_key' => self::SANDBOX_TEST_KEY,
-            'institute_slug' => $user->slug ?: $user->username,
+            'institute_slug' => $slug,
             'docs_url' => 'https://www.examsnepal.com/institute-api',
         ]);
     }
@@ -39,16 +40,17 @@ class CorporateApiKeyController extends Controller
     {
         $user = Auth::guard('users')->user();
         if (!$user) {
-            return Response::apiError('Unauthorized', 401);
+            return Response::apiError('Unauthorized', null, 401);
         }
 
         $newKey = $user->generateApiSecretKey();
+        $slug = $user->ensureSlug();
 
         return Response::apiSuccess('API secret key regenerated successfully. Your previous key has been invalidated.', [
             'api_secret_key' => $newKey,
             'api_secret_key_rotated_at' => $user->api_secret_key_rotated_at,
             'sandbox_test_key' => self::SANDBOX_TEST_KEY,
-            'institute_slug' => $user->slug ?: $user->username,
+            'institute_slug' => $slug,
             'docs_url' => 'https://www.examsnepal.com/institute-api',
         ]);
     }

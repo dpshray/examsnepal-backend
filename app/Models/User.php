@@ -80,6 +80,21 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Ensure the user has a slug.
+     */
+    public function ensureSlug(): string
+    {
+        if (!empty($this->slug)) {
+            return $this->slug;
+        }
+
+        $source = $this->username ?: $this->org ?: $this->fullname ?: 'institute';
+        $slug = static::generateUniqueSlug($source, $this->id);
+        $this->update(['slug' => $slug]);
+        return $slug;
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>
