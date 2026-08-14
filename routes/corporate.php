@@ -5,6 +5,7 @@ use App\Http\Controllers\Corporate\Classroom\ClassMeetingLinkController;
 use App\Http\Controllers\Corporate\Classroom\ClassNoteController;
 use App\Http\Controllers\Corporate\Classroom\ClassroomController;
 use App\Http\Controllers\Corporate\Classroom\ClassStudentController;
+use App\Http\Controllers\Corporate\CorporateApiKeyController;
 use App\Http\Controllers\Corporate\CorporateAuthController;
 use App\Http\Controllers\Corporate\CorporateExamController;
 use App\Http\Controllers\Corporate\CorporateExamSectionController;
@@ -60,6 +61,8 @@ Route::prefix('corporate')->group(function () {
             Route::get('/', 'show');
             Route::post('/', 'update');
         });
+        Route::get('api-key', [CorporateApiKeyController::class, 'show']);
+        Route::post('api-key/regenerate', [CorporateApiKeyController::class, 'regenerate']);
         Route::get('/exams/{exam}/download-results', [ExamResultController::class, 'downloadExamResults']);
         Route::get('/exam/{exam}/get-participant',[CorporateExamSectionController::class,'participantList']);
         Route::controller(CorporateResultController::class)->group(function(){

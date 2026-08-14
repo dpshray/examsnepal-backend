@@ -51,7 +51,34 @@ class User extends Authenticatable implements JWTSubject
         'twitter',
         'linkedin',
         'org',
+        'api_secret_key',
+        'api_secret_key_rotated_at',
     ];
+
+    /**
+     * Generate or rotate API secret key for corporate institute.
+     */
+    public function generateApiSecretKey(): string
+    {
+        $key = 'en_sec_' . bin2hex(random_bytes(16));
+        $this->update([
+            'api_secret_key' => $key,
+            'api_secret_key_rotated_at' => now(),
+        ]);
+        return $key;
+    }
+
+    /**
+     * Ensure the user has an API secret key.
+     */
+    public function ensureApiSecretKey(): string
+    {
+        if (!empty($this->api_secret_key)) {
+            return $this->api_secret_key;
+        }
+        return $this->generateApiSecretKey();
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

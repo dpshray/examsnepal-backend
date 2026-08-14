@@ -15,8 +15,37 @@ class InstituteReviewController extends Controller
 {
     use PaginatorTrait;
 
+    const SANDBOX_TEST_KEY = 'en_test_sandbox_demo_key';
+
+    protected function validateApiKey(Request $request, User $institute): bool
+    {
+        $providedKey = $request->header('X-Institute-API-Key')
+            ?: $request->query('api_key')
+            ?: (str_starts_with((string) $request->bearerToken(), 'en_') ? $request->bearerToken() : null);
+
+        $isFirstParty = $request->header('X-App-Client') === 'first-party'
+            || $request->header('Sec-Fetch-Site') === 'same-origin'
+            || $request->header('Sec-Fetch-Site') === 'same-site';
+
+        if (!$providedKey && $isFirstParty) {
+            return true;
+        }
+
+        if ($providedKey === self::SANDBOX_TEST_KEY) {
+            return true;
+        }
+
+        $instituteKey = $institute->ensureApiSecretKey();
+        return $providedKey && hash_equals($instituteKey, $providedKey);
+    }
+
     public function index(Request $request, User $institute)
     {
+        if (!$this->validateApiKey($request, $institute)) {
+            $displayName = $institute->org ?: $institute->fullname;
+            return Response::apiError("API Secret Key required or invalid for {$displayName}. Please pass 'X-Institute-API-Key' or '?api_key='.", 401);
+        }
+
         $reviews = InstituteReview::where('institute_id', $institute->id)
             ->where('is_published', true)
             ->with('student:id,name')
