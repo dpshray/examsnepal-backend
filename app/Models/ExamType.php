@@ -30,6 +30,16 @@ class ExamType extends Model
         return $this->hasMany(Exam::class); // One Exam Type has many Exams
     }
 
+    public function tags()
+    {
+        return $this->belongsToMany(
+            ExamTag::class,
+            'exam_type_tag',
+            'exam_type_id',
+            'exam_tag_id'
+        )->withTimestamps();
+    }
+
     function scopeActive($qry) {
         return $qry->where('is_active',true);
     }

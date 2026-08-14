@@ -7,6 +7,7 @@ use App\Http\Resources\Admin\Exam\Type\AdminExamTypeResource;
 use App\Models\ExamType;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
 class AdminExamTypeController extends Controller
@@ -87,7 +88,8 @@ class AdminExamTypeController extends Controller
         $per_page = $request->query('per_page', 99);
         $search = $request->query('search');
         $status = $request->query('status');
-        $examtype = ExamType::when($search, fn($qry) => $qry->where('name', 'like', '%' . $search . '%'))
+        $examtype = ExamType::with(['tags:id,name,slug'])
+            ->when($search, fn($qry) => $qry->where('name', 'like', '%' . $search . '%'))
             ->when($status, fn($qry) => $qry->where('is_active', $status))
             ->orderBy('id', 'DESC')
             ->paginate($per_page);
@@ -148,6 +150,7 @@ class AdminExamTypeController extends Controller
      */
     function show(ExamType $examtype)
     {
+        $examtype->load('tags:id,name,slug');
         $data = new AdminExamTypeResource($examtype);
         return Response::apiSuccess("Exam type", $data);
     }
@@ -192,8 +195,18 @@ class AdminExamTypeController extends Controller
         $data = $request->validate([
             'name' => 'required',
             'is_active' => 'required',
+            'tags' => 'nullable|array',
+            'tags.*' => 'integer|exists:exam_tags,id',
         ]);
-        $examtype = ExamType::create($data);
+
+        DB::transaction(function () use ($data) {
+            $examtype = ExamType::create([
+                'name' => $data['name'],
+                'is_active' => $data['is_active'],
+            ]);
+            $examtype->tags()->sync($data['tags'] ?? []);
+        });
+
         return Response::apiSuccess("Exam type created successfully");
     }
     /**
@@ -244,8 +257,18 @@ class AdminExamTypeController extends Controller
         $data = $request->validate([
             'name' => 'required',
             'is_active' => 'required',
+            'tags' => 'nullable|array',
+            'tags.*' => 'integer|exists:exam_tags,id',
         ]);
-        $examtype->update($data);
+
+        DB::transaction(function () use ($data, $examtype) {
+            $examtype->update([
+                'name' => $data['name'],
+                'is_active' => $data['is_active'],
+            ]);
+            $examtype->tags()->sync($data['tags'] ?? []);
+        });
+
         return Response::apiSuccess("Exam type updated successfully");
     }
     /**

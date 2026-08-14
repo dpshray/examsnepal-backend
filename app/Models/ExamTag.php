@@ -22,6 +22,15 @@ class ExamTag extends Model
             'exam_id'
         )->withTimestamps();
     }
+    public function examTypes()
+    {
+        return $this->belongsToMany(
+            ExamType::class,
+            'exam_type_tag',
+            'exam_tag_id',
+            'exam_type_id'
+        )->withTimestamps();
+    }
     public function slugSource()
     {
         return 'name';

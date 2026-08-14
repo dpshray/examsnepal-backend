@@ -8,7 +8,7 @@ use App\Http\Resources\Student\Exam\StudentExamCompletedListCollection;
 use App\Http\Resources\Student\Exam\StudentExamListCollection;
 use App\Http\Resources\Student\Exam\StudentExamListResource;
 use App\Models\Exam;
-use App\Models\ExamTag;
+use App\Models\ExamType;
 use App\Traits\PaginatorTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -1259,12 +1259,11 @@ class QuizController extends Controller
 
     public function getTagsByExamType($examTypeId)
     {
-        $tags = ExamTag::whereHas('exams', function ($q) use ($examTypeId) {
-            $q->where('exam_type_id', $examTypeId);
-        })
-            ->select('id', 'name', 'slug')
-            ->distinct()
-            ->get();
+        $examType = ExamType::find($examTypeId);
+
+        $tags = $examType
+            ? $examType->tags()->select('exam_tags.id', 'exam_tags.name', 'exam_tags.slug')->get()->makeHidden('pivot')
+            : collect();
 
         return Response::apiSuccess('Exam tags retrieved successfully.', $tags);
     }
