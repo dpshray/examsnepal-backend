@@ -34,6 +34,7 @@ class CorporateQuestionResource extends JsonResource
                             'id' => $option->id,
                             'option' => $option->option,
                             'value' => $option->value,
+                            'image_url' => $option->image_url,
                         ];
                     }) ?? [];
                 }

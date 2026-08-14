@@ -9,6 +9,7 @@ use App\Http\Resources\Corporate\CorporateQuestionCollection;
 use App\Http\Resources\Corporate\CorporateQuestionResource;
 use App\Models\Corporate\CorporateExamSection;
 use App\Models\Corporate\CorporateQuestion;
+use App\Models\Corporate\CorporateQuestionOption;
 use App\Services\QuestionWordImportService;
 use App\Support\DataUriImage;
 use App\Traits\PaginatorTrait;
@@ -531,13 +532,23 @@ class CorporateQuestionController extends Controller
                         'full_marks' => 1,
                     ]);
 
-                    $question->options()->createMany(array_map(
+                    $createdOptions = $question->options()->createMany(array_map(
                         fn ($option) => [
                             'option' => $option['text'],
                             'value' => $option['is_correct'],
                         ],
                         $q['options']
                     ));
+
+                    foreach ($q['options'] as $optIndex => $option) {
+                        if (!empty($option['image_data_uri'])) {
+                            $image = DataUriImage::decode($option['image_data_uri']);
+                            $createdOptions[$optIndex]
+                                ->addMediaFromString($image['binary'])
+                                ->usingFileName('option_' . $optIndex . '.' . $image['extension'])
+                                ->toMediaCollection(CorporateQuestionOption::OPTION_IMAGE);
+                        }
+                    }
 
                     if (!empty($q['image_data_uri'])) {
                         $image = DataUriImage::decode($q['image_data_uri']);
