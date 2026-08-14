@@ -36,26 +36,22 @@ return Application::configure(basePath: dirname(__DIR__))
         //     }
         // });
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
-            if ($request->expectsJson()) {
-                return Response::apiError($e->getMessage() ?? 'Resource Not Found');
-            }
-        });
-        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
-            if ($request->expectsJson()) {
-                return Response::apiError('Not Found');
+            if ($request->expectsJson() || $request->is('api/*') || $request->is('corporate/*') || $request->is('institute/*')) {
+                return Response::apiError($e->getMessage() ?: 'Resource Not Found', null, 404);
             }
         });
         $exceptions->render(function (ValidationException $e, Request $request) {
-            if ($request->expectsJson()) {
+            if ($request->expectsJson() || $request->is('api/*') || $request->is('corporate/*') || $request->is('institute/*')) {
                 $flattenedErrors = collect($e->errors())->map(function ($messages) {
                     return $messages[0]; // get first error message per field
                 });
-                return Response::apiError('Validation Error', $flattenedErrors);
+                $firstMessage = collect($e->errors())->flatten()->first() ?: 'Validation error occurred';
+                return Response::apiError($firstMessage, $flattenedErrors, 422);
             }
         });
         $exceptions->render(function (HttpException $e, Request $request) {
-            if ($request->expectsJson()) {
-                return Response::apiError($e->getMessage());
+            if ($request->expectsJson() || $request->is('api/*') || $request->is('corporate/*') || $request->is('institute/*')) {
+                return Response::apiError($e->getMessage() ?: 'An error occurred', null, $e->getStatusCode());
             }
         });
     })->create();

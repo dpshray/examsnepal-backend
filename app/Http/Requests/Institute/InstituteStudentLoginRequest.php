@@ -18,4 +18,14 @@ class InstituteStudentLoginRequest extends FormRequest
             'password' => 'required|string',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Please enter your email address.',
+            'email.email' => 'Please enter a valid email address.',
+            'password.required' => 'Please enter your password.',
+        ];
+    }
 }
+

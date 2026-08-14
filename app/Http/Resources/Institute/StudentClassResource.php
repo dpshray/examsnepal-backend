@@ -26,6 +26,7 @@ class StudentClassResource extends JsonResource
             'exams_count' => $this->whenCounted('exams'),
             'notes_count' => $this->whenCounted('notes'),
             'meeting_links_count' => $this->whenCounted('meetingLinks'),
+            'students_count' => $this->whenCounted('students'),
             // Set by the controller from the student's own pivot row; null if they've never applied.
             'my_status' => $this->my_status ?? null,
         ];

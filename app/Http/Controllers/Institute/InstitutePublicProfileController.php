@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Institute;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Institute\InstituteListResource;
 use App\Http\Resources\Institute\InstitutePublicProfileResource;
+use App\Http\Resources\Institute\StudentClassResource;
+use App\Models\Corporate\Classroom;
 use App\Models\Corporate\CorporateExam;
 use App\Models\InstituteReview;
 use App\Models\InstituteStudent;
@@ -54,6 +56,15 @@ class InstitutePublicProfileController extends Controller
             'reviews_count' => (clone $publishedReviews)->count(),
         ];
 
-        return Response::apiSuccess('Institute profile', compact('profile', 'insights'));
+        $classes = Classroom::where('institute_id', $institute->id)
+            ->withCount(['exams', 'notes', 'meetingLinks', 'students'])
+            ->orderBy('name')
+            ->get();
+
+        return Response::apiSuccess('Institute profile', [
+            'profile' => $profile,
+            'insights' => $insights,
+            'classes' => StudentClassResource::collection($classes),
+        ]);
     }
 }

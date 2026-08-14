@@ -11,10 +11,15 @@ use App\Http\Controllers\Institute\StudentClassController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
-// Resolves the {institute} route parameter by slug, restricted to corporate accounts.
+// Resolves the {institute} route parameter by slug or username, restricted to corporate accounts.
 // This is what an institute's public landing page URL (examsnepal.com/institute/{slug}) uses.
 Route::bind('institute', function (string $slug) {
-    return User::where('slug', $slug)
+    return User::where(function ($query) use ($slug) {
+            $query->where('slug', $slug)
+                ->orWhere('username', $slug)
+                ->orWhereRaw('LOWER(slug) = ?', [strtolower($slug)])
+                ->orWhereRaw('LOWER(username) = ?', [strtolower($slug)]);
+        })
         ->whereHas('role', fn ($q) => $q->where('name', 'corporate'))
         ->firstOrFail();
 });
