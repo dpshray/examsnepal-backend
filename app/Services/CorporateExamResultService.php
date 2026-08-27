@@ -100,17 +100,16 @@ class CorporateExamResultService
 
     private function assignRanks($results)
     {
+        // Dense ranking: tied totals share a rank, and the next lower total gets
+        // the immediately following integer (1, 1, 2, 3 - never skips a rank).
+        // Assumes $results is already sorted by total_marks descending.
         $rankedResults = [];
         $previousMarks = null;
-        $rank = 1;
-        $sameRankCount = 0;
+        $rank = 0;
 
-        foreach ($results as $index => $result) {
-            if ($previousMarks !== null && $result['total_marks'] < $previousMarks) {
-                $rank += $sameRankCount;
-                $sameRankCount = 1;
-            } else {
-                $sameRankCount++;
+        foreach ($results as $result) {
+            if ($previousMarks === null || $result['total_marks'] < $previousMarks) {
+                $rank++;
             }
 
             $result['rank'] = $rank;
