@@ -11,7 +11,7 @@
             "description": "Localhost API Server 1"
         },
         {
-            "url": "http://192.168.1.68:8001/api/",
+            "url": "/api/",
             "description": "Localhost API Server 2"
         },
         {
@@ -2276,6 +2276,142 @@
                 }
             }
         },
+        "/admin/payment-settings": {
+            "get": {
+                "tags": [
+                    "Admin Payment Settings"
+                ],
+                "summary": "Get payment settings",
+                "description": "Display a listing of payment settings.",
+                "operationId": "0393007f9c0fa20705e790a1f8a021a4",
+                "responses": {
+                    "200": {
+                        "description": "Payment settings fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "payment settings fetched"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Esewa"
+                                                    },
+                                                    "status": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin Payment Settings"
+                ],
+                "summary": "Create or update payment setting",
+                "description": "Create or update a payment setting.",
+                "operationId": "4eb0fd279dc2f1c20404f56986086992",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Esewa"
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment setting created/updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "payment settings updated"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Esewa"
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/submit-answer": {
             "post": {
                 "tags": [
@@ -3601,6 +3737,109 @@
                                         "message": {
                                             "type": "string",
                                             "example": "transaction validation response"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/esewa/init-transaction": {
+            "post": {
+                "tags": [
+                    "Esewa"
+                ],
+                "summary": "Get logged in student question solved doubts",
+                "operationId": "transaction_begin_esewa",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "subscription_type_id"
+                                ],
+                                "properties": {
+                                    "subscription_type_id": {
+                                        "type": "integer",
+                                        "example": "127181"
+                                    },
+                                    "promo_code": {
+                                        "type": "string",
+                                        "example": "DWORK2025"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Transaction generated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "merchant_id": {
+                                                    "type": "string",
+                                                    "example": "1122"
+                                                },
+                                                "app_id": {
+                                                    "type": "string",
+                                                    "example": "AME-3541-API-2"
+                                                },
+                                                "app_name": {
+                                                    "type": "string",
+                                                    "example": "TESTER Sol"
+                                                },
+                                                "transaction_id": {
+                                                    "type": "string",
+                                                    "example": "TXN202508181158374473"
+                                                },
+                                                "transaction_date": {
+                                                    "type": "string",
+                                                    "example": "2025-08-18"
+                                                },
+                                                "ref_id": {
+                                                    "type": "string",
+                                                    "example": "REF-68a2c4914c0f1"
+                                                },
+                                                "remarks": {
+                                                    "type": "string",
+                                                    "example": "RMKS-68a2c4914c0f4"
+                                                },
+                                                "particular": {
+                                                    "type": "string",
+                                                    "example": "PART-68a2c4914c0f5"
+                                                },
+                                                "price": {
+                                                    "type": "string",
+                                                    "example": "101.00"
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "NPR"
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "vHsFl9jS95G3BnQak1hd203AJs1H2ZWdqhP5W1wJYeVIv67VNg4VieqP8d4aZlKZ93gwf04qBF1lClsenNKRujlRmwj0Xgmh9UlcDR6ri2kufbVeBcslnQnlQCPhQydI7dR+6FYgdzOml6KGxL+iAekRlpvOUeWv5f14n9f6Jj8="
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "transaction generated"
                                         }
                                     },
                                     "type": "object"
@@ -11098,195 +11337,6 @@
                 }
             }
         },
-        "/esewa/save-transaction": {
-            "post": {
-                "tags": [
-                    "Esewa"
-                ],
-                "summary": "Saves student transactions",
-                "description": "Saves student transactions.",
-                "operationId": "esewaSaveTransaction",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "student_id",
-                                    "productId",
-                                    "productName",
-                                    "totalAmount",
-                                    "environment",
-                                    "code",
-                                    "merchantName",
-                                    "message",
-                                    "date",
-                                    "status",
-                                    "refId"
-                                ],
-                                "properties": {
-                                    "studentId": {
-                                        "type": "integer",
-                                        "example": 12127
-                                    },
-                                    "productId": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "productName": {
-                                        "type": "string",
-                                        "example": "some name"
-                                    },
-                                    "totalAmount": {
-                                        "type": "string",
-                                        "example": "100.50"
-                                    },
-                                    "environment": {
-                                        "type": "string",
-                                        "example": "test"
-                                    },
-                                    "code": {
-                                        "type": "string",
-                                        "example": "00"
-                                    },
-                                    "merchantName": {
-                                        "type": "string",
-                                        "example": "EPAYTEST"
-                                    },
-                                    "message": {
-                                        "type": "string",
-                                        "example": "1"
-                                    },
-                                    "date": {
-                                        "type": "string",
-                                        "example": "Fri May 30 12:46:57 NPT 2025"
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "example": "COMPLETED"
-                                    },
-                                    "refId": {
-                                        "type": "string",
-                                        "example": "000ASZ5"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Transaction saved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "student_profile_id": {
-                                                    "type": "integer",
-                                                    "example": 12127
-                                                },
-                                                "subscription_type_id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "transaction_id": {
-                                                    "type": "string",
-                                                    "example": "000ASZ5"
-                                                },
-                                                "start_date": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2025-05-29T18:15:00.000000Z"
-                                                },
-                                                "end_date": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2025-06-29T18:15:00.000000Z"
-                                                },
-                                                "price": {
-                                                    "type": "string",
-                                                    "example": "110.00"
-                                                },
-                                                "paid": {
-                                                    "type": "string",
-                                                    "example": "100.50"
-                                                },
-                                                "subscribed_at": {
-                                                    "type": "string",
-                                                    "example": "2025-05-30 17:03:20"
-                                                },
-                                                "data": {
-                                                    "properties": {
-                                                        "studentId": {
-                                                            "type": "integer",
-                                                            "example": 12127
-                                                        },
-                                                        "productId": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "productName": {
-                                                            "type": "string",
-                                                            "example": "some name"
-                                                        },
-                                                        "totalAmount": {
-                                                            "type": "string",
-                                                            "example": "100.50"
-                                                        },
-                                                        "environment": {
-                                                            "type": "string",
-                                                            "example": "test"
-                                                        },
-                                                        "code": {
-                                                            "type": "string",
-                                                            "example": "00"
-                                                        },
-                                                        "merchantName": {
-                                                            "type": "string",
-                                                            "example": "EPAYTEST"
-                                                        },
-                                                        "message": {
-                                                            "type": "string",
-                                                            "example": "1"
-                                                        },
-                                                        "date": {
-                                                            "type": "string",
-                                                            "example": "Fri May 30 12:46:57 NPT 2025"
-                                                        },
-                                                        "status": {
-                                                            "type": "string",
-                                                            "example": "COMPLETED"
-                                                        },
-                                                        "refId": {
-                                                            "type": "string",
-                                                            "example": "000ASZ5"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Transaction saved"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/request-pool-question": {
             "get": {
                 "tags": [
@@ -18079,6 +18129,155 @@
                 }
             }
         },
+        "/teacher/doubts": {
+            "get": {
+                "tags": [
+                    "TeacherDoubt"
+                ],
+                "summary": "List doubts for the teacher's own exams",
+                "description": "Fetches student doubts raised on questions belonging to exams created by the logged-in teacher. Unlike the admin listing, this is scoped to only that teacher's exams.",
+                "operationId": "teacher_doubts_list",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "filter by student name or doubt text",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "1=unresolved, 0=resolved",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Doubt list"
+                    }
+                }
+            }
+        },
+        "/teacher/doubts/{doubt}/resolve": {
+            "post": {
+                "tags": [
+                    "TeacherDoubt"
+                ],
+                "summary": "Resolve a doubt",
+                "description": "Updates the question/explanation/options the doubt was raised on and marks the doubt resolved with an optional remark shown to the student. Only the exam's owner (or an admin) may resolve it.",
+                "operationId": "teacher_doubt_resolve",
+                "parameters": [
+                    {
+                        "name": "doubt",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Doubt resolved"
+                    }
+                }
+            }
+        },
+        "/teacher/earnings": {
+            "get": {
+                "tags": [
+                    "TeacherEarnings"
+                ],
+                "summary": "List the teacher's payout history",
+                "operationId": "teacher_earnings_list",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payout history"
+                    }
+                }
+            }
+        },
+        "/teacher/earnings/{payout}": {
+            "get": {
+                "tags": [
+                    "TeacherEarnings"
+                ],
+                "summary": "Get one payout's detail",
+                "operationId": "teacher_earnings_detail",
+                "parameters": [
+                    {
+                        "name": "payout",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payout detail"
+                    }
+                }
+            }
+        },
+        "/teacher/earnings/current-estimate": {
+            "get": {
+                "tags": [
+                    "TeacherEarnings"
+                ],
+                "summary": "Live current-month earnings estimate",
+                "description": "Computed on the fly from this month's data so far - not a finalized/persisted payout.",
+                "operationId": "teacher_earnings_current_estimate",
+                "responses": {
+                    "200": {
+                        "description": "Current estimate"
+                    }
+                }
+            }
+        },
         "/teacher/exam": {
             "get": {
                 "tags": [
@@ -18617,6 +18816,116 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/teacher/exam/{exam}/submissions": {
+            "get": {
+                "tags": [
+                    "TeacherExamSubmission"
+                ],
+                "summary": "List submissions for a teacher's exam",
+                "description": "Fetches every completed student attempt for the given exam, with score summary. Only the exam's owner (or an admin) may view this.",
+                "operationId": "teacher_exam_submissions_list",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "filter by student name/email",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Submission list"
+                    }
+                }
+            }
+        },
+        "/teacher/exam/{exam}/submissions/{studentExam}": {
+            "get": {
+                "tags": [
+                    "TeacherExamSubmission"
+                ],
+                "summary": "Get one submission's detail",
+                "description": "Fetches a single student's score plus a question-by-question breakdown (selected vs correct option) for the given exam. Only the exam's owner (or an admin) may view this.",
+                "operationId": "teacher_exam_submission_detail",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "studentExam",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Submission detail"
+                    }
+                }
+            }
+        },
+        "/teacher/exam/{exam}/submissions/export": {
+            "get": {
+                "tags": [
+                    "TeacherExamSubmission"
+                ],
+                "summary": "Export exam results summary",
+                "description": "Downloads a ranked Rank/Name/Score spreadsheet of every completed attempt for the given exam. Only the exam's owner (or an admin) may download this.",
+                "operationId": "teacher_exam_submissions_export",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Results spreadsheet (.xlsx)"
                     }
                 }
             }
@@ -19225,12 +19534,20 @@
             "description": "Notification"
         },
         {
+            "name": "Admin Payment Settings",
+            "description": "Admin Payment Settings"
+        },
+        {
             "name": "Quiz",
             "description": "Quiz"
         },
         {
             "name": "ConnectIPS",
             "description": "ConnectIPS"
+        },
+        {
+            "name": "Esewa",
+            "description": "Esewa"
         },
         {
             "name": "Users",
@@ -19317,10 +19634,6 @@
             "description": "Organizations"
         },
         {
-            "name": "Esewa",
-            "description": "Esewa"
-        },
-        {
             "name": "Pool",
             "description": "Pool"
         },
@@ -19369,8 +19682,20 @@
             "description": "Teachers"
         },
         {
+            "name": "TeacherDoubt",
+            "description": "TeacherDoubt"
+        },
+        {
+            "name": "TeacherEarnings",
+            "description": "TeacherEarnings"
+        },
+        {
             "name": "TeacherExam",
             "description": "TeacherExam"
+        },
+        {
+            "name": "TeacherExamSubmission",
+            "description": "TeacherExamSubmission"
         },
         {
             "name": "TeacherQuestion",

@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Cache;
  *     description="Localhost API Server 1"
  * ),
  * @OA\Server(
- *     url="http://192.168.1.68:8001/api/",
+ *     url="/api/",
  *     description="Localhost API Server 2"
  * ),
  * @OA\Server(
