@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\Blog\AdminBlogTagController;
 use App\Http\Controllers\Admin\Exam\Type\AdminExamTypeController;
 use App\Http\Controllers\Admin\ExamTag\AdminExamTagController;
 use App\Http\Controllers\Admin\Notification\AdminNotificationController;
+use App\Http\Controllers\Admin\Payment\AdminPaymentSettingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\Api\ForumController;
@@ -34,7 +35,6 @@ use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\Participant\ParticipantController;
-use App\Http\Controllers\Payment\EsewaController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Middleware\isStudentSubscribedMiddleware;
 use App\Models\Answersheet;
@@ -259,7 +259,7 @@ Route::middleware(['auth:api', 'verified', CheckTokenVersionMiddleware::class])-
 
     Route::get('user-subscription-status', [SubscriptionTypeController::class, 'subscribeStat']);
     Route::apiResource('subscription-type', SubscriptionTypeController::class)->names('student.subscription-type');
-    Route::post('esewa/save-transaction', [EsewaController::class, 'storeTransaction']);
+
 
     Route::post('verify-promo-code', [PromoCodeController::class, 'checkPromoCodes']);
     Route::get('notification', [NotificationController::class, 'getUserNotifications']);
@@ -350,7 +350,9 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::apiResource('admin/blog/category', AdminBlogCategoryController::class)->scoped(['category' => 'slug']);
     Route::apiResource('admin/blog/tag', AdminBlogTagController::class)->scoped(['tag' => 'slug']);
     Route::apiResource('admin/blogs', AdminBlogController::class)->scoped(['blog' => 'slug'])->names('admin.blogs');
+    Route::post('admin/payment-settings', [AdminPaymentSettingController::class, 'store']);
 });
+Route::get('admin/payment-settings', [AdminPaymentSettingController::class, 'index']);
 
 Route::controller(ParticipantController::class)->group(function () {
     Route::post('/store-participant', 'store');

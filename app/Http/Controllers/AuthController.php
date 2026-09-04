@@ -587,14 +587,14 @@ class AuthController extends Controller
      *     )
      * )
      */
-    function manualStudentEmailVerifier(Request $request, $student_profile_id) {
+    function manualStudentEmailVerifier(Request $request, $student_profile_id)
+    {
         $student_profile = StudentProfile::firstWhere('id', $student_profile_id);
         if (empty($student_profile)) {
             return Response::apiError('Student does not exists.');
         }
         $student_profile->update(['email_verified_at' => now()]);
         return Response::apiSuccess('Student email has been verified.');
-
     }
 
     /**
@@ -622,20 +622,21 @@ class AuthController extends Controller
      *     )
      * )
      */
-    function resendStudentEmailVerification(Request $request) {
+    function resendStudentEmailVerification(Request $request)
+    {
         $form_data = $request->validate([
             'email' => 'required|exists:student_profiles,email'
         ]);
         // return $requested_from;
         try {
-            DB::transaction(function () use($form_data){
+            DB::transaction(function () use ($form_data) {
                 $requested_from = RequestedFromEnum::WEB->value;
                 if (Browser::isAndroid() || Browser::isTablet()) {
                     $requested_from = RequestedFromEnum::ANDROID->value;
-                }else if (Browser::platformFamily() === 'iOS') {
+                } else if (Browser::platformFamily() === 'iOS') {
                     $requested_from = RequestedFromEnum::IOS->value;
                 }
-                Log::info('resend verificationn link : '.Browser::platformFamily().'|'. $requested_from);
+                Log::info('resend verificationn link : ' . Browser::platformFamily() . '|' . $requested_from);
                 $student_profile = StudentProfile::firstWhere('email', $form_data['email']);
                 $student_profile->update(['requested_from' => $requested_from]);
                 $student_profile->resendEmailVerificationLink();

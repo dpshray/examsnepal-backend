@@ -8,4 +8,5 @@ enum PaymentStatusEnum: string
     case PAYMENT_PENDING = 'PAYMENT_PENDING';
     case PAYMENT_SUCCESS = 'PAYMENT_SUCCESS';
     case PAYMENT_ERROR = 'PAYMENT_ERROR';
+    case PAYMENT_FAILED = 'PAYMENT_FAILED';
 }
