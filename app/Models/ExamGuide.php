@@ -8,12 +8,14 @@ class ExamGuide extends Model
 {
     protected $fillable = [
         'exam_category_id',
+        'type',
         'name',
         'slug',
         'meta_title',
         'meta_description',
         'intro',
         'conducting_body',
+        'official_source',
         'eligibility',
         'exam_pattern',
         'passing_marks',
