@@ -11762,6 +11762,341 @@
                 }
             }
         },
+        "/admin/promo-code": {
+            "get": {
+                "tags": [
+                    "Admin PromoCode"
+                ],
+                "summary": "Api for getting promo codes",
+                "description": "Api for getting promo codes.",
+                "operationId": "getPromoCodes",
+                "responses": {
+                    "200": {
+                        "description": "Promo codes fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#components/schemas/PromoCode"
+                                                    }
+                                                },
+                                                "meta": {
+                                                    "$ref": "#components/schemas/PaginationMeta"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Promo codes fetched successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin PromoCode"
+                ],
+                "summary": "Api for storing promo code",
+                "description": "Api for storing promo code.",
+                "operationId": "storePromoCode",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "NEPALMEDIA25"
+                                    },
+                                    "discount_percent": {
+                                        "type": "string",
+                                        "example": "9.00"
+                                    },
+                                    "detail": {
+                                        "type": "string",
+                                        "example": "Nostrum velit id ratione dolorem cumque alias. Voluptatem nulla eaque dolores laborum quae."
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Promo code stored successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#components/schemas/PromoCode"
+                                                    }
+                                                },
+                                                "meta": {
+                                                    "$ref": "#components/schemas/PaginationMeta"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Promo code stored successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/promo-code/{id}": {
+            "get": {
+                "tags": [
+                    "Admin PromoCode"
+                ],
+                "summary": "Api for getting promo code",
+                "description": "Api for getting promo code.",
+                "operationId": "getPromoCode",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Promo code fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#components/schemas/PromoCode"
+                                                    }
+                                                },
+                                                "meta": {
+                                                    "$ref": "#components/schemas/PaginationMeta"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Promo code fetched successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin PromoCode"
+                ],
+                "summary": "Api for updating promo code",
+                "description": "Api for updating promo code.",
+                "operationId": "updatePromoCode",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "NEPALMEDIA25"
+                                    },
+                                    "discount_percent": {
+                                        "type": "string",
+                                        "example": "9.00"
+                                    },
+                                    "detail": {
+                                        "type": "string",
+                                        "example": "Nostrum velit id ratione dolorem cumque alias. Voluptatem nulla eaque dolores laborum quae."
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Promo code updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#components/schemas/PromoCode"
+                                                    }
+                                                },
+                                                "meta": {
+                                                    "$ref": "#components/schemas/PaginationMeta"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Promo code updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin PromoCode"
+                ],
+                "summary": "Api for deleting promo code",
+                "description": "Api for deleting promo code.",
+                "operationId": "deletePromoCode",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Promo code deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#components/schemas/PromoCode"
+                                                    }
+                                                },
+                                                "meta": {
+                                                    "$ref": "#components/schemas/PaginationMeta"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Promo code deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/questions": {
             "get": {
                 "tags": [
@@ -19640,6 +19975,10 @@
         {
             "name": "PromoCode",
             "description": "PromoCode"
+        },
+        {
+            "name": "Admin PromoCode",
+            "description": "Admin PromoCode"
         },
         {
             "name": "MCQs",

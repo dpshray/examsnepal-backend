@@ -351,6 +351,8 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::apiResource('admin/blog/tag', AdminBlogTagController::class)->scoped(['tag' => 'slug']);
     Route::apiResource('admin/blogs', AdminBlogController::class)->scoped(['blog' => 'slug'])->names('admin.blogs');
     Route::post('admin/payment-settings', [AdminPaymentSettingController::class, 'store']);
+    //Promocode 
+    Route::apiResource('admin/promo-code', PromoCodeController::class);
 });
 Route::get('admin/payment-settings', [AdminPaymentSettingController::class, 'index']);
 
