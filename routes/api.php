@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\Blog\AdminBlogController;
 use App\Http\Controllers\Admin\Blog\AdminBlogTagController;
 use App\Http\Controllers\Admin\Exam\Type\AdminExamTypeController;
 use App\Http\Controllers\Admin\ExamTag\AdminExamTagController;
+use App\Http\Controllers\Admin\ForumQuestionReport\AdminForumQuestionReportController;
 use App\Http\Controllers\Admin\Notification\AdminNotificationController;
 use App\Http\Controllers\Admin\Payment\AdminPaymentSettingController;
 use App\Http\Controllers\AuthController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\BankQuestionController;
 use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
+use App\Http\Controllers\BlockedUserController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Contact\ContactController;
 use App\Http\Controllers\Corporate\CorporateExamController;
@@ -263,6 +265,13 @@ Route::middleware(['auth:api', 'verified', CheckTokenVersionMiddleware::class])-
 
     Route::post('verify-promo-code', [PromoCodeController::class, 'checkPromoCodes']);
     Route::get('notification', [NotificationController::class, 'getUserNotifications']);
+
+    Route::post('forum-report', [ForumController::class, 'reportForumQuestion']);
+    Route::delete('forum-answer-delete/{id}', [ForumController::class, 'deleteAnswer']);
+
+    Route::get('/user/blocked', [BlockedUserController::class, 'getBlockedUsers']);
+    Route::post('/user/block', [BlockedUserController::class, 'blockUser']);
+    Route::delete('/user/unblock/{id}', [BlockedUserController::class, 'unblockUser']);
 });
 
 // for exam type
@@ -277,7 +286,10 @@ Route::apiResource('user/blogs', AdminBlogController::class)->scoped(['blog' => 
 // })->withoutMiddleware('auth:api');
 
 Route::middleware(['auth:users', 'role:admin'])->group(function () {
+    Route::get('/admin/forum-question-report', [AdminForumQuestionReportController::class, 'index']);
+    Route::delete('/admin/forum-question-report/{id}', [AdminForumQuestionReportController::class, 'delete']);
 
+    Route::get('/admin/blocked-users', [BlockedUserController::class, 'adminallblockeduser']);
     // for subjects
     Route::post('/subject', [SubjectController::class, 'store']);
     Route::get('/subject/{id}', [SubjectController::class, 'show']);
@@ -351,6 +363,8 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::apiResource('admin/blog/tag', AdminBlogTagController::class)->scoped(['tag' => 'slug']);
     Route::apiResource('admin/blogs', AdminBlogController::class)->scoped(['blog' => 'slug'])->names('admin.blogs');
     Route::post('admin/payment-settings', [AdminPaymentSettingController::class, 'store']);
+    //Promocode 
+    Route::apiResource('admin/promo-code', PromoCodeController::class);
 });
 Route::get('admin/payment-settings', [AdminPaymentSettingController::class, 'index']);
 

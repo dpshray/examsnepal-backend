@@ -9,7 +9,9 @@ use App\Http\Resources\ForumQuestionResource;
 use Illuminate\Http\Request;
 use App\Models\ForumQuestion;
 use App\Models\ForumAnswer;
+use App\Models\ForumQuestionAnswerReport;
 use App\Models\StudentProfile;
+use App\Models\UserBlocked;
 use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
@@ -97,15 +99,52 @@ class ForumController extends Controller
     public function fetchQuestions()
     {
         $user = Auth::guard('api')->user();
-        $questions = ForumQuestion::whereRelation('studentProfile', 'exam_type_id', $user->exam_type_id)
-            // ->where('exam_type_id', $user->exam_type_id)
-            ->with(['studentProfile', 'answers.studentProfile'])
-            ->withCount('answers')
-            ->where('deleted', '0') // Only fetch non-deleted questions
+
+        // Users that I blocked
+        $blockedByMe = UserBlocked::where('student_id', $user->id)
+            ->pluck('blocked_id');
+
+        // Users who blocked me
+        $blockedMe = UserBlocked::where('blocked_id', $user->id)
+            ->pluck('student_id');
+
+        // Both directions
+        $blockedUsers = $blockedByMe
+            ->merge($blockedMe)
+            ->unique()
+            ->values()
+            ->toArray();
+
+        $questions = ForumQuestion::whereRelation(
+            'studentProfile',
+            'exam_type_id',
+            $user->exam_type_id
+        )
+            ->with([
+                'studentProfile',
+
+                'answers' => function ($query) use ($blockedUsers) {
+                    $query->whereNotIn('user_id', $blockedUsers)
+                        ->with('studentProfile');
+                }
+            ])
+            ->withCount([
+                'answers' => function ($query) use ($blockedUsers) {
+                    $query->whereNotIn('user_id', $blockedUsers);
+                }
+            ])
+            ->where('deleted', '0')
+
+            // Don't show questions from blocked users
+            ->whereNotIn('user_id', $blockedUsers)
+
             ->orderBy('id', 'DESC')
             ->paginate(4);
 
-        $data = $this->setupPagination($questions, ForumQuestionCollection::class);
+        $data = $this->setupPagination(
+            $questions,
+            ForumQuestionCollection::class
+        );
 
         return response()->json($data);
     }
@@ -748,11 +787,125 @@ class ForumController extends Controller
     }
     public function question_answer($id)
     {
-        $question = ForumQuestion::with(['studentProfile', 'answers.studentProfile'])
+        $user = Auth::guard('api')->user();
+
+        // Users I blocked
+        $blockedByMe = UserBlocked::where('student_id', $user->id)
+            ->pluck('blocked_id');
+
+        // Users who blocked me
+        $blockedMe = UserBlocked::where('blocked_id', $user->id)
+            ->pluck('student_id');
+
+        // Combine both directions
+        $blockedUsers = $blockedByMe
+            ->merge($blockedMe)
+            ->unique()
+            ->values()
+            ->toArray();
+
+        $question = ForumQuestion::with([
+            'studentProfile',
+            'answers' => function ($query) use ($blockedUsers) {
+                $query->whereNotIn('user_id', $blockedUsers)
+                    ->with('studentProfile')->where('is_deleted', '0');
+            }
+        ])
+            ->whereNotIn('user_id', $blockedUsers)->where('deleted', '0')
             ->findOrFail($id);
+
         return response()->json([
             'message' => 'Question fetched successfully',
             'question' => new ReplyResource($question)
         ]);
+    }
+    /**
+     * @OA\Post(
+     *     path="/forum-report",
+     *     tags={"Forum"},
+     *     summary="Forum question answer report",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"forum_question_id", "forum_answer_id", "reason", "report_type"},
+     *             @OA\Property(property="forum_question_id", type="integer", example=1),
+     *             @OA\Property(property="forum_answer_id", type="integer", example=1),
+     *             @OA\Property(property="reason", type="string", example="Spam"),
+     *             @OA\Property(property="report_type", type="string", example="Question"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *     response=200,
+     *     description="Report submitted successfully",
+     *     @OA\JsonContent(
+     *         type="object",
+     *         @OA\Property(property="status", type="boolean", example=true),
+     *         @OA\Property(property="data", type="string", nullable=true, example=null),
+     *         @OA\Property(property="message", type="string", example="Report submitted successfully")
+     *     )
+     *     )
+     * )
+     */
+    function reportForumQuestion(Request $request)
+    {
+        $request->validate([
+            'forum_question_id' => 'required|exists:forum_questions,id',
+            'forum_answer_id' => 'nullable|exists:forum_answers,id',
+            'reason' => 'nullable|string',
+            'report_type' => 'required|string',
+        ]);
+        $existingReport = ForumQuestionAnswerReport::where('forum_question_id', $request->forum_question_id)
+            ->where('forum_answer_id', $request->forum_answer_id)
+            ->where('student_id', Auth::id())
+            ->first();
+        if ($existingReport) {
+            return Response::apiError('You have already reported this question/answer', null, 400);
+        }
+        $report = ForumQuestionAnswerReport::create([
+            'forum_question_id' => $request->forum_question_id,
+            'forum_answer_id' => $request->forum_answer_id,
+            'reason' => $request->reason,
+            'report_type' => $request->report_type,
+            'student_id' => Auth::id(),
+        ]);
+        return Response::apiSuccess('Report submitted successfully');
+    }
+    /**
+     * @OA\Post(
+     *     path="/forum-answer-delete/{id}",
+     *     tags={"Forum"},
+     *     summary="Forum question answer delete",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="answer id",
+     *         @OA\Schema(
+     *             type="integer",
+     *             example="1"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *     response=200,
+     *     description="Answer deleted successfully",
+     *     @OA\JsonContent(
+     *         type="object",
+     *         @OA\Property(property="status", type="boolean", example=true),
+     *         @OA\Property(property="data", type="string", nullable=true, example=null),
+     *         @OA\Property(property="message", type="string", example="Answer deleted successfully")
+     *     )
+     *     )
+     * )
+     */
+    function deleteAnswer(Request $request, $id)
+    {
+        $answer = ForumAnswer::findOrFail($id);
+        if ($answer->user_id != Auth::id()) {
+            return Response::apiError('Unauthorized', null, 403);
+        }
+        $answer->delete();
+        return Response::apiSuccess('Answer deleted successfully');
     }
 }
