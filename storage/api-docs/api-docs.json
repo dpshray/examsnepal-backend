@@ -2105,6 +2105,78 @@
                 ]
             }
         },
+        "/admin/forum-question-report": {
+            "get": {
+                "tags": [
+                    "Forum Question Report"
+                ],
+                "summary": "Get all forum question reports",
+                "operationId": "50be2bc55965d804d9d57d2f22f84ac1",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "question_id",
+                        "in": "query",
+                        "description": "Question ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Forum question reports fetched successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/forum-question-report/{id}": {
+            "delete": {
+                "tags": [
+                    "Forum Question Report"
+                ],
+                "summary": "Delete a forum question report",
+                "operationId": "46cb26c5ef91aaa9991508ce013d391b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Report ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Forum question report deleted successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/admin/students-notifications": {
             "get": {
                 "tags": [
@@ -3552,6 +3624,134 @@
                                         "message": {
                                             "type": "string",
                                             "example": "view incremented"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/forum-report": {
+            "post": {
+                "tags": [
+                    "Forum"
+                ],
+                "summary": "Forum question answer report",
+                "operationId": "c8a77dc1648af7a01842dbc9572103b6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "forum_question_id",
+                                    "forum_answer_id",
+                                    "reason",
+                                    "report_type"
+                                ],
+                                "properties": {
+                                    "forum_question_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "forum_answer_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "example": "Spam"
+                                    },
+                                    "report_type": {
+                                        "type": "string",
+                                        "example": "Question"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Report submitted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Report submitted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/forum-answer-delete/{id}": {
+            "post": {
+                "tags": [
+                    "Forum"
+                ],
+                "summary": "Forum question answer delete",
+                "operationId": "a19f98e29c18f779fcc923829ca3a0be",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "answer id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Answer deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Answer deleted successfully"
                                         }
                                     },
                                     "type": "object"
@@ -5053,6 +5253,113 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/user/blocked": {
+            "get": {
+                "tags": [
+                    "Blocked User"
+                ],
+                "summary": "Get all blocked users",
+                "operationId": "ce12ffcbe187a5cfed7ce779b9e925a4",
+                "responses": {
+                    "200": {
+                        "description": "Blocked users fetched successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/user/block": {
+            "post": {
+                "tags": [
+                    "Blocked User"
+                ],
+                "summary": "Block a user",
+                "operationId": "ccbddf6d550e46ad75ae764a1f6b915d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "blocked_id"
+                                ],
+                                "properties": {
+                                    "blocked_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User blocked successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/user/unblock/{id}": {
+            "delete": {
+                "tags": [
+                    "Blocked User"
+                ],
+                "summary": "Unblock a user",
+                "operationId": "43f0132fae3376f306b7c4e34911b3eb",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user to unblock",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User unblocked successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/blocked-users": {
+            "get": {
+                "tags": [
+                    "Admin Blocked User"
+                ],
+                "summary": "Get all blocked users",
+                "operationId": "f2cb2c474b1be7b9ec28bab8b5e0878f",
+                "responses": {
+                    "200": {
+                        "description": "Blocked users fetched successfully"
                     }
                 },
                 "security": [
@@ -19865,6 +20172,10 @@
             "description": "Admin Exam Type"
         },
         {
+            "name": "Forum Question Report",
+            "description": "Forum Question Report"
+        },
+        {
             "name": "Notification",
             "description": "Notification"
         },
@@ -19903,6 +20214,14 @@
         {
             "name": "Question Banks",
             "description": "Question Banks"
+        },
+        {
+            "name": "Blocked User",
+            "description": "Blocked User"
+        },
+        {
+            "name": "Admin Blocked User",
+            "description": "Admin Blocked User"
         },
         {
             "name": "Blog",
