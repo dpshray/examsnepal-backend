@@ -19,7 +19,27 @@ class ClassroomRequest extends FormRequest
             'bio' => 'nullable|string|max:2000',
             'price' => 'nullable|numeric|min:0',
             'duration_days' => 'nullable|integer|min:1',
-            'syllabus' => 'nullable|string',
+            'banner' => 'nullable|image|max:4096',
         ];
+    }
+
+    /**
+     * Multipart form submissions send empty optional fields as empty strings
+     * rather than omitting them, which fails rules like numeric/integer.
+     */
+    protected function prepareForValidation(): void
+    {
+        $nullableIfEmpty = ['target', 'bio', 'price', 'duration_days'];
+
+        $data = [];
+        foreach ($nullableIfEmpty as $key) {
+            if ($this->has($key) && $this->input($key) === '') {
+                $data[$key] = null;
+            }
+        }
+
+        if ($data) {
+            $this->merge($data);
+        }
     }
 }

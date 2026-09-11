@@ -16,6 +16,7 @@ class StudentClassController extends Controller
 
         $classes = Classroom::where('institute_id', $student->institute_id)
             ->withCount(['exams', 'notes', 'meetingLinks'])
+            ->with('syllabusTopics')
             ->orderBy('name')
             ->get();
 
@@ -35,6 +36,7 @@ class StudentClassController extends Controller
         $class = Classroom::where('slug', $slug)
             ->where('institute_id', $student->institute_id)
             ->withCount(['exams', 'notes', 'meetingLinks'])
+            ->with('syllabusTopics')
             ->firstOrFail();
 
         $pivot = $class->students()->where('institute_student_id', $student->id)->first();

@@ -4,6 +4,7 @@ namespace App\Http\Resources\Corporate\Classroom;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class ClassResource extends JsonResource
 {
@@ -22,7 +23,8 @@ class ClassResource extends JsonResource
             'bio' => $this->bio,
             'price' => $this->price !== null ? (float) $this->price : null,
             'duration_days' => $this->duration_days,
-            'syllabus' => $this->syllabus,
+            'banner' => $this->banner ? Storage::disk('public')->url($this->banner) : null,
+            'syllabus_topics' => ClassSyllabusTopicResource::collection($this->whenLoaded('syllabusTopics')),
             'notes_count' => $this->whenCounted('notes'),
             'exams_count' => $this->whenCounted('exams'),
             'meeting_links_count' => $this->whenCounted('meetingLinks'),

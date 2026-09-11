@@ -108,6 +108,10 @@ class TeacherExamController extends Controller
 
         $teacher = Auth::guard('users')->user();
         $pagination = Exam::query()
+            // Exams created inside a class (Class Management → Exams) are
+            // scoped to that class's enrolled students and are managed
+            // from there, not from the general Student Exams list.
+            ->where('is_class_exam', false)
             ->when(!$teacher->isAdmin(), fn($qry) => $qry->where('user_id', $teacher->id))
             ->when($search, fn($q) => $q->whereLike('exam_name', '%' . $search . '%'))
             ->when($examTypeId, function ($q) use ($examTypeId) {

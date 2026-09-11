@@ -1,10 +1,17 @@
 <?php
 
+use App\Http\Controllers\Corporate\Classroom\ClassAssignmentController;
+use App\Http\Controllers\Corporate\Classroom\ClassAssignmentSubmissionController;
+use App\Http\Controllers\Corporate\Classroom\ClassDiscussionController;
 use App\Http\Controllers\Corporate\Classroom\ClassExamController;
+use App\Http\Controllers\Corporate\Classroom\ClassExamQuestionController;
+use App\Http\Controllers\Corporate\Classroom\ClassExamSectionController;
+use App\Http\Controllers\Corporate\Classroom\ClassExamSubmissionController;
 use App\Http\Controllers\Corporate\Classroom\ClassMeetingLinkController;
 use App\Http\Controllers\Corporate\Classroom\ClassNoteController;
 use App\Http\Controllers\Corporate\Classroom\ClassroomController;
 use App\Http\Controllers\Corporate\Classroom\ClassStudentController;
+use App\Http\Controllers\Corporate\Classroom\ClassSyllabusTopicController;
 use App\Http\Controllers\Corporate\CorporateApiKeyController;
 use App\Http\Controllers\Corporate\CorporateAuthController;
 use App\Http\Controllers\Corporate\CorporateExamController;
@@ -87,7 +94,30 @@ Route::prefix('corporate')->group(function () {
             Route::get('exams', [ClassExamController::class, 'index']);
             Route::get('available-exams', [ClassExamController::class, 'available']);
             Route::post('exams', [ClassExamController::class, 'store']);
+            Route::post('exams/create', [ClassExamController::class, 'createNew']);
             Route::delete('exams/{exam}', [ClassExamController::class, 'destroy']);
+
+            Route::prefix('exams/{exam}')->group(function () {
+                Route::get('sections', [ClassExamSectionController::class, 'index']);
+                Route::post('sections', [ClassExamSectionController::class, 'store']);
+                Route::put('sections/{section}', [ClassExamSectionController::class, 'update']);
+                Route::delete('sections/{section}', [ClassExamSectionController::class, 'destroy']);
+
+                Route::get('sections/{section}/questions', [ClassExamQuestionController::class, 'index']);
+                Route::post('sections/{section}/questions', [ClassExamQuestionController::class, 'store']);
+                // These two literal routes must be registered before the {question}
+                // wildcard routes below, otherwise "bulk-import" gets matched as a
+                // {question} route-model-binding value and 404s with a confusing
+                // "No query results for model [ClassExamQuestion] bulk-import" error.
+                Route::post('sections/{section}/questions/bulk-import', [ClassExamQuestionController::class, 'bulkImport']);
+                Route::post('sections/{section}/questions/bulk-import/publish', [ClassExamQuestionController::class, 'publishBulkImport']);
+                Route::post('sections/{section}/questions/{question}', [ClassExamQuestionController::class, 'update']);
+                Route::delete('sections/{section}/questions/{question}', [ClassExamQuestionController::class, 'destroy']);
+
+                Route::get('submissions', [ClassExamSubmissionController::class, 'index']);
+                Route::get('submissions/{studentExam}', [ClassExamSubmissionController::class, 'show']);
+                Route::post('submissions/answers/{answer}/grade', [ClassExamSubmissionController::class, 'gradeAnswer']);
+            });
 
             Route::get('students', [ClassStudentController::class, 'index']);
             Route::post('students', [ClassStudentController::class, 'store']);
@@ -100,6 +130,28 @@ Route::prefix('corporate')->group(function () {
             Route::post('meeting-links', [ClassMeetingLinkController::class, 'store']);
             Route::put('meeting-links/{meetingLink}', [ClassMeetingLinkController::class, 'update']);
             Route::delete('meeting-links/{meetingLink}', [ClassMeetingLinkController::class, 'destroy']);
+
+            Route::get('syllabus-topics', [ClassSyllabusTopicController::class, 'index']);
+            Route::post('syllabus-topics', [ClassSyllabusTopicController::class, 'store']);
+            Route::put('syllabus-topics/{topic}', [ClassSyllabusTopicController::class, 'update']);
+            Route::delete('syllabus-topics/{topic}', [ClassSyllabusTopicController::class, 'destroy']);
+
+            Route::get('assignments', [ClassAssignmentController::class, 'index']);
+            Route::post('assignments', [ClassAssignmentController::class, 'store']);
+            Route::post('assignments/{assignment}', [ClassAssignmentController::class, 'update']);
+            Route::delete('assignments/{assignment}', [ClassAssignmentController::class, 'destroy']);
+
+            Route::get('assignments/{assignment}/submissions', [ClassAssignmentSubmissionController::class, 'index']);
+            Route::get('assignments/{assignment}/submissions/export', [ClassAssignmentSubmissionController::class, 'export']);
+            Route::post('assignments/{assignment}/submissions/{submission}/grade', [ClassAssignmentSubmissionController::class, 'grade']);
+            Route::post('assignments/{assignment}/submissions/{submission}/annotate', [ClassAssignmentSubmissionController::class, 'annotate']);
+            Route::get('assignments/{assignment}/submissions/{submission}/original-file', [ClassAssignmentSubmissionController::class, 'downloadOriginal']);
+
+            Route::get('discussions', [ClassDiscussionController::class, 'index']);
+            Route::post('discussions', [ClassDiscussionController::class, 'store']);
+            Route::delete('discussions/{post}', [ClassDiscussionController::class, 'destroy']);
+            Route::post('discussions/{post}/replies', [ClassDiscussionController::class, 'storeReply']);
+            Route::delete('discussions/{post}/replies/{reply}', [ClassDiscussionController::class, 'destroyReply']);
         });
     });
 });

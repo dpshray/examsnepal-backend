@@ -15,9 +15,9 @@ class ClassNoteRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'type' => 'required|in:pdf,video_link',
+            'type' => 'required|in:pdf,video_link,image',
             'content' => 'nullable|string',
-            'file' => 'nullable|file|mimes:pdf|max:10240',
+            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp,gif|max:10240',
             'video_url' => 'nullable|url|max:2048',
         ];
     }

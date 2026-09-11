@@ -23,7 +23,7 @@ class Classroom extends Model
         'bio',
         'price',
         'duration_days',
-        'syllabus',
+        'banner',
     ];
 
     protected $casts = [
@@ -50,6 +50,21 @@ class Classroom extends Model
     public function notes()
     {
         return $this->hasMany(ClassNote::class, 'class_id');
+    }
+
+    public function assignments()
+    {
+        return $this->hasMany(ClassAssignment::class, 'class_id');
+    }
+
+    public function discussionPosts()
+    {
+        return $this->hasMany(ClassDiscussionPost::class, 'class_id')->latest();
+    }
+
+    public function syllabusTopics()
+    {
+        return $this->hasMany(ClassSyllabusTopic::class, 'class_id')->orderBy('order');
     }
 
     public function meetingLinks()

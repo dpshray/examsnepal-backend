@@ -34,9 +34,9 @@ class ClassNoteController extends Controller
 
         $data = $request->validated();
 
-        if ($data['type'] === 'pdf') {
+        if (in_array($data['type'], ['pdf', 'image'], true)) {
             if (!$request->hasFile('file')) {
-                return Response::apiError('Please upload a PDF file.');
+                return Response::apiError($data['type'] === 'pdf' ? 'Please upload a PDF file.' : 'Please upload an image.');
             }
             $data['file_path'] = $request->file('file')->store('classes/notes', 'public');
             $data['video_url'] = null;
@@ -60,14 +60,14 @@ class ClassNoteController extends Controller
 
         $data = $request->validated();
 
-        if ($data['type'] === 'pdf') {
+        if (in_array($data['type'], ['pdf', 'image'], true)) {
             if ($request->hasFile('file')) {
                 if ($note->file_path) {
                     Storage::disk('public')->delete($note->file_path);
                 }
                 $data['file_path'] = $request->file('file')->store('classes/notes', 'public');
-            } elseif (!$note->file_path) {
-                return Response::apiError('Please upload a PDF file.');
+            } elseif (!$note->file_path || $note->type !== $data['type']) {
+                return Response::apiError($data['type'] === 'pdf' ? 'Please upload a PDF file.' : 'Please upload an image.');
             } else {
                 $data['file_path'] = $note->file_path;
             }

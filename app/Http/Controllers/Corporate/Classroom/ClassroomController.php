@@ -12,6 +12,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
 class ClassroomController extends Controller
 {
@@ -44,6 +45,7 @@ class ClassroomController extends Controller
     {
         $this->authorizeOwner($class);
 
+        $class->load('syllabusTopics');
         $class->loadCount([
             'notes',
             'exams',
@@ -60,6 +62,12 @@ class ClassroomController extends Controller
         $data = $request->validated();
         $data['institute_id'] = Auth::user()->id;
 
+        if ($request->hasFile('banner')) {
+            $data['banner'] = $request->file('banner')->store('classes/banners', 'public');
+        } else {
+            unset($data['banner']);
+        }
+
         $class = Classroom::create($data);
 
         return Response::apiSuccess('Class created successfully', new ClassResource($class));
@@ -69,7 +77,18 @@ class ClassroomController extends Controller
     {
         $this->authorizeOwner($class);
 
-        $class->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('banner')) {
+            if ($class->banner) {
+                Storage::disk('public')->delete($class->banner);
+            }
+            $data['banner'] = $request->file('banner')->store('classes/banners', 'public');
+        } else {
+            unset($data['banner']);
+        }
+
+        $class->update($data);
 
         return Response::apiSuccess('Class updated successfully', new ClassResource($class));
     }

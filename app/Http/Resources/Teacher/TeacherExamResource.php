@@ -34,6 +34,12 @@ class TeacherExamResource extends JsonResource
                 });
             }),
             "exam_name" => $this->exam_name,
+            "is_class_exam" => (bool)$this->is_class_exam,
+            "exam_mode" => $this->exam_mode,
+            "exam_date" => $this->exam_date,
+            "exam_time" => $this->exam_time,
+            "end_time" => $this->end_time,
+            "instructions" => $this->instructions,
             "live" => $this->live,
             "description" => $this->description,
             "assign" => $this->assign,
@@ -41,6 +47,8 @@ class TeacherExamResource extends JsonResource
             "is_negative_marking" => (bool)$this->is_negative_marking,
             "negative_marking_point" => (float)$this->negative_marking_point,
             "points_per_question" => (float)$this->points_per_question,
+            "is_shuffled_question" => (bool)$this->is_shuffled_question,
+            "is_shuffled_option" => (bool)$this->is_shuffled_option,
             'duration' => $this->minToHis()
         ];
     }
