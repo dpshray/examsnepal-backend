@@ -7,4 +7,5 @@ return [
     'verify_url' => env('ESEWA_VERIFY_URL', 'https://rc-epay.esewa.com.np/api/epay/transaction/status'),
     'status_check_url' => env('ESEWA_STATUS_URL'),
     'app_redirect_base' => env('ESEWA_APP_REDIRECT_BASE'),
+    'class_redirect_base' => env('CORPORATE_APP_URL', 'http://localhost:3000'),
 ];

@@ -2,8 +2,10 @@
 
 namespace App\Http\Resources\Institute;
 
+use App\Http\Resources\Corporate\Classroom\ClassSyllabusTopicResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class StudentClassResource extends JsonResource
 {
@@ -20,7 +22,8 @@ class StudentClassResource extends JsonResource
             'slug' => $this->slug,
             'target' => $this->target,
             'bio' => $this->bio,
-            'syllabus' => $this->syllabus,
+            'banner' => $this->banner ? Storage::disk('public')->url($this->banner) : null,
+            'syllabus_topics' => ClassSyllabusTopicResource::collection($this->whenLoaded('syllabusTopics')),
             'price' => $this->price !== null ? (float) $this->price : null,
             'duration_days' => $this->duration_days,
             'exams_count' => $this->whenCounted('exams'),

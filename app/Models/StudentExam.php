@@ -46,6 +46,16 @@ class StudentExam extends Model
         return $this->hasMany(Answersheet::class, 'student_exam_id');
     }
 
+    /**
+     * Answers for a sectioned class exam (App\Models\Corporate\ClassExamAnswer),
+     * distinct from the flat answers() relation above used by the legacy
+     * single-list MCQ flow.
+     */
+    public function classExamAnswers()
+    {
+        return $this->hasMany(\App\Models\Corporate\ClassExamAnswer::class, 'student_exam_id');
+    }
+
     public function correct_answers()
     {
         return $this->hasMany(Answersheet::class)->where('is_correct', 1);

@@ -24,8 +24,11 @@ class Exam extends Model
         'user_id', # added_by
         'exam_type_id',
         'exam_name',
+        'exam_mode', # 'open' | 'scheduled'
+        'is_class_exam',
         'status',
         'description',
+        'instructions',
         'exam_date',
         'exam_time',
         'end_time',
@@ -39,6 +42,8 @@ class Exam extends Model
         'is_negative_marking',
         'negative_marking_point',
         'points_per_question',
+        'is_shuffled_question',
+        'is_shuffled_option',
     ];
 
     protected function casts(): array
@@ -50,8 +55,32 @@ class Exam extends Model
             'is_active' => 'integer',
             'status' => 'integer',
             'live' => 'integer',
-            'assign' => 'integer'
+            'assign' => 'integer',
+            'is_shuffled_question' => 'boolean',
+            'is_shuffled_option' => 'boolean',
+            'is_class_exam' => 'boolean',
         ];
+    }
+
+    /**
+     * True when this exam can currently be started/accessed: always true
+     * for an "open" exam, and true only inside [exam_date exam_time, exam_date end_time]
+     * for a "scheduled" one. An incomplete schedule never locks students out.
+     */
+    public function isWithinScheduledWindow(): bool
+    {
+        if ($this->exam_mode !== 'scheduled') {
+            return true;
+        }
+
+        if (!$this->exam_date || !$this->exam_time || !$this->end_time) {
+            return true;
+        }
+
+        $start = \Carbon\Carbon::parse($this->exam_date . ' ' . $this->exam_time);
+        $end = \Carbon\Carbon::parse($this->exam_date . ' ' . $this->end_time);
+
+        return now()->between($start, $end);
     }
 
     function minToHis()
@@ -209,6 +238,27 @@ class Exam extends Model
     public function classes()
     {
         return $this->belongsToMany(\App\Models\Corporate\Classroom::class, 'class_exams', 'exam_id', 'class_id');
+    }
+
+    /**
+     * Sections for a class exam (App\Models\Corporate\ClassExamSection),
+     * distinct from questions() below used by the legacy single-list MCQ flow.
+     */
+    public function classExamSections()
+    {
+        return $this->hasMany(\App\Models\Corporate\ClassExamSection::class, 'exam_id')->orderBy('order');
+    }
+
+    public function classExamQuestions()
+    {
+        return $this->hasManyThrough(
+            \App\Models\Corporate\ClassExamQuestion::class,
+            \App\Models\Corporate\ClassExamSection::class,
+            'exam_id',
+            'class_exam_section_id',
+            'id',
+            'id'
+        );
     }
     public function questions()
     {

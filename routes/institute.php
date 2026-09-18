@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\Institute\Classroom\StudentClassAssignmentController;
+use App\Http\Controllers\Institute\Classroom\StudentClassDiscussionController;
 use App\Http\Controllers\Institute\Classroom\StudentClassExamController;
 use App\Http\Controllers\Institute\Classroom\StudentClassMeetingLinkController;
 use App\Http\Controllers\Institute\Classroom\StudentClassNoteController;
+use App\Http\Controllers\Institute\ClassEsewaController;
 use App\Http\Controllers\Institute\InstitutePublicProfileController;
 use App\Http\Controllers\Institute\InstituteReviewController;
 use App\Http\Controllers\Institute\InstituteStudentAuthController;
@@ -42,6 +45,7 @@ Route::prefix('institute/students')->middleware('auth:institute_student')->group
     Route::get('classes', [StudentClassController::class, 'index']);
     Route::get('classes/{slug}', [StudentClassController::class, 'show']);
     Route::post('classes/{slug}/apply', [StudentClassController::class, 'apply']);
+    Route::post('classes/{slug}/pay/init-transaction', [ClassEsewaController::class, 'beginTransaction']);
 
     Route::prefix('classes/{slug}')->group(function () {
         Route::get('notes', [StudentClassNoteController::class, 'index']);
@@ -51,5 +55,28 @@ Route::prefix('institute/students')->middleware('auth:institute_student')->group
         Route::get('exams/{exam}/questions', [StudentClassExamController::class, 'questions']);
         Route::post('exams/{exam}/answers', [StudentClassExamController::class, 'submitAnswers']);
         Route::get('exams/{exam}/result', [StudentClassExamController::class, 'result']);
+
+        // Sectioned class-exam flow (is_class_exam = true)
+        Route::get('exams/{exam}/sections', [StudentClassExamController::class, 'sections']);
+        Route::post('exams/{exam}/section-answer', [StudentClassExamController::class, 'answerSectionQuestion']);
+        Route::post('exams/{exam}/section-complete', [StudentClassExamController::class, 'completeSectionExam']);
+        Route::get('exams/{exam}/section-result', [StudentClassExamController::class, 'sectionResult']);
+
+        Route::get('assignments', [StudentClassAssignmentController::class, 'index']);
+        Route::post('assignments/{assignment}/submit', [StudentClassAssignmentController::class, 'submit']);
+
+        Route::get('discussions', [StudentClassDiscussionController::class, 'index']);
+        Route::post('discussions', [StudentClassDiscussionController::class, 'store']);
+        Route::delete('discussions/{post}', [StudentClassDiscussionController::class, 'destroy']);
+        Route::post('discussions/{post}/replies', [StudentClassDiscussionController::class, 'storeReply']);
+        Route::delete('discussions/{post}/replies/{reply}', [StudentClassDiscussionController::class, 'destroyReply']);
     });
 });
+
+// eSewa itself hits these via browser GET redirect — must stay public (no JWT on that request).
+Route::controller(ClassEsewaController::class)
+    ->prefix('institute/students/classes-payment/esewa')
+    ->group(function () {
+        Route::get('success', 'successPayment')->name('api.esewa.class.success');
+        Route::get('failure', 'failurePayment')->name('api.esewa.class.failure');
+    });
