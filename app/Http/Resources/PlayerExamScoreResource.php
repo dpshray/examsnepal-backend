@@ -38,7 +38,7 @@ class PlayerExamScoreResource extends JsonResource
                 fn() => $this->student?->is_hidden ? 'Anonymous' : $this->student->name
             ),
             'solutions' => [
-                'marks' => number_format(
+                'marks' =>(float) number_format(
                     ($correct_answer_count * $points_per_question)
                         - $total_point_reduction_based_on_negative_marking_point,
                     2,
