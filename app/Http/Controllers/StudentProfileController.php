@@ -86,7 +86,7 @@ class StudentProfileController extends Controller
                 if ($minutesDiff > $email_link_expires_at) {
                     $student->delete();
                 } else {
-                    return Response::apiError("A verification like has already been sent to your email.(or please wait for {$email_link_expires_at} minute(s))",null,400);
+                    return Response::apiError("A verification like has already been sent to your email.(or please wait for {$email_link_expires_at} minute(s))", null, 400);
                 }
             }
         }
@@ -100,7 +100,7 @@ class StudentProfileController extends Controller
         ]);
         if ($validator->fails()) {
             $an_error = $validator->errors()->all();
-            return Response::apiError($an_error[0] ?? 'Validation error occurred',null,422);
+            return Response::apiError($an_error[0] ?? 'Validation error occurred', null, 422);
         }
 
         // Create student profile
@@ -110,9 +110,9 @@ class StudentProfileController extends Controller
         } else if (Browser::platformFamily() === 'iOS') {
             $requested_from = RequestedFromEnum::IOS->value;
         }
-        Log::info('normal register : '.Browser::platformFamily().'|'. $requested_from);
+        Log::info('normal register : ' . Browser::platformFamily() . '|' . $requested_from);
         try {
-            DB::transaction(function () use($request, $requested_from){            
+            DB::transaction(function () use ($request, $requested_from) {
                 $student = StudentProfile::create([
                     'name' => $request->name,
                     'email' => $request->email,
@@ -127,7 +127,6 @@ class StudentProfileController extends Controller
             return Response::apiError('Unable to send the email right now. Please retry in a moment.');
         }
         return Response::apiSuccess('An verification link has been sent to your email.');
-
     }
 
 
@@ -228,17 +227,17 @@ class StudentProfileController extends Controller
      */
     public function allStudents(Request $request)
     {
-        $email= $request->query('search');
-        $exam_type_id= $request->query('exam_type');
+        $email = $request->query('search');
+        $exam_type_id = $request->query('exam_type');
         $limit = $request->input('limit', 10);
-        $query = StudentProfile::with(['subscriptions','examType']);
+        $query = StudentProfile::with(['subscriptions', 'examType']);
         if ($email) {
             $query->where('email', 'like', '%' . $email . '%');
         }
         if ($exam_type_id) {
-            $query->where('exam_type_id',$exam_type_id);
+            $query->where('exam_type_id', $exam_type_id);
         }
-        $students=$query->orderBy('id', 'DESC')->paginate($limit);
+        $students = $query->orderBy('id', 'DESC')->paginate($limit);
         $data = $this->setupPagination($students, fn($item) => AllStudentResource::collection($item));
 
         return response()->json([
@@ -356,25 +355,26 @@ class StudentProfileController extends Controller
         if (array_key_exists('previous_password', $validatedData)) {
             if (!Hash::check($validatedData['previous_password'], $student->password)) {
                 return Response::apiError('previous password does not match', null, 402);
-            }else if (!array_key_exists('new_password', $validatedData) || !array_key_exists('new_password_confirmation', $validatedData)) {
+            } else if (!array_key_exists('new_password', $validatedData) || !array_key_exists('new_password_confirmation', $validatedData)) {
                 throw ValidationException::withMessages(['new_password_confirmation' => 'New Password/confirmation field is required.']);
-            }else{
+            } else {
                 $data['password'] = Hash::make($validatedData['new_password']);
             }
         }
-        DB::transaction(function() use($student_id, $data){
+        DB::transaction(function () use ($student_id, $data) {
             StudentProfile::find($student_id)->update($data);
         });
         return Response::apiSuccess('User profile updated');
     }
 
-    public function verifyStudentEmail(Request $request, $email) {
+    public function verifyStudentEmail(Request $request, $email)
+    {
         if (!$request->hasValidSignature()) {
             return Response::apiError('The link you used is invalid or has already expired.', null, 410);
         }
         $student_profile = null;
         try {
-            DB::transaction(function () use($email, &$student_profile){
+            DB::transaction(function () use ($email, &$student_profile) {
                 $student_profile = StudentProfile::firstWhere('email', $email);
                 if (!$student_profile) {
                     throw new \Exception('Student not found');
@@ -388,9 +388,9 @@ class StudentProfileController extends Controller
         // dd([$student_profile->requested_from, RequestedFromEnum::ANDROID, $student_profile->requested_from == RequestedFromEnum::ANDROID->value]);
         if ($student_profile->requested_from->value == RequestedFromEnum::ANDROID->value) {
             return redirect()->away("https://play.google.com/store/apps/details?id=com.dwork.examsnepal");
-        }else if($student_profile->requested_from->value == RequestedFromEnum::IOS->value){
+        } else if ($student_profile->requested_from->value == RequestedFromEnum::IOS->value) {
             return redirect()->away("https://play.google.com/store/apps/details?id=com.dwork.examsnepal");
-        }else{
+        } else {
             return redirect()->away(env('EXAMSNEPAL_STUDENT_LOGIN_PAGE_URL'));
         }
     }
@@ -435,7 +435,8 @@ class StudentProfileController extends Controller
      *     )
      * )
      */
-    public function sendPasswordResetMail(Request $request) {
+    public function sendPasswordResetMail(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|exists:student_profiles,email',
         ]);
@@ -450,7 +451,7 @@ class StudentProfileController extends Controller
             $time = Carbon::parse($timestamp);
             $hasPassed = $time->diffInMinutes(now(), false) > $token_valid_until;
             if (!$hasPassed) {
-                return Response::apiError('Mail has already been sent/please wait for '.$token_valid_until.' minute(s)');
+                return Response::apiError('Mail has already been sent/please wait for ' . $token_valid_until . ' minute(s)');
             }
             DB::table('password_reset_tokens')->where('email', $request->email)->delete();
         }
@@ -521,10 +522,11 @@ class StudentProfileController extends Controller
      *     )
      * )
      */
-    public function verifyPasswordReseToken(Request $request) {
+    public function verifyPasswordReseToken(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'token' => 'required|string|exists:password_reset_tokens,token',
-        ],[
+        ], [
             'token.exists' => 'Token does not match/exists'
         ]);
         if ($validator->fails()) {
@@ -534,8 +536,8 @@ class StudentProfileController extends Controller
         $row = DB::table('password_reset_tokens')->where('token', $request->token)->first();
         $token = $row->token;
         $email = $row->email;
-        $data = compact('token','email');
-        return Response::apiSuccess('Token is verified',$data);
+        $data = compact('token', 'email');
+        return Response::apiSuccess('Token is verified', $data);
     }
 
     /**
@@ -579,7 +581,8 @@ class StudentProfileController extends Controller
      *     )
      * )
      */
-    public function passwordResetor(Request $request){
+    public function passwordResetor(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'token' => 'required|string|exists:password_reset_tokens,token',
             'email' => 'required|string|exists:password_reset_tokens,email',
@@ -595,11 +598,11 @@ class StudentProfileController extends Controller
             ['token', $request->token]
         ]);
         if (empty($row->first())) {
-            return Response::apiError('Requested token does not match with the email that you want the password to reset',null,400);
+            return Response::apiError('Requested token does not match with the email that you want the password to reset', null, 400);
         }
-        DB::transaction(function () use($row, $request){
+        DB::transaction(function () use ($row, $request) {
             $row->delete();
-            $student_profile = StudentProfile::firstWhere('email',$request->email);
+            $student_profile = StudentProfile::firstWhere('email', $request->email);
             $student_profile->update([
                 'password' => Hash::make($request->password),
                 'token_version' => $student_profile->token_version + 1,
@@ -646,7 +649,7 @@ class StudentProfileController extends Controller
     {
         $logged_in_user = Auth::guard('api')->user();
         if ($logged_in_user->isNot($student)) {
-            return Response::apiError('Cannot delete account.(user does not match)',null,403);
+            return Response::apiError('Cannot delete account.(user does not match)', null, 403);
         }
         $logged_in_user->delete();
         return Response::apiSuccess('Your account has been removed permanently');
@@ -693,9 +696,9 @@ class StudentProfileController extends Controller
      *     )
      * )
      */
-    public function studentProfileExamStats() {
+    public function studentProfileExamStats()
+    {
         return Auth::guard('api')->user()->student_exams()->with('answers')->get();
-
     }
 
     /**
@@ -731,44 +734,45 @@ class StudentProfileController extends Controller
      *         )
      *     )
      * )
-    */
-    public function studentPerformanceReport(){
+     */
+    public function studentPerformanceReport()
+    {
 
         $student = Auth::guard('api')->user();
 
         $total_exams = DB::table('exams')->count();
         $data = DB::table('student_profiles as sp')
-                ->join('student_exams as se', 'sp.id', '=', 'se.student_id')
-                ->join('answersheets as a', 'se.id', '=', 'a.student_exam_id')
-                ->join('exams as e', 'e.id', '=', 'se.exam_id')
-                ->where('sp.id', $student->id)
-                ->select(
-                    // 'sp.id as sp_id',
-                    'e.status',
-                    DB::raw('COUNT(DISTINCT se.exam_id) as exams_given'),
-                    DB::raw('COUNT(a.question_id) as total_questions'),
-                    DB::raw('CAST(SUM(CASE WHEN a.is_correct = 1 THEN 1 ELSE 0 END) AS UNSIGNED) as correct_answers')
-                )
-                ->groupBy('sp.id', 'e.status')
-                ->get()
-                ->map(function ($item) {
-                    $item->exam_type = ExamTypeEnum::getKeyByValue((int) $item->status);
-                    $item->exams_given = (int) $item->exams_given;
-                    $item->total_questions = (int) $item->total_questions;
-                    $item->correct_answers = (int) $item->correct_answers;
-                    unset($item->status);
+            ->join('student_exams as se', 'sp.id', '=', 'se.student_id')
+            ->join('answersheets as a', 'se.id', '=', 'a.student_exam_id')
+            ->join('exams as e', 'e.id', '=', 'se.exam_id')
+            ->where('sp.id', $student->id)
+            ->select(
+                // 'sp.id as sp_id',
+                'e.status',
+                DB::raw('COUNT(DISTINCT se.exam_id) as exams_given'),
+                DB::raw('COUNT(a.question_id) as total_questions'),
+                DB::raw('CAST(SUM(CASE WHEN a.is_correct = 1 THEN 1 ELSE 0 END) AS UNSIGNED) as correct_answers')
+            )
+            ->groupBy('sp.id', 'e.status')
+            ->get()
+            ->map(function ($item) {
+                $item->exam_type = ExamTypeEnum::getKeyByValue((int) $item->status);
+                $item->exams_given = (int) $item->exams_given;
+                $item->total_questions = (int) $item->total_questions;
+                $item->correct_answers = (int) $item->correct_answers;
+                unset($item->status);
 
-                    $item->average_score = (float) $item->total_questions > 0
-                        ? round(($item->correct_answers / $item->total_questions) * 100, 2)
-                        : 0;
+                $item->average_score = (float) $item->total_questions > 0
+                    ? round(($item->correct_answers / $item->total_questions) * 100, 2)
+                    : 0;
 
-                    return $item;
-                });
+                return $item;
+            });
         $totalCorrect = $data->sum('correct_answers');
         $totalQuestions = $data->sum('total_questions');
 
         $total_average_score = $totalQuestions > 0 ? round(($totalCorrect / $totalQuestions) * 100, 2) : 0;
-        return Response::apiSuccess('performance data for user : '.$student->name, compact('data','total_average_score','total_exams'));
+        return Response::apiSuccess('performance data for user : ' . $student->name, compact('data', 'total_average_score', 'total_exams'));
     }
 
     /**
@@ -806,7 +810,8 @@ class StudentProfileController extends Controller
      *     )
      * )
      */
-    function googleLogin(Request $request){
+    function googleLogin(Request $request)
+    {
 
         $request->validate([
             'google_token' => 'required',
@@ -911,7 +916,8 @@ class StudentProfileController extends Controller
      *     )
      * )
      */
-    function myExamScores() {
+    function myExamScores()
+    {
         $exams_score = StudentProfile::where('id', Auth::id())
             ->has('student_exams')
             // ->whereRelation('student_exams','is_exam_completed',1)
@@ -919,13 +925,13 @@ class StudentProfileController extends Controller
                 $q->with([
                     'exam' => fn($q) => $q->withCount('questions')
                 ])
-                ->withCount([
-                    'answers as correct_answer_count' => fn($q) => $q->where('is_correct', 1),
-                    'answers as incorrect_answer_count' => fn($q) => $q->where('is_correct', 0),
-                    'answers as missed_answer_count' => fn($q) => $q->where('is_correct', null),
-                ])
-                ->where('is_exam_completed', 1)
-                ->orderBy('id','DESC');
+                    ->withCount([
+                        'answers as correct_answer_count' => fn($q) => $q->where('is_correct', 1),
+                        'answers as incorrect_answer_count' => fn($q) => $q->where('is_correct', 0),
+                        'answers as missed_answer_count' => fn($q) => $q->where('is_correct', null),
+                    ])
+                    ->where('is_exam_completed', 1)
+                    ->orderBy('id', 'DESC');
             }])
             ->firstOrFail();
         $scores = new StudentAllExamScoreDetailResource($exams_score);
@@ -998,7 +1004,7 @@ class StudentProfileController extends Controller
                 'answers as missed_answer_count' => fn($q) => $q->where('is_correct', null),
             ])
             ->where('student_id', Auth::id())
-            ->where('is_exam_completed',1)
+            ->where('is_exam_completed', 1)
             ->first();
         if (empty($student_exam)) {
             return Response::apiError("Please complete the exam before viewing your result.");
@@ -1007,5 +1013,47 @@ class StudentProfileController extends Controller
         $scores = (new ScoreService())->fetchExamScore($student_exam);
 
         return Response::apiSuccess('Student exam score results.', $scores);
+    }
+    /**
+     * @OA\Put(
+     *     path="/student-profile/visibility-toggle",
+     *     summary="Get student profile visibility toggle.",
+     *     description="Get student profile visibility toggle.",
+     *     operationId="StudentProfileVisibilityToggle",
+     *     tags={"Students"},
+     *     security={ "sanctum": {} },
+     *     @OA\Response(
+     *         response=200,
+     *         description="Student profile visibility toggle",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="boolean",
+     *                 example=true
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="is_hidden", type="boolean", example=true)
+     *             ),
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Student profile visibility updated successfully."
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    function studentProfileVisibility()
+    {
+        $student_profile = StudentProfile::where('id', Auth::id())->first();
+        if (empty($student_profile)) {
+            return Response::apiError("Student profile not found.");
+        }
+        $student_profile->is_hidden = !$student_profile->is_hidden;
+        $student_profile->save();
+        return Response::apiSuccess('Student profile visibility updated successfully.');
     }
 }
