@@ -17025,6 +17025,50 @@
                 }
             }
         },
+        "/student-profile/visibility-toggle": {
+            "put": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Get student profile visibility toggle.",
+                "description": "Get student profile visibility toggle.",
+                "operationId": "StudentProfileVisibilityToggle",
+                "responses": {
+                    "200": {
+                        "description": "Student profile visibility toggle",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "is_hidden": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Student profile visibility updated successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": {
+                    "sanctum": {}
+                }
+            }
+        },
         "/exam/{exam}/register-public": {
             "post": {
                 "tags": [

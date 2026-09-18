@@ -35,15 +35,17 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
         'email_verified_at',
         'fcm_token',
         'requested_from',
-        'token_version'
+        'token_version',
+        'is_hidden'
     ];
 
     protected $hidden = ['password'];
-    
+
     protected function casts(): array
     {
         return [
             'id' => 'integer',
+            'is_hidden' => 'boolean',
             'exam_type_id' => 'integer',
             'is_subscripted' => 'integer',
             'requested_from' => RequestedFromEnum::class
@@ -176,7 +178,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
         return $this->belongsTo(ExamType::class, 'exam_type_id');
     }
 
-    function resendEmailVerificationLink() {
+    function resendEmailVerificationLink()
+    {
 
         $student = $this;
         $link_expires_minute   = SELF::EMAIL_LINK_EXPIRES_AT;
@@ -197,7 +200,8 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
         }
     }
 
-    function notificationReads() {
+    function notificationReads()
+    {
         return $this->hasMany(StudentNotificationRead::class);
     }
 }

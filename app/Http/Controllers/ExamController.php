@@ -536,7 +536,7 @@ class ExamController extends Controller
                 'student_exams.created_at',
             ])
             ->with([
-                'student:id,name',
+                'student:id,name,is_hidden',
                 'exam.questions'
             ])
             ->withCount([

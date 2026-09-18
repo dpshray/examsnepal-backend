@@ -251,6 +251,7 @@ Route::middleware(['auth:api', 'verified', CheckTokenVersionMiddleware::class])-
 
     Route::get('student-profile-fetcher', [StudentProfileController::class, 'getStudentProfile']);
     Route::put('update-student-profile', [StudentProfileController::class, 'studentProfileUpdater']);
+    Route::put('student-profile/visibility-toggle', [StudentProfileController::class, 'studentProfileVisibility']);
 
     #pool
     Route::get('get-todays-pool-players', [PoolController::class, 'fetchTodaysPoolPlayers']);
