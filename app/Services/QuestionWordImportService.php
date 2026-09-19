@@ -156,7 +156,7 @@ class QuestionWordImportService
             } elseif ($element instanceof TextRun) {
                 $lines = array_merge($lines, $this->flattenContainer($element, false));
             } elseif ($element instanceof Text) {
-                $lines[] = ['text' => trim((string) $element->getText()), 'images' => [], 'isListItemStart' => false];
+                $lines[] = ['text' => trim($this->decodeText($element->getText())), 'images' => [], 'isListItemStart' => false];
             } elseif ($element instanceof Image) {
                 $lines[] = ['text' => '', 'images' => [$element], 'isListItemStart' => false];
             } elseif ($element instanceof TextBreak) {
@@ -197,7 +197,7 @@ class QuestionWordImportService
             if ($child instanceof TextBreak) {
                 $flush();
             } elseif ($child instanceof Text) {
-                $bufferText .= $child->getText();
+                $bufferText .= $this->decodeText($child->getText());
             } elseif ($child instanceof Image) {
                 $bufferImages[] = $child;
             } elseif ($child instanceof AbstractContainer) {
@@ -206,7 +206,7 @@ class QuestionWordImportService
                 // contain a line break per the OOXML schema).
                 foreach ($child->getElements() as $grandchild) {
                     if ($grandchild instanceof Text) {
-                        $bufferText .= $grandchild->getText();
+                        $bufferText .= $this->decodeText($grandchild->getText());
                     } elseif ($grandchild instanceof Image) {
                         $bufferImages[] = $grandchild;
                     }
@@ -217,6 +217,18 @@ class QuestionWordImportService
         $flush();
 
         return $lines;
+    }
+
+    /**
+     * PHPWord's DOCX reader HTML-escapes every text run as it parses the XML
+     * (it assumes the text will be fed back into its own HTML writer), so
+     * Text::getText() always comes back with entities like &amp;, &#039; and
+     * &quot; in place of the literal characters. Since we store this text as
+     * plain text, undo that escaping here before it ever reaches a question.
+     */
+    private function decodeText(string $text): string
+    {
+        return htmlspecialchars_decode($text, ENT_QUOTES);
     }
 
     private function stripCorrectMarker(string $text): array
