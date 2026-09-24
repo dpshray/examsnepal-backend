@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Nepal Pharmacy Council  | News
+    </title>
+    <link rel="shortcut icon" href="/storage/logo/81ecc29a-f589-430d-b5b1-adff9c62e3ca.png">
+    <meta name="keyword" content="``">
+    <meta name="description" content="``">
+    <meta name="csrf-token" content="OYlz43nECQgMvwAfPmenxBcP06l5czcRKSivT84N">
+    <!-- ========== Start Stylesheet ========== -->
+<link href="https://nepalpharmacycouncil.org.np/frontend/css/style.css" rel="stylesheet" />
+<link href="https://nepalpharmacycouncil.org.np/frontend/css/media.css" rel="stylesheet" />
+<link href="https://nepalpharmacycouncil.org.np/frontend/css/about.css" rel="stylesheet" />
+<link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+<style>
+  .pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.pagination-info,
+.pagination-dropdown,
+.pagination-links {
+    flex: 1;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+}
+
+.pagination a {
+  padding: 8px 16px;
+  margin: 0 5px;
+  border: 1px solid var(--blue-color);
+  color: var(--blue-color);
+  text-decoration: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.pagination .active {
+  background-color: var(--blue-color);
+  color: var(--white-color);
+  padding: 7px 16px;
+  margin: 0 5px; 
+  margin-top: -6px;
+  border-radius: 4px;
+}
+
+.npc_pagination a:hover {
+  background-color: var(--blue-color);
+  color: var(--white-color);
+}
+</style>    </head>
+<body>
+    <!-- header  -->
+<header>
+  <!-- TOP NAV -->
+  <div class="npc__header-top-nav">
+    <div class="npc__container--fluid px-2 flex justify-between">
+      <!-- contact info  -->
+      <div class="npc__header-contact flex">
+        <div
+          class="npc__header-contact-phone npc__contact-child flex items-center gap-1"
+        >
+          <span>
+            <i class="fa-solid fa-phone"></i>
+          </span>
+          <span>+977 (0)1 4790747, 970-9090485  </span>
+        </div>
+        <div
+          class="npc__header-contact-email npc__contact-child flex items-center gap-1"
+        >
+          <span>
+            <i class="fa-solid fa-envelope"></i>
+          </span>
+          <span> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7e0c1b19170d0a0c1f0c3e101b0e1f120e161f0c131f1d071d110b101d171250110c1950100e">[email&#160;protected]</a>  </span>
+        </div>
+      </div>
+      <!-- socail links  -->
+      <div class="npc__header-social flex items-center">
+        <a
+        class="npc_social-link npc__header-social-child"
+        href="https://www.facebook.com/nepalpharmacycouncil"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <i class="fa-brands fa-square-facebook"></i>
+      </a>
+      |
+      <span> 23 Sep, 2026 </span>
+      </div>
+    </div>
+  </div>
+  <!-- MIDDLE NAV  -->
+  <div class="npc__header-middle-nav">
+    <div class="npc__container--fluid">
+      <!-- HEADER LOGO  -->
+      <div class="npc__header-mid-wrapper">
+        <div class="npc__header-logo">
+          <a href="/">
+            <div class="npc__logo-wrapper">
+              <image
+                src="/storage/logo/81ecc29a-f589-430d-b5b1-adff9c62e3ca.png"
+                alt="nepal pharmacy council logo"
+              />
+            </div>
+          </a>
+        </div>
+
+        <div class="npc__nepal-flag">
+          <div class="npc__nepal-flag-wrapper">
+            <img src="https://nepalpharmacycouncil.org.np/frontend/images/np_flag.gif" alt="flag of nepal" />
+          </div>
+        </div>
+        <!-- MOBILE NAV TOGGLE BUTTON -->
+        <div class="npc__header-mob-toggle">
+          <div class="npc__header-mob-toggle-icon-container">
+            <button class="hamburger-icon" id="hamburger">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+            <button class="cross-icon" id="cross">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MAIN NAV  -->
+  <div class="npc__header-main-nav">
+    <div class="npc__header-container px-2">
+      <nav class="flex items-center">
+        <!-- nav items  -->
+        <!-- normal link  -->
+        <div class="npc__nav-item">
+          <a class="npc__nav-btn inline-block" href="/">home</a>
+        </div>
+        <!-- dropdown sample  -->
+        <div class="npc__nav-item relative">
+          <button
+            class="npc__nav-btn npc__show-dropdown flex items-center transparent gap-1"
+          >
+            <span> about </span>
+            <span class="npc__dropdown-icon">
+              <i class="fa-solid fa-angle-down"></i>
+            </span>
+          </button>
+          <div class="npc__dropdown invisible absolute left-0 top-full">
+            <nav class="npc__dropdown-links flex flex-col">
+              <a href="https://nepalpharmacycouncil.org.np/about" class="">Introduction</a>
+              <a href="https://nepalpharmacycouncil.org.np/bod" class="">Board Member</a>
+              <a href="https://nepalpharmacycouncil.org.np/staff" class="">Staffs</a>
+            </nav>
+          </div>
+        </div>
+
+        <div class="npc__nav-item relative">
+          <button
+            class="npc__nav-btn npc__show-dropdown flex items-center transparent gap-1"
+          >
+            <span> Institutions </span>
+            <span class="npc__dropdown-icon">
+              <i class="fa-solid fa-angle-down"></i>
+            </span>
+          </button>
+          <div class="npc__dropdown invisible absolute left-0 top-full">
+            <nav class="npc__dropdown-links flex flex-col">
+              <a href="https://nepalpharmacycouncil.org.np/institutions" class="">Diploma Colleges</a>
+              <a href="https://nepalpharmacycouncil.org.np/bachelor" class="">NPC Registered Bachelor Colleges</a>
+              <a href="https://nepalpharmacycouncil.org.np/foreign" class="">Foreign Colleges</a>
+            </nav>
+          </div>
+        </div>
+
+        <div class="npc__nav-item relative">
+          <button
+            class="npc__nav-btn npc__show-dropdown flex items-center transparent gap-1"
+          >
+            <span> Minimum Requirement </span>
+            <span class="npc__dropdown-icon">
+              <i class="fa-solid fa-angle-down"></i>
+            </span>
+          </button>
+          <div class="npc__dropdown invisible absolute left-0 top-full">
+            <nav class="npc__dropdown-links flex flex-col">
+              <a href="https://nepalpharmacycouncil.org.np/requirement-diploma" class="">Requirement For Diploma Level</a>
+              <a href="https://nepalpharmacycouncil.org.np/requirement-bachelor" class="">Requirement For Bachelor Level</a>
+            </nav>
+          </div>
+        </div>
+
+        <div class="npc__nav-item relative">
+          <button
+            class="npc__nav-btn npc__show-dropdown flex items-center transparent gap-1"
+          >
+            <span> Act Regulation & Guidelines </span>
+            <span class="npc__dropdown-icon">
+              <i class="fa-solid fa-angle-down"></i>
+            </span>
+          </button>
+          <div class="npc__dropdown invisible absolute left-0 top-full">
+            <nav class="npc__dropdown-links flex flex-col">
+              <a href="https://nepalpharmacycouncil.org.np/act" class="">Act</a>
+              <a href="https://nepalpharmacycouncil.org.np/regulation" class="">Regulation</a>
+              <a href="https://nepalpharmacycouncil.org.np/guidelines" class="">Guidelines</a>
+            </nav>
+          </div>
+        </div>
+
+        <div class="npc__nav-item">
+          <a class="npc__nav-btn inline-block" href="https://nepalpharmacycouncil.org.np/news">News & Notice</a>
+        </div>
+
+        <div class="npc__nav-item relative">
+          <button
+            class="npc__nav-btn npc__show-dropdown flex items-center transparent gap-1"
+          >
+            <span> Syllabus & Publications </span>
+            <span class="npc__dropdown-icon">
+              <i class="fa-solid fa-angle-down"></i>
+            </span>
+          </button>
+          <div class="npc__dropdown invisible absolute left-0 top-full">
+            <nav class="npc__dropdown-links flex flex-col">
+              <a href="https://nepalpharmacycouncil.org.np/syllabus" class="">Syllabus</a>
+              <a href="https://nepalpharmacycouncil.org.np/formation" class="">Formation</a>
+              <a href="https://nepalpharmacycouncil.org.np/publication" class="">Publications</a>
+            </nav>
+          </div>
+        </div>
+
+        <div class="npc__nav-item">
+          <a class="npc__nav-btn inline-block" href="https://nepalpharmacycouncil.org.np/cpd-activities">CPD Activities</a>
+        </div>
+
+        
+
+        <div class="npc__nav-item">
+            <a class="npc__nav-btn inline-block" href="https://onlinenameregistration.nepalpharmacycouncil.org.np/result">Result</a>
+          <!--<a class="npc__nav-btn inline-block" href="https://nepalpharmacycouncil.org.np/result">Result</a>-->
+        </div>
+       
+      </nav>
+    </div>
+  </div>
+  <!-- MOBILE NAV  -->
+  <div class="npc__mob-nav" id="mobile-nav">
+    <nav class="npc__mob-nav-links">
+
+      <div class="npc__mob-nav-link">
+        <a class="npc__mob-nav-item" href="/">home</a>
+      </div>
+      <!-- dropdown sample  -->
+
+      <div
+        class="npc__mob-nav-link npc__nav-link-dropdown npc__mob-dropdown-hide"
+      >
+        <button class="npc__mob-nav-item npc__mob-nav-drop-item">
+          <span> about </span>
+          <span class="npc__mob-drop-right-icon">
+            <i class="fa-solid fa-angle-right"></i>
+          </span>
+          <span class="npc__mob-drop-down-icon">
+            <i class="fa-solid fa-angle-down"></i>
+          </span>
+        </button>
+        <div class="npc__mob-dropdown">
+          <nav class="npc__mob-dropdown-links">
+            <a href="/about" class="npc__mob-dropdown-item">About</a>
+            <a href="/staff" class="npc__mob-dropdown-item">Staffs</a>
+            <a href="/bod" class="npc__mob-dropdown-item"
+              >Board Members</a
+            >
+          </nav>
+        </div>
+      </div>
+
+      <div
+      class="npc__mob-nav-link npc__nav-link-dropdown npc__mob-dropdown-hide"
+    >
+      <button class="npc__mob-nav-item npc__mob-nav-drop-item">
+        <span> Institutions </span>
+        <span class="npc__mob-drop-right-icon">
+          <i class="fa-solid fa-angle-right"></i>
+        </span>
+        <span class="npc__mob-drop-down-icon">
+          <i class="fa-solid fa-angle-down"></i>
+        </span>
+      </button>
+      <div class="npc__mob-dropdown">
+        <nav class="npc__mob-dropdown-links">
+          <a href="/institutions" class="npc__mob-dropdown-item">Diploma Colleges</a>
+          <a href="/bachelor" class="npc__mob-dropdown-item">NPC Registered Bachelor Colleges</a>
+        </nav>
+      </div>
+    </div>
+
+    <div
+      class="npc__mob-nav-link npc__nav-link-dropdown npc__mob-dropdown-hide"
+    >
+      <button class="npc__mob-nav-item npc__mob-nav-drop-item">
+        <span> Minimum Requirement </span>
+        <span class="npc__mob-drop-right-icon">
+          <i class="fa-solid fa-angle-right"></i>
+        </span>
+        <span class="npc__mob-drop-down-icon">
+          <i class="fa-solid fa-angle-down"></i>
+        </span>
+      </button>
+      <div class="npc__mob-dropdown">
+        <nav class="npc__mob-dropdown-links">
+          <a href="/requirement-diploma" class="npc__mob-dropdown-item">Diploma Level Requirement</a>
+          <a href="/requirement-bachelor" class="npc__mob-dropdown-item">Bachelor Level Requirement</a>
+        </nav>
+      </div>r
+    </div>
+
+    <div
+    class="npc__mob-nav-link npc__nav-link-dropdown npc__mob-dropdown-hide"
+  >
+    <button class="npc__mob-nav-item npc__mob-nav-drop-item">
+      <span> Act Regulation & Guidelines </span>
+      <span class="npc__mob-drop-right-icon">
+        <i class="fa-solid fa-angle-right"></i>
+      </span>
+      <span class="npc__mob-drop-down-icon">
+        <i class="fa-solid fa-angle-down"></i>
+      </span>
+    </button>
+    <div class="npc__mob-dropdown">
+      <nav class="npc__mob-dropdown-links">
+        <a href="/act" class="npc__mob-dropdown-item">Act</a>
+        <a href="/regulation" class="npc__mob-dropdown-item">regulation</a>
+        <a href="/guidelines" class="npc__mob-dropdown-item">guidelines</a>
+
+      </nav>
+    </div>
+  </div>
+
+    <div class="npc__mob-nav-link">
+      <a class="npc__mob-nav-item" href="/news">News & Notice</a>
+    </div>
+
+    <div
+    class="npc__mob-nav-link npc__nav-link-dropdown npc__mob-dropdown-hide"
+  >
+    <button class="npc__mob-nav-item npc__mob-nav-drop-item">
+      <span> Syllabus & Publications </span>
+      <span class="npc__mob-drop-right-icon">
+        <i class="fa-solid fa-angle-right"></i>
+      </span>
+      <span class="npc__mob-drop-down-icon">
+        <i class="fa-solid fa-angle-down"></i>
+      </span>
+    </button>
+    <div class="npc__mob-dropdown">
+      <nav class="npc__mob-dropdown-links">
+        <a href="/syllabus" class="npc__mob-dropdown-item">syllabus</a>
+        <a href="/formation" class="npc__mob-dropdown-item">formation</a>
+        <a href="/publication" class="npc__mob-dropdown-item">publication</a>
+
+      </nav>
+    </div>
+  </div>
+
+  <div class="npc__mob-nav-link">
+    <a class="npc__mob-nav-item" href="/cpd-activities">Cpd Activities</a>
+  </div>
+  
+  <div class="npc__mob-nav-link">
+    <a class="npc__mob-nav-item" href="/result">Result</a>
+  </div>
+
+
+      <!-- drop down link  -->
+      
+      <!-- dorpdown 2  -->
+    </nav>
+  </div>
+</header>
+
+
+    <!-- Start Breadcrumb 
+    ============================================= -->
+        <div class="react-breadcrumbs">
+      <div class="breadcrumbs-wrap">
+          <img class="desktop" src="https://nepalpharmacycouncil.org.np/frontend/images/breadcrumb.jpg" alt="Breadcrumbs">
+          <div class="breadcrumbs-inner">
+              <div class="container">
+                  
+              </div>
+          </div>
+      </div>                
+  </div>
+      <!-- End Breadcrumb -->
+
+
+     
+
+    <div class="contain" style="min-height: 600px;">
+      <section>
+    <div class="npc__container--fluid px-2">
+      <div class="npc__news-list-page">
+        <div class="npc__header">
+          <div class="npc__header-title">
+            <h2>News</h2>
+          </div>
+        </div>
+        <div class="npc__news-content">
+            <div class="npc__news-content-wrapper">
+                            <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/130" class="npc__news-item-title">
+                        अत्यन्त जरुरी सार्वजनिक सूचना
+                      </a>
+                    </h2>
+                    <p>Sep 22, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/129" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को ३१ औँ नाम दर्ता परीक्षा (फार्मासिस्ट) को नतिजा
+                      </a>
+                    </h2>
+                    <p>Sep 13, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/128" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को ३१ औ नाम दर्ता परीक्षा उतिर्ण फार्मेसी सहायकहरु को नाम दर्ता प्रमाण -पत्र वितरण सम्बन्धी जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Sep 02, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/127" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को अत्यन्त जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Aug 29, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/126" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को हार्दिक अपिल
+                      </a>
+                    </h2>
+                    <p>Aug 26, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/125" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को ३१ औँ नाम दर्ता परीक्षा (फार्मेसी सहायक) को नतिजा
+                      </a>
+                    </h2>
+                    <p>Aug 22, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/124" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को ३१ औं नाम दर्ता परीक्षा (फार्मेसी सहायक एवम् फर्मासिष्ट) सम्बन्धी अत्यन्त जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Aug 07, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/123" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को अत्यन्त जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Jun 03, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/122" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को ३१औ नाम दर्ता परीक्षा(फर्मासिष्ट तथा फार्मेसी सहायक) को आवेदन फारम भर्ने म्याद थप सम्बन्धी अत्यन्त जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Apr 27, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/121" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को अत्यन्त जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Apr 08, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/120" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को ३०औ नाम दर्ता परीक्षा (फार्मेसी सहायक) सम्बन्धी अत्यन्त जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Mar 13, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/119" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को अत्यन्त जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Feb 01, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/118" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को अत्यन्त जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Jan 27, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/117" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को ३०औ नाम दर्ता परीक्षा (फर्मासिष्टको) तालिका सम्बन्धि अत्यन्त जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Jan 21, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/116" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को अत्यन्त जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Jan 12, 2026</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/115" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को ३० औ नाम दर्ता परीक्षाको दरखास्त फारम भर्ने सम्बन्धि अत्यन्त जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Dec 20, 2025</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/113" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को २९औ नाम दर्ता परीक्षा उतिर्ण फार्मेसी सहायकहरु को नाम दर्ता प्रमाण -पत्र वितरण सम्बन्धी जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Oct 06, 2025</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/112" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को २९  औ नाम दर्ता परीक्षा उतिर्ण फर्मासिष्टहरु को नाम दर्ता प्रमाण -पत्र वितरण सम्बन्धी जरुरी सूचना
+                      </a>
+                    </h2>
+                    <p>Sep 18, 2025</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/111" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषदद्वारा सञ्चालन हुने तालिम सम्बन्धी सूचना
+                      </a>
+                    </h2>
+                    <p>Sep 14, 2025</p>
+                  </div>
+                </div>
+                              <div class="npc__news-item flex gap-2 py-2">
+                  <div class="npc__news-item-left">
+                    <span class="inline-block">
+                      <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                  </div>
+                  <div class="npc__news-item-right">
+                    <h2>
+                      <a href="https://nepalpharmacycouncil.org.np/news-details/110" class="npc__news-item-title">
+                        नेपाल फार्मेसी परिषद्को २९औ नाम दर्ता परीक्षा (फार्मेसी सहायक) डिप्लोमा इन फार्मेसीको तालिका सम्बन्धि अत्यन्त जरुरी  सूचना
+                      </a>
+                    </h2>
+                    <p>Sep 02, 2025</p>
+                  </div>
+                </div>
+                
+                
+            </div>
+            <div style="padding: 10px; float:right;">
+                <nav>
+    <ul class="pagination pagination mb-0">
+        
+                    <li class="page-item disabled">
+                <span class="page-link" aria-label="Previous" aria-hidden="true">&laquo;</span>
+            </li>
+        
+        
+                    
+                                                                        <li class="page-item active">
+                            <span class="page-link">1</span>
+                        </li>
+                                                                                <li class="page-item">
+                            <a class="page-link" href="https://nepalpharmacycouncil.org.np/news?page=2">2</a>
+                        </li>
+                                                                                <li class="page-item">
+                            <a class="page-link" href="https://nepalpharmacycouncil.org.np/news?page=3">3</a>
+                        </li>
+                                                                                <li class="page-item">
+                            <a class="page-link" href="https://nepalpharmacycouncil.org.np/news?page=4">4</a>
+                        </li>
+                                                                                <li class="page-item">
+                            <a class="page-link" href="https://nepalpharmacycouncil.org.np/news?page=5">5</a>
+                        </li>
+                                                                                <li class="page-item">
+                            <a class="page-link" href="https://nepalpharmacycouncil.org.np/news?page=6">6</a>
+                        </li>
+                                                        
+        
+                    <li class="page-item">
+                <a class="page-link" href="https://nepalpharmacycouncil.org.np/news?page=2" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            </ul>
+</nav>
+
+            </div>
+          </div>
+         
+      
+      </div>
+    </div>
+  </section>
+    
+
+
+    </div>
+
+    <footer>
+  <div class="npc__container--fluid">
+    <div class="npc__footer-content-wrapper">
+      <div class="npc__footer-main-content">
+        <!-- one  -->
+        <div class="npc__footer-main-content-left">
+          <div class="npc__footer-contact-info">
+            <!-- footer logo -->
+            <div class="footer__logo">
+              <div class="footer__logo-img">
+                <img src="/storage/logo/81ecc29a-f589-430d-b5b1-adff9c62e3ca.png" alt="" />
+              </div>
+            </div>
+
+            <div class="footer__get-in-touch">
+              <p class="flex items-center gap-2">
+                <span>
+                  <i class="fa-solid fa-phone"></i>
+                </span>
+                <span>+977 (0)1 4790747, 970-9090485</span>
+              </p>
+              <p class="flex items-center gap-2">
+                <span>
+                  <i class="fa-solid fa-location-dot"></i>
+                </span>
+                <span>Swet Vinayak Marg, Babarmahal, Kathmandu, Nepal</span>
+              </p>
+              <p class="flex items-center gap-2">
+                <span>
+                  <i class="fa-solid fa-envelope"></i>
+                </span>
+                <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7c0e191b150f080e1d0e3c12190c1d100c141d0e111d1f051f1309121f151052130e1b52120c">[email&#160;protected]</a></span>
+              </p>
+            </div>
+          </div>
+
+          <div class="npc__footer-quick-links">
+            <h3>Quick Links</h3>
+            <div class="npc__footer-quick-links-container flex flex-col">
+              <!--<a-->
+              <!--  href="https://nepalpharmacycouncil.org.np/kyp/public/"-->
+              <!--  target="_blank"-->
+              <!--  rel="noopener noreferrer"-->
+              <!--  class="npc__footer-quick-link"-->
+              <!--  >Know Your Pharmacis (KYP)</a-->
+              <!-->
+              <a
+                href="https://onlinenameregistration.nepalpharmacycouncil.org.np/renew"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="npc__footer-quick-link"
+                >Update Name Registration (Online Renew)</a
+              >
+              <a
+              href="https://onlinenameregistration.nepalpharmacycouncil.org.np/old_records/search_professional"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="npc__footer-quick-link"
+              >Search Professionals</a
+            >
+            <a
+              href="https://onlinenameregistration.nepalpharmacycouncil.org.np/admitcards"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="npc__footer-quick-link"
+              >Admit Card</a
+            ><a
+              href="https://onlinenameregistration.nepalpharmacycouncil.org.np/result"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="npc__footer-quick-link"
+              >Result</a
+            >
+            </div>
+          </div>
+        </div>
+
+        <!-- two  -->
+        <div class="npc__footer-main-content-right">
+          <div class="npc__footer-links">
+            <h3>Links</h3>
+            <div class="npc__footer-links-container flex flex-col">
+              <a href="/" class="npc__footer-link">home</a
+              ><a href="/contact" class="npc__footer-link">contact</a
+              ><a href="/about" class="npc__footer-link">about</a>
+            </div>
+          </div>
+
+          <div class="npc__footer-connect flex flex-col gap-10">
+            <div class="npc__footer-connect-container">
+              <h3>Connect With Us</h3>
+              <div class="npc__footer-socials-container flex flex-col">
+                <a href="https://www.facebook.com/nepalpharmacycouncil" class="npc__footer-social flex gap-2">
+                  <span>
+                    <i class="fa-brands fa-square-facebook"></i>
+                  </span>
+                  <span>facebook</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="copyright-separator"></div>
+      <div class="footer__copyright-content">
+        <h2 class="npc__copyright">
+          Copyright 2024, Nepal Pharmacy Council. All rights reserved.
+        </h2>
+      </div>
+    </div>
+  </div>
+</footer>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const overlay = document.getElementById("overlay");
+      const regToggle = document.getElementById("reg-toggle");
+      const regModal = document.getElementById("reg-modal");
+      const slideArrowIcon = document.getElementById("slide-arrow-icon");
+      const iconElement = document.createElement("i");
+      iconElement.classList.add("fa-solid", "fa-angles-right");
+      slideArrowIcon.appendChild(iconElement);
+      let isOpen = true;
+
+      overlay.addEventListener("scroll", (e) => {
+        e.stopPropagation();
+      });
+
+      overlay.addEventListener("click", () => {
+        regModal.style.transform = "translateX(100.1%)";
+        overlay.style.display = "none";
+      })
+
+      regToggle.addEventListener("click", () => {
+        const visible = regModal.getAttribute("data-visible");
+        if (isOpen) {
+          slideArrowIcon.innerHTML = "";
+          const rightIcon = document.createElement("i");
+          rightIcon.classList.add("fa-solid", "fa-angles-right");
+          slideArrowIcon.appendChild(rightIcon);
+          regModal.style.transform = "translateX(0)";
+          overlay.style.display = "block";
+          isOpen = false;
+        } else {
+          slideArrowIcon.innerHTML = "";
+          const leftIcon = document.createElement("i");
+          leftIcon.classList.add("fa-solid", "fa-angles-left");
+          slideArrowIcon.appendChild(leftIcon);
+          regModal.style.transform = "translateX(100.1%)";
+          overlay.style.display = "none";
+          isOpen = true;
+        }
+      });
+    });
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      let currentSlide = 0;
+      const slides = document.querySelectorAll(".slide-img");
+      const slidesContainer = document.querySelector(".slides");
+      const totalSlides = slides.length;
+
+      // Clone the first and last slides for smooth transition effect
+      const firstClone = slides[0].cloneNode(true);
+      const lastClone = slides[totalSlides - 1].cloneNode(true);
+
+      slidesContainer.appendChild(firstClone); // Append the first slide clone at the end
+      slidesContainer.insertBefore(lastClone, slides[0]); // Insert the last slide clone at the beginning
+
+      let currentPosition = -100; // Start at the first actual slide
+      slidesContainer.style.transform = `translateX(${currentPosition}%)`;
+
+      function moveToSlide(position, transition = true) {
+        if (!transition) {
+          slidesContainer.style.transition = "none";
+        } else {
+          slidesContainer.style.transition = "transform 0.5s ease-in-out";
+        }
+        slidesContainer.style.transform = `translateX(${position}%)`;
+      }
+
+      function nextSlide() {
+        currentPosition -= 100;
+        currentSlide++;
+
+        moveToSlide(currentPosition);
+
+        // If the last slide is reached, reset to the first one after the transition
+        if (currentSlide === totalSlides) {
+          setTimeout(() => {
+            currentPosition = -100;
+            currentSlide = 0;
+            moveToSlide(currentPosition, false); // Disable transition to make the jump seamless
+          }, 500); // Wait for the transition to finish
+        }
+      }
+
+      // Auto slide
+      setInterval(nextSlide, 3000); // Change image every 3 seconds
+    });
+  </script>
+
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let currentSlide = 0;
+      const slides = document.getElementsByClassName("npc__card");
+      const slidesContainer = document.getElementById("slides");
+      const totalSlides = slides.length;
+
+      // Clone the first and last slides for smooth transition effect
+      const firstClone = slides[0].cloneNode(true);
+      const lastClone = slides[totalSlides - 1].cloneNode(true);
+
+      slidesContainer.appendChild(firstClone); // Append the first slide clone at the end
+      slidesContainer.insertBefore(lastClone, slides[0]); // Insert the last slide clone at the beginning
+
+      let currentPosition = -100; // Start at the first actual slide
+      slidesContainer.style.transform = `translateX(${currentPosition}%)`;
+
+      function moveToSlide(position, transition = true) {
+        if (!transition) {
+          slidesContainer.style.transition = "none";
+        } else {
+          slidesContainer.style.transition = "transform 0.5s ease-in-out";
+        }
+        slidesContainer.style.transform = `translateX(${position}%)`;
+      }
+
+      function nextSlide() {
+        currentPosition -= 100;
+        currentSlide++;
+
+        moveToSlide(currentPosition);
+
+        // If the last slide is reached, reset to the first one after the transition
+        if (currentSlide === totalSlides) {
+          setTimeout(() => {
+            currentPosition = -100;
+            currentSlide = 0;
+            moveToSlide(currentPosition, false); // Disable transition to make the jump seamless
+          }, 500); // Wait for the transition to finish
+        }
+      }
+
+      // Auto slide
+      setInterval(nextSlide, 3000); // Change image every 3 seconds
+    });
+  </script>
+
+  <!-- mobile nav drop down  -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let isOpen = false;
+      const dropDownBtns = document.getElementsByClassName(
+        "npc__nav-link-dropdown"
+      );
+      const dropDowns = document.getElementsByClassName("npc__mob-dropdown");
+
+      function AttachDropDownEvent() {
+        for (const ds of dropDownBtns) {
+          ds.addEventListener("click", (e) => {
+            ds.classList.toggle("npc__mob-dropdown-hide");
+            ds.classList.toggle("npc__mob-dropdown-icon");
+          });
+        }
+      }
+      // hideAllDropDown();
+      AttachDropDownEvent();
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const hamburger = document.getElementById("hamburger");
+      const cross = document.getElementById("cross");
+      const mobileNav = document.getElementById("mobile-nav");
+
+      hamburger.addEventListener("click", () => {
+        hamburger.style.display = "none";
+        cross.style.display = "block";
+        mobileNav.style.transform = "translateX(0%)";
+      });
+
+      cross.addEventListener("click", () => {
+        cross.style.display = "none";
+        hamburger.style.display = "block";
+        mobileNav.style.transform = "translateX(-100%)";
+      });
+    });
+  </script>
+
+<script src="https://nepalpharmacycouncil.org.np/backend/assets/js/vendor.min.js"></script>
+<script src="https://nepalpharmacycouncil.org.np/backend/assets/js/app.min.js"></script>
+
+
+
+
+
+
+
+
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"8d333aa58a8147ab898b87f8bd49363b","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

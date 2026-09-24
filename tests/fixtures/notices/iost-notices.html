@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://iost.tu.edu.np/assets/temp2/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="https://iost.tu.edu.np/assets/temp2/font/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://iost.tu.edu.np/assets/temp2/css/temp2.css">
+    <link rel="shortcut icon" href="https://portal.tu.edu.np/medias/TULogoTIF-2_2024_04_21_11_26_49.jpg" type="image/x-icon">
+    <title>INSTITUTE OF SCIENCE AND TECHNOLOGY</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="https://iost.tu.edu.np/assets/temp1/images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://iost.tu.edu.np/assets/temp1/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://iost.tu.edu.np/assets/temp1/images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="https://iost.tu.edu.np/assets/temp1/images/favicon/site.webmanifest">
+    <link rel="mask-icon" href="https://iost.tu.edu.np/assets/temp1/images/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+</head>
+<body>
+    <header class="header shadow">
+        <div class="header-middle text-center">
+        <div class="container">
+                <div class="row align-items-center m-display-none d-flex">
+                    <div class="col-10 d-flex">
+                        <!-- <img src="https://portal.tu.edu.np/medias/TULogoTIF-2_2024_04_21_11_26_49.jpg" alt="" height="100"> -->
+                        <img src="https://iost.tu.edu.np/assets/logo.png" height="100"
+                        alt="">
+                        <div class="text-start mt-4">
+                            <h4>INSTITUTE OF SCIENCE AND TECHNOLOGY</h4>
+                            <small><b></b></small>
+                            <p>Kirtipur, Kathmandu, Nepal</p>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="header-middle-right">
+                            <ul class="header-middle-contact text-end d-flex">
+                                    <li class="me-2 social-media-icons"><a href="https://www.facebook.com/tuiostdean/" target="_blank"><i class="bi bi-facebook " style="color: #338CF1;font-size: 1.5rem;"></i></a>
+                                    </li>
+                                    <li class="me-2 social-media-icons"><a href=""><i class="bi bi-twitter" style="color: #399BEF ;font-size: 1.5rem;"></i></a></li>
+                                    <li class="me-2 social-media-icons"><a href=""><i class="bi bi-linkedin" style="color: #2366C2;font-size: 1.5rem;"></i></a></li>
+                                    <li class="dropdown show">
+                                        <div class="me-2 mt-1" id="shareButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-share-fill" style="color: #1b6ae0 ;font-size: 1.2rem;"></i>
+                                        </div>
+                                        <div class="dropdown-menu" aria-labelledby="shareButton">
+                                            <a class="dropdown-item text-primary"
+                                                href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fiost.tu.edu.np%2Fnotices"
+                                                target="_blank">
+                                                <i class="bi bi-facebook me-2 text-primary"></i>Share on facebook
+                                            </a>
+                                            <a class="dropdown-item text-primary"
+                                                href="https://twitter.com/intent/tweet?text=Check+this+out!&url=https%3A%2F%2Fiost.tu.edu.np%2Fnotices"
+                                                target="_blank">
+                                                <i class="bi bi-twitter me-2 text-info"></i>Share on twitter
+                                            </a>
+                                            <a class="dropdown-item text-primary"
+                                                href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fiost.tu.edu.np%2Fnotices"
+                                                target="_blank">
+                                                <i class="bi bi-linkedin me-2 text-primary"></i>Share on linkedin
+                                            </a>
+                                        </div>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <div class="d-flex align-items-center">
+                    <img src="https://portal.tu.edu.np/medias/TULogoTIF-2_2024_04_21_11_26_49.jpg" alt="" height="100">
+                    <div class="text-start ms-2">
+                        <div class="title">INSTITUTE OF SCIENCE AND TECHNOLOGY</div>
+                        <div class="address">Kirtipur, Kathmandu, Nepal</div>
+                    </div>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"><i class="bi bi-list"></i></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    <li class="nav-item ">
+                        <a class="nav-link" href="/" id="navbarDropdown" role="button" aria-expanded="false">
+                            <i class="bi bi-house-fill"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link" href="https://iost.tu.edu.np/institute/calendar" id="navbarDropdown" role="button"
+                           aria-expanded="false">
+                            <img src="/assets/calendar.png" alt="" width="25">
+
+
+                        </a>
+                    </li>
+                                                                                                        <li class="nav-item dropdown  ">
+                                                                            <div class="nav-link dropdown-toggle d-flex justify-content-between"
+                                             id="navbarDropdown" role="button" aria-expanded="false">
+                                            <a href="/pages/about-iost-245" class="text-white">
+                                                &#9782;
+                                                IoST
+                                            </a>
+                                            <div class="second-level-menu-toogle d-lg-none">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/message-from-the-dean-2135">Message from the Dean
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/about-iost-245">About IoST
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/sections-and-services-249">Sections and Services
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/committies-250">Committees
+                                                                                                                    <i class="bi bi-arrow-right ms-4"></i>
+                                                                                                            </a>
+                                                                                                                                                    <ul class="inner-menu ms-lg-5">
+                                                                                                                                                                                    <li class=""><a
+                                                                        class="dropdown-item"
+                                                                        href="/pages/faculty-board-251">Faculty Board</a>
+                                                                </li>
+                                                                                                                                                                                                                                                <li class=""><a
+                                                                        class="dropdown-item" href="http://iost.tu.edu.np/pages/research-246"
+                                                                        target="_blank">Research Committee</a>
+                                                                </li>
+                                                                                                                                                                                                                                                <li class=""><a
+                                                                        class="dropdown-item" href="http://iost.tu.edu.np/pages/publication-247"
+                                                                        target="_blank">Journal Committee</a>
+                                                                </li>
+                                                                                                                                                                        </ul>
+                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/staffs">Authorities &amp; Supporting Staffs
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                            </ul>
+                                </li>
+
+                                                                                                                                                            <li class="nav-item dropdown  active">
+                                                                            <div class="nav-link dropdown-toggle d-flex justify-content-between"
+                                             id="navbarDropdown" role="button" aria-expanded="false">
+                                            <a class="text-white" href="/notices"
+                                               id="navbarDropdown"
+                                               role="button" aria-expanded="false">&#x1F6C8;
+                                                Info
+                                            </a>
+                                            <div class="second-level-menu-toogle d-lg-none">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                                                                                    <li class="active">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/notices">Notices
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/events">Events
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/news">News
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                            </ul>
+                                </li>
+
+                                                                                                                                                            <li class="nav-item dropdown  ">
+                                                                            <div class="nav-link dropdown-toggle d-flex justify-content-between"
+                                             id="navbarDropdown" role="button" aria-expanded="false">
+                                            <a href="/pages/" class="text-white">
+                                                
+                                                Research
+                                            </a>
+                                            <div class="second-level-menu-toogle d-lg-none">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/research-246">About Research
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/mini-research-1834">Mini Research
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/">List of Ph.D. Awardee from IoST
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                            </ul>
+                                </li>
+
+                                                                                                                                                            <li class="nav-item dropdown  ">
+                                                                            <div class="nav-link dropdown-toggle d-flex justify-content-between"
+                                             id="navbarDropdown" role="button" aria-expanded="false">
+                                            <a href="/pages/publication-247" class="text-white">
+                                                
+                                                Publication
+                                            </a>
+                                            <div class="second-level-menu-toogle d-lg-none">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/publications">Bulletin
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/publication-247">Journal
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                            </ul>
+                                </li>
+
+                                                                                                                                                            <li class="nav-item dropdown  ">
+                                                                            <div class="nav-link dropdown-toggle d-flex justify-content-between"
+                                             id="navbarDropdown" role="button" aria-expanded="false">
+                                            <a href="/pages/colleges-256" class="text-white">
+                                                <i class='fas fa-school'></i>
+                                                Institutions
+                                            </a>
+                                            <div class="second-level-menu-toogle d-lg-none">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/constituent-colleges-277">Constituent Colleges
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/our-affiliated-colleges-329">Affiliated Colleges
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/central-departments-287">Central Departments
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                            </ul>
+                                </li>
+
+                                                                                                                                                            <li class="nav-item dropdown  ">
+                                                                            <div class="nav-link dropdown-toggle d-flex justify-content-between"
+                                             id="navbarDropdown" role="button" aria-expanded="false">
+                                            <a href="/pages/program-252" class="text-white">
+                                                
+                                                Programs
+                                            </a>
+                                            <div class="second-level-menu-toogle d-lg-none">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/programs-of-iost-255">Program of IoST
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/admissioin-policy-254">Admissioin Policy
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/evaluation-system-253">Evaluation System
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                            </ul>
+                                </li>
+
+                                                                                                                                                            <li class="nav-item dropdown  ">
+                                                                            <div class="nav-link dropdown-toggle d-flex justify-content-between"
+                                             id="navbarDropdown" role="button" aria-expanded="false">
+                                            <a href="/pages/resources-285" class="text-white">
+                                                <i class="fa fa-download"></i>
+                                                Resources
+                                            </a>
+                                            <div class="second-level-menu-toogle d-lg-none">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/downloads">Downloads
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/gallery">Gallery
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <a class="dropdown-item text-wrap"
+                                                       href="/pages/digital-resources-286">Digital Resources
+                                                                                                            </a>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <div class="dropdown-item text-wrap d-flex justify-content-between">
+
+                                                        <a href="https://tunepal-my.sharepoint.com/personal/info_ec_tu_edu_np/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Finfo%5Fec%5Ftu%5Fedu%5Fnp%2FDocuments%2FRule&amp;ct=1686964932516&amp;or=OWA%2DNT&amp;cid=4dee9e38%2D7d88%2D02be%2D964b%2D78478bbda7bb&amp;ga=1"
+                                                           class="text-white">All TU Act &amp; Rules</a>
+                                                                                                            </div>
+                                                                                                                                            </li>
+
+                                                                            </ul>
+                                </li>
+
+                                                                                                                            
+                                <li class="nav-item">
+                                                                            <a class="nav-link active " aria-current="page"
+                                           href="/pages/erc-2274"> IRC
+                                        </a>
+                                                                    </li>
+                                                                                                                                                            <li class="nav-item dropdown  ">
+                                                                            <div class="nav-link dropdown-toggle d-flex justify-content-between"
+                                             id="navbarDropdown" role="button" aria-expanded="false">
+                                            <a href="/pages/exam-2013" class="text-white">
+                                                
+                                                Exam
+                                            </a>
+                                            <div class="second-level-menu-toogle d-lg-none">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                                                                                    <li class="">
+                                                                                                    <div class="dropdown-item text-wrap d-flex justify-content-between">
+
+                                                        <a href="https://iost.tu.edu.np/notices?title=&amp;start_date=&amp;nep_start_date=&amp;end_date=&amp;nep_end_date=&amp;notice_type=21"
+                                                           class="text-white">Result</a>
+                                                                                                            </div>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <div class="dropdown-item text-wrap d-flex justify-content-between">
+
+                                                        <a href="https://iost.tu.edu.np/notices?title=&amp;start_date=&amp;nep_start_date=&amp;end_date=&amp;nep_end_date=&amp;notice_type=8"
+                                                           class="text-white">Form Filling NOtice</a>
+                                                                                                            </div>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <div class="dropdown-item text-wrap d-flex justify-content-between">
+
+                                                        <a href="https://iost.tu.edu.np/notices?title=&amp;start_date=&amp;nep_start_date=&amp;end_date=&amp;nep_end_date=&amp;notice_type=26"
+                                                           class="text-white">Exam Schedule</a>
+                                                                                                            </div>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <div class="dropdown-item text-wrap d-flex justify-content-between">
+
+                                                        <a href="https://iost.tu.edu.np/notices?title=&amp;start_date=&amp;nep_start_date=&amp;end_date=&amp;nep_end_date=&amp;notice_type=23"
+                                                           class="text-white">Exam Center</a>
+                                                                                                            </div>
+                                                                                                                                            </li>
+
+                                                                            </ul>
+                                </li>
+
+                                                                                                                            
+                                <li class="nav-item">
+                                                                            <a class="nav-link active " aria-current="page"
+                                           href="/pages/bada-patra-1424"> बडापत्र
+                                        </a>
+                                                                    </li>
+                                                                                                                                                            <li class="nav-item dropdown  ">
+                                                                            <div class="nav-link dropdown-toggle d-flex justify-content-between"
+                                             id="navbarDropdown" role="button" aria-expanded="false">
+                                            <a href="/pages/entrance-248" class="text-white">
+                                                
+                                                Entrance Call
+                                            </a>
+                                            <div class="second-level-menu-toogle d-lg-none">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </div>
+                                        </div>
+                                                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                                                                                    <li class="">
+                                                                                                    <div class="dropdown-item text-wrap d-flex justify-content-between">
+
+                                                        <a href="https://entrancebsc.iost.tu.edu.np/"
+                                                           class="text-white">General B.Sc. Entrance</a>
+                                                                                                            </div>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <div class="dropdown-item text-wrap d-flex justify-content-between">
+
+                                                        <a href="https://entrancebtech.iost.tu.edu.np/"
+                                                           class="text-white">B. Tech. (Food Technology) Entrance</a>
+                                                                                                            </div>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <div class="dropdown-item text-wrap d-flex justify-content-between">
+
+                                                        <a href="https://entrancebit.iost.tu.edu.np/"
+                                                           class="text-white">BIT Entrance</a>
+                                                                                                                    <i class="bi bi-arrow-right ms-4"></i>
+                                                                                                            </div>
+                                                                                                                                                    <ul class="inner-menu ms-lg-5">
+                                                                                                                                                                                    <li class=""><a
+                                                                        class="dropdown-item" href="https://entrancebit.iost.tu.edu.np/"
+                                                                        target="_blank">online form</a>
+                                                                </li>
+                                                                                                                                                                                                                                                <li class=""><a
+                                                                        class="dropdown-item" href="https://www.youtube.com/watch?v=YZP28es93IQ"
+                                                                        target="_blank">Right Way to Fill OMR Answer Sheet!</a>
+                                                                </li>
+                                                                                                                                                                        </ul>
+                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <div class="dropdown-item text-wrap d-flex justify-content-between">
+
+                                                        <a href="https://entrancecsit.iost.tu.edu.np/"
+                                                           class="text-white">B.Sc.CSIT Entrance</a>
+                                                                                                                    <i class="bi bi-arrow-right ms-4"></i>
+                                                                                                            </div>
+                                                                                                                                                    <ul class="inner-menu ms-lg-5">
+                                                                                                                                                                                    <li class=""><a
+                                                                        class="dropdown-item" href="https://entrancecsit.iost.tu.edu.np/"
+                                                                        target="_blank">Online form</a>
+                                                                </li>
+                                                                                                                                                                                                                                                <li class=""><a
+                                                                        class="dropdown-item" href="https://youtu.be/YZP28es93IQ?t=154"
+                                                                        target="_blank">Right Way to Fill OMR Answer Sheet!</a>
+                                                                </li>
+                                                                                                                                                                        </ul>
+                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <div class="dropdown-item text-wrap d-flex justify-content-between">
+
+                                                        <a href="http://103.175.192.30:85/"
+                                                           class="text-white">M.Sc. &amp; Masters&#039; Degree Entrance</a>
+                                                                                                            </div>
+                                                                                                                                            </li>
+
+                                                                                    <li class="">
+                                                                                                    <div class="dropdown-item text-wrap d-flex justify-content-between">
+
+                                                        <a href="https://sms.tu.edu.np/"
+                                                           class="text-white">B.Math.Sc. in Actuarial Science</a>
+                                                                                                            </div>
+                                                                                                                                            </li>
+
+                                                                            </ul>
+                                </li>
+
+                                                                                            
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-plus"></i> More
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                                                    <li>
+                                                                                    <a class="dropdown-item" href="https://outlook.office.com/mail/"
+                                               target="_blank">Webmail Login</a>
+                                                                            </li>
+                                                                    <li>
+                                                                                    <a class="dropdown-item" href="http://202.70.90.8"
+                                               target="_blank">Office atomation</a>
+                                                                            </li>
+                                                                    <li>
+                                                                                    <a class="dropdown-item" href="http://202.70.90.7:801/"
+                                               target="_blank">E-Hajiri</a>
+                                                                            </li>
+                                                                    <li>
+                                                                                    <a class="dropdown-item"
+                                               href="pages/contact-us-334">Contact Us</a>
+                                                                            </li>
+                                                                    <li>
+                                                                                    <a class="dropdown-item"
+                                               href="centralDepartments">Central Departments</a>
+                                                                            </li>
+                                                                    <li>
+                                                                                    <a class="dropdown-item"
+                                               href="campuses">Campuses</a>
+                                                                            </li>
+                                                                    <li>
+                                                                                    <a class="dropdown-item" href="https://iost.tu.edu.np/notices?title=&amp;start_date=&amp;nep_start_date=&amp;end_date=&amp;nep_end_date=&amp;notice_type=633"
+                                               target="_blank">Academic Calendar</a>
+                                                                            </li>
+                                                            </ul>
+                        </li>
+                                    </ul>
+            </div>
+        </div>
+    </nav>
+            <div class="scroll-news">
+            <div class="container">
+                <div class="news-acroll-warpper position-relative">
+                    <div class="scroll-news-badge"><i class="bi bi-newspaper me-2"></i>Highlights</div>
+                    <marquee behavior="" direction="" onmouseover="this.stop();" onmouseout="this.start();">
+                        <ul>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">1</div>
+                                    <a href="https://iost.tu.edu.np/notices/15565">M.Sc. Microbiology III Semester-2081 Exam Result</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">2</div>
+                                    <a href="https://iost.tu.edu.np/notices/15515">विद्यावारिधि प्रवेश परीक्षा केन्द्र र समयसम्बन्धी जरुरी सूचना</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">3</div>
+                                    <a href="https://iost.tu.edu.np/notices/15444">M.Sc. Engineering Geology I Semester-2082 Exam Result</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">4</div>
+                                    <a href="https://iost.tu.edu.np/notices/15443">M.Sc. Geology I Semester-2082 Exam Result</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">5</div>
+                                    <a href="https://iost.tu.edu.np/notices/15442">M.Sc. Food Technology I Semester-2082 Exam Result</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">6</div>
+                                    <a href="https://iost.tu.edu.np/notices/15401">M.Sc. IV Semester-2080 Make Up Exam Schedule</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">7</div>
+                                    <a href="https://iost.tu.edu.np/notices/15400">B.Sc.CSIT VIII Semester-2079 Form Fill Up Notice</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">8</div>
+                                    <a href="https://iost.tu.edu.np/notices/15399">Bachelor in Information Technology (BIT) VIII Semester-2079 Form Fill Up Notice</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">9</div>
+                                    <a href="https://iost.tu.edu.np/notices/15398">B.Tech.(Food Technology) I Semester-2082 Exam Result</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">10</div>
+                                    <a href="https://iost.tu.edu.np/notices/15397">M.Sc. Environmental Science I Semester-2082 Exam Result</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">11</div>
+                                    <a href="https://iost.tu.edu.np/notices/15396">M.Sc. Environmental Health in Disaster (EHD) I Semester-2082 Exam Result</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">12</div>
+                                    <a href="https://iost.tu.edu.np/notices/15395">Re-totaling Result of M.Sc. Zoology I Semester-2082</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">13</div>
+                                    <a href="https://iost.tu.edu.np/notices/15362">B.Sc. प्रवेश परीक्षा 2083 को नतिजा प्रकशित गरिएको बारे</a>
+                                </li>
+                                                            <li class="me-4">
+                                    <div class="scroll-index">14</div>
+                                    <a href="https://iost.tu.edu.np/notices/15323">परीक्षार्थीहरूका लागि अत्यन्त जरूरी सूचना</a>
+                                </li>
+                                                    </ul>
+                    </marquee>
+                </div>
+
+            </div>
+        </div>
+    </header>
+        <div class="inner-banner"
+        style="background-image: url(/assets/temp1/images/not.png);">
+        <div class="container">
+            <div class="inner-banner-wrapper">
+                <div class="inner-banner-detail">
+                    <h4 class="title">Notices</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="https://iost.tu.edu.np">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                Notices
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <section class="notices-pg">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12">
+                    <div class="section-title mb-5 py-3">
+                        <h3><i class="bi bi-layout-text-window-reverse"></i> Notices</h3>
+                    </div>
+                    <div class="col-md-12 mb-5">
+                        <form class="form" method="GET" action="https://iost.tu.edu.np/notices">
+                            <div class="row">
+                                <div class="col-md-12 form-group my-2">
+                                    <input class="form-control border border-secondary" type="title" placeholder="Title"
+                                        name="title" aria-label="Title" value="">
+                                </div>
+
+                                <div class="col-md-4 form-group my-2">
+                                    <input type="hidden" name="start_date" id="start_date"
+                                        value="">
+                                    <input class="form-control border border-secondary datepicker" type="text"
+                                        name="nep_start_date" placeholder="Publish Date From" aria-label="Publish Date"
+                                        data-field="#start_date">
+                                </div>
+                                <div class="col-md-4 form-group my-2">
+                                    <input type="hidden" name="end_date" id="end_date"
+                                        value="">
+                                    <input class="form-control border border-secondary datepicker" type="text"
+                                        name="nep_end_date" placeholder="Publish Date To" aria-label="Publish Date"
+                                        data-field="#end_date">
+                                </div>
+                                <div class="col-md-4 form-group my-2">
+                                    <select class="form-select border border-secondary" name="notice_type">
+                                                                                    <option value=""
+                                                selected>
+                                                Select Notice Type</option>
+                                                                                    <option value="8"
+                                                >
+                                                Form filling notice</option>
+                                                                                    <option value="21"
+                                                >
+                                                Result</option>
+                                                                                    <option value="22"
+                                                >
+                                                General Notice</option>
+                                                                                    <option value="23"
+                                                >
+                                                Exam Center Notice</option>
+                                                                                    <option value="26"
+                                                >
+                                                Exam schedule</option>
+                                                                                    <option value="633"
+                                                >
+                                                Academic Calendar</option>
+                                                                                    <option value="634"
+                                                >
+                                                About Scholarship</option>
+                                                                            </select>
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-outline-success" type="submit"><i class="bi bi-search me-2"></i>
+                                        Search</button>
+                                    <a href="https://iost.tu.edu.np/notices" class="btn btn-danger rounded-0"><i
+                                            class="bi bi-arrow-clockwise me-2 "></i>Refresh</a>
+                                </div>
+                            </div>
+                        </form>
+
+                        <hr>
+                    </div>
+                    <div class="notices-warpper rec-post">
+                        <ul>
+                                                            <div class="recent-post-wrapper shdow">
+                                    <div class="date">
+                                        <span class="nep_date">2026-09-23</span>
+                                    </div>
+                                    <div class="detail">
+                                        <a href="https://iost.tu.edu.np/notices/15565">
+                                            <h5>M.Sc. Microbiology III Semester-2081 Exam Result</h5>
+                                            
+                                        </a>
+                                    </div>
+                                </div>
+                                                            <div class="recent-post-wrapper shdow">
+                                    <div class="date">
+                                        <span class="nep_date">2026-09-22</span>
+                                    </div>
+                                    <div class="detail">
+                                        <a href="https://iost.tu.edu.np/notices/15515">
+                                            <h5>विद्यावारिधि प्रवेश परीक्षा केन्द्र र समयसम्बन्धी जरुरी सूचना</h5>
+                                            
+                                        </a>
+                                    </div>
+                                </div>
+                                                            <div class="recent-post-wrapper shdow">
+                                    <div class="date">
+                                        <span class="nep_date">2026-09-18</span>
+                                    </div>
+                                    <div class="detail">
+                                        <a href="https://iost.tu.edu.np/notices/15444">
+                                            <h5>M.Sc. Engineering Geology I Semester-2082 Exam Result</h5>
+                                            
+                                        </a>
+                                    </div>
+                                </div>
+                                                            <div class="recent-post-wrapper shdow">
+                                    <div class="date">
+                                        <span class="nep_date">2026-09-18</span>
+                                    </div>
+                                    <div class="detail">
+                                        <a href="https://iost.tu.edu.np/notices/15443">
+                                            <h5>M.Sc. Geology I Semester-2082 Exam Result</h5>
+                                            
+                                        </a>
+                                    </div>
+                                </div>
+                                                            <div class="recent-post-wrapper shdow">
+                                    <div class="date">
+                                        <span class="nep_date">2026-09-18</span>
+                                    </div>
+                                    <div class="detail">
+                                        <a href="https://iost.tu.edu.np/notices/15442">
+                                            <h5>M.Sc. Food Technology I Semester-2082 Exam Result</h5>
+                                            
+                                        </a>
+                                    </div>
+                                </div>
+                                                            <div class="recent-post-wrapper shdow">
+                                    <div class="date">
+                                        <span class="nep_date">2026-09-17</span>
+                                    </div>
+                                    <div class="detail">
+                                        <a href="https://iost.tu.edu.np/notices/15401">
+                                            <h5>M.Sc. IV Semester-2080 Make Up Exam Schedule</h5>
+                                            
+                                        </a>
+                                    </div>
+                                </div>
+                                                    </ul>
+                        <nav>
+        <ul class="pagination">
+            
+                            <li class="page-item disabled" aria-disabled="true">
+                    <span class="page-link">&laquo; Previous</span>
+                </li>
+            
+            
+                            <li class="page-item">
+                    <a class="page-link" href="https://iost.tu.edu.np/notices?cursor=eyJjcmVhdGVkX2F0IjoiMjAyNi0wOS0xNyAxNzoyNDoxNCIsIl9wb2ludHNUb05leHRJdGVtcyI6dHJ1ZX0" rel="next">Next &raquo;</a>
+                </li>
+                    </ul>
+    </nav>
+
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
+                    <div class="sidebar">
+                        <h4 class="title">
+                            More News
+                        </h4>
+                        <hr>
+                                                    <div class="sidebar-wrapper d-flex align-items-center mb-3">
+                                <div class="date">
+                                    <span class="nep_date">2026-09-02</span>
+                                </div>
+                                <div class="detail ms-2">
+                                    <a href="https://iost.tu.edu.np/news/1226">
+                                        
+                                        विज्ञान डीन कार्यालयको प्रशासनिक भवन शिलान्यास
+                                    </a>
+                                </div>
+
+                            </div>
+                                                    <div class="sidebar-wrapper d-flex align-items-center mb-3">
+                                <div class="date">
+                                    <span class="nep_date">2026-07-27</span>
+                                </div>
+                                <div class="detail ms-2">
+                                    <a href="https://iost.tu.edu.np/news/1180">
+                                        
+                                        विज्ञान तथा प्रविधि अध्ययन संस्थानमा इन्ट्रानेट जडान तथा हस्तान्तरण पश्चात् अभिमुखीकरण कार्यक्रम सम्पन्न
+                                    </a>
+                                </div>
+
+                            </div>
+                                                    <div class="sidebar-wrapper d-flex align-items-center mb-3">
+                                <div class="date">
+                                    <span class="nep_date">2026-06-05</span>
+                                </div>
+                                <div class="detail ms-2">
+                                    <a href="https://iost.tu.edu.np/news/1122">
+                                        
+                                        बुटवल बहुमुखी क्याम्पसमा Deep learning for Materials Science (DLMS-2026) कार्यशाला सुरु
+                                    </a>
+                                </div>
+
+                            </div>
+                                                    <div class="sidebar-wrapper d-flex align-items-center mb-3">
+                                <div class="date">
+                                    <span class="nep_date">2026-02-11</span>
+                                </div>
+                                <div class="detail ms-2">
+                                    <a href="https://iost.tu.edu.np/news/1004">
+                                        
+                                        अनुसन्धान आचरणसम्बन्धी तालिम कार्यक्रम सम्पन्न
+                                    </a>
+                                </div>
+
+                            </div>
+                                                    <div class="sidebar-wrapper d-flex align-items-center mb-3">
+                                <div class="date">
+                                    <span class="nep_date">2026-01-03</span>
+                                </div>
+                                <div class="detail ms-2">
+                                    <a href="https://iost.tu.edu.np/news/967">
+                                        
+                                        ५३ औं स्थापना दिवस सम्पन्न
+                                    </a>
+                                </div>
+
+                            </div>
+                                            </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="back-to-top shadow">
+    <i class="bi bi-arrow-up"></i>
+</div>
+
+<style>
+    .phone-img-list img { display: inline !important; vertical-align: middle; font-family: 'Mukta', sans-serif !important;
+        font-weight: 500;}
+</style>
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12">
+                <div class="info-officer">
+                    <div class="card">
+                                                    <img src="https://portal.tu.edu.np/medias/2026_08_26_10_05_34.png" class="card-img-top"
+                                alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title pt-3">Keshav Prasad Sharma</h5>
+                                <span>Information Officer</span>
+                                <span>info@iost.tu.edu.np</span>
+                                <span>9851076689
+                                    , 
+                                    014330844
+                                </span>
+                            </div>
+                                            </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12">
+                <h4 class="f-title mb-4">Menu</h4>
+                <ul class="f-links">
+                                            <li>
+                                                            <a href="https://www.facebook.com/tuiostdean/">facebook</a>
+                                                    </li>
+                                            <li>
+                                                            <a href="/faqs">FAQS</a>
+                                                    </li>
+                                            <li>
+                                                            <a href="https://www.tuiost.edu.np/">Old website</a>
+                                                    </li>
+                                    </ul>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12">
+                <h4 class="f-title mb-4">Useful Links</h4>
+                <ul class="f-links">
+                                            <li><a href="http://tu.edu.np/"> Tribhuvan University</a></li>
+                                            <li><a href="https://tucl.tu.edu.np/"> TU Central Library</a></li>
+                                            <li><a href="https://www.tuexam.edu.np/"> Examination Controller office</a></li>
+                                            <li><a href="https://recast.edu.np/"> RECAST</a></li>
+                                            <li><a href="http://moe.gov.np/"> Ministry of Education, Science and Technology</a></li>
+                                            <li><a href="http://www.ugcnepal.edu.np/"> University Grants Comission</a></li>
+                                            <li><a href="https://nhmnepal.edu.np/"> NATURAL HISTORY MUSEUM</a></li>
+                                    </ul>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12">
+                <h4 class="f-title mb-4">Contact</h4>
+                <ul class="f-links">
+                    <li><i class="bi bi-envelope me-2"></i>
+                                                info@iost.tu.edu.np,                                                 exam@iost.tu.edu.np,                                                 research@iost.tu.edu.np,                                                 bsc@iost.tu.edu.np                                            </li>
+                    <li class="phone-img-list"><i class="bi bi-geo-alt me-2"></i>Kirtipur, Kathmandu, Nepal</li>
+                    <li><i class="bi bi-phone me-2"></i>
+                                                4330844,                                                 4331755,                                                 4332738,                                                 4330120(Exam)                                            </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="foter-bottom">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 d-flex justify-content-between">
+                    <p class="text-start">© 2026 All Rights Reserved</p>
+                    <p> <a href="https://websitedesignnepal.com/" target="_blank" style="color: #04293A">Website Design</a>
+                        by: <a href="https://www.youngminds.com.np/" style="color: #04293A" target="_blank">Young Minds</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!--=================footer section ended=========-->
+
+<!-- All Scripts-->
+<script src="https://iost.tu.edu.np/assets/temp2/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="https://iost.tu.edu.np/assets/temp2/js/temp2.js"></script>
+<script>
+    AOS.init({
+        once: true
+    });
+</script>
+</body>
+
+</html>

@@ -7,6 +7,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "anthropic-ai/sdk": "^0.51.0",
+        "anuzpandey/laravel-nepali-date": "^3.3",
         "darkaonline/l5-swagger": "^9.0",
         "hisorange/browser-detect": "^5.0",
         "kreait/laravel-firebase": "^5.8",
@@ -15,7 +17,10 @@
         "laravel/tinker": "^2.9",
         "phpoffice/phpspreadsheet": "^4.4",
         "phpoffice/phpword": "^1.4",
+        "smalot/pdfparser": "^2.12",
         "spatie/laravel-medialibrary": "^11.17",
+        "symfony/css-selector": "^7.4",
+        "symfony/dom-crawler": "^7.4",
         "tymon/jwt-auth": "^2.1"
     },
     "require-dev": {

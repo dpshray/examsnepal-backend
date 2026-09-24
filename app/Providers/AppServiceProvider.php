@@ -39,6 +39,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function register()
     {
-       
+        // Notices AI provider (config/notices.php -> ai.provider).
+        $this->app->bind(\App\Services\Notices\Enrichment\NoticeAiClient::class, fn () => config('notices.ai.provider') === 'anthropic'
+            ? new \App\Services\Notices\Enrichment\AnthropicNoticeAiClient()
+            : new \App\Services\Notices\Enrichment\OpenRouterNoticeAiClient());
     }
 }

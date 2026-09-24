@@ -31,6 +31,10 @@ use App\Http\Controllers\Contact\ContactController;
 use App\Http\Controllers\Corporate\CorporateExamController;
 use App\Http\Controllers\ExamCategoryController;
 use App\Http\Controllers\Frontend\ExamGuideController;
+use App\Http\Controllers\Frontend\NoticeController;
+use App\Http\Controllers\Admin\Notice\AdminNoticeController;
+use App\Http\Controllers\Admin\Notice\AdminNoticeReportController;
+use App\Http\Controllers\Admin\Notice\AdminNoticeSourceController;
 use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\TableMigrateController;
 use App\Http\Controllers\MigrationController;
@@ -366,6 +370,22 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::post('admin/payment-settings', [AdminPaymentSettingController::class, 'store']);
     //Promocode 
     Route::apiResource('admin/promo-code', PromoCodeController::class);
+
+    // Notices (docs/notices-plan.md)
+    Route::get('admin/notices/stats', [AdminNoticeController::class, 'stats']);
+    Route::get('admin/notices/meta', [AdminNoticeController::class, 'meta']);
+    Route::post('admin/notices/{notice}/approve', [AdminNoticeController::class, 'approve']);
+    Route::post('admin/notices/{notice}/reject', [AdminNoticeController::class, 'reject']);
+    Route::post('admin/notices/{notice}/feature', [AdminNoticeController::class, 'toggleFeature']);
+    Route::post('admin/notices/{notice}/re-enrich', [AdminNoticeController::class, 'reEnrich']);
+    Route::apiResource('admin/notices', AdminNoticeController::class)->names('admin.notices');
+    Route::post('admin/notice-sources/test-fetch', [AdminNoticeSourceController::class, 'testFetch']);
+    Route::post('admin/notice-sources/{noticeSource}/test-fetch', [AdminNoticeSourceController::class, 'testFetch']);
+    Route::post('admin/notice-sources/{noticeSource}/fetch-now', [AdminNoticeSourceController::class, 'fetchNow']);
+    Route::apiResource('admin/notice-sources', AdminNoticeSourceController::class)->names('admin.notice-sources');
+    Route::get('admin/notice-fetch-logs', [AdminNoticeSourceController::class, 'logs']);
+    Route::get('admin/notice-reports', [AdminNoticeReportController::class, 'index']);
+    Route::post('admin/notice-reports/{noticeReport}/resolve', [AdminNoticeReportController::class, 'resolve']);
 });
 Route::get('admin/payment-settings', [AdminPaymentSettingController::class, 'index']);
 
@@ -412,4 +432,18 @@ Route::controller(ExamGuideController::class)->group(function () {
     Route::get('free/exam-guides/categories', 'categories');
     Route::get('free/exam-guides/categories/{categorySlug}', 'category');
     Route::get('free/exam-guides/{categorySlug}/{examSlug}', 'guide');
+});
+
+// Official notices (Loksewa / entrance / license) - public, used by the
+// website and the mobile apps.
+Route::controller(NoticeController::class)->group(function () {
+    Route::get('free/notices', 'index');
+    Route::get('free/notices/home', 'home');
+    Route::get('free/notices/meta', 'meta');
+    Route::get('free/notices/sitemap', 'sitemap');
+    Route::post('free/notices/subscribe', 'subscribe')->middleware('throttle:5,1');
+    Route::get('free/notices/unsubscribe/{token}', 'unsubscribe');
+    Route::get('free/notices/{slug}', 'show');
+    Route::post('free/notices/{slug}/report', 'report')->middleware('throttle:5,1');
+    Route::post('notices/subscribe-push', 'subscribePush')->middleware(['auth:api', CheckTokenVersionMiddleware::class]);
 });

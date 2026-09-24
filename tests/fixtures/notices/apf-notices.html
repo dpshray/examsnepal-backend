@@ -1,0 +1,3218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    <style>
+        /* Apply color filters to wrapper ONLY, never to body */
+        #page-content-wrapper {
+            filter: none;
+            transition: filter 0.3s ease;
+        }
+
+.btn-bright-yellow {
+    background-color: #e4d65b !important;
+    color: #000000 !important;
+    font-weight: 600;
+}
+body.color-grayscale  #page-content-wrapper * {
+    background-color: #444647d8 !important;
+    color: #ffffff !important;
+    border-color: #666666 !important;
+}
+
+        body.color-grayscale #page-content-wrapper {
+            filter: grayscale(100%) contrast(120%);
+            background-color: #212529;
+            color:white;
+        }
+
+        body.color-protanopia #page-content-wrapper {
+            filter: url('#protanopia-filter');
+        }
+
+        /* Accessibility Widget - always visible, never filtered */
+        #accessibility-widget {
+            position: fixed !important;
+            right: 0;
+            top: 50vh;
+            transform: translateY(-50%);
+            z-index: 99999;
+            /* display:none; */
+        }
+
+        #accessibility-toggle-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50% 0 0 50%;
+            background: #495057;
+            border: none;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: -2px 2px 6px rgba(0,0,0,0.3);
+            transition: background 0.2s ease;
+        }
+
+        #accessibility-toggle-btn:hover {
+            background: #212529;
+        }
+
+        #accessibility-panel {
+            display: none;
+            position: absolute;
+            right: 44px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px 8px;
+            flex-direction: column;
+            gap: 6px;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        #accessibility-panel .btn {
+            filter: none !important;
+        }
+        .low-bandwidth img {
+    display: none !important;
+        }
+
+        .low-bandwidth video {
+    display: none !important;
+        }
+
+    .low-bandwidth iframe {
+    display: none !important;
+    }
+
+/* Optional: remove background images */
+.low-bandwidth * {
+    background-image: none !important;
+}
+/* Active state for bandwidth buttons in panel */
+    #btn-low-bandwidth.active {
+        background-color: #6c757d !important;
+        color: #fff !important;
+    }
+    #btn-high-bandwidth.active {
+        background-color: #0d6efd !important;
+        color: #fff !important;
+    }
+
+
+    /* ── Top-right bandwidth toggle button ── */
+#bandwidth-top-btn {
+    display: inline-flex;
+    gap: 6px;
+    padding: 6px 14px 6px 10px;
+    border-radius: 20px;
+    border: 1.5px solid #495057;
+    background: #fff;
+    color: #495057;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+    font-family: inherit;
+}
+   #bandwidth-top-btn:hover {
+    color: #495057;
+    background: #fff;
+}
+    #bandwidth-top-btn i {
+        font-size: 13px;
+    }
+    /* When low-bandwidth is active, tint the button orange to signal images are hidden */
+    body.low-bandwidth #bandwidth-top-btn {
+        border-color: #e67e22;
+        color: #e67e22;
+    }
+    body.low-bandwidth #bandwidth-top-btn:hover {
+        background: #e67e22;
+        color: #fff;
+    }
+
+    /* ── Low-bandwidth: hide all images inside the page wrapper ── */
+        body.low-bandwidth #page-content-wrapper img {
+            display: none !important;
+        }
+    </style>
+     
+     
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Armed Police Force</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <link rel="icon" href="https://api.apf.gov.np:8443/storage/uploads/site_setting/site_favicon/Favicon_1727596097.png" type="image/x-icon">
+
+    <meta name="description" content="Armed Police Force." />
+    <meta name="keywords" content="Armed Police Force" />
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="Armed Police Force" />
+    <meta property="og:description" content="Armed Police Force." />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:type" content="website" />
+    <!-- Twitter Tags -->
+    <meta name="twitter:title" content="Armed Police Force" />
+    <meta name="twitter:description" content="Armed Police Force." />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="https://api.apf.gov.np:8443/storage/uploads/site_setting/site_favicon/Favicon_1727596097.png">
+
+    <!-- Audio Plugin -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.6.12/plyr.css" />
+
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Mukta -->
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+   
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://www.apf.gov.np/assets/plugins/bootstrap/css/bootstrap.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="https://www.apf.gov.np/css/index.css?v=563615004">
+    <link rel="stylesheet" href="https://www.apf.gov.np/css/xommon.css?v=20295059">
+    <link rel="stylesheet" href="https://www.apf.gov.np/css/responsive.css?v=716837126">
+    <link rel="stylesheet" href="https://www.apf.gov.np/css/bs-theme-overrides.css">
+    <link rel="stylesheet" href="https://www.apf.gov.np/css/styles.css?v=935848015">
+
+    <!-- Swiper -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+
+    <!-- aos -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- book viewer=> dearflip -->
+    <!-- https://jquery.dearflip.com/docs/getting-started/ -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@dearhive/dearflip-jquery-flipbook@1.7.3/dflip/css/dflip.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@dearhive/dearflip-jquery-flipbook@1.7.3/dflip/css/themify-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@dearhive/dearflip-jquery-flipbook@1.7.3/dflip/js/dflip.min.js"></script>
+
+    <!-- Leaflet -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" /> -->
+
+
+    <!-- lightGallery -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/css/lightgallery.min.css"
+        integrity="sha512-F2E+YYE1gkt0T5TVajAslgDfTEUQKtlu4ralVq78ViNxhKXQLrgQLLie8u1tVdG2vWnB3ute4hcdbiBtvJQh0g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/css/lightgallery-bundle.min.css"
+        integrity="sha512-nUqPe0+ak577sKSMThGcKJauRI7ENhKC2FQAOOmdyCYSrUh0GnwLsZNYqwilpMmplN+3nO3zso8CWUgu33BDag=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/lightgallery.min.js"
+        integrity="sha512-jEJ0OA9fwz5wUn6rVfGhAXiiCSGrjYCwtQRUwI/wRGEuWRZxrnxoeDoNc+Pnhx8qwKVHs2BRQrVR9RE6T4UHBg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- lightGallery Plugins (optional) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/lightgallery.umd.min.js"
+        integrity="sha512-VOQBxCIgNssJrB8+irZF7L8MvfpAshegc36C3H5QD7vmibXM4uCNaqJIaSNatD2z2ZQQJSx0k+q+m+xsSPp4Xw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/plugins/thumbnail/lg-thumbnail.min.js"
+        integrity="sha512-VBbe8aA3uiK90EUKJnZ4iEs0lKXRhzaAXL8CIHWYReUwULzxkOSxlNixn41OLdX0R1KNP23/s76YPyeRhE6P+Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/plugins/zoom/lg-zoom.min.js"
+        integrity="sha512-BLW2Jrofiqm6m7JhkQDIh2olT0EBI58+hIL/AXWvo8gOXKmsNlU6myJyEkTy6rOAAZjn0032FRk8sl9RgXPYIQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/plugins/fullscreen/lg-fullscreen.min.js"
+        integrity="sha512-11B0rPDzvnSOYzAT37QdnYgt0z9Xg+wX5tckB1QKl5Znl8RPvrB5npo38K2jCt+Ad44udCfBiKt9D4jRdkSE1A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/plugins/autoplay/lg-autoplay.min.js"
+        integrity="sha512-1YRlp9jO1ermVx9E3UzfBwoo88ODK0i9l2C2lNoZwCZAzvRdA+O0Lm00bUfkIf/A1esj4OK9yZ3yfgfa+FcYwg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/plugins/share/lg-share.min.js"
+        integrity="sha512-phbNIp+K+Fna0FQomV8kLzwnaSsvV7H5/cpTeZ1DanG/NFYPGzkcZS3Q+2z9eJOfjM3MLb0BdqzOzgxp1pgGKw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/plugins/video/lg-video.min.js"
+        integrity="sha512-Eo7d/1I/2Yywxw/unjfX06Q+owD82+3ign70yHtNTajId+C3CcHeqb+XP/a+uq/Fhrrkf8MeBcBiZqoMASFiiw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</head>
+
+<body>
+      <!-- <button id="bandwidth-top-btn" onclick="toggleBandwidth()" title="Toggle bandwidth mode">
+        
+        <span id="bandwidth-top-label">Low Bandwidth</span>
+    </button> -->
+ 
+
+    <div id="page-content-wrapper">
+                    <!-- convert number format if current language is nepali -->
+<style>
+.blink-white-red {
+  font-size: 14px;
+  font-weight: bold;
+  animation: blinkColor 1s infinite;
+}
+.qr-text{
+    border: 2px solid #f1ebeb;
+    padding: 4px 14px;
+    border-radius: 50px;   /* makes oval shape */
+    font-size: 10px;
+    display: inline-block;
+}
+@keyframes blinkColor {
+  0%, 100% { color: white; }
+  50% { color: brown; }
+}
+</style>
+<header class="d-xl-flex flex-column d-none pb-1 position-relative new-header-w_">
+    <div class="secondary-color text-white">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between f-12">
+                <div class="d-flex justify-content-center align-items-center">
+                <div>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#sos-Modal" class="my-top-a" title="आपतकालीन सम्पर्क नं.">
+                        <i class="fa-solid fa-address-book"></i> आपतकालीन सम्पर्क नं.
+                    </a>
+                </div>
+                <div class="ms-5">
+                    <a href="https://mail.apf.gov.np/" target="_blank" class="my-top-a" title="इमेल">
+                    <i class="fas fa-globe"></i> इमेल
+                    </a>
+                </div>
+                <div class="ms-3">
+                     टोल फ्री : 
+                    <a href="tel:१११४" class="my-top-a" title="फोन: १११४">
+                    <i class="fa-solid fa-phone"></i> 
+                    १११४
+                    </a>
+                </div>
+                <div class="mx-3">
+                    <!-- एपीएफ :  -->
+                    <a href="tel:+९७७-०१५२४९५२४" class="my-top-a" title="फोन: +९७७-०१५२४९५२४">
+                        <i class="fa-solid fa-phone"></i> +९७७-०१५२४९५२४
+                    </a>
+                </div>
+                <div>
+                    <a href="mailto:info@apf.gov.np" class="my-top-a" title="इमेल गर्नुहोस्: info@apf.gov.np">
+                        <i class="fa-solid fa-envelope"></i> info@apf.gov.np
+                    </a>
+                </div>
+                </div>
+                <div class="d-flex justify-content-center align-items-center mb-1 position-relative">
+                    <i class="fa-solid fa-magnifying-glass search-icon_ f-18 custom-hover-color" title="खोज्नुहोस्"></i>
+                    <input 
+                    name="slug" 
+                    type="text" 
+                    placeholder="Search Here..." 
+                    class="primary-font ps-4 py-2 searchInput my-top-search" 
+                    onkeydown="handleInputKeyDown(event, this.value)"
+                    required
+                    >
+                </div>
+    <div class="d-flex justify-content-end align-items-center text-white">
+        <div class="language-switcher ">
+            <a href="#" class="custom-hover-color my-top-a f-12 fw-bold text-decoration-none whitespace-nowrap" id="languageSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="नेपाली">
+                नेपाली <i class="ms-2 fa-solid fa-angle-down"></i>
+            </a>
+            <ul class="dropdown-menu py-1" aria-labelledby="languageSwitcherDropdown">
+                                <li><a class="dropdown-item custom-hover-color f-12 text-decoration-none primary-font-bold py-2" href="https://www.apf.gov.np/lang/en">English</a></li>
+                        </div>
+        <div class="ms-4 custom-font-b">
+            <span>
+                <a class="increase" title="फन्ट साइज बढाउनुहोस्">A <sup>+</sup></a> |
+                <a class="decrease" title="फन्ट साइज घटाउनुहोस्">A <sup>-</sup></a> 
+                <!-- <a class="reset">reset</a> -->
+            </span>
+        </div>
+        <div class="ms-4 custom-font-b"><button id="bandwidth-top-btn" onclick="toggleBandwidth()" title="Toggle bandwidth mode">
+    
+    <span id="bandwidth-top-label">Low Bandwidth</span>
+</button></div>
+        <!-- <div class="ms-4">
+            <button onclick="toggleLowBandwidth()" id="lowBandwidthBtn" style="background-color: var(--secondary-color); color: white; border: none; padding: 5px 10px; border-radius: 4px;">
+                Low Bandwidth
+            </button>
+        </div> -->
+        <!-- <div>
+            <i class="fa-solid fa-magnifying-glass search-icon f-18 mt-1 cursor-pointer custom-hover-color ps-3 pe-1 ps-xl-4" title="खोज्नुहोस्"></i>
+        </div> -->
+
+        <!-- Desktop Search Bar -->
+        <div id="search-bar" class="w-100 search-bar position-absolute h-75 align-items-center cursor-pointer rounded-50 p-3 justify-content-between">
+            <div class="d-flex w-100">
+                <input 
+                    name="slug" 
+                    type="text" 
+                    placeholder="Search Here..." 
+                    class="w-90 outline-0 border-0 primary-font p-2 searchInput" 
+                    onkeydown="handleInputKeyDown(event, this.value)"
+                    required
+                    >
+            </div>
+            <i class="fa-solid fa-xmark cross-icon f-26 cursor-pointer primary-color custom-hover-color"></i>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <div class="hamburger-menu position-absolute d-none d-xl-block_">
+        <img src="https://www.apf.gov.np/img/Home-Page-Images/Menu/toggle-menu.png" alt="Toggle Menu" class="toggle-menu cursor-pointer" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+    </div>
+    <div class="new-header-w accent-color text-white" id="stickyHeader">
+    <div class="container header-container">
+        <div class="header d-flex pt-1_ justify-content-between position-relative">
+            <div class="header-left ">
+                <a href="https://www.apf.gov.np" class="text-decoration-none me-4 d-flex align-items-center justify-content-between">
+                    <!-- <img src="https://api.apf.gov.np:8443/storage/uploads/site_setting/site_logo/Logo_1727596097.png" class="apf-logo cursor-pointer img-fluid" alt="APF"> -->
+                    <img src="https://www.apf.gov.np/img/logo/2.png" class="apf-logo_ cursor-pointer img-fluid " alt="APF">
+                    <div class="text-white f-16 secondary-font-bold ms-2 my-logo-text">
+                        सशस्त्र प्रहरी बल, नेपाल
+                        <br/>
+                        Armed Police Force, Nepal                         
+                    </div>
+                </a>
+                
+            </div>
+            <div class="header-right d-flex">
+                <div class="d-flex flex-column justify-content-center position-relative">
+                    
+                    <ul class="header-menu d-flex list-unstyled m-0 my-1">
+                                                                        <li class="nav-item dropdown cursor-pointer ps-3 ps-xl-4">
+                                                        <a href="/" class="custom-hover-color primary-font-bold text-white f-14 text-decoration-none text-uppercase" role="button" title="गृह पृष्ठ" target="">गृह पृष्ठ</a>
+                            
+                        </li>
+                                                <li class="nav-item dropdown cursor-pointer ps-3 ps-xl-4">
+                                                        <a href="javascript:void(0)" class="custom-hover-color primary-font-bold text-white f-14 text-decoration-none text-uppercase whitespace-nowrap" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="हाम्रो बारे">
+                                हाम्रो बारे <span> <i class="ms-2 fa-solid fa-angle-down"></i> </span>
+                            </a>
+                            <ul class="dropdown-menu py-1" aria-labelledby="aboutDropdown">
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="/development"
+                                        target="_self"
+                                    >
+                                        विकासक्रम
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/ethos-and-mission"
+                                        target="_self"
+                                    >
+                                        आदर्श र मिशन
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="/ranks"
+                                        target="_self"
+                                    >
+                                        दर्जाहरु
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/martyrs"
+                                        target="_self"
+                                    >
+                                        सहिद
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/roles-of-armed-police-force"
+                                        target="_self"
+                                    >
+                                        कार्यादेशहरु
+                                    </a>
+                                </li>
+                                
+                                
+                                                            </ul>
+                            
+                        </li>
+                                                <li class="nav-item dropdown cursor-pointer ps-3 ps-xl-4">
+                                                        <a href="javascript:void(0)" class="custom-hover-color primary-font-bold text-white f-14 text-decoration-none text-uppercase whitespace-nowrap" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="युएन मिसन">
+                                युएन मिसन <span> <i class="ms-2 fa-solid fa-angle-down"></i> </span>
+                            </a>
+                            <ul class="dropdown-menu py-1" aria-labelledby="aboutDropdown">
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/un-background"
+                                        target="_self"
+                                    >
+                                        पृष्ठ भुमि
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/mission-deployment"
+                                        target="_self"
+                                    >
+                                        परिचालन
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/un-vacany"
+                                        target="_self"
+                                    >
+                                        मिसन जागिर
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/un-mission-form"
+                                        target="_self"
+                                    >
+                                        मिसन फारम
+                                    </a>
+                                </li>
+                                
+                                
+                                                            </ul>
+                            
+                        </li>
+                                                <li class="nav-item dropdown cursor-pointer ps-3 ps-xl-4">
+                                                        <a href="javascript:void(0)" class="custom-hover-color primary-font-bold text-white f-14 text-decoration-none text-uppercase whitespace-nowrap" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="पदपूर्ति">
+                                पदपूर्ति <span> <i class="ms-2 fa-solid fa-angle-down"></i> </span>
+                            </a>
+                            <ul class="dropdown-menu py-1" aria-labelledby="aboutDropdown">
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="/vacancy"
+                                        target="_self"
+                                    >
+                                        पदपूर्ति सूचना
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/syllabus-general"
+                                        target="_self"
+                                    >
+                                        पाठ्यक्रम (साधारण  समुह)
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/syallbus-technical-engineering"
+                                        target="_self"
+                                    >
+                                        पाठ्यक्रम (प्राविधिक-ईन्जिनियरिङ्ग  समुह)
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/syllabus-technical-health"
+                                        target="_self"
+                                    >
+                                        पाठ्यक्रम (प्राविधिक -स्वास्थ्य समुह )
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/syllabus-other"
+                                        target="_self"
+                                    >
+                                        पाठ्यक्रम (अन्य समुह)
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/vacancy-forms"
+                                        target="_self"
+                                    >
+                                        दरखास्त फारम
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/results"
+                                        target="_self"
+                                    >
+                                        नतिजा
+                                    </a>
+                                </li>
+                                
+                                
+                                                            </ul>
+                            
+                        </li>
+                                                <li class="nav-item dropdown cursor-pointer ps-3 ps-xl-4">
+                                                        <a href="/gallery" class="custom-hover-color primary-font-bold text-white f-14 text-decoration-none text-uppercase" role="button" title="ग्यालरी" target="">ग्यालरी</a>
+                            
+                        </li>
+                                                <li class="nav-item dropdown cursor-pointer ps-3 ps-xl-4">
+                                                        <a href="javascript:void(0)" class="custom-hover-color primary-font-bold text-white f-14 text-decoration-none text-uppercase whitespace-nowrap" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="डाउनलोड">
+                                डाउनलोड <span> <i class="ms-2 fa-solid fa-angle-down"></i> </span>
+                            </a>
+                            <ul class="dropdown-menu py-1" aria-labelledby="aboutDropdown">
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/forms"
+                                        target="_self"
+                                    >
+                                        फारम
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/apf-calendars"
+                                        target="_self"
+                                    >
+                                        ए.पी.एफ पात्रो
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/directory"
+                                        target="_self"
+                                    >
+                                        निर्देशिका
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/act-rules-and-regulations"
+                                        target="_self"
+                                    >
+                                        ऐन तथा नियमावली
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/information-for-staff"
+                                        target="_self"
+                                    >
+                                        कर्मचारीहरूका लागि सूचना
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/dress-code-booklet"
+                                        target="_self"
+                                    >
+                                        पोशाक कोड पुस्तिका
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://www.apf.gov.np/right-to-information"
+                                        target="_self"
+                                    >
+                                        स.प्र.बल,नेपाल द्वारा जारी सूचना
+                                    </a>
+                                </li>
+                                
+                                
+                                                            </ul>
+                            
+                        </li>
+                                                <li class="nav-item dropdown cursor-pointer ps-3 ps-xl-4">
+                                                        <a href="javascript:void(0)" class="custom-hover-color primary-font-bold text-white f-14 text-decoration-none text-uppercase whitespace-nowrap" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="हस्पिटलहरुसंगको सम्झौता">
+                                हस्पिटलहरुसंगको सम्झौता <span> <i class="ms-2 fa-solid fa-angle-down"></i> </span>
+                            </a>
+                            <ul class="dropdown-menu py-1" aria-labelledby="aboutDropdown">
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://apf.gov.np/valley"
+                                        target="_self"
+                                    >
+                                        उपत्यका
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://apf.gov.np/koshi-province"
+                                        target="_self"
+                                    >
+                                        कोशी प्रदेश
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://apf.gov.np/madhesh-province"
+                                        target="_self"
+                                    >
+                                        मधेश प्रदेश
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://apf.gov.np/bagmati-province"
+                                        target="_self"
+                                    >
+                                        बाग्मती प्रदेश
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://apf.gov.np/gandaki-province"
+                                        target="_self"
+                                    >
+                                        गण्डकी प्रदेश
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://apf.gov.np/lumbini-province"
+                                        target="_self"
+                                    >
+                                        लुम्बिनी प्रदेश
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://apf.gov.np/karnali-province"
+                                        target="_self"
+                                    >
+                                        कर्णाली प्रदेश
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://apf.gov.np/sudurpaschim-province"
+                                        target="_self"
+                                    >
+                                        सुदूरपश्चिम प्रदेश
+                                    </a>
+                                </li>
+                                
+                                
+                                                            </ul>
+                            
+                        </li>
+                                                <li class="nav-item dropdown cursor-pointer ps-3 ps-xl-4">
+                                                        <a href="javascript:void(0)" class="custom-hover-color primary-font-bold text-white f-14 text-decoration-none text-uppercase whitespace-nowrap" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="कल्याणकारी">
+                                कल्याणकारी <span> <i class="ms-2 fa-solid fa-angle-down"></i> </span>
+                            </a>
+                            <ul class="dropdown-menu py-1" aria-labelledby="aboutDropdown">
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://napfs.edu.np/"
+                                        target="_self"
+                                    >
+                                        ए.पी.एफ विद्यालय
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://hospital.apf.gov.np/"
+                                        target="_self"
+                                    >
+                                        ए.पी.एफ अस्पताल
+                                    </a>
+                                </li>
+                                
+                                
+                                                            </ul>
+                            
+                        </li>
+                                                <li class="nav-item dropdown cursor-pointer ps-3 ps-xl-4">
+                                                        <a href="javascript:void(0)" class="custom-hover-color primary-font-bold text-white f-14 text-decoration-none text-uppercase whitespace-nowrap" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="प्रकाशन">
+                                प्रकाशन <span> <i class="ms-2 fa-solid fa-angle-down"></i> </span>
+                            </a>
+                            <ul class="dropdown-menu py-1" aria-labelledby="aboutDropdown">
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="/publication/apf-publication-day"
+                                        target="_self"
+                                    >
+                                        ए.पी.एफ दिवस विशेषाङ्क
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://csc.apf.gov.np/publication/journal"
+                                        target="_self"
+                                    >
+                                        APF CSC Journals
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="https://hospital.apf.gov.np/publication/pratibimba_2081"
+                                        target="_self"
+                                    >
+                                        नेपाल ए.पी.एफ अस्पताल प्रतिविम्भ २०८१
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="/publication/samarpan-apf-monthly-newspaper"
+                                        target="_self"
+                                    >
+                                        समर्पण ए.पी.एफ मासिक पत्रिका
+                                    </a>
+                                </li>
+                                
+                                
+                                                                <li>
+                                    <a 
+                                        class="dropdown-item primary-font-bold primary-color f-14 py-2" 
+                                        href="/publication/other_publication"
+                                        target="_self"
+                                    >
+                                        अन्य प्रकाशन
+                                    </a>
+                                </li>
+                                
+                                
+                                                            </ul>
+                            
+                        </li>
+                                                <li class="nav-item dropdown cursor-pointer ps-3 ps-xl-4">
+                                                        <a href="contact-us" class="custom-hover-color primary-font-bold text-white f-14 text-decoration-none text-uppercase" role="button" title="सम्पर्क" target="">सम्पर्क</a>
+                            
+                        </li>
+                                                                    </ul>
+                </div>
+                <div class="d-flex flex-column align-items-center ms-4">
+                    <!-- <a  class="blink-white-red" href="https://api.apf.gov.np:8443/storage/uploads/media_files/एपिएफ APPS सम्बन्धी भिडियो ०५.११ गते.mp4" target="_blank">
+                        Community Alert System
+                    </a>-->
+                   <img src="https://www.apf.gov.np/img/logo/gunaso.png" class="apf-logo_ cursor-pointer img-fluid" alt="APF" style="height:70px;"> 
+                      <span class="f-12 text-center "><a href="https://gunaso.apf.gov.np/" target="_blank">Online Gunaso</a></span> 
+                </div>
+                <!-- <a href="http://apf.innepal.biz/" target="_blank" class="text-decoration-none d-flex justify-content-end ms-5">
+                    <img src="https://www.apf.gov.np/img/logo/2.png" class="apf-logo_ cursor-pointer img-fluid" alt="APF">
+                </a> -->
+            </div>
+        </div>
+    </div>
+    </div>
+</header>
+
+<header class="d-xl-none new-header-w accent-color">
+    <div class="container">
+    <div class="row d-flex">
+        <div class="col-2 d-flex align-items-center justify-content-center">
+            <div class="hamburger-mobile-menu d-xl-none d-flex align-items-center">
+                <img src="https://www.apf.gov.np/img/Home-Page-Images/Menu/toggle-menu-white.png" alt="Toggle Menu" class="toggle-menu cursor-pointer" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+            </div>
+        </div>
+        <div class="col-10 d-flex position-relative align-items-center justify-content-center ps-0">
+            <div class="row w-100 d-flex justify-content-between">
+                <div class="col-12 d-flex justify-content-start ps-0">
+                    <div class="header-left">
+                        <!-- <a href="https://www.apf.gov.np" class="text-decoration-none">
+                            <img src="https://api.apf.gov.np:8443/storage/uploads/site_setting/site_logo/Logo_1727596097.png" class="apf-logo cursor-pointer img-fluid" alt="Disaster Management Training School">
+                        </a> -->
+                        <a href="https://www.apf.gov.np" class="text-decoration-none p-0  d-flex align-items-center w-100">
+                            <!-- <img src="https://api.apf.gov.np:8443/storage/uploads/site_setting/site_logo/Logo_1727596097.png" class="apf-logo cursor-pointer img-fluid" alt="Disaster Management Training School"> -->
+                            <img src="https://www.apf.gov.np/img/logo/2.png" class="apf-logo_ cursor-pointer img-fluid " alt="APF">
+                        
+                            <div class="text-white f-14 f-sm-16 secondary-font-bold ms-2">
+                                सशस्त्र प्रहरी बल, नेपाल
+                                <br/>
+                                Armed Police Force, Nepal 
+                                    
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <!-- <a href="http://apf.innepal.biz/" target="_blank" class="text-decoration-none d-flex justify-content-end ms-1">
+                <img src="https://www.apf.gov.np/img/logo/2.png" class="apf-logo_ cursor-pointer img-fluid" alt="APF">
+            </a> -->
+        </div>
+    </div>
+    </div>
+</header>
+
+
+
+  
+
+
+
+<div class="offcanvas offcanvas-start bg-body-tertiary py-3" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel" style="width: 350px;">
+    <div class="offcanvas-header me-2">
+        <button type="button" class="btn-close f-18" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column px-0 py-0">
+        <ul class="sidebar-nav pt-0">
+        <li class="sidebar-item list-unstyled d-xl-none">
+                <!-- <div class="col-2 d-flex justify-content-end py-3">
+                    <div class="header-right d-flex align-items-center justify-content-between">
+                        <div>
+                            <i class="fa-solid fa-magnifying-glass search-icon-mobile f-23 cursor-pointer custom-hover-color" ></i>
+                        </div>
+                    </div>
+                </div> -->
+
+                <!-- Mobile Search Bar -->
+                <div class="pt-1 pb-3 d-flex justify-content-center">
+                    <div id="search-bar-mobile_" class="w-90 search-bar-mobile h-85 align-items-center cursor-pointer rounded-50 px-3 py-1 justify-content-between search-bar-color">
+                        <div class="d-flex w-100">
+                            <input 
+                                id="searchInputMobile"
+                                name="slug" 
+                                type="text" 
+                                placeholder="Search Here..." 
+                                class="w-90 outline-0 border-0 primary-font p-2 searchInput tertiary-color" 
+                                onkeydown="handleInputKeyDown(event, this.value)"
+                                required
+                                >
+                        </div>
+                        <!-- <i class="fa-solid fa-xmark cross-icon-mobile f-26 cursor-pointer primary-color custom-hover-color"></i> -->
+                        <i class="fa-solid fa-magnifying-glass f-23 cursor-pointer custom-hover-color" onclick="handleSearchClick()"></i>
+                    </div>
+                </div>
+            </li>
+                                    <li class="sidebar-item list-unstyled">
+                                <a href="#" class="sidebar-link collapsed has-dropdown text-decoration-none py-2" data-bs-toggle="collapse" data-bs-target="#56" aria-expanded="false" aria-controls="56">
+                    <span class="text-uppercase primary-font-bold f-14">हाम्रो बारे </span>
+                    <i class="fas fa-chevron-down float-end"></i>
+                </a>
+                <ul id="56" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#offcanvasScrolling">
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="/development"
+                            target="_self"
+                        >
+                            विकास
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/ethos-mission"
+                            target="_self"
+                        >
+                            इथोस र मिशन
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="/ranks"
+                            target="_self"
+                        >
+                            दर्जाहरु
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/martyrs"
+                            target="_self"
+                        >
+                            सहिद
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/roles-of-armed-police-force"
+                            target="_self"
+                        >
+                            भूमिका
+                        </a>
+                        
+                    </li>
+                                    </ul>
+                            </li>
+
+                        <li class="sidebar-item list-unstyled">
+                                <a href="#" class="sidebar-link collapsed has-dropdown text-decoration-none py-2" data-bs-toggle="collapse" data-bs-target="#57" aria-expanded="false" aria-controls="57">
+                    <span class="text-uppercase primary-font-bold f-14">युएन मिसन </span>
+                    <i class="fas fa-chevron-down float-end"></i>
+                </a>
+                <ul id="57" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#offcanvasScrolling">
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/un-background"
+                            target="_self"
+                        >
+                            पृष्ठ भुमि
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/mission-deployment"
+                            target="_self"
+                        >
+                            परिचालन
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/un-vacany"
+                            target="_self"
+                        >
+                            मिसन जागिर
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/un-mission-form"
+                            target="_self"
+                        >
+                            मिसन फारम
+                        </a>
+                        
+                    </li>
+                                    </ul>
+                            </li>
+
+                        <li class="sidebar-item list-unstyled">
+                                <a href="#" class="sidebar-link collapsed has-dropdown text-decoration-none py-2" data-bs-toggle="collapse" data-bs-target="#58" aria-expanded="false" aria-controls="58">
+                    <span class="text-uppercase primary-font-bold f-14">पदपूर्ति </span>
+                    <i class="fas fa-chevron-down float-end"></i>
+                </a>
+                <ul id="58" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#offcanvasScrolling">
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="/vacancy"
+                            target="_self"
+                        >
+                            पदपूर्ति
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/syllabus-general"
+                            target="_self"
+                        >
+                            साधारण पाठ्यक्रम
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/syallbus-technical-engineering"
+                            target="_self"
+                        >
+                            प्राविधिक (ईन्जिनियरिङ्ग तर्फ) पाठ्यक्रम
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/syllabus-technical-health"
+                            target="_self"
+                        >
+                            प्राविधिक (स्वास्थ्य तर्फ) पाठ्यक्रम
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/syllabus-other"
+                            target="_self"
+                        >
+                            अन्य पाठ्यक्रम
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/vacancy-forms"
+                            target="_self"
+                        >
+                            दरखास्त फारम
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/results"
+                            target="_self"
+                        >
+                            परिणामहरू
+                        </a>
+                        
+                    </li>
+                                    </ul>
+                            </li>
+
+                        <li class="sidebar-item list-unstyled">
+                                <a href="#" class="sidebar-link collapsed has-dropdown text-decoration-none py-2" data-bs-toggle="collapse" data-bs-target="#541" aria-expanded="false" aria-controls="541">
+                    <span class="text-uppercase primary-font-bold f-14">हस्पिटलहरुसंगको सम्झौता </span>
+                    <i class="fas fa-chevron-down float-end"></i>
+                </a>
+                <ul id="541" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#offcanvasScrolling">
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://apf.gov.np/valley"
+                            target="_self"
+                        >
+                            उपत्यका
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://apf.gov.np/koshi-province"
+                            target="_self"
+                        >
+                            कोशी प्रदेश
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://apf.gov.np/madhesh-province"
+                            target="_self"
+                        >
+                            मधेश प्रदेश
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://apf.gov.np/bagmati-province"
+                            target="_self"
+                        >
+                            बाग्मती प्रदेश
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://apf.gov.np/gandaki-province"
+                            target="_self"
+                        >
+                            गण्डकी प्रदेश
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://apf.gov.np/lumbini-province"
+                            target="_self"
+                        >
+                            लुम्बिनी प्रदेश
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://apf.gov.np/karnali-province"
+                            target="_self"
+                        >
+                            कर्णाली प्रदेश
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://apf.gov.np/sudurpaschim-province"
+                            target="_self"
+                        >
+                            सुदूरपश्चिम प्रदेश
+                        </a>
+                        
+                    </li>
+                                    </ul>
+                            </li>
+
+                        <li class="sidebar-item list-unstyled">
+                                <a href="javascript:void(0)" class="sidebar-link collapsed has-dropdown text-decoration-none py-2">
+                    <span class="text-uppercase primary-font-bold f-14">ग्यालरी </span>
+                </a>
+                            </li>
+
+                        <li class="sidebar-item list-unstyled">
+                                <a href="#" class="sidebar-link collapsed has-dropdown text-decoration-none py-2" data-bs-toggle="collapse" data-bs-target="#60" aria-expanded="false" aria-controls="60">
+                    <span class="text-uppercase primary-font-bold f-14">डाउनलोडहरू </span>
+                    <i class="fas fa-chevron-down float-end"></i>
+                </a>
+                <ul id="60" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#offcanvasScrolling">
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/forms"
+                            target="_self"
+                        >
+                            फारमहरू
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/apf-calendars"
+                            target="_self"
+                        >
+                            सशस्त्र प्रहरी बल पात्रो
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/directory"
+                            target="_self"
+                        >
+                            निर्देशिका
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/act-rules-and-regulations"
+                            target="_self"
+                        >
+                            ऐन तथा नियमावली
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/information-for-staff"
+                            target="_self"
+                        >
+                            कर्मचारीहरूको लागि जानकारी
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/dress-code-booklet"
+                            target="_self"
+                        >
+                            ड्रेस कोड पुस्तिका
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.apf.gov.np/right-to-information"
+                            target="_self"
+                        >
+                            स.प्र.बल,नेपाल द्वारा जारी सूचना
+                        </a>
+                        
+                    </li>
+                                    </ul>
+                            </li>
+
+                        <li class="sidebar-item list-unstyled">
+                                <a href="#" class="sidebar-link collapsed has-dropdown text-decoration-none py-2" data-bs-toggle="collapse" data-bs-target="#518" aria-expanded="false" aria-controls="518">
+                    <span class="text-uppercase primary-font-bold f-14">प्रकाशन </span>
+                    <i class="fas fa-chevron-down float-end"></i>
+                </a>
+                <ul id="518" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#offcanvasScrolling">
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://apf.gov.np/publication/apf-publication-day"
+                            target="_self"
+                        >
+                            APF Day Yearbook
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://apf.gov.np/publication/hospital-pratibimba-2080"
+                            target="_self"
+                        >
+                            Hospital Pratibimba 2080
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://csc.apf.gov.np/publication/journal"
+                            target="_self"
+                        >
+                            APF CSC Journals
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://apf.gov.np/publication/samarpan-apf-monthly-newspaper"
+                            target="_self"
+                        >
+                            Samarpan Apf Monthly Newspaper
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://hospital.apf.gov.np/publication/pratibimba_2081"
+                            target="_self"
+                        >
+                            APF Hospital Pratibimba 2081
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://apf.gov.np/publication/other_publication"
+                            target="_self"
+                        >
+                            Other  APF Publication
+                        </a>
+                        
+                    </li>
+                                    </ul>
+                            </li>
+
+                        <li class="sidebar-item list-unstyled">
+                                <a href="#" class="sidebar-link collapsed has-dropdown text-decoration-none py-2" data-bs-toggle="collapse" data-bs-target="#523" aria-expanded="false" aria-controls="523">
+                    <span class="text-uppercase primary-font-bold f-14">Welfare </span>
+                    <i class="fas fa-chevron-down float-end"></i>
+                </a>
+                <ul id="523" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#offcanvasScrolling">
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://www.napfs.edu.np/"
+                            target="_blank"
+                        >
+                            APF School
+                        </a>
+                        
+                    </li>
+                                        <li class="sidebar-item">
+                        <a 
+                            class="sidebar-link text-decoration-none primary-font f-14 py-2" 
+                            href="https://hospital.apf.gov.np/"
+                            target="_blank"
+                        >
+                            APF Hospital
+                        </a>
+                        
+                    </li>
+                                    </ul>
+                            </li>
+
+                        <li class="sidebar-item list-unstyled">
+                                <a href="/contact-us" class="sidebar-link collapsed has-dropdown text-decoration-none py-2">
+                    <span class="text-uppercase primary-font-bold f-14">सम्पर्क गर्नुहोस् </span>
+                </a>
+                            </li>
+
+                                    <hr class="mx-4">
+            <li class="sidebar-item list-unstyled primary-font-medium">
+                <div class="ms-4 ps-1 f-15 primary-font-medium">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#sos-Modal" class="my-top-a" title="आपतकालीन सम्पर्क नं.">
+                        <i class="fa-solid fa-address-book"></i> आपतकालीन सम्पर्क नं.
+                    </a>
+                </div>
+                <hr class="mx-4">
+                <div class="ms-4 ps-1 my-2">
+                    <a href="https://mail.apf.gov.np/" target="_blank" class="my-top-a" title="इमेल">
+                    <i class="fas fa-globe"></i> <span class="f-15 primary-font-medium">इमेल</span>
+                    </a>
+                </div>
+                <div class="ms-4 ps-1 f-15 primary-font-medium">
+                     टोल फ्री : 
+                    <a href="tel:१११४" class="my-top-a" title="फोन: १११४">
+                    <i class="fa-solid fa-phone accent-color-text mx-1 "></i> <span class="accent-color-text ">
+                        १११४
+                    </span>
+                    </a>
+                </div>
+                <div class="ms-4 ps-1 my-2">
+                    <!-- एपीएफ :  -->
+                    <a href="tel:+९७७-०१५२४९५२४" class="my-top-a" title="फोन: +९७७-०१५२४९५२४">
+                        <i class="fa-solid fa-phone accent-color-text me-1 "></i> <span class="f-15">+९७७-०१५२४९५२४</span>
+                    </a>
+                </div>
+                <div class="ms-4 ps-1">
+                    <a href="mailto:info@apf.gov.np" class="my-top-a" title="इमेल गर्नुहोस्: info@apf.gov.np">
+                        <i class="fa-solid fa-envelope accent-color-text me-1 "></i> <span class="f-15">info@apf.gov.np</span>
+                    </a>
+                </div>
+            </li>
+            <hr class="mb-2 mx-4">
+            <li class="sidebar-item list-unstyled">
+                <a href="#" class="sidebar-link collapsed has-dropdown text-decoration-none py-2" data-bs-toggle="collapse" data-bs-target="#language" aria-expanded="false" aria-controls="language">
+                    <span class="fw-bold f-15 nepali-font">नेपाली</span>
+                    <i class="fas fa-chevron-down float-end"></i>
+                </a>
+                <ul id="language" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#offcanvasScrolling">
+                                        <li class="sidebar-item">
+                        <a class="sidebar-link text-decoration-none primary-font f-14 py-2" href="https://www.apf.gov.np/lang/en">English</a>
+                    </li>
+                    
+                </ul>
+            </li>
+            <li class="sidebar-item list-unstyled">
+                <div class="ms-4 custom-font-b">
+                    <span>
+                        <a class="increase sidebar-link d-inline-block ps-2 fw-bold" title="फन्ट साइज बढाउनुहोस्">A <sup>+</sup></a> |
+                        <a class="decrease sidebar-link d-inline-block fw-bold" title="फन्ट साइज घटाउनुहोस्">A <sup>-</sup></a> 
+                        <!-- <a class="reset">reset</a> -->
+                    </span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="modal fade" id="sos-Modal" tabindex="-1" aria-labelledby="sosModalLabel"
+        aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content rounded-0_">
+            <div class="m-3_ quick-links-color px-xl-3 px-2 pt-3 pb-5 rounded-6">
+                <div class="modalButton_ d-flex justify-content-end position-relative">
+                    <button type="button" class="modal-btn-close text-white accent-color border-0 rounded-100"
+                        data-bs-dismiss="modal" aria-label="Close" title="Close">
+                        <i class="fa-solid fa-xmark modal-btn-icon"></i>
+                    </button>
+                </div>
+                <div class="modalHeader d-flex justify-content-center mb-2">
+                    <h5 class="modal-title f-26" id="sosModalLabel">आपतकालीन सम्पर्क नं.</h5>
+                </div>
+                <div class="modalBody mb-5_ px-3">
+                    <div class="row mt-xl-5 mt-3">
+                        <div class="mb-3 col-xl-4 col-lg-6 col-12">
+    <div class="h-100 contact-us-color d-flex align-items-center justify-content-center p-3 rounded-6 contact-us-border">
+        <div class="row w-100">
+            <div class="col-4"><img src="https://www.apf.gov.np/img/Home-Page-Images/Contact-Us-Icon/Icon-40-39.png" alt="हटलाइन" class="img-fluid"></div>
+            <div class="col-8">
+                <div class="col">
+                    <div class="row-6">
+                        <div class="secondary-font fw-bold f-14 contact-primary-color text-uppercase">हटलाइन</div>
+                    </div>
+                    <div class="row-6">
+                        <div>
+                            <a href="tel: १११४" title="फोन: १११४" class="text-decoration-none secondary-font fw-bold f-17 contact-secondary-color about-info-links">१११४</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mb-3 col-xl-4 col-lg-6 col-12">
+    <div class="h-100 contact-us-color d-flex align-items-center justify-content-center p-3 rounded-6 contact-us-border">
+        <div class="row">
+            <div class="col-4"><img src="https://www.apf.gov.np/img/Home-Page-Images/Contact-Us-Icon/Icon-40-38.png" alt="अनुगमन तथा गुनासो व्यवस्थापन ईकाई" class="img-fluid"></div>
+            <div class="col-8">
+                <div class="col">
+                    <div class="row-6">
+                        <div class="secondary-font fw-bold f-14 contact-primary-color text-uppercase">अनुगमन तथा गुनासो व्यवस्थापन ईकाई</div>
+                    </div>
+                    <div class="row-6">
+                        <div class="row mb-1">
+                            <div class="col-lg-4">
+                                स.प्र.उ राधेश्याम धिमाल:
+                            </div>
+                            <div class="col-lg-8">
+                                <a href="tel: ९८५१२७२९१७" title="फोन: ९८५१२७२९१७" class="text-decoration-none secondary-font fw-bold f-17 contact-secondary-color about-info-links">९८५१२७२९१७</a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                हटलाइन:
+                            </div>
+                            <div class="col-lg-8">
+                                <a href="tel: ९८५१२६१२००" title="फोन: ९८५१२६१२००" class="text-decoration-none secondary-font fw-bold f-17 contact-secondary-color about-info-links">९८५१२६१२००</a> <br>
+                                (२४ सै घण्टा) <br>
+                                <a href="tel: ०१-५२४९२१७" title="फोन: ०१-५२४९२१७" class="text-decoration-none secondary-font fw-bold f-17 contact-secondary-color about-info-links">०१-५२४९२१७</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mb-3 col-xl-4 col-lg-6 col-12">
+    <div class="h-100 contact-us-color d-flex align-items-center justify-content-center p-3 rounded-6 contact-us-border">
+        <div class="row">
+            <div class="col-4"><img src="https://www.apf.gov.np/img/Home-Page-Images/Contact-Us-Icon/Icon-40-40.png" alt="गुनासो सुनुवाई शाखा (कार्यालय समय)" class="img-fluid"></div>
+            <div class="col-8">
+                <div class="col">
+                    <div class="row-6">
+                        <div class="secondary-font fw-bold f-14 contact-primary-color text-uppercase">गुनासो सुनुवाई शाखा (कार्यालय समय)</div>
+                    </div>
+                    <div class="row-6">
+                        <div>
+                            <a href="tel: ०१-५२४९२११" title="फोन: ०१-५२४९२११" class="text-decoration-none secondary-font fw-bold f-17 contact-secondary-color about-info-links">०१-५२४९२११</a>
+                        </div>
+                        <div class="mt-3">
+                            <a href="https://gunaso.apf.gov.np" target="_blank" title="अनलाईन गुनासो/ सुझाव" class="button btn accent-border primary-font-bold f-16 text-white accent-color accent-color-button text-center rounded-6 px-3">
+                                <span>अनलाईन गुनासो/ सुझाव</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mb-3 col-xl-4 col-lg-6 col-12">
+    <div class="h-100 contact-us-color d-flex align-items-center justify-content-center p-3 rounded-6 contact-us-border">
+        <div class="row">
+            <div class="col-4"><img src="https://www.apf.gov.np/img/Home-Page-Images/Contact-Us-Icon/Icon-40-41.png" alt="सीमा सुरक्षासँग सम्बन्धित कुनै जानकारी दिनु वा लिनु परेमा" class="img-fluid"></div>
+            <div class="col-8">
+                <div class="col">
+                    <div class="row-6">
+                        <div class="secondary-font fw-bold f-14 contact-primary-color text-uppercase">सीमा सुरक्षासँग सम्बन्धित कुनै जानकारी दिनु वा लिनु परेमा</div>
+                    </div>
+                    <div class="row-6">
+                        <div>
+                            <a href="tel: ९८५१२६०७३०" title="फोन: ९८५१२६०७३०" class="text-decoration-none secondary-font fw-bold f-17 contact-secondary-color about-info-links">९८५१२६०७३०</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mb-3 col-xl-4 col-lg-6 col-12">
+    <div class="h-100 contact-us-color d-flex align-items-center justify-content-center p-3 rounded-6 contact-us-border">
+        <div class="row">
+            <div class="col-4"><img src="https://www.apf.gov.np/img/Home-Page-Images/Contact-Us-Icon/Icon-40-42.png" alt="हस्पिटल हटलाईन (सशस्त्र प्रहरी कर्मचारीहरुका लागि)" class="img-fluid"></div>
+            <div class="col-8">
+                <div class="col">
+                    <div class="row-6">
+                        <div class="secondary-font fw-bold f-14 contact-primary-color text-uppercase">हस्पिटल हटलाईन (सशस्त्र प्रहरी कर्मचारीहरुका लागि)</div>
+                    </div>
+                    <div class="row-6">
+                        <div>
+                            <a href="tel: ९८५१२६०११२" title="फोन: ९८५१२६०११२" class="text-decoration-none secondary-font fw-bold f-17 contact-secondary-color about-info-links">९८५१२६०११२</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        
+        
+
+<link rel="stylesheet" href="https://www.apf.gov.np/assets/plugins/nepali.datepicker.v4.0.4/nepali.datepicker.v4.0.4.min.css">
+<link rel="stylesheet" href="https://www.apf.gov.np/css/publication.css">
+
+<script src="https://www.apf.gov.np/assets/plugins/nepali.datepicker.v4.0.4/nepali.datepicker.v4.0.4.min.js"></script>
+
+<div class="background-div position-relative d-flex flex-column justify-content-end"
+    style="background-image: url(https://www.apf.gov.np/img/Artboard.png)">
+    <div class="container">
+        <h1 class="mb-4 text-uppercase text-center text-xl-start text-white">सूचनाहरू</h1>
+    </div>
+    <div class="info-section info-section--border position-relative"></div>
+</div>
+<div class="static-content">
+    <div class="mb-5 pb-4">
+        <div class="container">
+            <form id="searchForm" method="GET" action="https://www.apf.gov.np/notices" class="w-100 mb-4">
+                <div class="row">
+                    <div class="col-md-6 col-xl-3">
+                        <label class="text-uppercase form-label f-16" for="title">Title</label>
+                        <input type="text" id="title" name="title" class="form-control mt-2 custom-input f-14"
+                            placeholder="Search here..." value="">
+                    </div>
+                    <div class="col-md-6 col-xl-3 mt-4 mt-md-0">
+                        <label class="text-uppercase form-label f-16" for="date_from">Date From</label>
+                        <input type="date" id="nepali-datepicker" name="from"
+                            class="form-control mt-2 custom-input f-14" value="">
+                    </div>
+                    <div class="col-md-6 col-xl-3 mt-4 mt-md-0">
+                        <label class="text-uppercase form-label f-16" for="date_to">Date To</label>
+                        <input type="date" id="nepali-datepicker2" name="to" class="form-control mt-2 custom-input f-14"
+                            value="">
+                    </div>
+
+
+                    <div class="col-md-6 col-xl-3 mt-4 mt-md-0 d-none">
+                        <label class="text-uppercase form-label f-16" for="category">Category</label>
+                        <select id="category" name="category" class="form-control mt-2 custom-input f-14">
+                            <option value="" disabled selected>Select a category
+                            </option>
+                            <option value="category1" >Category
+                                1</option>
+                            <option value="category2" >Category
+                                2</option>
+                            <option value="category3" >Category
+                                3</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" id="submit" title="Submit" class="accent-border primary-font-bold f-17 text-white 
+                            accent-color accent-color-button px-3 py-2 rounded-6 text-uppercase">
+                        फिल्टर
+                    </button>
+                </div>
+            </form>
+
+            <div class="row g-4 g-lg-0 custom-gap news-section">
+
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/Sitrol_Notice_1790070699.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="साधारण समूह, साधारण उपसमूह र लेखा उपसमूहर्फ सप्रनि पदको सम्पर्क राख्ने सम्बन्धी सूचना" title="साधारण समूह, साधारण उपसमूह र लेखा उपसमूहर्फ सप्रनि पदको सम्पर्क राख्ने सम्बन्धी सूचना">
+                                    </div> -->
+                                    <div class="custom-padding" title="साधारण समूह, साधारण उपसमूह र लेखा उपसमूहर्फ सप्रनि पदको सम्पर्क राख्ने सम्बन्धी सूचना">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            साधारण समूह, साधारण उपसमूह र लेखा उपसमूहर्फ सप्रनि पदको सम्पर्क राख्ने सम्बन्धी सूचना</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>साधारण समूह, साधारण उपसमूह र लेखा उपसमूहर्फ सप्रनि पदको सम्पर्क राख्ने सम्बन्धी सूचना</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-06-06
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/Sansodhit_Notice_insp_Interview_1789613484.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="साधारण समूह, साधारण उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको अन्तर्वार्ता सम्बन्धी संशोधित सूचना" title="साधारण समूह, साधारण उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको अन्तर्वार्ता सम्बन्धी संशोधित सूचना">
+                                    </div> -->
+                                    <div class="custom-padding" title="साधारण समूह, साधारण उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको अन्तर्वार्ता सम्बन्धी संशोधित सूचना">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            साधारण समूह, साधारण उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको अन्तर्वार्ता सम्बन्धी संशोधित सूचना</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>साधारण समूह, साधारण उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको अन्तर्वार्ता सम्बन्धी संशोधित सूचना</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-06-01
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/Adv_083.05.26_1789101597.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="नयाँ भर्ना सम्बन्धी सूचना (२०८३/०५/२६ गते, सूचना नं. ०१(०८३/८४)" title="नयाँ भर्ना सम्बन्धी सूचना (२०८३/०५/२६ गते, सूचना नं. ०१(०८३/८४)">
+                                    </div> -->
+                                    <div class="custom-padding" title="नयाँ भर्ना सम्बन्धी सूचना (२०८३/०५/२६ गते, सूचना नं. ०१(०८३/८४)">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            नयाँ भर्ना सम्बन्धी सूचना (२०८३/०५/२६ गते, सूचना नं. ०१(०८३/८४)</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-05-26
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/hospital_1789189300.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना" title="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना">
+                                    </div> -->
+                                    <div class="custom-padding" title="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-05-26
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/Insp_Interview_Notice_1789046951.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="साधारण समूह, साधारण उपसमूह र लेखा उपसमूहतर्फ सप्रनि पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना" title="साधारण समूह, साधारण उपसमूह र लेखा उपसमूहतर्फ सप्रनि पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना">
+                                    </div> -->
+                                    <div class="custom-padding" title="साधारण समूह, साधारण उपसमूह र लेखा उपसमूहतर्फ सप्रनि पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            साधारण समूह, साधारण उपसमूह र लेखा उपसमूहतर्फ सप्रनि पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>साधारण समूह, साधारण उपसमूह र लेखा उपसमूहतर्फ सप्रनि पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-05-25
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/Asi_Interview_Notice_1789047048.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="साधारण समूह, साधारण उपसमूहतर्फ सप्रसनि पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना" title="साधारण समूह, साधारण उपसमूहतर्फ सप्रसनि पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना">
+                                    </div> -->
+                                    <div class="custom-padding" title="साधारण समूह, साधारण उपसमूहतर्फ सप्रसनि पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            साधारण समूह, साधारण उपसमूहतर्फ सप्रसनि पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>साधारण समूह, साधारण उपसमूहतर्फ सप्रसनि पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-05-25
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/05-22_1788780922.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="अन्तिम नतिजा प्रकाशन सम्बन्धमा (नेपाल ए.पी.एफ. अस्पताल)" title="अन्तिम नतिजा प्रकाशन सम्बन्धमा (नेपाल ए.पी.एफ. अस्पताल)">
+                                    </div> -->
+                                    <div class="custom-padding" title="अन्तिम नतिजा प्रकाशन सम्बन्धमा (नेपाल ए.पी.एफ. अस्पताल)">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            अन्तिम नतिजा प्रकाशन सम्बन्धमा (नेपाल ए.पी.एफ. अस्पताल)</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>अन्तिम नतिजा प्रकाशन सम्बन्धमा (नेपाल ए.पी.एफ. अस्पताल)</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-05-22
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/cons_baikalpik_1788261727.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="साधारण समूह, साधारण उपसमूहतर्फ सप्रज पदको बैकल्पिक उम्मेदवारहरुको नियुक्ति सम्बन्धी सूचना" title="साधारण समूह, साधारण उपसमूहतर्फ सप्रज पदको बैकल्पिक उम्मेदवारहरुको नियुक्ति सम्बन्धी सूचना">
+                                    </div> -->
+                                    <div class="custom-padding" title="साधारण समूह, साधारण उपसमूहतर्फ सप्रज पदको बैकल्पिक उम्मेदवारहरुको नियुक्ति सम्बन्धी सूचना">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            साधारण समूह, साधारण उपसमूहतर्फ सप्रज पदको बैकल्पिक उम्मेदवारहरुको नियुक्ति सम्बन्धी सूचना</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p><span style="background-color:rgb(255,255,255);color:rgb(34,34,34);font-family:Arial, Helvetica, sans-serif;font-size:small;"><span style="-webkit-text-stroke-width:0px;display:inline !important;float:none;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">साधारण समूह, साधारण उपसमूहतर्फ सप्रज पदको बैकल्पिक उम्मेदवारहरुको नियुक्ति सम्बन्धी सूचना</span></span></p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-05-16
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/folls_baikalpik_1788261569.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="साधारण समूह, साधारण उपसमूहतर्फ सप्रप (भान्छे र कूचिकार) पदको बैकल्पिक  उम्मेदवारहरुको नियुक्ति सम्बन्धी सूचना" title="साधारण समूह, साधारण उपसमूहतर्फ सप्रप (भान्छे र कूचिकार) पदको बैकल्पिक  उम्मेदवारहरुको नियुक्ति सम्बन्धी सूचना">
+                                    </div> -->
+                                    <div class="custom-padding" title="साधारण समूह, साधारण उपसमूहतर्फ सप्रप (भान्छे र कूचिकार) पदको बैकल्पिक  उम्मेदवारहरुको नियुक्ति सम्बन्धी सूचना">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            साधारण समूह, साधारण उपसमूहतर्फ सप्रप (भान्छे र कूचिकार) पदको बैकल्पिक  उम्मेदवारहरुको नियुक्ति सम्बन्धी सूचना</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p><span style="background-color:transparent;color:rgb(34,34,34);font-family:Arial, Helvetica, sans-serif;font-size:small;"><span style="-webkit-text-stroke-width:0px;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">साधारण समूह, साधारण उपसमूहतर्फ&nbsp;</span></span><span style="background-color:rgb(255,255,255);color:rgb(34,34,34);font-family:Arial, Helvetica, sans-serif;font-size:small;"><span style="-webkit-text-stroke-width:0px;display:inline !important;float:none;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">सप्रप (भान्छे र कूचिकार) पदको बैकल्पिक&nbsp; उम्मेदवारहरुको नियुक्ति सम्बन्धी सूचना</span></span></p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-05-16
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/Asi_Special_Medical_Notice_1787843734.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="साधारण समूह, साधारण उपसमूहतर्सफ सशस्त्र प्रहरी सहायक निरीक्षक पदको  विशेष स्वास्थ्य परीक्षण परीक्षा सम्बन्धी सूचना" title="साधारण समूह, साधारण उपसमूहतर्सफ सशस्त्र प्रहरी सहायक निरीक्षक पदको  विशेष स्वास्थ्य परीक्षण परीक्षा सम्बन्धी सूचना">
+                                    </div> -->
+                                    <div class="custom-padding" title="साधारण समूह, साधारण उपसमूहतर्सफ सशस्त्र प्रहरी सहायक निरीक्षक पदको  विशेष स्वास्थ्य परीक्षण परीक्षा सम्बन्धी सूचना">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            साधारण समूह, साधारण उपसमूहतर्सफ सशस्त्र प्रहरी सहायक निरीक्षक पदको  विशेष स्वास्थ्य परीक्षण परीक्षा सम्बन्धी सूचना</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-05-11
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/apfhospital_1787048110.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (नेपाल ए.पी.एफ. अस्पताल)" title="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (नेपाल ए.पी.एफ. अस्पताल)">
+                                    </div> -->
+                                    <div class="custom-padding" title="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (नेपाल ए.पी.एफ. अस्पताल)">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (नेपाल ए.पी.एफ. अस्पताल)</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (नेपाल ए.पी.एफ. अस्पताल)</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-05-02
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/GTO_Notice_1785498483.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="साधारण समूह, साधारण उपसमूह र लेखा उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना" title="साधारण समूह, साधारण उपसमूह र लेखा उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना">
+                                    </div> -->
+                                    <div class="custom-padding" title="साधारण समूह, साधारण उपसमूह र लेखा उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            साधारण समूह, साधारण उपसमूह र लेखा उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p><span style="background-color:rgb(255,255,255);color:rgb(34,34,34);font-family:Arial, Helvetica, sans-serif;font-size:small;"><span style="-webkit-text-stroke-width:0px;display:inline !important;float:none;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">साधारण समूह, साधारण उपसमूह र लेखा उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना</span></span></p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-04-15
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/hospital_1785207572.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी दरखास्त फाराम बुझाउने म्याद थप सम्बन्धि सूचना (नेपाल ए.पी.एफ. अस्पताल)" title="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी दरखास्त फाराम बुझाउने म्याद थप सम्बन्धि सूचना (नेपाल ए.पी.एफ. अस्पताल)">
+                                    </div> -->
+                                    <div class="custom-padding" title="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी दरखास्त फाराम बुझाउने म्याद थप सम्बन्धि सूचना (नेपाल ए.पी.एफ. अस्पताल)">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी दरखास्त फाराम बुझाउने म्याद थप सम्बन्धि सूचना (नेपाल ए.पी.एफ. अस्पताल)</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी दरखास्त फाराम बुझाउने म्याद थप सम्बन्धि सूचना (नेपाल ए.पी.एफ. अस्पताल)</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-04-11
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/01_1784545790.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (Community Health Nursing II and Social Science)" title="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (Community Health Nursing II and Social Science)">
+                                    </div> -->
+                                    <div class="custom-padding" title="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (Community Health Nursing II and Social Science)">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (Community Health Nursing II and Social Science)</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (Community Health Nursing II and Social Science)</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-04-04
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/Lekha_Gto_Notice_1784540716.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="साधारण समूह,  लेखा उपसमूहतर्फ  सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना" title="साधारण समूह,  लेखा उपसमूहतर्फ  सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना">
+                                    </div> -->
+                                    <div class="custom-padding" title="साधारण समूह,  लेखा उपसमूहतर्फ  सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            साधारण समूह,  लेखा उपसमूहतर्फ  सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>साधारण समूह, &nbsp;लेखा उपसमूहतर्फ &nbsp;सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-04-04
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/Dr._Nurse_Interview_Notice_1784300230.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="प्राविधिक समूह (स्वास्थ्य) तर्फ प्राविधिक सशस्त्र प्रहरी निरीक्षक (चिकित्सक) र प्राविधिक सशस्त्र प्रहरी नायव निरीक्षक (स्टाफ नर्स) पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना" title="प्राविधिक समूह (स्वास्थ्य) तर्फ प्राविधिक सशस्त्र प्रहरी निरीक्षक (चिकित्सक) र प्राविधिक सशस्त्र प्रहरी नायव निरीक्षक (स्टाफ नर्स) पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना">
+                                    </div> -->
+                                    <div class="custom-padding" title="प्राविधिक समूह (स्वास्थ्य) तर्फ प्राविधिक सशस्त्र प्रहरी निरीक्षक (चिकित्सक) र प्राविधिक सशस्त्र प्रहरी नायव निरीक्षक (स्टाफ नर्स) पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            प्राविधिक समूह (स्वास्थ्य) तर्फ प्राविधिक सशस्त्र प्रहरी निरीक्षक (चिकित्सक) र प्राविधिक सशस्त्र प्रहरी नायव निरीक्षक (स्टाफ नर्स) पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>प्राविधिक समूह (स्वास्थ्य) तर्फ प्राविधिक सशस्त्र प्रहरी निरीक्षक (चिकित्सक) र प्राविधिक सशस्त्र प्रहरी नायव निरीक्षक (स्टाफ नर्स) पदको अन्तर्वार्ता परीक्षा सम्बन्धी सूचना</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-04-01
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/13_1784288477.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (नेपाल ए.पी.एफ. अस्पताल)" title="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (नेपाल ए.पी.एफ. अस्पताल)">
+                                    </div> -->
+                                    <div class="custom-padding" title="करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (नेपाल ए.पी.एफ. अस्पताल)">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (नेपाल ए.पी.एफ. अस्पताल)</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>करार सेवामा कर्मचारी पदपूर्ति गर्ने सम्बन्धी सूचना (नेपाल ए.पी.एफ. अस्पताल)</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-04-01
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/GTO_Notice_1784300123.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="साधारण समूह, साधारण उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना" title="साधारण समूह, साधारण उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना">
+                                    </div> -->
+                                    <div class="custom-padding" title="साधारण समूह, साधारण उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            साधारण समूह, साधारण उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>साधारण समूह, साधारण उपसमूहतर्फ सशस्त्र प्रहरी निरीक्षक पदको गुणमापक (TO, GTO, IO र BC) परीक्षा सम्बन्धी सूचना</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-04-01
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/iohs_1783765819.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="विज्ञापन रद्द गरिएको सूचना (ए.पी.एफ. नेपाल इन्स्टिच्युट अफ हेल्थ साईन्सेस)" title="विज्ञापन रद्द गरिएको सूचना (ए.पी.एफ. नेपाल इन्स्टिच्युट अफ हेल्थ साईन्सेस)">
+                                    </div> -->
+                                    <div class="custom-padding" title="विज्ञापन रद्द गरिएको सूचना (ए.पी.एफ. नेपाल इन्स्टिच्युट अफ हेल्थ साईन्सेस)">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            विज्ञापन रद्द गरिएको सूचना (ए.पी.एफ. नेपाल इन्स्टिच्युट अफ हेल्थ साईन्सेस)</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-03-26
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                                    <a href="https://api.apf.gov.np:8443/storage/uploads/news/pdf/Notice_for_Interview_1782915534.pdf" target="_blank" download class="w-100 h-100 d-block"
+                                style="color: inherit; text-decoration: none;">
+                                                    <div class="d-flex h-100">
+                                <div class="notice-color notice-border box-hover w-100">
+                                    <!-- <div class="text-center">
+                                        <img class="notice-img-desktop" src="https://www.apf.gov.np/img/Home-Page-Images/Icon/Icon-15.png" alt="उत्तीर्ण उम्मेदवारहरुको अन्तर्वार्ता परीक्षा संचालन सम्बन्धी सूचना ।" title="उत्तीर्ण उम्मेदवारहरुको अन्तर्वार्ता परीक्षा संचालन सम्बन्धी सूचना ।">
+                                    </div> -->
+                                    <div class="custom-padding" title="उत्तीर्ण उम्मेदवारहरुको अन्तर्वार्ता परीक्षा संचालन सम्बन्धी सूचना ।">
+                                        <h5 class="primary-font-bold f-16 text-center notice-title pt-1">
+                                            उत्तीर्ण उम्मेदवारहरुको अन्तर्वार्ता परीक्षा संचालन सम्बन्धी सूचना ।</h5>
+                                        <div class="description-div">
+                                            <div
+                                                class="secondary-font f-14 lh-sm primary-color description text-center break-word">
+                                                <p>उत्तीर्ण उम्मेदवारहरुको अन्तर्वार्ता परीक्षा संचालन सम्बन्धी सूचना ।</p>
+                                            </div>
+                                        </div>
+                                        <div class="secondary-font f-12 primary-color text-center pt-3">
+                                            2083-03-17
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </a>
+                                                </div>
+                
+                                    <nav class="mb-5">
+                        <div class="pagination justify-content-center pagination-button">
+                            <!-- Previous Page Button -->
+                            <a href="javascript:void(0)"
+                                aria-label="Previous">
+                                <button type="button"
+                                    class="btn-pagination-disabled rounded-100 primary-color border-0">
+                                    <i class="fa-solid fa-chevron-left f-17"></i>
+                                </button>
+                            </a>
+
+                            <!-- Page Numbers -->
+                            <div class="d-flex justify-content-center align-items-center mx-2">
+                                
+                                <!-- First Page -->
+                                
+                                <!-- Page Numbers -->
+                                                                    <div
+                                        class="primary-font fw-bold f-20 mx-2 pagination-active">
+                                        <a href="?page=1&"
+                                            class="text-decoration-none primary-color pagination-numbers">1</a>
+                                    </div>
+                                                                    <div
+                                        class="primary-font fw-bold f-20 mx-2 ">
+                                        <a href="?page=2&"
+                                            class="text-decoration-none primary-color pagination-numbers">2</a>
+                                    </div>
+                                                                    <div
+                                        class="primary-font fw-bold f-20 mx-2 ">
+                                        <a href="?page=3&"
+                                            class="text-decoration-none primary-color pagination-numbers">3</a>
+                                    </div>
+                                
+                                <!-- Last Page -->
+                                                                                                            <span class="mx-2">...</span>
+                                                                        <div class="primary-font fw-bold f-20 mx-2">
+                                        <a href="?page=36&"
+                                            class="text-decoration-none primary-color pagination-numbers">36</a>
+                                    </div>
+                                                            </div>
+
+                            <!-- Next Page Button -->
+                            <a href="?page=2&amp;"
+                                aria-label="Next">
+                                <button type="button"
+                                    class="btn-pagination rounded-100 primary-color border-0">
+                                    <i class="fa-solid fa-chevron-right f-17"></i>
+                                </button>
+                            </a>
+                        </div>
+                    </nav>
+                
+
+            </div>
+        </div>
+    </div>
+</div>
+
+                    <footer class="footer-color">
+    <div class="container">
+        <div class="upper-footer primary-color primary-font-bold">
+            <div class="row d-flex justify-content-center">
+
+                                <div class="col-lg-3 col-12 d-lg-block d-flex justify-content-center">
+                    <div class="upper-footer-first-col">
+
+                        <h6 class="text-uppercase f-20 d-lg-block d-flex justify-content-center text-md-start text-center">
+                            महत्त्वपूर्ण लिङ्कहरू
+                        </h6>
+                        <ul class="ps-0">
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="https://www.moha.gov.np/page/sanction-list" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="प्रतिबन्धित सूची" 
+                                    target="_self"
+                                >
+                                    प्रतिबन्धित सूची
+                                </a>
+                                
+                            </li>
+                        
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="https://bharna.apf.gov.np/" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="अनलाईन भर्ना पोर्टल" 
+                                    target="_blank"
+                                >
+                                    अनलाईन भर्ना पोर्टल
+                                </a>
+                                
+                            </li>
+                        
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="https://gunaso.apf.gov.np/" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="अनलाईन गुनासो/ सुझाव" 
+                                    target="_blank"
+                                >
+                                    अनलाईन गुनासो/ सुझाव
+                                </a>
+                                
+                            </li>
+                        
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="https://www.apf.gov.np/mission-deployment" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="पृष्ठ भुमि" 
+                                    target="_self"
+                                >
+                                    पृष्ठ भुमि
+                                </a>
+                                
+                            </li>
+                        
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/vacancy" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="पदपूर्ति सूचना" 
+                                    target="_self"
+                                >
+                                    पदपूर्ति सूचना
+                                </a>
+                                
+                            </li>
+                        
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="https://www.apf.gov.np/results" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="नतिजा" 
+                                    target="_self"
+                                >
+                                    नतिजा
+                                </a>
+                                
+                            </li>
+                        
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/gallery" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="ग्यालरी" 
+                                    target="_self"
+                                >
+                                    ग्यालरी
+                                </a>
+                                
+                            </li>
+                        
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/contact-us" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="सम्पर्क गर्नुहोस्" 
+                                    target="_self"
+                                >
+                                    सम्पर्क गर्नुहोस्
+                                </a>
+                                
+                            </li>
+                        
+                                                </ul>
+                    </div>
+                </div>
+                
+                                <div class="col-lg-3 col-12 d-lg-block d-flex justify-content-center">
+                    <div class="upper-footer-second-col">
+                        <h6 class="text-uppercase f-20 d-lg-block d-flex justify-content-center text-md-start text-center">
+                            प्रकाशन
+                        </h6>
+                        <ul class="ps-0">
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/publication/apf-publication-day" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="ए.पी.एफ दिवस विशेषाङ्क" 
+                                    target="_self"
+                                >
+                                    ए.पी.एफ दिवस विशेषाङ्क
+                                </a>
+                            </li>
+                            
+                        
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/publication/samarpan-apf-monthly-newspaper" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="समर्पण ए.पि.एफ. मासिक पत्रिका" 
+                                    target="_self"
+                                >
+                                    समर्पण ए.पि.एफ. मासिक पत्रिका
+                                </a>
+                            </li>
+                            
+                        
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="https://hospital.apf.gov.np/publication/pratibimba_2081" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="नेपाल एपीएफ अस्पताल प्रतिबिम्ब-२०८१" 
+                                    target="_self"
+                                >
+                                    नेपाल एपीएफ अस्पताल प्रतिबिम्ब-२०८१
+                                </a>
+                            </li>
+                            
+                        
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="https://csc.apf.gov.np/publication/journal" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="APF CSC Journals" 
+                                    target="_self"
+                                >
+                                    APF CSC Journals
+                                </a>
+                            </li>
+                            
+                        
+                                                    <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/publication/hospital-pratibimba-2080" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="नेपाल एपीएफ अस्पताल प्रतिबिम्ब-२०८०" 
+                                    target="_self"
+                                >
+                                    नेपाल एपीएफ अस्पताल प्रतिबिम्ब-२०८०
+                                </a>
+                            </li>
+                            
+                        
+                                                </ul>
+                    </div>
+                </div>
+                
+                                <div class="col-lg-3 col-12 d-lg-block d-flex justify-content-center">
+                    <div class="upper-footer-third-col">
+                        <h6 class="text-uppercase f-20 d-lg-block d-flex justify-content-center text-md-start text-center">
+                            मिडिया सेन्टर
+                        </h6>
+
+                        <ul class="ps-0">
+                                                        <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/news" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="समाचार" 
+                                    target="_self"
+                                >
+                                    समाचार
+                                </a>
+                            </li>
+                            
+                                                        <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/notices" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="सूचनाहरू" 
+                                    target="_self"
+                                >
+                                    सूचनाहरू
+                                </a>
+                            </li>
+                            
+                                                        <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/tender-notices" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="टेन्डर सूचनाहरू" 
+                                    target="_self"
+                                >
+                                    टेन्डर सूचनाहरू
+                                </a>
+                            </li>
+                            
+                                                        <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/video-program" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="भिडियो कार्यक्रम" 
+                                    target="_self"
+                                >
+                                    भिडियो कार्यक्रम
+                                </a>
+                            </li>
+                            
+                                                        <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/audio-program" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="अडियो कार्यक्रम" 
+                                    target="_self"
+                                >
+                                    अडियो कार्यक्रम
+                                </a>
+                            </li>
+                            
+                                                    </ul>
+                    </div>
+                </div>
+                
+                                <div class="col-lg-3 col-12 d-lg-block d-flex justify-content-center">
+                    <div class="upper-footer-fourth-col">
+                        <h6 class="text-uppercase f-20 d-lg-block d-flex justify-content-center text-md-start text-center">
+                            हाम्रो बारे
+                        </h6>
+
+                        <ul class="ps-0">
+                                                        <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/development" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="विकास" 
+                                    target="_self"
+                                >
+                                    विकास
+                                </a>
+                            </li>
+                            
+                            
+                                                        <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="https://www.apf.gov.np/ethos-mission" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="आदर्श र मिशन" 
+                                    target="_self"
+                                >
+                                    आदर्श र मिशन
+                                </a>
+                            </li>
+                            
+                            
+                                                        <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="/ranks" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="दर्जाहरु" 
+                                    target="_self"
+                                >
+                                    दर्जाहरु
+                                </a>
+                            </li>
+                            
+                            
+                                                        <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="https://www.apf.gov.np/martyrs" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="सहिद" 
+                                    target="_self"
+                                >
+                                    सहिद
+                                </a>
+                            </li>
+                            
+                            
+                                                        <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="https://www.apf.gov.np/roles-of-armed-police-force" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="भूमिका" 
+                                    target="_self"
+                                >
+                                    भूमिका
+                                </a>
+                            </li>
+                            
+                            
+                                                        <li class="list-unstyled text-md-start text-center">
+                                <a 
+                                    href="https://www.apf.gov.np/igp-profile" 
+                                    class="primary-color secondary-font f-17 text-decoration-none cursor-pointer d-lg-block d-flex justify-content-center" 
+                                    title="महानिरीक्षकको प्रोफाइल" 
+                                    target="_self"
+                                >
+                                    महानिरीक्षकको प्रोफाइल
+                                </a>
+                            </li>
+                            
+                            
+                                                    </ul>
+                    </div>
+                </div>
+                            </div>
+        </div>
+
+
+        <hr class="footer-hr d-lg-block d-none">
+        <div class="mid-footer d-flex justify-content-between d-lg-block d-none">
+            <div class="row">
+                <div class="col-6">
+                    <div class="download-apps">
+                        <h6 class="text-uppercase primary-color primary-font-bold f-20">हाम्रो अनुप्रयोगहरू डाउनलोड गर्नुहोस्</h6>
+                        <div class="store-images">
+                            <a href="https://apps.apple.com/np/app/apf-nepal/id6741147332" class="text-decoration-none"><img class="app-store" src="https://www.apf.gov.np/img/Home-Page-Images/Apps/app-store.png" alt="app-store"></a>
+                            <a href="https://play.google.com/store/apps/details?id=com.apf.mobileapp" class="text-decoration-none"><img class="play-store ms-4" src="https://www.apf.gov.np/img/Home-Page-Images/Apps/play-store.png" alt="play-store"></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="follow-us d-flex flex-column align-items-end">
+                        <h6 class="text-uppercase primary-color primary-font-bold f-20 pe-5">हामीलाई पछ्याउनुहोस्</h6>
+                        <div class="app-images d-flex">
+                            <div>
+                                <a href="https://www.facebook.com/armedpoliceforcenepal/" target="_blank" class="text-decoration-none"><img src="https://www.apf.gov.np/img/Home-Page-Images/Icon/facebook.png" alt="follow-us-on-facebook"></a>
+                            </div>
+                            <div>
+                                <a href="https://x.com/APF_Nepal" target="_blank" class="text-decoration-none"><img src="https://www.apf.gov.np/img/Home-Page-Images//Icon/twitter.png" alt="follow-us-on-twitter"></a>
+                            </div>
+                            <div>
+                                <a href="https://www.youtube.com/user/apfaudiovisual" target="_blank" class="text-decoration-none"><img src="https://www.apf.gov.np/img/Home-Page-Images/Icon/youtube.png" alt="follow-us-on-youtube"></a>
+                            </div>
+                            <div>
+                                <a href="https://soundcloud.com/apf_nepal" target="_blank" class="text-decoration-none"><img src="https://www.apf.gov.np/img/Home-Page-Images/Icon/soundcloud.png" alt="follow-us-on-soundcloud"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="middle-mobile-footer d-lg-none">
+            <div class="follow-us d-lg-block d-flex flex-column align-items-center mt-4 mb-5">
+                <h6 class="text-uppercase primary-color primary-font-bold f-20 mb-4">हामीलाई पछ्याउनुहोस्</h6>
+                <div class="app-images d-flex">
+                    <div class="custom-width">
+                        <a href="https://www.facebook.com/armedpoliceforcenepal/" target="_blank" class="text-decoration-none"><img src="https://www.apf.gov.np/img/Home-Page-Images/Icon/facebook.png" alt="follow-us-on-facebook"></a>
+                    </div>
+                    <div class="custom-width">
+                        <a href="https://x.com/APF_Nepal" target="_blank" class="text-decoration-none"><img src="https://www.apf.gov.np/img/Home-Page-Images//Icon/twitter.png" alt="follow-us-on-twitter"></a>
+                    </div>
+                    <div class="custom-width">
+                        <a href="https://www.youtube.com/user/apfaudiovisual" target="_blank" class="text-decoration-none"><img src="https://www.apf.gov.np/img/Home-Page-Images/Icon/youtube.png" alt="follow-us-on-youtube"></a>
+                    </div>
+                    <div class="custom-width">
+                        <a href="https://soundcloud.com/apf_nepal" target="_blank" class="text-decoration-none"><img src="https://www.apf.gov.np/img/Home-Page-Images/Icon/soundcloud.png" alt="follow-us-on-soundcloud"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="download-apps d-lg-block d-flex flex-column align-items-center">
+                <h6 class="text-uppercase primary-color primary-font-bold f-20 mb-4">हाम्रो अनुप्रयोगहरू डाउनलोड गर्नुहोस्</h6>
+                <div class="store-images">
+                    <a href="https://apps.apple.com/np/app/apf-nepal/id6741147332" class="text-decoration-none"><img class="app-store" src="https://www.apf.gov.np/img/Home-Page-Images/Apps/app-store.png" alt="app-store"></a>
+                    <a href="https://play.google.com/store/apps/details?id=com.apf.mobileapp" class="text-decoration-none"><img class="play-store ms-2" src="https://www.apf.gov.np/img/Home-Page-Images/Apps/play-store.png" alt="play-store"></a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="lower-footer text-center pb-3 d-lg-none">
+            <div class="primary-color secondary-font fs-16 footer-description"><p class="d-none d-xl-block">Designed and Maintained by ICT Section (Computer), Armed Police Force, Nepal Headquarters</p><p class="d-block d-xl-none">Designed and Maintained by ICT Section (Computer),&nbsp;&nbsp;<br>Armed Police Force, Nepal Headquarters</p></div>
+            <div class="copy-right primary-color secondary-font fs-16 mt-2">© 2026 सशस्त्र प्रहरी बल नेपाल।</div>
+            <div class="copy-right primary-color secondary-font fs-16 ">सबै अधिकार सुरक्षित।</div>
+        </div>
+
+        <div class="lower-footer text-center pb-3 d-none d-lg-block">
+            <div class="primary-color secondary-font fs-16 footer-description"><p class="d-none d-xl-block">Designed and Maintained by ICT Section (Computer), Armed Police Force, Nepal Headquarters</p><p class="d-block d-xl-none">Designed and Maintained by ICT Section (Computer),&nbsp;&nbsp;<br>Armed Police Force, Nepal Headquarters</p></div>
+            <div class="copy-right primary-color secondary-font fs-16 mt-2">© 2026 सशस्त्र प्रहरी बल नेपाल । सबै अधिकार सुरक्षित।</div>
+        </div>
+    </div>
+</footer>
+            </div>
+    
+    
+    <div id="accessibility-widget">
+ <button
+    id="accessibility-toggle-btn"
+    onclick="toggleAccessibilityPanel()"
+    title="Accessibility Options"
+    style="color: black; background: white; border: none; padding: 8px; cursor: pointer;"
+>
+    <i class="fas fa-wheelchair"></i>
+</button>
+
+        <div id="accessibility-panel">
+            <button class="btn btn-sm btn-secondary w-100" onclick="setColorMode('default')">
+                Default
+            </button>
+            <button class="btn btn-sm btn-dark w-100" onclick="setColorMode('grayscale')">
+                 Colour Blind
+            </button>
+            <button class="btn btn-sm btn-bright-yellow w-100" onclick="setColorMode('protanopia')">
+                Red Weakness
+            </button>
+            <!-- <button class="btn btn-sm btn-outline-secondary w-100" id="btn-low-bandwidth" onclick="localStorage.setItem('bandwidthMode','low'); location.reload();">
+             Low Bandwidth
+        </button>
+        <button class="btn btn-sm btn-outline-primary w-100" id="btn-high-bandwidth" onclick="localStorage.setItem('bandwidthMode','high'); location.reload();">
+            High Bandwidth 
+        </button>-->
+        </div>
+    </div>
+  
+    
+    <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute; width:0; height:0;">
+        <filter id="protanopia-filter">
+            <feColorMatrix type="matrix"
+                values="
+                    0.567 0.433 0     0 0
+                    0.558 0.442 0     0 0
+                    0     0.242 0.758 0 0
+                    0     0     0     1 0"/>
+        </filter>
+    </svg>
+    <script src="https://www.apf.gov.np/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script> -->
+        
+
+
+    
+    <script>
+        calcHeaderWidth();
+        function calcHeaderWidth() {
+            const headerContainer = document.getElementsByClassName('header-container');
+            const hamburgerMenu = document.getElementsByClassName('hamburger-menu');
+
+                // Get the outer width including padding and border
+                if (headerContainer) {
+                    const outerWidth = headerContainer[0].offsetWidth;
+
+                    // Get the width of the window
+                    const windowWidth = window.innerWidth;
+                    
+                    // Calculate the difference
+                    const widthDifference = windowWidth - outerWidth;
+
+                    // Calculate half of the width difference
+                    const halfWidthDifference = widthDifference / 4;
+
+                    // Set the left position of the hamburger menu
+                    hamburgerMenu[0].style.left = `${halfWidthDifference}px`;
+                }
+        }
+        addEventListener("resize", (event) => {calcHeaderWidth()});
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            lightGallery(document.getElementById('animated-thumbnails-gallery'), {
+                plugins: [lgZoom, lgThumbnail, lgAutoplay, lgFullscreen, lgShare],
+                autoplay: true,
+                autoplayControls: true, 
+                // allowMediaOverlap: true,
+                fullscreen: true,
+                zoom: false,
+                toggleThumb: true,
+                thumbWidth: 100,
+                thumbHeight: '80px',
+                actualSize: true,
+                fullscreen: true,
+                mobileSettings: {
+                    controls: false,
+                    showCloseIcon: false,
+                    download: false,
+                    rotate: false
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            // sidebarLinks.forEach(function (link) {
+            //     link.addEventListener('click', function () {
+            //         const icon = this.querySelector('i');
+            //         sidebarLinks.forEach(function (otherLink) {
+            //             console.log('otherLink',otherLink)
+            //             if (otherLink !== link) {
+            //                 if(otherLink.querySelector('i') !== null) {}
+            //                 console.log('otherLink.querySelector',otherLink.querySelector('i'))
+            //                 otherLink.querySelector('i').classList.remove('fa-rotated');
+            //             }
+            //         });
+            //         icon.classList.toggle('fa-rotated');
+            //     });
+            // });
+            document.querySelectorAll('.collapse').forEach(function (collapse) {
+                collapse.addEventListener('show.bs.collapse', function () {
+                    const link = document.querySelector(`[data-bs-target="#${collapse.id}"]`);
+                    link.querySelector('i').classList.add('fa-rotated');
+                });
+                collapse.addEventListener('hide.bs.collapse', function () {
+                    const link = document.querySelector(`[data-bs-target="#${collapse.id}"]`);
+                    link.querySelector('i').classList.remove('fa-rotated');
+                });
+            });
+        });
+    </script>
+
+
+
+    <script>
+        const swiper = new Swiper('.componentSwiper', {
+            slidesPerView: "auto", 
+            spaceBetween: 30, 
+
+           
+            autoplay: {
+                delay: 3000, 
+                disableOnInteraction: false, 
+            },
+
+            loop: true,
+
+           
+            scrollbar: {
+                el: '.swiper-scrollbar',
+                draggable: true,
+            },
+
+            slideToClickedSlide: true,
+        });
+ const btn = document.getElementById("toggleAutoplay");
+
+  let isPaused = false;
+
+  btn.addEventListener("click", () => {
+    if (isPaused) {
+      swiper.autoplay.start();
+      btn.innerText = "Pause";
+    } else {
+      swiper.autoplay.stop();
+      btn.innerText = "Play";
+    }
+
+    isPaused = !isPaused;
+  });
+    </script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // const searchIcon = document.querySelector('.search-icon');
+            const searchIconMobile = document.querySelector('.search-icon-mobile');
+            const searchBar = document.getElementById('search-bar');
+            const searchBarMobile = document.getElementById('search-bar-mobile');
+            const crossIcon = document.querySelector('.cross-icon');
+            const crossIconMobile = document.querySelector('.cross-icon-mobile');
+
+            if ( !searchIconMobile || !searchBar || !searchBarMobile || !crossIcon || !crossIconMobile) {
+                console.error('One or more elements not found. Check your selectors.');
+                return;
+            }
+
+            // Toggle search bar visibility on desktop
+            // searchIcon.addEventListener('click', function() {
+            //     console.log('Desktop search icon clicked');
+            //     if (searchBar.style.display === 'none' || searchBar.style.display === '') {
+            //         searchBar.style.display = 'flex';
+            //     } else {
+            //         searchBar.style.display = 'none';
+            //     }
+            // });
+
+            // Toggle search bar visibility on mobile
+            // searchIconMobile.addEventListener('click', function() {
+            //     console.log('Mobile search icon clicked');
+            //     if (searchBarMobile.style.display === 'none' || searchBarMobile.style.display === '') {
+            //         searchBarMobile.style.display = 'flex';
+            //     } else {
+            //         searchBarMobile.style.display = 'none';
+            //     }
+            // });
+
+            // Hide search bar on desktop when clicking the close icon
+            crossIcon.addEventListener('click', function() {
+                console.log('Desktop close icon clicked');
+                searchBar.style.display = 'none';
+            });
+
+            // Hide search bar on mobile when clicking the close icon
+            // crossIconMobile.addEventListener('click', function() {
+            //     console.log('Mobile close icon clicked');
+            //     searchBarMobile.style.display = 'none';
+            // });
+        });
+    </script>
+
+    <script>
+        AOS.init();
+    </script>
+
+    <script>
+        var app_url ="https://apf.gov.np";
+        function handleInputKeyDown(event, value) {
+            console.log("Input key", event.key);
+            if (event.key === "Enter") {
+                handleSearch(value);
+            }
+        }
+
+        function handleSearchClick() {
+            const searchInput = document.getElementById('searchInputMobile');
+            const value = searchInput.value;
+            console.log("value", value);
+            handleSearch(value);
+        }
+
+        function handleSearch(value) {
+            const query = value.trim();
+            if (query !== "") {
+                const googleSearchUrl = `https://www.google.com/search?q=site:${app_url}${encodeURIComponent(query)}`;
+                window.open(googleSearchUrl, "_blank");
+
+                // Reset each input field
+                const searchInputs = document.getElementsByClassName("searchInput");
+                for (let i = 0; i < searchInputs.length; i++) {
+                    searchInputs[i].value = "";
+                }
+
+                // Determine which cross icon to click based on screen size
+                const crossIcon = document.querySelector('.cross-icon');
+                const crossIconMobile = document.querySelector('.cross-icon-mobile');
+
+                if (window.innerWidth >= 1200) { // XL screens and above
+                    if (crossIcon) {
+                        crossIcon.click();
+                    }
+                } else { // Below XL screens
+                    if (crossIconMobile) {
+                        crossIconMobile.click();
+                    }
+                }
+            }
+        }
+
+
+    </script>
+    <script>
+        $(document).ready(function() {
+            // var resize = new Array('p', '.resizable');
+            var resize = new Array('body', 'a', 'div', 'p', 'h6');
+            resize = resize.join(',');
+            var incCount = 1;
+            var decCount = 1;
+            //resets the font size when "reset" is clicked
+            var resetFont = $(resize).css('font-size');
+            $(".reset").click(function() {
+                $(resize).css('font-size', resetFont);
+            });
+
+            //increases font size when "+" is clicked
+            $(".increase").click(function() {
+                if(incCount<(decCount+2)){
+                var originalFontSize = $(resize).css('font-size');
+                    var originalFontNumber = parseFloat(originalFontSize, 10);
+                    var newFontSize = originalFontNumber * 1.1;
+                    $(resize).css('font-size', newFontSize);
+                    incCount++
+                    return false;
+                }
+            });
+
+            //decrease font size when "-" is clicked
+
+            $(".decrease").click(function() {
+                if(decCount<(incCount+2)){
+                    var originalFontSize = $(resize).css('font-size');
+                    var originalFontNumber = parseFloat(originalFontSize, 10);
+                    var newFontSize = originalFontNumber * 0.9;
+                    $(resize).css('font-size', newFontSize);
+                    decCount++
+                    return false;
+                }
+            });
+
+
+var header = document.getElementById("stickyHeader");
+
+var sticky = header.offsetTop;
+
+window.onscroll = function() {
+    if (window.pageYOffset > sticky) {
+        header.classList.add("my-h-sticky");
+    } else {
+        header.classList.remove("my-h-sticky");
+    }
+};
+        });
+    </script>
+
+    <!-- <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script> -->
+
+    <!-- <script>
+        // Initialize the map
+        var map = L.map('map').setView([27.717684, 85.280797], 15); // Coordinates for Halchowk, Kathmandu
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add a marker at the specified location
+        var marker = L.marker([27.717684, 85.280797]).addTo(map);
+
+        // Bind a popup to the marker
+        marker.bindPopup("<b>Armed Police Force, Halchowk</b><br>Location: Halchowk, Kathmandu, Nepal<br>Phone: +977-1-xxxxxxx<br>Email: info@apfhalchowk.com").openPopup();
+    </script> -->
+
+    <!-- <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfU5oJ_4IaQ5EvTJhChNcKtDDrUl8T7zw"
+        defer>
+    </script> -->
+
+    <!-- <script>
+        function initMap() {
+            // Create a map centered at the desired location
+            const map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: 27.6922, lng: 85.3246 }, // Coordinates for the location
+            zoom: 13, // Adjust the zoom level as needed
+            });
+
+            // Add the traffic layer to the map
+            const trafficLayer = new google.maps.TrafficLayer();
+            trafficLayer.setMap(map);
+        }
+    </script> -->
+
+    <!-- Audio Plugin -->
+    <script src="https://cdn.plyr.io/3.6.12/plyr.js"></script>
+    <script>
+        let players = Array.from(document.querySelectorAll('.audio-player')).map(audio => new Plyr(audio));
+        let currentlyPlaying = null;
+
+        players.forEach(player => {
+            const audioId = player.media.id;
+            const audioContainer = document.querySelector(`[data-audio-id="${audioId}"]`).closest('.position-relative');
+            const playIcon = audioContainer.querySelector('.audio-img-play');
+            const pauseIcon = audioContainer.querySelector('.audio-img-pause');
+            
+            // Initially hide both play and pause icons
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'none';
+
+            // Show the appropriate icon when hovering over the container
+            audioContainer.addEventListener('mouseenter', () => {
+                if (player.paused) {
+                    playIcon.style.display = 'block';
+                } else {
+                    pauseIcon.style.display = 'block';
+                }
+            });
+
+            // Hide both icons when not hovering
+            audioContainer.addEventListener('mouseleave', () => {
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'none';
+            });
+
+            player.on('play', () => {
+                // Toggle icons when the audio is playing
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+
+                if (currentlyPlaying && currentlyPlaying !== player) {
+                    currentlyPlaying.pause();
+                    currentlyPlaying.currentTime = 0; // Optionally reset time
+                }
+                currentlyPlaying = player;
+            });
+
+            player.on('pause', () => {
+                // Toggle icons when the audio is paused
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+
+                if (currentlyPlaying === player) {
+                    currentlyPlaying = null;
+                }
+            });
+
+            // Make the entire container clickable to control play/pause
+            audioContainer.addEventListener('click', () => {
+                if (player.paused) {
+                    player.play();
+                } else {
+                    player.pause();
+                }
+            });
+        });
+    </script>
+
+
+    <script>
+        function toggleAccessibilityPanel() {
+            const panel = document.getElementById('accessibility-panel');
+            const isOpen = panel.style.display === 'flex';
+            panel.style.display = isOpen ? 'none' : 'flex';
+            panel.style.flexDirection = 'column';
+        }
+
+        document.addEventListener('click', function (e) {
+            const widget = document.getElementById('accessibility-widget');
+            if (!widget.contains(e.target)) {
+                document.getElementById('accessibility-panel').style.display = 'none';
+            }
+        });
+
+        function setColorMode(mode) {
+            document.body.classList.remove('color-default', 'color-grayscale', 'color-protanopia');
+            if (mode === 'grayscale') {
+                document.body.classList.add('color-grayscale');
+            } else if (mode === 'protanopia') {
+                document.body.classList.add('color-protanopia');
+            } else {
+                document.body.classList.add('color-default');
+            }
+            localStorage.setItem('colorMode', mode);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const saved = localStorage.getItem('colorMode') || 'default';
+            setColorMode(saved);
+             const savedBandwidth = localStorage.getItem('bandwidthMode') || 'high';
+            setBandwidth(savedBandwidth);
+        });
+    </script>
+
+<script>
+function toggleLowBandwidth() {
+    let enabled = localStorage.getItem('lowBandwidth') === 'true';
+
+    if (enabled) {
+        localStorage.setItem('lowBandwidth', 'false');
+        document.body.classList.remove('low-bandwidth');
+    } else {
+        localStorage.setItem('lowBandwidth', 'true');
+        document.body.classList.add('low-bandwidth');
+    }
+}
+
+// Apply on page load
+document.addEventListener("DOMContentLoaded", function () {
+    if (localStorage.getItem('lowBandwidth') === 'true') {
+        document.body.classList.add('low-bandwidth');
+    }
+});
+
+</script>
+<script>
+    function setColorMode(mode) {
+            document.body.classList.remove('color-default', 'color-grayscale', 'color-protanopia');
+            if (mode === 'grayscale') {
+                document.body.classList.add('color-grayscale');
+            } else if (mode === 'protanopia') {
+                document.body.classList.add('color-protanopia');
+            } else {
+                document.body.classList.add('color-default');
+            }
+            localStorage.setItem('colorMode', mode);
+        }
+
+        function setBandwidth(mode) {
+        const btnLow = document.getElementById('btn-low-bandwidth');
+        const btnHigh = document.getElementById('btn-high-bandwidth');
+        const topBtn = document.getElementById('bandwidth-top-btn');
+        const topLabel = document.getElementById('bandwidth-top-label');
+        const topIcon = topBtn ? topBtn.querySelector('i') : null;
+
+        if (mode === 'low') {
+            document.body.classList.add('low-bandwidth');
+            if (btnLow)  btnLow.classList.add('active');
+            if (btnHigh) btnHigh.classList.remove('active');
+            // Top button shows the OPPOSITE action (click to go High)
+            if (topLabel) topLabel.textContent = 'High Bandwidth';
+            if (topIcon)  { topIcon.classList.remove('fa-image-slash'); topIcon.classList.add('fa-image'); }
+        } else {
+            document.body.classList.remove('low-bandwidth');
+            if (btnHigh) btnHigh.classList.add('active');
+            if (btnLow)  btnLow.classList.remove('active');
+            // Top button shows the OPPOSITE action (click to go Low)
+            if (topLabel) topLabel.textContent = 'Low Bandwidth';
+            if (topIcon)  { topIcon.classList.remove('fa-image'); topIcon.classList.add('fa-image'); }
+        }
+
+        localStorage.setItem('bandwidthMode', mode);
+    }
+
+
+
+    // Clicking the top button toggles between modes and reloads
+    function toggleBandwidth() {
+        const current = localStorage.getItem('bandwidthMode') || 'high';
+        const next = current === 'high' ? 'low' : 'high';
+        localStorage.setItem('bandwidthMode', next);
+        location.reload();
+    }
+</script>
+    <script>
+    $(document).ready(function () {
+        var mainInput = document.getElementById("nepali-datepicker");
+        mainInput.nepaliDatePicker();
+        var mainInput2 = document.getElementById("nepali-datepicker2");
+        mainInput2.nepaliDatePicker();
+
+    });
+</script>
+
+</body>
+
+</html>
