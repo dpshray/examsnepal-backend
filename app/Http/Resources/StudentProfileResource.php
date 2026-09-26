@@ -21,6 +21,8 @@ class StudentProfileResource extends JsonResource
             "is_subscripted" => $this->is_subscripted,
             "name" => $this->name,
             "email" => $this->email,
+            // Web/app should route to the 2-step onboarding when true (Phase 8).
+            "needs_onboarding" => \App\Http\Controllers\Student\Marketing\StudentOnboardingController::needsOnboarding($this->resource),
         ];
     }
 }

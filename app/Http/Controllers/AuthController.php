@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Marketing\EventTracker;
 use App\Enums\RequestedFromEnum;
 use App\Http\Requests\Teacher\Register\TeacherRegisterRequest;
 use App\Http\Resources\StudentProfileResource;
@@ -220,6 +221,7 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $student->update(['fcm_token' => $request->fcm_token]);
+        app(EventTracker::class)->track($student->id, EventTracker::LOGGED_IN, ['method' => 'password']);
         $data = [
             'access_token' => $token,
             'token_type' => 'bearer',

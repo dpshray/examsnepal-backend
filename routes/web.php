@@ -21,3 +21,11 @@ Route::get('/doc-2', function () {
     Artisan::call('l5:generate');
     return redirect('/api/documentation');
 });
+// Marketing email tracking (docs/marketing.md). Signed, public.
+Route::controller(\App\Http\Controllers\Marketing\EmailTrackingController::class)->middleware('signed')->group(function () {
+    Route::get('/e/o/{send}', 'open')->name('marketing.open');
+    Route::get('/e/c/{send}', 'click')->name('marketing.click');
+    Route::get('/e/u/{send}', 'unsubscribe')->name('marketing.unsubscribe');
+    Route::post('/e/u/{send}', 'unsubscribePost');
+    Route::post('/e/r/{send}', 'resubscribe')->name('marketing.resubscribe');
+});

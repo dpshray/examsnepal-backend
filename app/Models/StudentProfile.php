@@ -36,7 +36,13 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
         'fcm_token',
         'requested_from',
         'token_version',
-        'is_hidden'
+        'is_hidden',
+        'target_exam_date',
+        'signup_source',
+        'utm_source',
+        'utm_medium',
+        'utm_campaign',
+        'marketing_email_opt_in',
     ];
 
     protected $hidden = ['password'];
@@ -48,7 +54,13 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
             'is_hidden' => 'boolean',
             'exam_type_id' => 'integer',
             'is_subscripted' => 'integer',
-            'requested_from' => RequestedFromEnum::class
+            'requested_from' => RequestedFromEnum::class,
+            'created_at' => 'datetime',
+            'last_active_at' => 'datetime',
+            'unsubscribed_at' => 'datetime',
+            'target_exam_date' => 'date',
+            'marketing_email_opt_in' => 'boolean',
+            'onboarded_at' => 'datetime',
         ];
     }
 
@@ -56,6 +68,9 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
     {
         parent::boot();
         static::creating(function ($student) {
+            // The table has no updated_at, so model timestamps stay off and
+            // only the signup time is recorded.
+            $student->created_at ??= now();
             $link_expires_minute   = SELF::EMAIL_LINK_EXPIRES_AT;
             $url_expiration_minute = now()->addMinutes($link_expires_minute);
             $url                   = URL::temporarySignedRoute('student_email_confirmation', $url_expiration_minute, ['email' => $student->email]);

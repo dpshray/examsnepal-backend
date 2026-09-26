@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Marketing\EventTracker;
+use App\Services\Marketing\AttemptScorer;
+use App\Jobs\RefreshStudentMetricsJob;
+
 use App\Enums\ExamTypeEnum;
 use App\Http\Requests\AnswerStoreRequest;
 use App\Http\Resources\QuestionCollection;
@@ -194,10 +198,14 @@ class AnswerSheetController extends Controller
         }
         // return $temp;
         // Log::info($validatedData);
+        $was_completed = (bool) $student_exam->is_exam_completed;
         DB::transaction(function() use($student_exam, $temp, $validatedData){
             $student_exam->answers()->upsert($temp, ['student_exam_id', 'question_id'], ['selected_option_id', 'is_correct']);
             $student_exam->update(['is_exam_completed' => $validatedData['is_exam_completed']]);
         });
+        if (!$was_completed && (int) $validatedData['is_exam_completed'] === 1) {
+            $this->recordSubmission($student_exam);
+        }
 
         $student_exam->refresh();
         $student_exam->load(['answers', 'exam.questions'])
@@ -301,5 +309,24 @@ class AnswerSheetController extends Controller
         $data['data'] = $items;
         return Response::apiSuccess('User Exam Solutions', $data);
 
+    }
+
+    /** Marketing side effects of a first-time exam submission; never fails the request. */
+    private function recordSubmission(StudentExam $student_exam): void
+    {
+        try {
+            (new AttemptScorer())->score([$student_exam->id]);
+            $score_pct = DB::table('student_exams')->where('id', $student_exam->id)->value('score_pct');
+            $exam_status = DB::table('exams')->where('id', $student_exam->exam_id)->value('status');
+            app(EventTracker::class)->track($student_exam->student_id, EventTracker::EXAM_SUBMITTED, [
+                'student_exam_id' => $student_exam->id,
+                'exam_id' => $student_exam->exam_id,
+                'exam_type' => ExamTypeEnum::getKeyByValue((int) $exam_status),
+                'score_pct' => $score_pct !== null ? (float) $score_pct : null,
+            ]);
+            RefreshStudentMetricsJob::dispatch($student_exam->student_id)->afterResponse();
+        } catch (\Throwable $e) {
+            Log::error('Recording exam submission for marketing failed: ' . $e->getMessage(), ['student_exam_id' => $student_exam->id]);
+        }
     }
 }

@@ -7,6 +7,29 @@ use App\Models\StudentExam;
 
 class ScoreService
 {
+    /**
+     * Final marks as a percentage of full marks, using the same negative
+     * marking rule as fetchExamScore(). Floored at 0; null for an exam with
+     * no questions.
+     */
+    public static function percentage(
+        int $correct,
+        int $incorrect,
+        int $totalQuestions,
+        float $pointsPerQuestion,
+        bool $isNegativeMarking,
+        float $negativeMarkingPoint,
+    ): ?float {
+        $pointsPerQuestion = $pointsPerQuestion > 0 ? $pointsPerQuestion : 1;
+        $fullMarks = $totalQuestions * $pointsPerQuestion;
+        if ($fullMarks <= 0) {
+            return null;
+        }
+        $marks = $correct * $pointsPerQuestion - ($isNegativeMarking ? $incorrect * $negativeMarkingPoint : 0);
+
+        return round(max(0, min(100, $marks / $fullMarks * 100)), 2);
+    }
+
     function fetchExamScore(StudentExam $student_exam): array {
         $exam = $student_exam->exam;
 

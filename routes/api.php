@@ -54,6 +54,8 @@ use App\Http\Controllers\Student\Exam\StudentExamController;
 use App\Http\Controllers\Student\Exam\StudentSubmitAnswersController;
 use App\Http\Controllers\Student\ExamRegister\StudentExamRegisterController;
 use App\Http\Controllers\SubscriptionTypeController;
+use App\Http\Controllers\Admin\Marketing\AdminMarketingController;
+use App\Http\Controllers\Admin\Marketing\AdminMessagingController;
 use App\Http\Middleware\AuthEitherUser;
 use App\Http\Middleware\CheckTokenVersionMiddleware;
 use App\Models\Exam;
@@ -161,6 +163,9 @@ Route::middleware(AuthEitherUser::class)->group(function () {
 
 // Protected Routes (for authenticated students)
 Route::middleware(['auth:api', 'verified', CheckTokenVersionMiddleware::class])->group(function () {
+    Route::get('/student/marketing/banner', [\App\Http\Controllers\Student\Marketing\StudentBannerController::class, 'show']);
+    Route::get('/student/onboarding', [\App\Http\Controllers\Student\Marketing\StudentOnboardingController::class, 'show']);
+    Route::post('/student/onboarding', [\App\Http\Controllers\Student\Marketing\StudentOnboardingController::class, 'store']);
     Route::get('test', [BlogController::class, 'test']);
     Route::get('auth-student', [AuthController::class, 'studentAuthResponse']);
     Route::post('/student/logout', [AuthController::class, 'logoutStudent']);
@@ -386,6 +391,43 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('admin/notice-fetch-logs', [AdminNoticeSourceController::class, 'logs']);
     Route::get('admin/notice-reports', [AdminNoticeReportController::class, 'index']);
     Route::post('admin/notice-reports/{noticeReport}/resolve', [AdminNoticeReportController::class, 'resolve']);
+
+    // Marketing dashboard (docs/marketing.md)
+    Route::controller(AdminMarketingController::class)->prefix('admin/marketing')->group(function () {
+        Route::get('overview', 'overview');
+        Route::get('cohorts', 'cohorts');
+        Route::get('meta', 'meta');
+        Route::get('students', 'students');
+        Route::get('students/export', 'export');
+        Route::post('students/tags', 'tags');
+        Route::get('students/{id}', 'student')->whereNumber('id');
+        Route::get('segments', 'segments');
+        Route::post('segments', 'storeSegment');
+        Route::delete('segments/{id}', 'destroySegment')->whereNumber('id');
+    });
+    Route::controller(AdminMessagingController::class)->prefix('admin/marketing')->group(function () {
+        Route::get('messaging/status', 'status');
+        Route::post('messaging/pause', 'pause');
+        Route::get('automations', 'automations');
+        Route::patch('automations/{automation}', 'updateAutomation');
+        Route::get('automations/{automation}/preview', 'preview');
+        Route::get('sends', 'sends');
+        Route::get('suppressions', 'suppressions');
+        Route::post('suppressions', 'suppress');
+        Route::delete('suppressions/{id}', 'unsuppress')->whereNumber('id');
+        Route::post('automations/{automation}/promote', 'promote');
+        Route::get('templates', 'templates');
+        Route::post('templates', 'storeTemplate');
+        Route::post('templates/draft-preview', 'draftPreview');
+        Route::put('templates/{template:key}', 'updateTemplate');
+        Route::delete('templates/{template:key}', 'destroyTemplate');
+        Route::get('templates/{template:key}/preview', 'renderTemplate');
+        Route::post('templates/{template:key}/test', 'sendTest');
+        Route::get('broadcasts', 'broadcasts');
+        Route::post('broadcasts/preview', 'previewBroadcast');
+        Route::post('broadcasts', 'storeBroadcast');
+        Route::post('broadcasts/{broadcast}/cancel', 'cancelBroadcast');
+    });
 });
 Route::get('admin/payment-settings', [AdminPaymentSettingController::class, 'index']);
 

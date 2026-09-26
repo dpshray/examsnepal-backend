@@ -27,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Ensure API authentication middleware is properly set
         $middleware->append(AuthenticateApi::class);
+
+        // Email tracking/unsubscribe links are signed URLs; mail clients POST
+        // one-click unsubscribes without a CSRF token (RFC 8058).
+        $middleware->validateCsrfTokens(except: ['e/*']);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Handle global exceptions here (e.g., logging, custom responses)

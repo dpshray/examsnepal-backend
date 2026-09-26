@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Marketing\EventTracker;
+use App\Models\StudentProfile;
+
 use App\Http\Resources\Admin\Subscription\AdminsubscriptionlistCollection;
 use App\Http\Resources\Admin\Subscription\AdminsubscriptionlistResource;
 use App\Http\Resources\StudentSubscriptionResource;
@@ -120,6 +123,11 @@ class SubscriptionTypeController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $tracker = app(EventTracker::class);
+        $dedupe = now()->subMinutes((int) config('marketing.pricing_view_dedupe_minutes'));
+        if ($user instanceof StudentProfile && !$tracker->has($user->id, EventTracker::PRICING_VIEWED, $dedupe)) {
+            $tracker->track($user->id, EventTracker::PRICING_VIEWED);
+        }
         $rows = SubscriptionType::select('id as subscription_type_id', 'duration', 'price')
             ->where('status', 1)
             ->where('exam_type_id', $user->exam_type_id)

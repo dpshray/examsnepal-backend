@@ -43,5 +43,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\App\Services\Notices\Enrichment\NoticeAiClient::class, fn () => config('notices.ai.provider') === 'anthropic'
             ? new \App\Services\Notices\Enrichment\AnthropicNoticeAiClient()
             : new \App\Services\Notices\Enrichment\OpenRouterNoticeAiClient());
+
+        // Marketing channels (config/marketing.php).
+        $this->app->bind(\App\Services\Marketing\Channels\PushSender::class, \App\Services\Marketing\Channels\FcmPushSender::class);
+        $this->app->bind(\App\Services\Marketing\Channels\SmsGateway::class, fn () => config('marketing.sms.driver') === 'sparrow'
+            ? new \App\Services\Marketing\Channels\SparrowSmsGateway()
+            : new \App\Services\Marketing\Channels\LogSmsGateway());
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Services\Marketing\EventTracker;
 use App\Enums\ExamTypeEnum;
 use App\Exceptions\ClientStudentExamException;
 use App\Http\Resources\QuestionCollection;
@@ -1260,6 +1261,13 @@ class QuestionController extends Controller
             }
         
         });
+        if ($user_exam->wasRecentlyCreated) {
+            app(EventTracker::class)->track($user->id, EventTracker::EXAM_STARTED, [
+                'student_exam_id' => $user_exam->id,
+                'exam_id' => $exam->id,
+                'exam_type' => ExamTypeEnum::getKeyByValue((int) $exam->status),
+            ]);
+        }
         // $user_exam now contains the record, new or existing
         return $user_exam;
     }

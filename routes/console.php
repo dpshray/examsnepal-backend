@@ -25,3 +25,12 @@ Schedule::command('queue:work', [
     '--max-time' => 50,
     '--sleep' => 0,
 ])->everyMinute()->withoutOverlapping(10);
+
+// Marketing funnel (see docs/marketing.md). Metric refresh jobs queued on
+// submission run on the `marketing` queue, served by a supervisor-managed
+// worker on the VPS - not by the short-lived notices worker above.
+Schedule::command('marketing:sync-payment-events')->everyMinute()->withoutOverlapping();
+Schedule::command('marketing:detect-lifecycle-events')->everyFifteenMinutes()->withoutOverlapping();
+Schedule::command('marketing:refresh-metrics')->hourly()->withoutOverlapping(55);
+Schedule::command('marketing:run-automations')->hourlyAt(5)->withoutOverlapping();
+Schedule::command('marketing:dispatch')->everyMinute()->withoutOverlapping(10);

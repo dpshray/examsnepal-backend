@@ -19,6 +19,7 @@ use App\Http\Resources\Student\Exam\StudentAllExamScoreDetailResource;
 use App\Http\Resources\StudentProfileResource;
 use App\Models\Exam;
 use App\Services\ScoreService;
+use App\Services\Marketing\EventTracker;
 use App\Traits\PaginatorTrait;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
@@ -112,20 +113,25 @@ class StudentProfileController extends Controller
         }
         Log::info('normal register : ' . Browser::platformFamily() . '|' . $requested_from);
         try {
-            DB::transaction(function () use ($request, $requested_from) {
-                $student = StudentProfile::create([
+            $student = DB::transaction(function () use ($request, $requested_from) {
+                return StudentProfile::create([
                     'name' => $request->name,
                     'email' => $request->email,
                     'phone' => $request->phone,
                     'password' => Hash::make($request->password),
                     'exam_type_id' => $request->exam_type_id,
                     'date' => Carbon::now()->format('m/d/Y h:i:s a'),
-                    'requested_from' => $requested_from
+                    'requested_from' => $requested_from,
+                    ...self::attribution($request),
                 ]);
             });
         } catch (\Exception $e) {
             return Response::apiError('Unable to send the email right now. Please retry in a moment.');
         }
+        app(EventTracker::class)->track($student->id, EventTracker::SIGNED_UP, [
+            'method' => 'email',
+            'exam_type_id' => (int) $request->exam_type_id,
+        ], strtolower($requested_from));
         return Response::apiSuccess('An verification link has been sent to your email.');
     }
 
@@ -835,7 +841,12 @@ class StudentProfileController extends Controller
                     'email_verified_at' => now(),
                     'fcm_token' => $request->fcm_token,
                     'date' => now(),
-                    'exam_type_id' => $request->exam_type_id
+                    'exam_type_id' => $request->exam_type_id,
+                    ...self::attribution($request),
+                ]);
+                app(EventTracker::class)->track($student->id, EventTracker::SIGNED_UP, [
+                    'method' => 'google',
+                    'exam_type_id' => (int) $request->exam_type_id,
                 ]);
             } else {
                 $student = tap($student, function ($student) use ($googleUser, $request) {
@@ -850,6 +861,7 @@ class StudentProfileController extends Controller
                 });
             }
             $token = JWTAuth::fromUser($student);
+            app(EventTracker::class)->track($student->id, EventTracker::LOGGED_IN, ['method' => 'google']);
             $data = [
                 'access_token' => $token,
                 'token_type' => 'bearer',
@@ -1055,5 +1067,17 @@ class StudentProfileController extends Controller
         $student_profile->is_hidden = !$student_profile->is_hidden;
         $student_profile->save();
         return Response::apiSuccess('Student profile visibility updated successfully.');
+    }
+
+    /**
+     * Optional signup attribution sent by the web/app signup form
+     * (signup_source, utm_source, utm_medium, utm_campaign).
+     */
+    private static function attribution(Request $request): array
+    {
+        return collect($request->only(['signup_source', 'utm_source', 'utm_medium', 'utm_campaign']))
+            ->filter(fn ($v) => is_string($v) && $v !== '')
+            ->map(fn ($v, $k) => mb_substr($v, 0, $k === 'utm_campaign' ? 150 : ($k === 'signup_source' ? 50 : 100)))
+            ->all();
     }
 }
