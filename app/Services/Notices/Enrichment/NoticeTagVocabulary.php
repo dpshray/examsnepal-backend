@@ -3,7 +3,7 @@
 namespace App\Services\Notices\Enrichment;
 
 use App\Models\ExamGuide;
-use Illuminate\Support\Facades\Cache;
+use App\Services\Notices\NoticePublisher;
 
 /**
  * The exam_tags the model may assign: slugs of every published exam guide
@@ -14,7 +14,7 @@ class NoticeTagVocabulary
     /** @return array<string, string> slug => human label */
     public function all(): array
     {
-        return Cache::remember('notices:tag-vocabulary', now()->addHour(), function () {
+        return NoticePublisher::remember('notices:tag-vocabulary', now()->addHour(), function () {
             $tags = ExamGuide::published()->orderBy('name')->pluck('name', 'slug')->all();
 
             foreach (array_keys(config('notices.fixed_exam_tags')) as $slug) {

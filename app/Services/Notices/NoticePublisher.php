@@ -4,7 +4,10 @@ namespace App\Services\Notices;
 
 use App\Jobs\NotifyNoticeSubscribersJob;
 use App\Models\Notice;
+use Closure;
+use DateTimeInterface;
 use Illuminate\Support\Facades\Cache;
+use Throwable;
 
 /**
  * Publishing rules (Phase 4) and everything that has to happen when the set
@@ -86,5 +89,34 @@ class NoticePublisher
     public static function cacheKey(string $suffix): string
     {
         return 'notices:v'.Cache::get('notices:cache-version', 1).':'.$suffix;
+    }
+
+    /**
+     * Cache::remember() that never fails the request: if the store cannot be
+     * read or written (e.g. a file-cache directory owned by the cron user),
+     * report it and serve the freshly computed value instead of a 500.
+     */
+    public static function remember(string $key, DateTimeInterface|int $ttl, Closure $callback): mixed
+    {
+        try {
+            $value = Cache::get($key);
+        } catch (Throwable $e) {
+            report($e);
+            $value = null;
+        }
+
+        if ($value !== null) {
+            return $value;
+        }
+
+        $value = $callback();
+
+        try {
+            Cache::put($key, $value, $ttl);
+        } catch (Throwable $e) {
+            report($e);
+        }
+
+        return $value;
     }
 }

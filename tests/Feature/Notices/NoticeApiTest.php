@@ -6,6 +6,9 @@ use App\Models\Notice;
 use App\Models\NoticeReport;
 use App\Models\NoticeSubscription;
 use App\Services\Notices\NoticePublisher;
+use ErrorException;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class NoticeApiTest extends NoticeDatabaseTestCase
@@ -119,6 +122,26 @@ class NoticeApiTest extends NoticeDatabaseTestCase
 
         app(NoticePublisher::class)->publish($pending);
         $this->getJson('/api/free/notices')->assertJsonPath('data.total', 2);
+    }
+
+    public function test_unwritable_cache_does_not_fail_requests(): void
+    {
+        $notice = $this->notice(['exam_tags' => ['kharidar']]);
+        // Simulates a file-cache directory owned by the cron user.
+        Cache::extend('unwritable', fn () => Cache::repository(new class extends ArrayStore
+        {
+            public function put($key, $value, $seconds)
+            {
+                throw new ErrorException('file_put_contents(): Failed to open stream: Permission denied');
+            }
+        }));
+        config(['cache.stores.unwritable' => ['driver' => 'unwritable'], 'cache.default' => 'unwritable']);
+        Cache::forgetDriver();
+
+        $this->getJson('/api/free/notices')->assertOk()->assertJsonPath('data.total', 1);
+        $this->getJson('/api/free/notices/home')->assertOk();
+        $this->getJson('/api/free/notices/meta')->assertOk();
+        $this->getJson("/api/free/notices/{$notice->slug}")->assertOk()->assertJsonPath('data.exam_links.0.tag', 'kharidar');
     }
 
     public function test_report_and_subscribe(): void

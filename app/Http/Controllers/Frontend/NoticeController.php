@@ -13,7 +13,6 @@ use App\Services\Notices\NoticePublisher;
 use App\Traits\PaginatorTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rule;
 
@@ -49,7 +48,7 @@ class NoticeController extends Controller
         ]);
 
         $key = NoticePublisher::cacheKey('list:'.md5(json_encode($filters)));
-        $data = Cache::remember($key, now()->addMinutes(self::CACHE_MINUTES), function () use ($filters) {
+        $data = NoticePublisher::remember($key, now()->addMinutes(self::CACHE_MINUTES), function () use ($filters) {
             $query = $this->filtered($filters);
 
             if (isset($filters['closing'])) {
@@ -75,7 +74,7 @@ class NoticeController extends Controller
     {
         $category = $request->validate(['category' => ['nullable', Rule::in(Notice::CATEGORIES)]])['category'] ?? null;
 
-        $data = Cache::remember(NoticePublisher::cacheKey('home:'.($category ?? 'all')), now()->addMinutes(self::CACHE_MINUTES), function () use ($category) {
+        $data = NoticePublisher::remember(NoticePublisher::cacheKey('home:'.($category ?? 'all')), now()->addMinutes(self::CACHE_MINUTES), function () use ($category) {
             $base = fn () => Notice::published()->when($category, fn ($q) => $q->where('category', $category));
             $list = fn (Builder $q, int $n) => NoticeListResource::collection($q->limit($n)->get())->resolve();
 
@@ -93,7 +92,7 @@ class NoticeController extends Controller
     /** GET free/notices/meta - filter options. */
     public function meta()
     {
-        $data = Cache::remember(NoticePublisher::cacheKey('meta'), now()->addHour(), fn () => [
+        $data = NoticePublisher::remember(NoticePublisher::cacheKey('meta'), now()->addHour(), fn () => [
             'categories' => Notice::CATEGORIES,
             // Only options that match at least one published notice, so no
             // filter choice leads to a guaranteed-empty page.
@@ -119,7 +118,7 @@ class NoticeController extends Controller
 
         Notice::whereKey($notice->id)->increment('view_count');
 
-        $data = Cache::remember(NoticePublisher::cacheKey("show:{$notice->id}"), now()->addMinutes(self::CACHE_MINUTES), function () use ($notice) {
+        $data = NoticePublisher::remember(NoticePublisher::cacheKey("show:{$notice->id}"), now()->addMinutes(self::CACHE_MINUTES), function () use ($notice) {
             $related = Notice::published()
                 ->where('id', '!=', $notice->id)
                 ->where(function ($q) use ($notice) {
