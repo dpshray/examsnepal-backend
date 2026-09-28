@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('teacher')->group(function(){
     Route::post('login', [AuthController::class, 'teacherLogin']);
-    Route::middleware('auth:users')
+    Route::middleware(['auth:users', 'active'])
         ->controller(TeacherExamController::class)
         ->group(function(){
             Route::apiResource('exam', TeacherExamController::class)->names('teacher.exam');

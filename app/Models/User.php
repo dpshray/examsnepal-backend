@@ -124,6 +124,8 @@ class User extends Authenticatable implements JWTSubject
         return [
             'id' => 'integer',
             'role_id' => 'integer',
+            'is_disabled' => 'boolean',
+            'disabled_at' => 'datetime',
             'added_by' => 'integer',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',

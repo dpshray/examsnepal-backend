@@ -26,6 +26,7 @@ class InstitutePublicProfileController extends Controller
 
         $institutes = User::whereHas('role', fn ($q) => $q->where('name', 'corporate'))
             ->whereNotNull('slug')
+            ->where('is_disabled', false)
             ->when($search, fn ($q) => $q->where(function ($q) use ($search) {
                 $q->where('fullname', 'like', "%{$search}%")
                     ->orWhere('org', 'like', "%{$search}%");

@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth.api' => AuthenticateApi::class,
             'role'     => CheckUserRole::class,
+            'active'   => \App\Http\Middleware\EnsureAccountNotDisabled::class,
         ]);
 
         // Ensure API authentication middleware is properly set

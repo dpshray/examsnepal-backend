@@ -22,6 +22,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\Admin\AdminInstituteController;
 use App\Http\Controllers\BankQuestionController;
 use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
@@ -309,6 +310,8 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('/all-students', [StudentProfileController::class, 'allStudents']);
 
     Route::get('/teachers', [TeacherController::class, 'index']);
+    Route::get('/admin/institutes', [AdminInstituteController::class, 'index']);
+    Route::post('/admin/institutes/{user}/toggle-status', [AdminInstituteController::class, 'toggleStatus']);
     Route::get('/all-question-banks', [BankQuestionController::class, 'index']);
     Route::post('/question-bank', [BankQuestionController::class, 'store']);
     Route::get('/question-bank/{id}', [BankQuestionController::class, 'show']);

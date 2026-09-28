@@ -85,6 +85,8 @@ class CorporateAuthController extends Controller
             return Response::apiError('User not found or invalid role', 403);
         } elseif ($user->name != RoleEnum::CORPORATE->value) {
             return Response::apiError('Please login in as corporate', 500);
+        } elseif ($user->is_disabled) {
+            return Response::apiError('Your account has been disabled. Please contact ExamsNepal support.', null, 403);
         }
 
         if (! $token = Auth::guard('users')->attempt($validated)) {
@@ -172,6 +174,7 @@ class CorporateAuthController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role_id' => 5,
+            'created_date' => now()->toDateTimeString(),
         ]);
         // $user->loadMissing('role');
         // event(new Registered($user));

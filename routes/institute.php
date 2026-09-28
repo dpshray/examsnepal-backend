@@ -24,6 +24,7 @@ Route::bind('institute', function (string $slug) {
                 ->orWhereRaw('LOWER(username) = ?', [strtolower($slug)]);
         })
         ->whereHas('role', fn ($q) => $q->where('name', 'corporate'))
+        ->where('is_disabled', false)
         ->firstOrFail();
 });
 

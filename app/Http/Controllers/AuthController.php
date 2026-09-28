@@ -381,6 +381,9 @@ class AuthController extends Controller
         if (!Hash::check($credentials['password'], $user->password)) {
             return response()->json(['error' => 'Incorrect password'], 401);
         }
+        if ($user->is_disabled) {
+            return response()->json(['error' => 'Your account has been disabled. Please contact ExamsNepal support.'], 403);
+        }
         $token = JWTAuth::fromUser($user);
         $data = [
             'user' => [
