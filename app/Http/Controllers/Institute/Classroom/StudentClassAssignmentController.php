@@ -61,7 +61,7 @@ class StudentClassAssignmentController extends Controller
         $data = $request->validate([
             'type' => 'required|in:pdf,image,text',
             'content_text' => 'required_if:type,text|nullable|string',
-            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp,gif|max:10240',
+            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp,gif|max:51200',
         ]);
 
         if (in_array($data['type'], ['pdf', 'image'], true)) {

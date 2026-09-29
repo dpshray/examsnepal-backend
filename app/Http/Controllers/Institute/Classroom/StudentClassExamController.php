@@ -339,7 +339,7 @@ class StudentClassExamController extends Controller
             'question_id' => 'required|integer|exists:class_exam_questions,id',
             'selected_option_id' => 'nullable|integer|exists:class_exam_question_options,id',
             'answer_text' => 'nullable|string',
-            'answer_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'answer_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:51200',
         ]);
 
         $question = ClassExamQuestion::findOrFail($data['question_id']);
