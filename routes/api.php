@@ -55,6 +55,7 @@ use App\Http\Controllers\Student\Exam\StudentExamController;
 use App\Http\Controllers\Student\Exam\StudentSubmitAnswersController;
 use App\Http\Controllers\Student\ExamRegister\StudentExamRegisterController;
 use App\Http\Controllers\SubscriptionTypeController;
+use App\Http\Controllers\Admin\Marketing\AdminInsightsController;
 use App\Http\Controllers\Admin\Marketing\AdminMarketingController;
 use App\Http\Controllers\Admin\Marketing\AdminMessagingController;
 use App\Http\Middleware\AuthEitherUser;
@@ -407,6 +408,11 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
         Route::get('segments', 'segments');
         Route::post('segments', 'storeSegment');
         Route::delete('segments/{id}', 'destroySegment')->whereNumber('id');
+    });
+    Route::controller(AdminInsightsController::class)->prefix('admin/marketing/insights')->group(function () {
+        Route::get('summary', 'summary');
+        Route::post('brief', 'brief')->middleware('throttle:10,1');
+        Route::get('{source}', 'source')->whereIn('source', ['search', 'analytics', 'facebook']);
     });
     Route::controller(AdminMessagingController::class)->prefix('admin/marketing')->group(function () {
         Route::get('messaging/status', 'status');

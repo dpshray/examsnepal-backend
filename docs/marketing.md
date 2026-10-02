@@ -219,3 +219,46 @@ Every dashboard read is well under the 2s target. `SendGuard::prime()` makes bul
 - **Local result:** 1,190 of 2,439 exams tagged, which is 107,274 questions across 52 subjects. A random sample of 70 was all correct. The rest are multi-subject (184), ambiguous lists (30), generic names (894) or exam types without subject rules (141: pharmacy, radiography, administration, agriculture).
 - **Scores:** a student's subject score is their average on that subject's exams. `weakest_subject_*` / `strongest_subject_id` need at least two subjects with two or more scored attempts each. They feed the `has_weak_subject` segment, the `weakest_score_max` condition, `{{weakest_subject}}` / `{{weakest_subject_score}}` in templates, and the drawer's Subjects section.
 - **Deploy:** after `marketing:migrate`, run `php artisan subjects:infer`, check the output, then `--apply` and `marketing:refresh-metrics`.
+
+## Web & social insights
+
+Admin page **Marketing → Web & social insights** (`/marketing/insights`) pulls Google Search Console,
+Google Analytics 4 and the Facebook Page into one view and turns them into findings with a next step
+(`app/Services/Marketing/Insights/`). Tabs: Action plan (all findings ranked + optional AI brief),
+Google Search, Website, Facebook.
+
+- **Search**: clicks/impressions/CTR/position vs previous period, brand vs non-brand share, demand by exam
+  (queries bucketed by `marketing.insights.topics` and compared with `student_profiles.exam_type_id` share),
+  "almost on page 1" (position 8–20), low-CTR titles, rising/new/declining queries, search intent.
+- **Website**: users/sessions/engagement/key events, channels with conversion rate, landing pages that
+  lose visitors, weekday × hour activity heatmap, cities, devices, events.
+- **Facebook**: posting cadence and gaps, engagement by format / exam topic / weekday / hour (Nepal time),
+  top and weakest posts, follower metrics. Post numbers come from the posts themselves; Page Insights
+  metrics are best-effort (Meta renames them — edit `marketing.insights.facebook.page_metrics`).
+- **Cross-channel**: Facebook engagement vs Facebook-referred visits, top search topics with no posts,
+  untracked sign-up sources.
+- **AI brief** (button): prioritised plan, content ideas, weekly schedule. Uses the notices AI provider
+  (`NOTICES_AI_PROVIDER` + key); model `MARKETING_INSIGHTS_AI_MODEL` or the notices model. Cached 6h.
+
+Each source is cached for `MARKETING_INSIGHTS_CACHE_MINUTES` (60); the Refresh button bypasses it.
+Errors are shown on the page with the setup steps and are not cached.
+
+### Setup (.env on the VPS)
+
+```
+GOOGLE_INSIGHTS_CREDENTIALS=/var/www/examsnepal-backend/storage/app/private/google-insights.json  # default
+GA4_PROPERTY_ID=123456789                 # numeric property id, not G-XXXX
+SEARCH_CONSOLE_SITE=sc-domain:examsnepal.com   # or the exact URL-prefix property
+FACEBOOK_PAGE_ID=...
+FACEBOOK_PAGE_TOKEN=...                   # long-lived Page token
+# FACEBOOK_GRAPH_VERSION=v23.0
+# MARKETING_INSIGHTS_AI_MODEL=
+```
+
+1. Google Cloud: create a service account, enable *Google Analytics Data API* and *Google Search Console API*,
+   download the JSON key to the path above (readable by www-data, not web-accessible).
+2. GA4 → Admin → Property access management: add the service-account email as **Viewer**.
+3. Search Console → Settings → Users and permissions: add the same email (**Restricted**).
+4. Facebook: Graph API Explorer → user token with `pages_show_list`, `pages_read_engagement`, `read_insights`
+   → exchange for a long-lived token → `GET /me/accounts` → copy the Page's `access_token` (does not expire).
+5. `php artisan config:cache && php artisan marketing:insights-check` — prints OK or the exact error per source.

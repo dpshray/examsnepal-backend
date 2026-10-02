@@ -76,6 +76,66 @@ return [
         'dormant' => ['tone' => 'info', 'title' => 'Welcome back!', 'body' => "We've added new practice since your last visit.", 'cta_label' => 'Take a free quiz', 'cta_path' => '/student/exams/free-quiz'],
     ],
 
+    // Web & social insights page (docs/marketing.md#web--social-insights).
+    // Google: one service account JSON key, added as a Viewer on the GA4
+    // property and as a (restricted) user on the Search Console property.
+    'insights' => [
+        'cache_minutes' => (int) env('MARKETING_INSIGHTS_CACHE_MINUTES', 60),
+        'timezone' => 'Asia/Kathmandu',
+        'google_credentials' => env('GOOGLE_INSIGHTS_CREDENTIALS', storage_path('app/private/google-insights.json')),
+        // Numeric GA4 property id (Admin > Property details), not the G-XXXX measurement id.
+        'ga4_property_id' => env('GA4_PROPERTY_ID'),
+        // "sc-domain:examsnepal.com" for a domain property, or the exact URL-prefix property ("https://www.examsnepal.com/").
+        'search_console_site' => env('SEARCH_CONSOLE_SITE'),
+        'facebook' => [
+            'graph_version' => env('FACEBOOK_GRAPH_VERSION', 'v23.0'),
+            'page_id' => env('FACEBOOK_PAGE_ID'),
+            // Long-lived Page access token (pages_read_engagement, read_insights).
+            'page_token' => env('FACEBOOK_PAGE_TOKEN'),
+            // Page Insights metrics, fetched one by one; Meta renames these
+            // often, so any the API rejects are skipped and listed as unavailable.
+            'page_metrics' => [
+                'page_daily_follows_unique' => 'New followers',
+                'page_daily_unfollows_unique' => 'Unfollows',
+                'page_media_view' => 'Views',
+                'page_post_engagements' => 'Post engagements',
+            ],
+            'max_posts' => 300,
+        ],
+        // Model for the AI marketing brief; empty = the notices model. Uses
+        // the notices AI provider/key (NOTICES_AI_PROVIDER), so that must be set.
+        'ai_model' => env('MARKETING_INSIGHTS_AI_MODEL'),
+        'brief_cache_hours' => 6,
+        // Queries containing these are "brand" searches (people who already know us).
+        'brand_terms' => ['examsnepal', 'exams nepal', 'exam nepal', 'examnepal', 'examsnp'],
+        // Search queries and Facebook posts are bucketed by these keywords
+        // (lowercase, first match wins; keywords of 3 letters or fewer match whole
+        // words only, longer ones match word starts). exam_type_ids ties a topic to
+        // student_profiles.exam_type_id to compare search demand with our student base.
+        'topics' => [
+            'dental' => ['label' => 'Dental', 'exam_type_ids' => [9], 'keywords' => ['dental', 'bds', 'mds', 'dentist']],
+            'nursing' => ['label' => 'Nursing', 'exam_type_ids' => [5], 'keywords' => ['nursing', 'nurse', 'bns', 'anm', 'pcl', 'bsc nursing', 'midwi']],
+            'radiography' => ['label' => 'Radiography', 'exam_type_ids' => [10], 'keywords' => ['radiograph', 'radiology', 'x-ray', 'xray', 'imaging']],
+            'pharmacy' => ['label' => 'Pharmacy', 'exam_type_ids' => [11], 'keywords' => ['pharma', 'pharmacy', 'pharmacist', 'drug']],
+            'medical' => ['label' => 'Medical (NMCLE / MD-MS)', 'exam_type_ids' => [1, 3], 'keywords' => ['nmcle', 'mbbs', 'medical', 'mdms', 'md ms', 'md/ms', 'cee', 'nmc', 'doctor', 'health assistant', 'ha']],
+            'computer' => ['label' => 'Computer engineering', 'exam_type_ids' => [12], 'keywords' => ['computer', 'it officer', 'programming', 'software']],
+            'civil' => ['label' => 'Civil engineering', 'exam_type_ids' => [13], 'keywords' => ['civil', 'sub engineer', 'sub-engineer', 'overseer']],
+            'electrical' => ['label' => 'Electrical engineering', 'exam_type_ids' => [14], 'keywords' => ['electrical', 'electronics']],
+            'engineering' => ['label' => 'Engineering (general)', 'exam_type_ids' => [2, 6], 'keywords' => ['engineering', 'nec', 'ioe', 'engineer']],
+            'loksewa' => ['label' => 'Loksewa (general)', 'exam_type_ids' => [4], 'keywords' => ['loksewa', 'lok sewa', 'psc', 'लोकसेवा', 'kharidar', 'nayab subba', 'section officer']],
+            'agriculture' => ['label' => 'Agriculture', 'exam_type_ids' => [7], 'keywords' => ['agri', 'jta', 'veterinary', 'vet']],
+        ],
+        // What the searcher wants, independent of exam.
+        'intents' => [
+            'practice' => ['label' => 'Practice / MCQ', 'keywords' => ['mcq', 'mock', 'model question', 'question bank', 'practice', 'quiz', 'test', 'sample question', 'objective']],
+            'past_papers' => ['label' => 'Old / past questions', 'keywords' => ['old question', 'past question', 'past paper', 'previous year', 'question paper', 'old paper', 'collection']],
+            'syllabus' => ['label' => 'Syllabus / pattern', 'keywords' => ['syllabus', 'pattern', 'curriculum', 'course']],
+            'notice' => ['label' => 'Notices / results / dates', 'keywords' => ['result', 'notice', 'vacancy', 'date', 'schedule', 'admit card', 'form', 'application', 'routine']],
+            'license' => ['label' => 'License exam', 'keywords' => ['license', 'licence', 'licensing']],
+            'entrance' => ['label' => 'Entrance exam', 'keywords' => ['entrance']],
+        ],
+    ],
+
     // A repeat pricing_viewed within this window is not logged again (the plan
     // list endpoint is also hit by the home page).
     'pricing_view_dedupe_minutes' => 30,
