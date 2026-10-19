@@ -172,6 +172,27 @@ class NoticeEnricher
     private function apply(Notice $notice, array $result): void
     {
         $d = $result['data'];
+
+        // A pending notice waits for review whatever the confidence; a live one
+        // doesn't, so a shaky extraction (e.g. title-only, scanned PDF) must not
+        // put wrong deadlines or fees on the public page. Keep it for review.
+        $minimum = (float) config('notices.ai.published_min_confidence');
+        if ($notice->status === 'published' && (float) $d['confidence'] < $minimum) {
+            $notice->forceFill([
+                'ai_confidence' => round((float) $d['confidence'], 2),
+                'ai_model' => $result['model'],
+                'ai_raw' => $d,
+                'ai_input_tokens' => $result['input_tokens'],
+                'ai_output_tokens' => $result['output_tokens'],
+                'enrichment_error' => sprintf(
+                    'Low-confidence extraction (%.2f < %.2f) not applied to the live notice - check the AI result and edit or re-run.',
+                    $d['confidence'],
+                    $minimum,
+                ),
+            ])->save();
+
+            return;
+        }
         $dates = [];
         foreach (NoticeExtractionSchema::DATE_FIELDS as $field) {
             // BS is converted on our side - the model is never asked to convert.

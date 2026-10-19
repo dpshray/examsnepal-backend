@@ -8,6 +8,14 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
+// Public website stats (App\Services\PublicStats). Cached for 6h; refreshed
+// every 4h so a visitor request never pays for the ~10s recompute.
+Schedule::command('stats:refresh-public')->everyFourHours()->withoutOverlapping();
+
+// Re-score MCQ pages for indexing nightly so new/edited questions (and new
+// duplicates) are picked up (App\Services\Seo\McqIndexability).
+Schedule::command('mcq:score-seo')->dailyAt('03:15')->timezone('Asia/Kathmandu')->withoutOverlapping();
+
 // Notices pipeline (see docs/notices-plan.md). The only server setup needed is
 // one cPanel cron job running `php artisan schedule:run` every minute - there
 // is no long-running worker/supervisor on shared hosting.

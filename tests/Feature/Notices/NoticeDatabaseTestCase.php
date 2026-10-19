@@ -49,6 +49,7 @@ abstract class NoticeDatabaseTestCase extends TestCase
             '2026_09_24_100200_create_notice_fetch_logs_table',
             '2026_09_24_100300_create_notice_subscriptions_table',
             '2026_09_24_100400_create_notice_reports_table',
+            '2026_10_20_110000_add_facebook_post_to_notices_table',
         ] as $migration) {
             Artisan::call('migrate', ['--path' => "database/migrations/{$migration}.php", '--database' => 'notices_testing', '--force' => true]);
         }

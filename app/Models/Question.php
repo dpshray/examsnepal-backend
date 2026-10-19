@@ -115,6 +115,18 @@ class Question extends Model implements HasMedia
         return $this->getFirstMediaUrl(self::EXPLANATION_IMAGE) ?: null;
     }
 
+    /**
+     * Pages worth listing in the /mcq sitemap: indexable and not a duplicate
+     * (see App\Services\Seo\McqIndexability / `php artisan mcq:score-seo`).
+     */
+    public function scopeInSitemap($query)
+    {
+        // Qualified: callers join exams / exam_types (which has its own slug).
+        return $query->whereNotNull($this->qualifyColumn('slug'))
+            ->whereNull($this->qualifyColumn('seo_noindex_reason'))
+            ->whereNull($this->qualifyColumn('canonical_question_id'));
+    }
+
     public function getQuestionAttribute(?string $value): ?string
     {
         return MojibakeFixer::fix($value);

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\EnrichNoticeJob;
 use App\Models\Notice;
 use App\Services\Notices\Enrichment\NoticeTagVocabulary;
+use App\Services\Notices\FacebookNoticePoster;
 use App\Services\Notices\NoticePublisher;
 use App\Services\Notices\Support\NepaliDate;
 use App\Services\Notices\Support\TitleNormalizer;
@@ -19,7 +20,10 @@ class AdminNoticeController extends Controller
 {
     use PaginatorTrait;
 
-    public function __construct(private readonly NoticePublisher $publisher) {}
+    public function __construct(
+        private readonly NoticePublisher $publisher,
+        private readonly FacebookNoticePoster $facebook,
+    ) {}
 
     /** GET admin/notices?status=pending&category=&source_id=&q=&per_page= */
     public function index(Request $request)
@@ -75,7 +79,9 @@ class AdminNoticeController extends Controller
     {
         $notice->load(['source:id,name,list_url,is_trusted', 'reports' => fn ($q) => $q->latest()]);
 
-        return Response::apiSuccess('Notice', $notice->makeVisible('ai_raw'));
+        return Response::apiSuccess('Notice', $notice->makeVisible('ai_raw')->toArray() + [
+            'facebook' => $this->facebookInfo($notice),
+        ]);
     }
 
     /** POST admin/notices - manual entry (manual sources, urgent notices). */
@@ -123,11 +129,43 @@ class AdminNoticeController extends Controller
         return Response::apiSuccess('Notice deleted');
     }
 
-    public function approve(Notice $notice)
+    /**
+     * POST admin/notices/{id}/approve - publish on the website and, when the
+     * admin panel sends a rendered image with post_to_facebook=1, post it to
+     * the Facebook Page too. A Facebook failure never undoes the website publish;
+     * it's reported in `facebook` and can be retried via postToFacebook().
+     */
+    public function approve(Request $request, Notice $notice)
     {
+        $data = $this->validatedFacebook($request);
+
         $this->publisher->publish($notice);
 
-        return Response::apiSuccess('Notice published', $notice->fresh());
+        $message = 'Notice published';
+        if ($request->boolean('post_to_facebook')) {
+            $message .= $this->postToPage($notice, $data)
+                ? ' on the website and Facebook'
+                : ' on the website - Facebook post failed: '.$notice->facebook_error;
+        }
+
+        return Response::apiSuccess($message, $notice->fresh()->toArray() + ['facebook' => $this->facebookInfo($notice)]);
+    }
+
+    /** POST admin/notices/{id}/facebook - post (or retry) a published notice. */
+    public function postToFacebook(Request $request, Notice $notice)
+    {
+        $data = $this->validatedFacebook($request);
+
+        if ($notice->status !== 'published') {
+            return Response::apiError('Publish the notice on the website first.', null, 422);
+        }
+        if ($notice->facebook_post_id) {
+            return Response::apiError('This notice is already on Facebook.', ['facebook' => $this->facebookInfo($notice)], 409);
+        }
+
+        return $this->postToPage($notice, $data)
+            ? Response::apiSuccess('Posted to Facebook', $notice->fresh()->toArray() + ['facebook' => $this->facebookInfo($notice)])
+            : Response::apiError('Facebook post failed: '.$notice->facebook_error, ['facebook' => $this->facebookInfo($notice)], 502);
     }
 
     public function reject(Notice $notice)
@@ -155,6 +193,38 @@ class AdminNoticeController extends Controller
         EnrichNoticeJob::dispatch($notice->id, force: true)->onQueue(config('notices.queue'));
 
         return Response::apiSuccess('Re-extraction queued');
+    }
+
+    private function postToPage(Notice $notice, array $data): bool
+    {
+        if (isset($data['facebook_image'])) {
+            $this->facebook->storeImage($notice, $data['facebook_image']->get());
+        }
+
+        return $this->facebook->post($notice, trim($data['facebook_caption'] ?? '') ?: $this->facebook->defaultCaption($notice));
+    }
+
+    private function validatedFacebook(Request $request): array
+    {
+        return $request->validate([
+            'post_to_facebook' => ['sometimes', 'boolean'],
+            'facebook_image' => ['nullable', 'file', 'mimes:png,jpg,jpeg', 'max:8192'],
+            'facebook_caption' => ['nullable', 'string', 'max:5000'],
+        ]);
+    }
+
+    private function facebookInfo(Notice $notice): array
+    {
+        return [
+            'configured' => FacebookNoticePoster::configured(),
+            'default_caption' => $this->facebook->defaultCaption($notice),
+            'notice_url' => $this->facebook->noticeUrl($notice),
+            'post_id' => $notice->facebook_post_id,
+            'post_url' => FacebookNoticePoster::postUrl($notice->facebook_post_id),
+            'posted_at' => $notice->facebook_posted_at?->toIso8601String(),
+            'error' => $notice->facebook_error,
+            'has_image' => $this->facebook->hasStoredImage($notice),
+        ];
     }
 
     private function validated(Request $request, ?Notice $notice = null): array

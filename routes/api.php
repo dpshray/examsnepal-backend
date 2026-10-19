@@ -384,6 +384,7 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     Route::get('admin/notices/stats', [AdminNoticeController::class, 'stats']);
     Route::get('admin/notices/meta', [AdminNoticeController::class, 'meta']);
     Route::post('admin/notices/{notice}/approve', [AdminNoticeController::class, 'approve']);
+    Route::post('admin/notices/{notice}/facebook', [AdminNoticeController::class, 'postToFacebook']);
     Route::post('admin/notices/{notice}/reject', [AdminNoticeController::class, 'reject']);
     Route::post('admin/notices/{notice}/feature', [AdminNoticeController::class, 'toggleFeature']);
     Route::post('admin/notices/{notice}/re-enrich', [AdminNoticeController::class, 'reEnrich']);
@@ -470,9 +471,12 @@ Route::controller(FrontendController::class)->group(function () {
     Route::get('free/search-questions', 'searchQuestions');
     Route::get('free/mcq/{slug}', 'showQuestionBySlug');
     Route::get('free/mcq/{slug}/comments', 'questionComments');
+    Route::post('free/mcq/{slug}/view', 'recordQuestionView')->middleware('throttle:60,1');
     Route::post('free/mcq/{slug}/comments', 'storeQuestionComment')->middleware('throttle:20,1');
     Route::get('free/exam-categories', 'examCategories');
     Route::get('free/exam-categories/{categorySlug}/questions', 'questionsByCategory');
+    Route::get('free/mcq-topics', 'mcqTopics');
+    Route::get('free/mcq-topics/{categorySlug}/{subjectSlug}', 'mcqTopic');
     Route::get('sitemap/mcq-meta', 'sitemapMcqMeta');
     Route::get('sitemap/mcqs', 'sitemapMcqs');
 });
@@ -481,8 +485,10 @@ Route::controller(FrontendController::class)->group(function () {
 // MCQ-browsing "free/exam-categories" above, which is ExamType-based.
 Route::controller(ExamGuideController::class)->group(function () {
     Route::get('free/exam-guides/categories', 'categories');
+    Route::get('free/exam-guides/menu', 'menu');
     Route::get('free/exam-guides/categories/{categorySlug}', 'category');
     Route::get('free/exam-guides/{categorySlug}/{examSlug}', 'guide');
+    Route::get('free/stats', 'stats');
 });
 
 // Official notices (Loksewa / entrance / license) - public, used by the

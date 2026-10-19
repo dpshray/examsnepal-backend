@@ -51,6 +51,7 @@ class Notice extends Model
             'exam_date_ad' => 'date',
             'enriched_at' => 'datetime',
             'published_at' => 'datetime',
+            'facebook_posted_at' => 'datetime',
         ];
     }
 

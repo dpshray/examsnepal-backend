@@ -9,6 +9,16 @@ return [
     'social_enabled' => env('NOTICES_SOCIAL_ENABLED', false),
 
     'alert_email' => env('NOTICES_ALERT_EMAIL'),
+
+    // Image posts to the Facebook Page when an admin publishes a notice
+    // (App\Services\Notices\FacebookNoticePoster). Defaults to the Page
+    // already configured for marketing insights; the token additionally needs
+    // the pages_manage_posts permission to publish.
+    'facebook' => [
+        'graph_version' => env('FACEBOOK_GRAPH_VERSION', 'v23.0'),
+        'page_id' => env('NOTICES_FACEBOOK_PAGE_ID', env('FACEBOOK_PAGE_ID')),
+        'page_token' => env('NOTICES_FACEBOOK_PAGE_TOKEN', env('FACEBOOK_PAGE_TOKEN')),
+    ],
     // Notice jobs always go to their own queue on the database connection, so
     // the cron-driven worker (routes/console.php) only ever runs these jobs,
     // whatever QUEUE_CONNECTION the rest of the app uses.
@@ -82,6 +92,9 @@ return [
         // Below this the fallback model gets a second pass.
         'fallback_below_confidence' => 0.6,
         'autopublish_min_confidence' => 0.8,
+        // Re-enriching an already-published notice (backfill, "Re-run AI")
+        // only updates the public page at or above this confidence.
+        'published_min_confidence' => (float) env('NOTICES_AI_PUBLISHED_MIN_CONFIDENCE', 0.7),
         // Characters of extracted text sent to the model.
         'max_text_chars' => 24000,
         // PDFs larger than this are not sent as document blocks.

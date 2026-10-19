@@ -9,7 +9,9 @@ use App\Models\ExamType;
 use App\Models\Question;
 use App\Models\StudentProfile;
 use App\Traits\PaginatorTrait;
+use App\Services\Seo\McqTopics;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class FrontendController extends Controller
 {
@@ -150,6 +152,18 @@ class FrontendController extends Controller
                 'image_url' => $question->image_url,
                 'explanation_image_url' => $question->explanation_image_url,
                 'view_count' => $question->view_count,
+                // Set by `php artisan mcq:score-seo`: thin/broken pages are
+                // noindexed, exact duplicates canonicalize to one copy.
+                // Topic page (category + subject) this question belongs to, for breadcrumbs.
+                'topic' => ($topic = app(McqTopics::class)->forQuestion($question))
+                    ? Arr::only($topic, ['category_slug', 'category_name', 'subject_slug', 'subject_name'])
+                    : null,
+                'seo' => [
+                    'indexable' => $question->seo_noindex_reason === null,
+                    'canonical_slug' => $question->canonical_question_id
+                        ? Question::whereKey($question->canonical_question_id)->value('slug')
+                        : null,
+                ],
                 'options' => $question->options->map(fn ($option) => [
                     'id' => $option->id,
                     'option' => $option->option,
@@ -164,6 +178,64 @@ class FrontendController extends Controller
                 ]),
             ],
         ], 200);
+    }
+
+    /**
+     * Every MCQ topic page (category + subject) - for the sitemap, category
+     * pages and exam guides to link to.
+     */
+    public function mcqTopics(McqTopics $topics)
+    {
+        return response()->json([
+            'success' => true,
+            'data' => array_map(fn ($t) => Arr::except($t, ['exam_type_id', 'subject_id']), $topics->all()),
+        ], 200);
+    }
+
+    /** GET free/mcq-topics/{categorySlug}/{subjectSlug}?page= - one topic page. */
+    public function mcqTopic(Request $request, McqTopics $topics, string $categorySlug, string $subjectSlug)
+    {
+        $topic = $topics->find($categorySlug, $subjectSlug);
+        if (! $topic) {
+            return response()->json(['success' => false, 'message' => 'Topic not found.'], 404);
+        }
+
+        $page = max(1, (int) $request->query('page', 1));
+        $questions = $topics->questions($topic, $page);
+        if ($page > $questions->lastPage()) {
+            return response()->json(['success' => false, 'message' => 'Page not found.'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'topic' => Arr::except($topic, ['exam_type_id', 'subject_id']),
+                'questions' => $questions->getCollection()->map(fn (Question $q) => [
+                    'id' => $q->id,
+                    'slug' => $q->slug,
+                    'question' => $q->question,
+                    'explanation' => $q->explanation,
+                    'image_url' => $q->image_url,
+                    'options' => $q->options->map(fn ($o) => ['option' => $o->option, 'is_correct' => (bool) $o->value]),
+                ]),
+                'current_page' => $questions->currentPage(),
+                'last_page' => $questions->lastPage(),
+                'related' => array_map(fn ($t) => Arr::only($t, ['subject_slug', 'subject_name', 'question_count']), $topics->related($topic)),
+                'guides' => $topics->guides($topic),
+            ],
+        ], 200);
+    }
+
+    /**
+     * Count a website page view. The /mcq/{slug} pages are now cached (ISR), so
+     * showQuestionBySlug() only runs when a page regenerates - the site calls
+     * this from the visitor's browser instead.
+     */
+    public function recordQuestionView(string $slug)
+    {
+        $updated = Question::where('slug', $slug)->increment('view_count');
+
+        return response()->json(['success' => (bool) $updated], $updated ? 200 : 404);
     }
 
     /**
@@ -232,7 +304,7 @@ class FrontendController extends Controller
      */
     public function sitemapMcqMeta()
     {
-        $total = Question::whereNotNull('slug')->count();
+        $total = Question::query()->inSitemap()->count();
 
         return response()->json([
             'success' => true,
@@ -251,7 +323,7 @@ class FrontendController extends Controller
     {
         $page = max(0, (int) $request->query('page', 0));
 
-        $questions = Question::whereNotNull('slug')
+        $questions = Question::query()->inSitemap()
             ->orderBy('id')
             ->skip($page * self::SITEMAP_CHUNK_SIZE)
             ->take(self::SITEMAP_CHUNK_SIZE)

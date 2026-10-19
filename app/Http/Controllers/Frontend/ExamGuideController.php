@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\ExamCategory;
 use App\Models\ExamGuide;
+use App\Services\PublicStats;
 
 class ExamGuideController extends Controller
 {
@@ -30,6 +31,40 @@ class ExamGuideController extends Controller
                 'slug' => $category->slug,
                 'description' => $category->description,
                 'guide_count' => $category->guide_count,
+            ]),
+        ], 200);
+    }
+
+    /**
+     * Every category with its published guides in one response, for the site
+     * nav mega menu - replaces 1 + N per-category requests on every page.
+     * Same per-category shape as category() below.
+     */
+    public function menu()
+    {
+        $categories = ExamCategory::query()
+            ->with(['guides' => fn ($query) => $query->where('status', 'published')->orderBy('name')])
+            ->orderBy('display_order')
+            ->orderBy('name')
+            ->get()
+            ->filter(fn ($category) => $category->guides->isNotEmpty())
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Exam guide menu retrieved successfully!',
+            'data' => $categories->map(fn ($category) => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                'description' => $category->description,
+                'guides' => $category->guides->map(fn ($guide) => [
+                    'id' => $guide->id,
+                    'name' => $guide->name,
+                    'slug' => $guide->slug,
+                    'type' => $guide->type,
+                    'meta_description' => $guide->meta_description,
+                ]),
             ]),
         ], 200);
     }
@@ -73,7 +108,7 @@ class ExamGuideController extends Controller
     /**
      * Individual exam page (/exams/{categorySlug}/{examSlug}/).
      */
-    public function guide(string $categorySlug, string $examSlug)
+    public function guide(string $categorySlug, string $examSlug, PublicStats $stats)
     {
         $category = ExamCategory::where('slug', $categorySlug)->first();
 
@@ -123,7 +158,22 @@ class ExamGuideController extends Controller
                     'name' => $related->name,
                     'slug' => $related->slug,
                 ]),
+                // Real performance of ExamsNepal students on this exam's
+                // question bank; null when there's too little data.
+                'stats' => $stats->forGuide($guide),
             ],
+        ], 200);
+    }
+
+    /**
+     * Sitewide platform numbers for the homepage (aggregate counts only).
+     */
+    public function stats(PublicStats $stats)
+    {
+        return response()->json([
+            'success' => true,
+            'message' => 'Platform stats retrieved successfully!',
+            'data' => $stats->site(),
         ], 200);
     }
 }
