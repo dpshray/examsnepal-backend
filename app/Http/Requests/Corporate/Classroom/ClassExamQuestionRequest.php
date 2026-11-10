@@ -23,7 +23,7 @@ class ClassExamQuestionRequest extends FormRequest
             'options' => 'required_if:question_type,mcq|array|min:2|max:5',
             'options.*.option' => 'required_with:options|string',
             'options.*.value' => 'required_with:options|boolean',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048',
         ];
     }
 

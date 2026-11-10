@@ -33,8 +33,8 @@ Route::get('institutes', [InstitutePublicProfileController::class, 'index']);
 Route::prefix('institute/{institute}')->group(function () {
     Route::get('/', [InstitutePublicProfileController::class, 'show']);
     Route::get('reviews', [InstituteReviewController::class, 'index']);
-    Route::post('students/register', [InstituteStudentAuthController::class, 'register']);
-    Route::post('students/login', [InstituteStudentAuthController::class, 'login']);
+    Route::post('students/register', [InstituteStudentAuthController::class, 'register'])->middleware('throttle:auth');
+    Route::post('students/login', [InstituteStudentAuthController::class, 'login'])->middleware('throttle:auth');
 });
 
 Route::prefix('institute/students')->middleware('auth:institute_student')->group(function () {

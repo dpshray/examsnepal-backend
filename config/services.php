@@ -35,6 +35,13 @@ return [
         ],
     ],
 
+    // Vercel frontend on-demand revalidation (App\Services\FrontendCache).
+    // The secret must equal REVALIDATE_SECRET in the frontend's Vercel env.
+    'frontend' => [
+        'revalidate_url' => env('FRONTEND_REVALIDATE_URL'),
+        'revalidate_secret' => env('FRONTEND_REVALIDATE_SECRET'),
+    ],
+
     'connectips' => [
         'merchant_id' => env('CONNECTIPS_MERCHANTID'),
         'app_id' => env('CONNECTIPS_APPID'),

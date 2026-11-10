@@ -33,6 +33,7 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
         'exam_type_id',
         'date',
         'email_verified_at',
+        'verification_revoked_at',
         'fcm_token',
         'requested_from',
         'token_version',
@@ -213,6 +214,17 @@ class StudentProfile extends Authenticatable implements JWTSubject, MustVerifyEm
             Log::error($e->getMessage());
             throw new \Exception('Something went wrong while sending mail');
         }
+    }
+
+    public function sendManualVerificationEmail(): void
+    {
+        Mail::send('mail.student.manual_verification', [
+            'name' => $this->name,
+            'login_url' => config('marketing.site_url') . '/login',
+        ], function ($message) {
+            $message->to($this->email);
+            $message->subject('Your ExamsNepal email has been verified');
+        });
     }
 
     function notificationReads()

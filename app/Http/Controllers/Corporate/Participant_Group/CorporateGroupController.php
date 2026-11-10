@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Response;
 class CorporateGroupController extends Controller
 {
     //
-    use PaginatorTrait;
+    use PaginatorTrait, \App\Traits\EnsuresCorporateOwnership;
     function index(Request $request)
     {
         $per_page = $request->query('per_page', 12);
@@ -29,6 +29,7 @@ class CorporateGroupController extends Controller
     }
     function show(ParticipantGroup $group)
     {
+        $this->ensureOwnsParticipantGroup($group);
         $data = new CorporateGroupResource($group);
         return Response::apiSuccess("corporate group details", $data);
     }
@@ -42,12 +43,14 @@ class CorporateGroupController extends Controller
     }
     function update(CorporateGroupRequest $request, ParticipantGroup $group)
     {
+        $this->ensureOwnsParticipantGroup($group);
         $data = $request->validated();
         $group->update($data);
         return Response::apiSuccess("corporate group updated successfully");
     }
     function destroy(ParticipantGroup $group)
     {
+        $this->ensureOwnsParticipantGroup($group);
         $group->delete();
         return Response::apiSuccess("corporate group deleted successfully");
     }

@@ -30,6 +30,29 @@ use hisorange\BrowserDetect\Facade as Browser;
 class StudentProfileController extends Controller
 {
     use PaginatorTrait;
+
+    private static function parseSignupDate(?string $value): ?Carbon
+    {
+        if (! $value) {
+            return null;
+        }
+        try {
+            return Carbon::createFromFormat('m/d/Y h:i:s a', $value);
+        } catch (\Throwable) {
+            try {
+                return Carbon::parse($value);
+            } catch (\Throwable) {
+                return null;
+            }
+        }
+    }
+
+    /** Reset codes stop working after StudentProfile::PASSWORD_RESET_TOKEN_VALID_UNTIL minutes. */
+    private static function liveResetTokens()
+    {
+        return DB::table('password_reset_tokens')
+            ->where('created_at', '>=', now()->subMinutes(StudentProfile::PASSWORD_RESET_TOKEN_VALID_UNTIL));
+    }
     /**
      * @OA\Post(
      *     path="/student/register",
@@ -81,9 +104,12 @@ class StudentProfileController extends Controller
         $email_link_expires_at = StudentProfile::EMAIL_LINK_EXPIRES_AT;
         $student = StudentProfile::where('email', $request->email)->first();
         if ($student) {
-            if ($student->email_verified_at == null) {
-                $time = Carbon::createFromFormat('m/d/Y h:i:s a', $student->date);
-                $minutesDiff = $time->diffInMinutes(now(), false);
+            // Only abandoned signups are replaced; an admin-revoked account must survive.
+            if ($student->email_verified_at == null && $student->verification_revoked_at == null) {
+                // `date` holds both 'm/d/Y h:i:s a' (legacy) and plain datetimes; an
+                // unreadable one is an old abandoned signup, so it counts as expired.
+                $time = self::parseSignupDate($student->date);
+                $minutesDiff = $time ? $time->diffInMinutes(now(), false) : PHP_INT_MAX;
                 if ($minutesDiff > $email_link_expires_at) {
                     $student->delete();
                 } else {
@@ -539,7 +565,10 @@ class StudentProfileController extends Controller
             $an_error = $validator->errors()->all();
             return Response::apiError($an_error[0], null, 422);
         }
-        $row = DB::table('password_reset_tokens')->where('token', $request->token)->first();
+        $row = self::liveResetTokens()->where('token', $request->token)->first();
+        if (! $row) {
+            return Response::apiError('This code has expired. Please request a new one.', null, 422);
+        }
         $token = $row->token;
         $email = $row->email;
         $data = compact('token', 'email');
@@ -605,6 +634,10 @@ class StudentProfileController extends Controller
         ]);
         if (empty($row->first())) {
             return Response::apiError('Requested token does not match with the email that you want the password to reset', null, 400);
+        }
+        // A little longer than the code itself, so a student who verified in time can finish the form.
+        if (Carbon::parse($row->first()->created_at)->lt(now()->subMinutes(StudentProfile::PASSWORD_RESET_TOKEN_VALID_UNTIL + 15))) {
+            return Response::apiError('This code has expired. Please request a new one.', null, 422);
         }
         DB::transaction(function () use ($row, $request) {
             $row->delete();

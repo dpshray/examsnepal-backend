@@ -2,10 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:users'])->get('/download-logs', function () {
-    if (auth()->user()->role->name == 'teacher') {
-        return 'Not Authorized';
-    }
+// Admin only: logs hold error traces and payment data, and institute accounts are self-registered.
+Route::middleware(['auth:users', 'role:admin'])->get('/download-logs', function () {
     $logPath = storage_path('logs');
     $zipFile = storage_path('app/logs.zip');
     // Delete existing zip if exists

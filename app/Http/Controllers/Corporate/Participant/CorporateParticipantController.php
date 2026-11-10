@@ -20,7 +20,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class CorporateParticipantController extends Controller
 {
     //
-    use PaginatorTrait;
+    use PaginatorTrait, \App\Traits\EnsuresCorporateOwnership;
     /**
      * Store participants from an Excel file.
      *
@@ -146,6 +146,7 @@ class CorporateParticipantController extends Controller
      */
     public function store(ParticipantRequest $request, CorporateExam $exam)
     {
+        $this->ensureOwnsCorporateExam($exam);
         $data = $request->validated();
         $user = Auth::user();
 

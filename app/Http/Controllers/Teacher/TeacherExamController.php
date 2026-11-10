@@ -231,6 +231,7 @@ class TeacherExamController extends Controller
      */
     public function show(Exam $exam)
     {
+        $this->isOwner($exam);
         $exam->loadMissing(['examType:id,name', 'examTags:id,name,slug']);
         $data = new TeacherExamDetailResource($exam);
         return Response::apiSuccess('exam detail fetched successfully', $data);

@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Response;
 class ParticipantExamSubmitController extends Controller
 {
     //
-    use PaginatorTrait;
+    use PaginatorTrait, \App\Traits\EnsuresCorporateOwnership;
     /**
      * @OA\Get(
      *     path="/corporate/exams/{exam}/submitted-exams",
@@ -246,6 +246,7 @@ class ParticipantExamSubmitController extends Controller
 
     function show(ExamAttempt $attempts)
     {
+        $this->ensureOwnsCorporateExam($attempts->exam);
         $attempts = $attempts->loadMissing(['exam', 'section', 'participant', 'studentAnswers']);
         $data = new ParticipantExamDetailResource($attempts);
         return Response::apiSuccess('Submissions detail', $data);

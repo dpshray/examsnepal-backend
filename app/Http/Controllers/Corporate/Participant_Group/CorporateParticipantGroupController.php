@@ -19,9 +19,10 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class CorporateParticipantGroupController extends Controller
 {
     //
-    use PaginatorTrait;
+    use PaginatorTrait, \App\Traits\EnsuresCorporateOwnership;
     function index(ParticipantGroup $group, Request $request)
     {
+        $this->ensureOwnsParticipantGroup($group);
         $per_page = $request->query('per_page', 12);
         $search = $request->query('search');
         $user = Auth::user();
@@ -145,6 +146,7 @@ class CorporateParticipantGroupController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
         $rows = $sheet->toArray();
         $group = ParticipantGroup::where('slug', $group)->firstOrFail();
+        $this->ensureOwnsParticipantGroup($group);
 
         $addedCount = 0;
         $errors = [];

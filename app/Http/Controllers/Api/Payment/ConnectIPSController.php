@@ -136,8 +136,6 @@ class ConnectIPSController extends Controller
      *  )
      */
     public function successPayment(Request $request, $transaction_id){
-        Log::info('inside successPayment');
-        Log::channel('payment')->debug('HERE', ["inside successfull payment"]);
         try {
             $data = app(ConnectIPSService::class)->transactionSuccessfull([
                 'transaction_id' => $transaction_id

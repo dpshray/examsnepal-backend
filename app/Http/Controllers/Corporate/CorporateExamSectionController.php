@@ -299,6 +299,7 @@ class CorporateExamSectionController extends Controller
     }
     public function participantList(Request $request, CorporateExam $exam)
     {
+        $this->itemBelongsToUser($exam);
         $perPage = $request->query('per_page', 10);
         $search  = $request->query('search');
 

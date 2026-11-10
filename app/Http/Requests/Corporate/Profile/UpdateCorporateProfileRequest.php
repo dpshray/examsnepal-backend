@@ -21,8 +21,8 @@ class UpdateCorporateProfileRequest extends FormRequest
             'facebook' => 'sometimes|nullable|string|max:255',
             'twitter' => 'sometimes|nullable|string|max:255',
             'linkedin' => 'sometimes|nullable|string|max:255',
-            'logo' => 'sometimes|nullable|image|max:2048',
-            'banner' => 'sometimes|nullable|image|max:4096',
+            'logo' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048',
+            'banner' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,webp,gif|max:4096',
         ];
     }
 }

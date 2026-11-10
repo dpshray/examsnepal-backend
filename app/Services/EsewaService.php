@@ -22,7 +22,7 @@ class EsewaService
     }
     public function initiateTransaction(array $data)
     {
-        $transactionID = 'TXN' . rand(10000, 99999);
+        $transactionID = \App\Models\Subscriber::newTransactionId();
         $transactionDateCarbon = now();
         // $transactionDate = $transactionDateCarbon->format('d-m-Y');
         // $REF_ID = uniqid('REF-');

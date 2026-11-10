@@ -9,7 +9,7 @@ use App\Http\Controllers\Teacher\TeacherQuestionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('teacher')->group(function(){
-    Route::post('login', [AuthController::class, 'teacherLogin']);
+    Route::post('login', [AuthController::class, 'teacherLogin'])->middleware('throttle:auth');
     Route::middleware(['auth:users', 'active'])
         ->controller(TeacherExamController::class)
         ->group(function(){

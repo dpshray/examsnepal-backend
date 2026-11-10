@@ -12,6 +12,9 @@ Artisan::command('inspire', function () {
 // every 4h so a visitor request never pays for the ~10s recompute.
 Schedule::command('stats:refresh-public')->everyFourHours()->withoutOverlapping();
 
+// Push content edits to the Vercel frontend, whose public pages are cached for days (App\Services\FrontendCache).
+Schedule::command('frontend:flush-cache')->everyMinute()->withoutOverlapping();
+
 // Re-score MCQ pages for indexing nightly so new/edited questions (and new
 // duplicates) are picked up (App\Services\Seo\McqIndexability).
 Schedule::command('mcq:score-seo')->dailyAt('03:15')->timezone('Asia/Kathmandu')->withoutOverlapping();

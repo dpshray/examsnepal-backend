@@ -135,7 +135,7 @@ class AdminController extends Controller
                     'paid_in_paisa' => $paid * 100 ?? 0.00,
                     'start_date' => $startDate,
                     'end_date' => $newEndDate,
-                    'transaction_id' => 'TXN' . rand(10000, 99999),
+                    'transaction_id' => Subscriber::newTransactionId(),
                     'payment_status' => 'PAYMENT_SUCCESS', // manual add by admin
                     'status' => 1,
                     'remark' => $request->remark,
@@ -154,7 +154,7 @@ class AdminController extends Controller
                 'paid_in_paisa' => $paid * 100 ?? 0.00,
                 'start_date' => $startDate,
                 'end_date' => $extendedEndDate,
-                'transaction_id' => 'TXN' . rand(10000, 99999),
+                'transaction_id' => Subscriber::newTransactionId(),
                 'payment_status' => 'PAYMENT_SUCCESS', // manual add by admin
                 'status' => 1,
                 'remark' => $request->remark,
@@ -197,7 +197,8 @@ class AdminController extends Controller
         $examCategory = $request->query('exam_category');
         $limit        = $request->input('limit', 10);
 
-        $query = StudentExam::with(['student', 'exam.examType', 'answers']);
+        // Class exams taken by institute students have no student profile; this list only covers platform students.
+        $query = StudentExam::has('student')->with(['student', 'exam.examType', 'answers']);
 
         if ($email) {
             $query->whereHas('student', function ($q) use ($email) {
@@ -404,7 +405,7 @@ class AdminController extends Controller
             "option_b" => 'required|max:255',
             "option_c" => 'required|max:255',
             "option_d" => 'required|max:255',
-            "image" => 'sometimes|nullable|image',
+            "image" => 'sometimes|nullable|image|mimes:jpg,jpeg,png,webp,gif',
             "option_a_is_true" => 'required|boolean',
             "option_b_is_true" => 'required|boolean',
             "option_c_is_true" => 'required|boolean',

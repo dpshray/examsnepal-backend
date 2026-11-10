@@ -129,8 +129,20 @@ class ClassEsewaController extends Controller
         ]);
     }
 
+    /**
+     * Public callbacks: only a payment still in progress can change state, except
+     * that a success verified with eSewa may replace an earlier failure.
+     */
     private function markPayment(ClassPayment $payment, string $paymentStatus, array $extra = []): void
     {
+        $changeable = [PaymentStatusEnum::PAYMENT_INIT->value];
+        if ($paymentStatus === PaymentStatusEnum::PAYMENT_SUCCESS->value) {
+            $changeable[] = PaymentStatusEnum::PAYMENT_FAILED->value;
+        }
+        if (! in_array($payment->payment_status, $changeable, true)) {
+            return;
+        }
+
         $payment->update([
             'payment_status' => $paymentStatus,
             'data' => $extra,

@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use App\Models\{Exam, Subject, Role};
 use App\Observers\ExamObserver;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,6 +38,19 @@ class AppServiceProvider extends ServiceProvider
             });
         }
         Exam::observe(ExamObserver::class);
+
+        foreach ([
+            \App\Models\Question::class, \App\Models\OptionQuestion::class, \App\Models\Notice::class,
+            \App\Models\ExamGuide::class, \App\Models\ExamType::class, Subject::class, \App\Models\Blog\Blog::class,
+        ] as $model) {
+            $model::observe(\App\Observers\FrontendCacheObserver::class);
+        }
+
+        // Login / signup: per IP, route and account. OTP: per IP and route, since the code is the only input.
+        RateLimiter::for('auth', fn (Request $request) => Limit::perMinute(10)->by(implode('|', [
+            $request->ip(), $request->path(), strtolower((string) ($request->input('email') ?? $request->input('username') ?? '')),
+        ])));
+        RateLimiter::for('otp', fn (Request $request) => Limit::perMinute(10)->by($request->ip() . '|' . $request->path()));
     }
 
     public function register()

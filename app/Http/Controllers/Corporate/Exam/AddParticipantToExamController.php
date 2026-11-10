@@ -13,13 +13,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Exists;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AddParticipantToExamController extends Controller
 {
     //
-    use PaginatorTrait;
+    use PaginatorTrait, \App\Traits\EnsuresCorporateOwnership;
     /**
      * Get participants assigned to a corporate exam.
      *
@@ -70,6 +71,7 @@ class AddParticipantToExamController extends Controller
      */
     function index(Request $request, CorporateExam $exam)
     {
+        $this->ensureOwnsCorporateExam($exam);
         $perPage = $request->get('per_page', 10);
         $participants = $exam->participants()->paginate($perPage);
         $data = $this->setupPagination($participants, ExamParticipantCollection::class)->data;
@@ -121,9 +123,11 @@ class AddParticipantToExamController extends Controller
      */
     function store(Request $request, CorporateExam $exam)
     {
+        $this->ensureOwnsCorporateExam($exam);
         $data = $request->validate([
             'ids' => 'required|array',
-            'ids.*' => 'integer|exists:participants,id',
+            // Only this institute's own participants.
+            'ids.*' => ['integer', Rule::exists('participants', 'id')->where('corporate_id', Auth::guard('users')->id())],
         ]);
         DB::transaction(function () use ($data, $exam) {
             foreach ($data['ids'] as $id) {
@@ -187,7 +191,9 @@ class AddParticipantToExamController extends Controller
             'ids.*' => 'exists:participant_exams,id',
         ]);
 
-        ParticipantExam::whereIn('id', $request->ids)->delete();
+        // Only remove enrolments in exams that belong to this institute.
+        $ownExamIds = CorporateExam::where('corporate_id', Auth::guard('users')->id())->select('id');
+        ParticipantExam::whereIn('id', $request->ids)->whereIn('corporate_exam_id', $ownExamIds)->delete();
 
         return Response::apiSuccess('Participants has been deleted from exam');
     }
@@ -251,6 +257,7 @@ class AddParticipantToExamController extends Controller
 
     public function bulk_upload_in_exam(Request $request, CorporateExam $exam)
     {
+        $this->ensureOwnsCorporateExam($exam);
         $user = Auth::user();
 
         $request->validate([

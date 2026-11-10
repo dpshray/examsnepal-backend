@@ -207,7 +207,7 @@ class CorporateExamController extends Controller
      */
     public function show(CorporateExam $exam)
     {
-        // $this->itemBelongsToUser($corporateExam);
+        $this->itemBelongsToUser($exam);
         $exam->loadCount([
             'sections',
             'participants',
@@ -322,6 +322,7 @@ class CorporateExamController extends Controller
     }
     function published_exam(CorporateExam $exam)
     {
+        $this->itemBelongsToUser($exam);
         // Check if exam has exactly 1 section
         $total_section = $exam->sections()->count();
 

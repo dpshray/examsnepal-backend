@@ -22,7 +22,7 @@ class ClassEsewaService
 
     public function initiateTransaction(Classroom $class, InstituteStudent $student): array
     {
-        $transactionUuid = 'CLS' . now()->format('YmdHis') . rand(1000, 9999);
+        $transactionUuid = 'CLS' . now()->format('YmdHis') . strtoupper(\Illuminate\Support\Str::random(10));
         $amount = (float) $class->price;
 
         $payload = [

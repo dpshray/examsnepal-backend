@@ -17,6 +17,10 @@ class ScoreMcqSeo extends Command
 
     public function handle(McqIndexability $rules): int
     {
+        // Holds a row per question (~150MB at 194k questions) to find
+        // duplicates; PHP's default CLI limit of 128M isn't enough.
+        ini_set('memory_limit', '1G');
+
         $dryRun = (bool) $this->option('dry-run');
 
         $withImage = DB::table('media')

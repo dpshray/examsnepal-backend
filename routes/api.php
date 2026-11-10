@@ -2,6 +2,7 @@
 
 use App\Enums\ExamTypeEnum;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminPayoutController;
 use App\Http\Controllers\Admin\Blog\AdminBlogCategoryController;
 use App\Http\Controllers\Admin\Blog\AdminBlogController;
@@ -27,7 +28,6 @@ use App\Http\Controllers\BankQuestionController;
 use App\Http\Controllers\DoubtController;
 use App\Http\Controllers\AnswerSheetController;
 use App\Http\Controllers\BlockedUserController;
-use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Contact\ContactController;
 use App\Http\Controllers\Corporate\CorporateExamController;
 use App\Http\Controllers\ExamCategoryController;
@@ -37,8 +37,6 @@ use App\Http\Controllers\Admin\Notice\AdminNoticeController;
 use App\Http\Controllers\Admin\Notice\AdminNoticeReportController;
 use App\Http\Controllers\Admin\Notice\AdminNoticeSourceController;
 use App\Http\Controllers\Frontend\FrontendController;
-use App\Http\Controllers\TableMigrateController;
-use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\Participant\ParticipantController;
@@ -73,90 +71,25 @@ require __DIR__ . '/teacher.php';
 require __DIR__ . '/testing.php';
 
 
-Route::get('/dl', function () {
-    $logPath = storage_path('logs');
-    $zipFile = storage_path('app/logs.zip');
-    // Delete existing zip if exists
-    if (file_exists($zipFile)) {
-        unlink($zipFile);
-    }
-    $zip = new ZipArchive();
-    if ($zip->open($zipFile, ZipArchive::CREATE) === TRUE) {
-        $files = glob($logPath . '/*.log');
+// The one-off legacy data migration endpoints (migrate*, password-encryptor) and
+// the unused POST /register were public and are removed; run migrations from the CLI.
 
-        foreach ($files as $file) {
-            $zip->addFile($file, basename($file));
-        }
-        $zip->close();
-    } else {
-        return response()->json(['error' => 'Cannot create zip file.'], 500);
-    }
-    return response()->download($zipFile)->deleteFileAfterSend(true);
-});
-
-/* Route::get('exam-options/{exam}', function(\App\Models\Exam $exam){
-    $options = $exam->questions()->with('options')->paginate();
-    return response()->json($options);
-});
-
-Route::get('answers/{exam}', function($exam_id){
-    $student_id = 12213;
-    $student_exam = \App\Models\User::find($student_id)->student_exams()->firstWhere('exam_id', $exam_id);
-    $user_choosed = $student_exam->answers->pluck('selected_option_id', 'question_id');
-    return response()->json($user_choosed);
-});
-
-Route::get('delete-my-exam', function(){
-    $student_id = 12213;
-    DB::table('student_exams')->where('student_id', $student_id)->delete();
-    echo "DELETED~$student_id";
-});
-
-Route::get('all-exams-list', function(Request $request){
-    $per_page = $request->query('per_page', 10);
-    $search = $request->query('search');
-    $rows = \App\models\Exam::select(
-            "id",
-            "is_active",
-            "user_id",
-            "exam_type_id",
-            "exam_name",
-            "status",
-        )
-        ->with(['examType:id,name,is_active'])
-        ->withCount(['questions'])
-        ->when($search, fn($qry) => $qry->where('exam_name','like', '%'.$search.'%'))
-        ->orderBy('id','DESC')
-        ->paginate($per_page);
-    return response()->json($rows);
-}); */
-
-// Registration route
-Route::post('/register', [AuthController::class, 'register']);
-Route::get('/migrate', [MigrationController::class, 'migrateNext']);
-
-// Route::get('migrate-question-option', [MigrationController::class, 'migrateNext']);
-Route::get('migrate-question-option', [TableMigrateController::class, 'migrateQuestionOption']);
-Route::get('migrate-pools', [TableMigrateController::class, 'migratePool']);
-Route::get('password-encryptor', [TableMigrateController::class, 'passwordHasher']);
-Route::get('migrate-answersheets', [TableMigrateController::class, 'migrateAnswersheets']);
 // Email verification route
 Route::get('/email/verify/{id}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
 
 // Student registration
-Route::post('/student/register/', [StudentProfileController::class, 'register']);
+Route::post('/student/register/', [StudentProfileController::class, 'register'])->middleware('throttle:auth');
 Route::get('student_email_confirmation/{email}', [StudentProfileController::class, 'verifyStudentEmail'])->name('student_email_confirmation');
 #Password Reset
-Route::post('student-password-reset', [StudentProfileController::class, 'sendPasswordResetMail']);
-Route::post('verify-password-reset-otp', [StudentProfileController::class, 'verifyPasswordReseToken']);
-Route::post('handle-password-reset-form', [StudentProfileController::class, 'passwordResetor']);
+Route::post('student-password-reset', [StudentProfileController::class, 'sendPasswordResetMail'])->middleware('throttle:auth');
+Route::post('verify-password-reset-otp', [StudentProfileController::class, 'verifyPasswordReseToken'])->middleware('throttle:otp');
+Route::post('handle-password-reset-form', [StudentProfileController::class, 'passwordResetor'])->middleware('throttle:otp');
 // Student login
-Route::post('/student/login', [AuthController::class, 'loginStudent'])->name('login');
-Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('loginAdmin');
+Route::post('/student/login', [AuthController::class, 'loginStudent'])->name('login')->middleware('throttle:auth');
+Route::post('/admin/login', [AuthController::class, 'AdminLogin'])->name('loginAdmin')->middleware('throttle:auth');
 Route::post('student-google-login', [StudentProfileController::class, 'googleLogin']);
-Route::post('/student/resend-email-verification', [AuthController::class, 'resendStudentEmailVerification']);
+Route::post('/student/resend-email-verification', [AuthController::class, 'resendStudentEmailVerification'])->middleware('throttle:auth');
 
-Route::apiResource('blog', BlogController::class)->scoped(['blog' => 'slug']);
 #routes accessed by both api and users guards
 Route::middleware(AuthEitherUser::class)->group(function () {
     Route::get('/subjects', [SubjectController::class, 'index']);
@@ -168,7 +101,6 @@ Route::middleware(['auth:api', 'verified', CheckTokenVersionMiddleware::class])-
     Route::get('/student/marketing/banner', [\App\Http\Controllers\Student\Marketing\StudentBannerController::class, 'show']);
     Route::get('/student/onboarding', [\App\Http\Controllers\Student\Marketing\StudentOnboardingController::class, 'show']);
     Route::post('/student/onboarding', [\App\Http\Controllers\Student\Marketing\StudentOnboardingController::class, 'store']);
-    Route::get('test', [BlogController::class, 'test']);
     Route::get('auth-student', [AuthController::class, 'studentAuthResponse']);
     Route::post('/student/logout', [AuthController::class, 'logoutStudent']);
     Route::post('/student/refresh', [AuthController::class, 'refreshStudent']);
@@ -194,31 +126,18 @@ Route::middleware(['auth:api', 'verified', CheckTokenVersionMiddleware::class])-
     Route::post('/student/answers', [ForumController::class, 'addAnswer']);
 
 
-    // for exam type
-    Route::post('/exam-types', [ExamTypeController::class, 'store']);
+    // Students only read these. The create/update/delete routes for exam types,
+    // organizations and exams were reachable by any logged-in student and are
+    // removed; admins manage them through the /admin routes.
     Route::get('/exam-types/{id}', [ExamTypeController::class, 'show']);
-    Route::put('/exam-types/{id}', [ExamTypeController::class, 'update']);
-    Route::delete('/exam-types/{id}', [ExamTypeController::class, 'destroy']);
 
-    // for Organization
-    Route::get('/organization', [OrganizationController::class, 'index']);
-    Route::post('/organization', [OrganizationController::class, 'store']);
-    Route::get('/organization/{id}', [OrganizationController::class, 'show']);
-    Route::put('/organization/{id}', [OrganizationController::class, 'update']);
-    Route::delete('/organization/{id}', [OrganizationController::class, 'destroy']);
-
-    // for Exam
-    // Route::get('/exam', [ExamController::class, 'index']);
     Route::get('exam-scorers/{exam}', [ExamController::class, 'examPlayersScoreList']);
-    Route::delete('/exam/{id}', [ExamController::class, 'destroy']);
-    Route::post('/exam', [ExamController::class, 'store']);
     Route::get('/exam/{id}', [ExamController::class, 'show']);
 
-    // for bookmarks
+    // for bookmarks (the per-student list exposed other students' bookmarks and is removed)
     Route::get('/bookmarks', [BookmarkController::class, 'index']);
     Route::post('/bookmarks', [BookmarkController::class, 'store']);
     Route::delete('/bookmarks/{question_id}', [BookmarkController::class, 'destroy']);
-    Route::get('/bookmarks/student/{student_id}', [BookmarkController::class, 'getBookmarksByStudent']);
     Route::get('/bookmarks/allmy', [BookmarkController::class, 'getAllMyBookmarks']);
 
     // for Questions
@@ -272,7 +191,8 @@ Route::middleware(['auth:api', 'verified', CheckTokenVersionMiddleware::class])-
     Route::get('student-exams-stats', [StudentProfileController::class, 'studentProfileExamStats']);
 
     Route::get('user-subscription-status', [SubscriptionTypeController::class, 'subscribeStat']);
-    Route::apiResource('subscription-type', SubscriptionTypeController::class)->names('student.subscription-type');
+    // Read-only for students: prices are managed through admin/subscription-type.
+    Route::apiResource('subscription-type', SubscriptionTypeController::class)->only(['index', 'show'])->names('student.subscription-type');
 
 
     Route::post('verify-promo-code', [PromoCodeController::class, 'checkPromoCodes']);
@@ -298,6 +218,11 @@ Route::apiResource('user/blogs', AdminBlogController::class)->scoped(['blog' => 
 // })->withoutMiddleware('auth:api');
 
 Route::middleware(['auth:users', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard/summary', [AdminDashboardController::class, 'summary']);
+    Route::get('/admin/doubts/stats', [AdminDashboardController::class, 'doubtStats']);
+    Route::get('/admin/students/stats', [AdminDashboardController::class, 'studentStats']);
+    Route::get('/admin/submissions/stats', [AdminDashboardController::class, 'submissionStats']);
+
     Route::get('/admin/forum-question-report', [AdminForumQuestionReportController::class, 'index']);
     Route::delete('/admin/forum-question-report/{id}', [AdminForumQuestionReportController::class, 'delete']);
 
@@ -366,6 +291,7 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
     // Route::post('/students/notification/{student_notification}', [NotificationController::class , 'deleteNotification']);
 
     Route::get('/admin/manual-student-email-verify/{student_profile_id}', [AuthController::class, 'manualStudentEmailVerifier']);
+    Route::post('/admin/manual-student-email-revoke/{student_profile_id}', [AuthController::class, 'manualStudentEmailRevoker']);
 
     //subscription type
     Route::apiResource('admin/subscription-type', SubscriptionTypeController::class)->except(['index'])->names('admin.subscription-type');
@@ -441,7 +367,8 @@ Route::middleware(['auth:users', 'role:admin'])->group(function () {
 });
 Route::get('admin/payment-settings', [AdminPaymentSettingController::class, 'index']);
 
-Route::controller(ParticipantController::class)->group(function () {
+// Were public; no app calls them, so they are admin-only.
+Route::middleware(['auth:users', 'role:admin'])->controller(ParticipantController::class)->group(function () {
     Route::post('/store-participant', 'store');
     Route::post('/excel-participant', 'store_from_excel');
     Route::post('/update-participant/{participant}', 'update');
@@ -458,7 +385,7 @@ Route::controller(StudentExamController::class)->group(function () {
     Route::get('/get-question/{attempt_id}', 'getquestion');
 });
 Route::controller(StudentExamRegisterController::class)->group(function () {
-    Route::post('/exam/{exam}/private-login', 'login');
+    Route::post('/exam/{exam}/private-login', 'login')->middleware('throttle:auth');
     Route::post('/exam/{exam}/register-public', 'registerStudent_public_exam');
     Route::post('/auth/logout', 'logout')->middleware('auth:sanctum');
 });

@@ -592,13 +592,40 @@ class AuthController extends Controller
      *     )
      * )
      */
+    function manualStudentEmailRevoker($student_profile_id)
+    {
+        $student_profile = StudentProfile::firstWhere('id', $student_profile_id);
+        if (empty($student_profile)) {
+            return Response::apiError('Student does not exists.');
+        }
+
+        if ($student_profile->email_verified_at) {
+            $student_profile->update(['email_verified_at' => null, 'verification_revoked_at' => now()]);
+        }
+
+        return Response::apiSuccess('Student email verification has been revoked.');
+    }
+
     function manualStudentEmailVerifier(Request $request, $student_profile_id)
     {
         $student_profile = StudentProfile::firstWhere('id', $student_profile_id);
         if (empty($student_profile)) {
             return Response::apiError('Student does not exists.');
         }
+        // The admin toggle calls this for verified students too; only a real change notifies them.
+        if ($student_profile->email_verified_at) {
+            return Response::apiSuccess('Student email has been verified.');
+        }
+
         $student_profile->update(['email_verified_at' => now()]);
+
+        try {
+            $student_profile->sendManualVerificationEmail();
+        } catch (\Throwable $e) {
+            Log::error($e);
+            return Response::apiSuccess('Student email has been verified, but the notification email could not be sent.');
+        }
+
         return Response::apiSuccess('Student email has been verified.');
     }
 

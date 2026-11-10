@@ -19,7 +19,7 @@ class ClassroomRequest extends FormRequest
             'bio' => 'nullable|string|max:2000',
             'price' => 'nullable|numeric|min:0',
             'duration_days' => 'nullable|integer|min:1',
-            'banner' => 'nullable|image|max:4096',
+            'banner' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:4096',
         ];
     }
 

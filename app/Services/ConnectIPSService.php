@@ -39,7 +39,7 @@ class ConnectIPSService
         // $pfxPath = storage_path('certs/CREDITOR.pfx');
 
         // $transactionID = 'TXN' . date('YmdHis') . rand(1000, 9999);
-        $transactionID = 'TXN' . rand(10000, 99999);
+        $transactionID = Subscriber::newTransactionId();
         $transactionDateCarbon = now(); 
         $transactionDate = $transactionDateCarbon->format('d-m-Y');
         $REF_ID = uniqid('REF-');
@@ -151,10 +151,22 @@ class ConnectIPSService
     public function transactionSuccessfull(array $data){
 
         $transaction_id = $data['transaction_id'];
-        $transaction = Subscriber::firstWhere('transaction_id', $transaction_id);
-        
+        // Only the student who started the payment may validate it.
+        $transaction = Subscriber::where('transaction_id', $transaction_id)
+            ->where('student_profile_id', Auth::id())
+            ->first();
+
         if (empty($transaction)) {
             throw new \Exception("invalid transaction ID");
+        }
+
+        // Already settled: never let a re-check downgrade a completed or failed payment.
+        if (! in_array($transaction->payment_status, [PaymentStatusEnum::PAYMENT_INIT->value, PaymentStatusEnum::PAYMENT_PENDING->value], true)) {
+            return (object) [
+                'status' => $transaction->payment_status === PaymentStatusEnum::PAYMENT_SUCCESS->value ? 'SUCCESS' : 'FAILED',
+                'statusDesc' => 'Transaction already processed',
+                'referenceId' => $transaction_id,
+            ];
         }
         $metadata = $transaction->data;
         

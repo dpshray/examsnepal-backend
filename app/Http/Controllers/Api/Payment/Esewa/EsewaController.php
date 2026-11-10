@@ -181,9 +181,22 @@ class EsewaController extends Controller
         ]);
     }
 
+    /**
+     * The callback URLs are public, so a settled subscription must never be
+     * failed (cancelled) from here: only a payment still in progress can change
+     * state. A success verified with eSewa may also replace an earlier failure.
+     */
     private function markSubscriber(int $id, string $paymentStatus, array $extra = [], bool $activate = false): void
     {
-        DB::table('subscribers')->where('id', $id)->update(array_filter([
+        $changeable = [PaymentStatusEnum::PAYMENT_INIT->value, PaymentStatusEnum::PAYMENT_PENDING->value];
+        if ($activate) {
+            $changeable[] = PaymentStatusEnum::PAYMENT_FAILED->value;
+            $changeable[] = PaymentStatusEnum::PAYMENT_ERROR->value;
+        }
+
+        DB::table('subscribers')->where('id', $id)
+            ->whereIn('payment_status', $changeable)
+            ->update(array_filter([
             'payment_status' => $paymentStatus,
             'status' => $activate ? 1 : 0,
             'data' => json_encode($extra),
