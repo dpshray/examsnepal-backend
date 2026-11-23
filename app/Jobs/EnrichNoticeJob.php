@@ -24,6 +24,11 @@ class EnrichNoticeJob implements ShouldQueue
 
     public int $timeout = 240;
 
+    // retryUntil() disables the attempt cap, so a job that keeps timing out
+    // would be re-picked forever (until jobs.attempts, a tinyint, overflows
+    // at 256 and blocks the whole queue). Fail it on the first timeout.
+    public bool $failOnTimeout = true;
+
     public function __construct(public int $noticeId, public bool $force = false)
     {
         $this->onConnection(config('notices.queue_connection'));
