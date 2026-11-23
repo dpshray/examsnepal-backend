@@ -51,9 +51,11 @@ class AdminNotificationController extends Controller
      * )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        $pagination = StudentNotification::with(['exam:id,exam_name,exam_type_id,status'])->orderBy('id','DESC')->paginate();
+        $search = $request->search;
+        $pagination = StudentNotification::with(['exam:id,exam_name,exam_type_id,status'])->when($search, fn($q) => $q->where('title', 'like', '%' . $search . '%')
+            ->orWhere('body', 'like', '%' . $search . '%'))->orderBy('id', 'DESC')->paginate();
         $data = $this->makePaginationResponse($pagination, fn($item) => AdminNotificationListResource::collection($item))->data;
         return Response::apiSuccess('list of notifications send by admin', $data);
     }
